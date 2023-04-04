@@ -24,9 +24,9 @@ import {RolesGuard} from '../roles/roles.guard';
 import {ValidationPipe} from '../validation/validation.pipe';
 import {ValidationSchema} from '../validation/validation.schema';
 import {MailServiceErrorException} from '../exceptions/mail-service-error.exception';
-import {LocalStrategy} from "./local.strategy";
+import {LocalAuthGuard} from "./local-auth-guard.service";
 
-@Controller('')
+@Controller('oauth')
 @UseInterceptors(ClassSerializerInterceptor)
 export class AuthController {
     constructor(
@@ -76,7 +76,7 @@ export class AuthController {
     }
 
     @Post('/signin')
-    @UseGuards(LocalStrategy)
+    @UseGuards(LocalAuthGuard)
     async signin(
         @Request() request,
         @Body(new ValidationPipe(ValidationSchema.SignInSchema)) body: any

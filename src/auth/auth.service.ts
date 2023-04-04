@@ -42,12 +42,9 @@ export class AuthService {
         if (!user.verified) {
             throw new EmailNotVerifiedException();
         }
-
-        const payload: object =
-            {
-                sub: user.username
-            };
-
+        const payload: object = {
+            sub: user.username
+        };
         return this.jwtService.sign(payload);
     }
 
@@ -55,11 +52,9 @@ export class AuthService {
      * Create a verification token for the user.
      */
     async createVerificationToken(user: User): Promise<string> {
-        const payload: object =
-            {
-                sub: user.username
-            };
-
+        const payload: object = {
+            sub: user.username
+        };
         return this.jwtService.sign(payload, {expiresIn: this.configService.get('TOKEN_VERIFICATION_EXPIRATION_TIME')});
     }
 

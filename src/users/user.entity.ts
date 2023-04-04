@@ -4,7 +4,7 @@ import {Role} from '../roles/role.entity';
 
 @Entity()
 export class User {
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn("uuid")
     @Exclude() // Exclude from responses.
     id: number;
 

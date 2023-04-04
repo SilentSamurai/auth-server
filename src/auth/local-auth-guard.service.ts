@@ -5,7 +5,7 @@ import {Request} from 'express';
 import {ValidationErrorException} from "../exceptions/validation-error.exception";
 
 @Injectable()
-export class LocalStrategy implements CanActivate {
+export class LocalAuthGuard implements CanActivate {
     constructor(private readonly authService: AuthService) {
         // Pass a configuration object to change the strategy.
         // Use email instead of username.
