@@ -1,6 +1,5 @@
 {
-    "records":
-    [
+    "records": [
         {
             "username": "admin",
             "password": "admin9000",
@@ -9,7 +8,10 @@
             "name": "Administrator",
             "surname": "",
             "birthdate": "2000-01-01",
-            "roles": ["user", "admin"]
+            "roles": [
+                "user",
+                "admin"
+            ]
         },
         {
             "username": "Frodo",
@@ -19,7 +21,9 @@
             "name": "Frodo",
             "surname": "Baggins",
             "birthdate": "2000-01-01",
-            "roles": ["user"]
+            "roles": [
+                "user"
+            ]
         },
         {
             "username": "Sam",
@@ -29,7 +33,9 @@
             "name": "Samwise",
             "surname": "Gamgee",
             "birthdate": "2000-01-01",
-            "roles": ["user"]
+            "roles": [
+                "user"
+            ]
         },
         {
             "username": "Merry",
@@ -39,7 +45,9 @@
             "name": "Meriadoc",
             "surname": "Brandigamo",
             "birthdate": "2000-01-01",
-            "roles": ["user"]
+            "roles": [
+                "user"
+            ]
         },
         {
             "username": "Pippin",
@@ -49,7 +57,9 @@
             "name": "Peregrin",
             "surname": "Took",
             "birthdate": "2000-01-01",
-            "roles": ["user"]
+            "roles": [
+                "user"
+            ]
         },
         {
             "username": "Gandalf",
@@ -59,7 +69,9 @@
             "name": "Gandalf",
             "surname": "The Grey",
             "birthdate": "2000-01-01",
-            "roles": ["user"]
+            "roles": [
+                "user"
+            ]
         },
         {
             "username": "Aragorn",
@@ -69,7 +81,9 @@
             "name": "Aragorn",
             "surname": "",
             "birthdate": "2000-01-01",
-            "roles": ["user"]
+            "roles": [
+                "user"
+            ]
         },
         {
             "username": "Legolas",
@@ -79,7 +93,9 @@
             "name": "Legolas",
             "surname": "",
             "birthdate": "2000-01-01",
-            "roles": ["user"]
+            "roles": [
+                "user"
+            ]
         },
         {
             "username": "Gimli",
@@ -89,7 +105,9 @@
             "name": "Gimli",
             "surname": "",
             "birthdate": "2000-01-01",
-            "roles": ["user"]
+            "roles": [
+                "user"
+            ]
         },
         {
             "username": "Boromir",
@@ -99,7 +117,9 @@
             "name": "Boromir",
             "surname": "",
             "birthdate": "2000-01-01",
-            "roles": ["user"]
+            "roles": [
+                "user"
+            ]
         }
     ]
 }
