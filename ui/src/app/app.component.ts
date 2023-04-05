@@ -4,7 +4,7 @@ import {TokenStorageService} from './_services/token-storage.service';
 @Component({
     selector: 'app-root',
     templateUrl: './app.component.html',
-    styleUrls: ['./app.component.css']
+    styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
     isLoggedIn = false;

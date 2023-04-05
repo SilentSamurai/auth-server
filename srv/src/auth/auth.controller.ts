@@ -82,7 +82,7 @@ export class AuthController {
         @Body(new ValidationPipe(ValidationSchema.SignInSchema)) body: any
     ): Promise<object> {
         const token: string = await this.authService.createAccessToken(request.user);
-        return {token: token};
+        return {token: token, user: request.user};
     }
 
     @Get('/verify/:token')

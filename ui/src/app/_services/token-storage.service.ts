@@ -34,6 +34,10 @@ export class TokenStorageService {
             return JSON.parse(user);
         }
 
-        return {};
+        return null;
+    }
+
+    public isLoggedIn(): boolean {
+        return !!this.getToken();
     }
 }

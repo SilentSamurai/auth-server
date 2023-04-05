@@ -8,16 +8,17 @@ import {ProfileComponent} from './profile/profile.component';
 import {BoardUserComponent} from './board-user/board-user.component';
 import {BoardModeratorComponent} from './board-moderator/board-moderator.component';
 import {BoardAdminComponent} from './board-admin/board-admin.component';
+import {UserAuthGuard} from "./shared/user-auth-guard.service";
 
 const routes: Routes = [
-    {path: 'home', component: HomeComponent},
+    {path: 'home', component: HomeComponent, canActivate: [UserAuthGuard]},
     {path: 'login', component: LoginComponent},
     {path: 'register', component: RegisterComponent},
-    {path: 'profile', component: ProfileComponent},
-    {path: 'user', component: BoardUserComponent},
-    {path: 'mod', component: BoardModeratorComponent},
-    {path: 'admin', component: BoardAdminComponent},
-    {path: '', redirectTo: 'home', pathMatch: 'full'}
+    {path: 'profile', component: ProfileComponent, canActivate: [UserAuthGuard]},
+    {path: 'user', component: BoardUserComponent, canActivate: [UserAuthGuard]},
+    {path: 'mod', component: BoardModeratorComponent, canActivate: [UserAuthGuard]},
+    {path: 'admin', component: BoardAdminComponent, canActivate: [UserAuthGuard]},
+    {path: '', redirectTo: 'login', pathMatch: 'full'}
 ];
 
 @NgModule({
