@@ -14,7 +14,11 @@ import {BoardModeratorComponent} from './board-moderator/board-moderator.compone
 import {BoardUserComponent} from './board-user/board-user.component';
 
 import {authInterceptorProviders} from './_helpers/auth.interceptor';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {NgbDropdown, NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {TableModule} from 'primeng/table';
+import {CreateUserModalComponent} from "./board-user/create-user-modal/create-user-modal.component";
+import {EditUserModalComponent} from "./board-user/edit-user-modal/edit-user-modal.component";
+import {DeleteUserModalComponent} from "./board-user/delete-user-modal/delete-user-modal.component";
 
 @NgModule({
     declarations: [
@@ -25,16 +29,20 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
         ProfileComponent,
         BoardAdminComponent,
         BoardModeratorComponent,
-        BoardUserComponent
+        BoardUserComponent,
+        CreateUserModalComponent,
+        EditUserModalComponent,
+        DeleteUserModalComponent
     ],
     imports: [
         BrowserModule,
         AppRoutingModule,
         FormsModule,
         HttpClientModule,
-        NgbModule
+        NgbModule,
+        TableModule,
     ],
-    providers: [authInterceptorProviders],
+    providers: [authInterceptorProviders, NgbDropdown],
     bootstrap: [AppComponent]
 })
 export class AppModule {

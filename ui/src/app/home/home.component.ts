@@ -1,5 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {UserService} from '../_services/user.service';
+import {TokenStorageService} from "../_services/token-storage.service";
 
 @Component({
     selector: 'app-home',
@@ -8,18 +9,12 @@ import {UserService} from '../_services/user.service';
 })
 export class HomeComponent implements OnInit {
     content?: string;
+    user: any;
 
-    constructor(private userService: UserService) {
+    constructor(private userService: UserService, private tokenService: TokenStorageService) {
     }
 
     ngOnInit(): void {
-        this.userService.getPublicContent().subscribe({
-            next: data => {
-                this.content = data;
-            },
-            error: err => {
-                this.content = JSON.parse(err.error).message;
-            }
-        });
+        this.user = this.tokenService.getUser();
     }
 }

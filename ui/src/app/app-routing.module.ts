@@ -15,7 +15,7 @@ const routes: Routes = [
     {path: 'login', component: LoginComponent},
     {path: 'register', component: RegisterComponent},
     {path: 'profile', component: ProfileComponent, canActivate: [UserAuthGuard]},
-    {path: 'user', component: BoardUserComponent, canActivate: [UserAuthGuard]},
+    {path: 'users', component: BoardUserComponent, canActivate: [UserAuthGuard]},
     {path: 'mod', component: BoardModeratorComponent, canActivate: [UserAuthGuard]},
     {path: 'admin', component: BoardAdminComponent, canActivate: [UserAuthGuard]},
     {path: '', redirectTo: 'login', pathMatch: 'full'}

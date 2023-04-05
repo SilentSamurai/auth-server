@@ -1,5 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import {UserService} from '../_services/user.service';
+import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
+import {CreateUserModalComponent} from "./create-user-modal/create-user-modal.component";
+import {EditUserModalComponent} from "./edit-user-modal/edit-user-modal.component";
+import {DeleteUserModalComponent} from "./delete-user-modal/delete-user-modal.component";
 
 @Component({
     selector: 'app-board-user',
@@ -7,19 +11,33 @@ import {UserService} from '../_services/user.service';
     styleUrls: ['./board-user.component.css']
 })
 export class BoardUserComponent implements OnInit {
-    content?: string;
+    users: any[] = [];
 
-    constructor(private userService: UserService) {
+    constructor(private userService: UserService, private modalService: NgbModal) {
     }
 
     ngOnInit(): void {
-        this.userService.getUserBoard().subscribe({
+        this.userService.getAllUsers().subscribe({
             next: data => {
-                this.content = data;
+                this.users = data;
             },
             error: err => {
-                this.content = JSON.parse(err.error).message;
+                this.users = [];
             }
         });
+    }
+
+    openCreateModal() {
+        const modalRef = this.modalService.open(CreateUserModalComponent);
+    }
+
+    openUpdateModal(user: any) {
+        const modalRef = this.modalService.open(EditUserModalComponent);
+        modalRef.componentInstance.user = user;
+    }
+
+    openDeleteModal(user: any) {
+        const modalRef = this.modalService.open(DeleteUserModalComponent);
+        modalRef.componentInstance.user = user;
     }
 }

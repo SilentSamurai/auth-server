@@ -1,0 +1,27 @@
+<div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Create User</h4>
+    <button (click)="activeModal.dismiss('Cross click')" aria-label="Close" class="close" type="button">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+    <form>
+        <div class="mb-3">
+            <label class="form-label" for="create.user.name">Name</label>
+            <input [(ngModel)]="form.name" class="form-control" id="create.user.name" type="text">
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="create.user.email">Email address</label>
+            <input [(ngModel)]="form.email" aria-describedby="emailHelp" class="form-control" id="create.user.email"
+                   type="email">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="create.user.username">Username</label>
+            <input [(ngModel)]="form.username" class="form-control" id="create.user.username" type="text">
+        </div>
+
+        <button (click)="onSubmit()" class="btn btn-primary" type="submit">Submit</button>
+    </form>
+</div>
+
