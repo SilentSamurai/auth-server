@@ -1,0 +1,99 @@
+<div class="row justify-content-center my-2">
+    <div class="col-md-8">
+        <div class="card text-black">
+            <i class="fa fa-apple fa-lg pt-3 pb-1 px-3"></i>
+            <div class="card-body">
+                <div>
+                    <div class="my-2">
+                        <div class="p-disabled">Tenant Id</div>
+                        <h2>{{ tenant_id }}</h2>
+                    </div>
+                    <br>
+                    <div class="my-2">
+                        <div class="p-disabled">Subdomain</div>
+                        <div>{{ tenant.subdomain }}</div>
+                    </div>
+                    <div class="my-2">
+                        <div class="p-disabled">Tenant Name</div>
+                        <div>{{ tenant.name }}</div>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between total font-weight-bold mt-4">
+                    <button class="btn btn-primary">
+                        Update
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-black">
+            <i class="fa fa-solid fa-user-cowboy"></i>
+            <div class="card-body">
+                <div>
+                    <div class="my-2">
+                        <div class="p-disabled">Roles</div>
+                        <div>
+                            <ul>
+                                <li>
+                                    <code>tenant-1::viewer</code>
+                                </li>
+                                <li>
+                                    <code>tenant-1::admin</code>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <br>
+                </div>
+                <div class="d-flex justify-content-between total font-weight-bold mt-4">
+                    <button class="btn btn-primary">
+                        Add New Role
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center my-2">
+    <div class="col-md-8">
+        <div class="card text-black">
+            <i class="fa fa-solid fa-user-cowboy"></i>
+            <div class="card-body my-2">
+                <p-table [value]="members" responsiveLayout="scroll">
+                    <ng-template pTemplate="caption">
+                        <div class="d-flex justify-content-between">
+                            <h5>Member List</h5>
+                            <button class="btn btn-primary">
+                                Add Member
+                            </button>
+                        </div>
+
+                    </ng-template>
+                    <ng-template let-columns pTemplate="header">
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Username</th>
+                            <th>Actions</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template let-columns="columns" let-user pTemplate="body">
+                        <tr>
+                            <td><span class="p-column-title">Name</span>{{user.name}} {{user.surname}}</td>
+                            <td><span class="p-column-title">Price</span>{{user.email}}</td>
+                            <td><span class="p-column-title">Price</span>{{user.username}}</td>
+                            <td class="d-flex ">
+                                <button class="btn btn-secondary" type="button">
+                                    <i class="fa fa-solid fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4"></div>
+</div>

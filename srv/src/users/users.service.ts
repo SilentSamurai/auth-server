@@ -95,7 +95,7 @@ export class UsersService implements OnModuleInit {
      * Get a user by id.
      */
     async getById(
-        id: number
+        id: string
     ): Promise<User> {
         const user: User = await this.usersRepository.findOne({where: {id: id}, relations: ['roles']});
         if (!user) {
@@ -151,7 +151,7 @@ export class UsersService implements OnModuleInit {
      * Update the user.
      */
     async update(
-        id: number,
+        id: string,
         username: string,
         password: string,
         avatar: string,
@@ -184,7 +184,7 @@ export class UsersService implements OnModuleInit {
      * Update the user's username.
      */
     async updateUsername(
-        id: number,
+        id: string,
         username: string
     ): Promise<User> {
         const user: User = await this.getById(id);
@@ -206,7 +206,7 @@ export class UsersService implements OnModuleInit {
      * Update the user's username if the password is verified.
      */
     async updateUsernameSecure(
-        id: number,
+        id: string,
         username: string,
         password: string
     ): Promise<User> {
@@ -234,7 +234,7 @@ export class UsersService implements OnModuleInit {
      * Update the user's email.
      */
     async updateEmail(
-        id: number,
+        id: string,
         email: string
     ): Promise<User> {
         const user: User = await this.getById(id);
@@ -251,7 +251,7 @@ export class UsersService implements OnModuleInit {
      * Update the user's password.
      */
     async updatePassword(
-        id: number,
+        id: string,
         password: string
     ): Promise<User> {
         const user: User = await this.getById(id);
@@ -268,7 +268,7 @@ export class UsersService implements OnModuleInit {
      * Update the user's password if the password is verified.
      */
     async updatePasswordSecure(
-        id: number,
+        id: string,
         currentPassword: string,
         newPassword: string
     ): Promise<User> {
@@ -291,7 +291,7 @@ export class UsersService implements OnModuleInit {
      * Update the user's avatar.
      */
     async updateAvatar(
-        id: number,
+        id: string,
         avatar: string = ''
     ): Promise<User> {
         const user: User = await this.getById(id);
@@ -308,7 +308,7 @@ export class UsersService implements OnModuleInit {
      * Update the user's name.
      */
     async updateName(
-        id: number,
+        id: string,
         name: string = ''
     ): Promise<User> {
         const user: User = await this.getById(id);
@@ -325,7 +325,7 @@ export class UsersService implements OnModuleInit {
      * Update the user's surname.
      */
     async updateSurname(
-        id: number,
+        id: string,
         surname: string = ''
     ): Promise<User> {
         const user: User = await this.getById(id);
@@ -342,7 +342,7 @@ export class UsersService implements OnModuleInit {
      * Update the user's birthdate.
      */
     async updateBirthdate(
-        id: number,
+        id: string,
         birthdate: Date = new Date('1900-01-01')
     ): Promise<User> {
         const user: User = await this.getById(id);
@@ -359,7 +359,7 @@ export class UsersService implements OnModuleInit {
      * Update the user's verified field.
      */
     async updateVerified(
-        id: number,
+        id: string,
         verified: boolean
     ): Promise<User> {
         const user: User = await this.getById(id);
@@ -376,7 +376,7 @@ export class UsersService implements OnModuleInit {
      * Delete the user.
      */
     async delete(
-        id: number
+        id: string
     ): Promise<User> {
         const user: User = await this.getById(id);
         if (!user) {
@@ -390,7 +390,7 @@ export class UsersService implements OnModuleInit {
      * Delete the user if the password is verified.
      */
     async deleteSecure(
-        id: number,
+        id: string,
         password: string
     ): Promise<User> {
         const user: User = await this.getById(id);
