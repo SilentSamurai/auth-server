@@ -1,5 +1,5 @@
 <div id="app">
-    <nav class="navbar navbar-expand navbar-dark bg-dark">
+    <nav *ngIf="isLoggedIn" class="navbar navbar-expand navbar-dark bg-dark">
         <a class="navbar-brand" href="#">bezKoder</a>
         <ul class="navbar-nav mr-auto" routerLinkActive="active">
             <li class="nav-item">
