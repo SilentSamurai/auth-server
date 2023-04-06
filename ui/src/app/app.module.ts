@@ -9,16 +9,13 @@ import {LoginComponent} from './login/login.component';
 import {RegisterComponent} from './register/register.component';
 import {HomeComponent} from './home/home.component';
 import {ProfileComponent} from './profile/profile.component';
-import {BoardAdminComponent} from './board-admin/board-admin.component';
-import {BoardUserComponent} from './board-user/board-user.component';
 
 import {authInterceptorProviders} from './_helpers/auth.interceptor';
 import {NgbDropdown, NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {TableModule} from 'primeng/table';
-import {CreateUserModalComponent} from "./board-user/create-user-modal/create-user-modal.component";
-import {EditUserModalComponent} from "./board-user/edit-user-modal/edit-user-modal.component";
-import {DeleteUserModalComponent} from "./board-user/delete-user-modal/delete-user-modal.component";
 import {TenantModule} from "./board-tenants/tenant.module";
+import {UserModule} from "./board-user/user.module";
+import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 
 @NgModule({
     declarations: [
@@ -26,12 +23,7 @@ import {TenantModule} from "./board-tenants/tenant.module";
         LoginComponent,
         RegisterComponent,
         HomeComponent,
-        ProfileComponent,
-        BoardAdminComponent,
-        BoardUserComponent,
-        CreateUserModalComponent,
-        EditUserModalComponent,
-        DeleteUserModalComponent
+        ProfileComponent
     ],
     imports: [
         BrowserModule,
@@ -41,6 +33,8 @@ import {TenantModule} from "./board-tenants/tenant.module";
         NgbModule,
         TableModule,
         TenantModule,
+        UserModule,
+        BrowserAnimationsModule
     ],
     providers: [authInterceptorProviders, NgbDropdown],
     bootstrap: [AppComponent]

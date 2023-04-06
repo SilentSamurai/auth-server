@@ -1,0 +1,14 @@
+<div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Delete Tenant</h4>
+    <button (click)="activeModal.dismiss('Cross click')" aria-label="Close" class="close" type="button">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+    <p>Are you sure, you want to delete tenant "<b>{{ tenant.subdomain }}</b>" ?</p>
+    <div>
+        <button class="btn btn-secondary btn-sm" type="button">No</button>
+        <button class="btn btn-primary btn-sm" type="button">Yes</button>
+    </div>
+</div>
+

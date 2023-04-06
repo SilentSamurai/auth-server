@@ -1,5 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import {UserService} from '../_services/user.service';
+import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
+import {CreateTenantComponent} from "./create-tenant/create-tenant.component";
+import {UpdateTenantComponent} from "./update-tenant/update-tenant.component";
+import {DeleteTenantComponent} from "./delete-tenant/delete-tenant.component";
 
 @Component({
     selector: 'app-board-tenants',
@@ -10,7 +14,7 @@ export class BoardTenantComponent implements OnInit {
 
     tenants: any[] = [];
 
-    constructor(private userService: UserService) {
+    constructor(private userService: UserService, private modalService: NgbModal) {
     }
 
     ngOnInit(): void {
@@ -26,11 +30,16 @@ export class BoardTenantComponent implements OnInit {
     }
 
     openCreateModal() {
+        const modalRef = this.modalService.open(CreateTenantComponent);
     }
 
     openUpdateModal(tenant: any) {
+        const modalRef = this.modalService.open(UpdateTenantComponent);
+        modalRef.componentInstance.form = tenant;
     }
 
     openDeleteModal(tenant: any) {
+        const modalRef = this.modalService.open(DeleteTenantComponent);
+        modalRef.componentInstance.tenant = tenant;
     }
 }

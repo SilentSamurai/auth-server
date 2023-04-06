@@ -1,42 +1,50 @@
-<div class="container">
-    <div class="card my-2">
-        <p-table [value]="tenants" responsiveLayout="scroll">
-            <ng-template pTemplate="caption">
-                <div class="d-flex justify-content-between">
-                    <h5>Tenant List</h5>
-                    <button (click)="openCreateModal()" class="btn btn-primary" type="button">
-                        <i class="fa fa-solid fa-plus"></i>
-                    </button>
-                </div>
+<div class="row">
 
-            </ng-template>
-            <ng-template let-columns pTemplate="header">
-                <tr>
-                    <th>Tenant Id</th>
-                    <th>Name</th>
-                    <th>Subdomain</th>
-                    <th>Action</th>
-                </tr>
-            </ng-template>
-            <ng-template let-columns="columns" let-tenant pTemplate="body">
-                <tr>
-                    <td>
-                        <span class="p-column-title">Name</span>
-                        <a [routerLink]="['/tenant/', tenant.id]" href="javascript:void(0)">{{tenant.id}}</a>
-                    </td>
-                    <td><span class="p-column-title">Price</span>{{tenant.name}}</td>
-                    <td><span class="p-column-title">Price</span>{{tenant.subdomain}}</td>
-                    <td class="d-flex ">
-                        <button (click)="openUpdateModal(tenant)" class="btn btn-primary" type="button">
-                            <i class="fa fa-edit"></i>
+    <div class="col-md-9">
+        <div class="card my-2">
+            <p-table [value]="tenants" responsiveLayout="scroll">
+                <ng-template pTemplate="caption">
+                    <div class="d-flex justify-content-between">
+                        <h5>Tenant List</h5>
+                        <button (click)="openCreateModal()" class="btn btn-primary" type="button">
+                            <i class="fa fa-solid fa-plus"></i>
                         </button>
-                        <button (click)="openDeleteModal(tenant)" class="btn btn-secondary" type="button">
-                            <i class="fa fa-solid fa-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-            </ng-template>
-        </p-table>
+                    </div>
+
+                </ng-template>
+                <ng-template let-columns pTemplate="header">
+                    <tr>
+                        <th>Tenant Id</th>
+                        <th>Name</th>
+                        <th>Subdomain</th>
+                        <th>Action</th>
+                    </tr>
+                </ng-template>
+                <ng-template let-columns="columns" let-tenant pTemplate="body">
+                    <tr>
+                        <td>
+                            <span class="p-column-title">Name</span>
+                            <a [routerLink]="['/tenant/', tenant.id]" href="javascript:void(0)">{{tenant.id}}</a>
+                        </td>
+                        <td><span class="p-column-title">Price</span>{{tenant.name}}</td>
+                        <td><span class="p-column-title">Price</span>{{tenant.subdomain}}</td>
+                        <td class="d-flex ">
+                            <button (click)="openUpdateModal(tenant)" class="btn btn-primary" type="button">
+                                <i class="fa fa-edit"></i>
+                            </button>
+                            <button (click)="openDeleteModal(tenant)" class="btn btn-secondary" type="button">
+                                <i class="fa fa-solid fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </div>
+
+
+    <div class="col-md-3">
+
     </div>
 
 </div>

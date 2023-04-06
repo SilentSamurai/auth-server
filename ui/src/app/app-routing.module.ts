@@ -7,9 +7,9 @@ import {HomeComponent} from './home/home.component';
 import {ProfileComponent} from './profile/profile.component';
 import {BoardUserComponent} from './board-user/board-user.component';
 import {BoardTenantComponent} from './board-tenants/board-tenant.component';
-import {BoardAdminComponent} from './board-admin/board-admin.component';
 import {UserAuthGuard} from "./shared/user-auth-guard.service";
-import {ShowTenantComponent} from "./board-tenants/show-tenant/show-tenant.component";
+import {TenantDetailsComponent} from "./board-tenants/tenant-details/tenant-details.component";
+import {UserDetailsComponent} from "./board-user/user-details/user-details.component";
 
 const routes: Routes = [
     {path: 'home', component: HomeComponent, canActivate: [UserAuthGuard]},
@@ -18,8 +18,8 @@ const routes: Routes = [
     {path: 'profile', component: ProfileComponent, canActivate: [UserAuthGuard]},
     {path: 'users', component: BoardUserComponent, canActivate: [UserAuthGuard]},
     {path: 'tenants', component: BoardTenantComponent, canActivate: [UserAuthGuard]},
-    {path: 'tenant/:tenantId', component: ShowTenantComponent, canActivate: [UserAuthGuard]},
-    {path: 'admin', component: BoardAdminComponent, canActivate: [UserAuthGuard]},
+    {path: 'tenant/:tenantId', component: TenantDetailsComponent, canActivate: [UserAuthGuard]},
+    {path: 'user/:email', component: UserDetailsComponent, canActivate: [UserAuthGuard]},
     {path: '', redirectTo: 'login', pathMatch: 'full'}
 ];
 
