@@ -32,6 +32,7 @@ export class UsersService implements OnModuleInit {
         if (!this.configService.isProduction()) {
             await this.populateDummyUsers();
         }
+        await this.createAdminUser();
     }
 
     /**
@@ -71,9 +72,7 @@ export class UsersService implements OnModuleInit {
      * Get all the users.
      */
     async getAll(): Promise<User[]> {
-        return await this.usersRepository.find({
-            relations: {}
-        });
+        return await this.usersRepository.find();
     }
 
     /**
@@ -124,7 +123,14 @@ export class UsersService implements OnModuleInit {
 
     async findByTenant(tenant: Tenant): Promise<User[]> {
         const users: User[] = await this.usersRepository.find({
-            where: {tenants: {id: tenant.id}},
+            where: {
+                tenants: {id: tenant.id},
+                scopes: {
+                    tenant: {
+                        id: tenant.id
+                    }
+                }
+            },
             relations: {
                 scopes: true
             }
@@ -271,26 +277,6 @@ export class UsersService implements OnModuleInit {
         return await this.usersRepository.remove(user);
     }
 
-    async addScope(
-        id: string,
-        scope: Scope
-    ): Promise<User> {
-        const user: User = await this.usersRepository.findOne({
-            where: {id},
-            relations: {
-                roles: true,
-                scopes: true
-            }
-        });
-        if (!user) {
-            throw new UserNotFoundException();
-        }
-
-        user.scopes.push(scope);
-
-        return await this.usersRepository.save(user);
-    }
-
     async removeScope(
         id: string,
         deleteScope: Scope
@@ -360,6 +346,21 @@ export class UsersService implements OnModuleInit {
                 }
             });
         });
+    }
+
+    async createAdminUser() {
+        try {
+            let user: User = await this.create(
+                "admin9000",
+                "admin@auth.server.com",
+                "admin",
+                ["admin", "user"]
+            );
+
+            await this.updateVerified(user.id, true);
+        } catch (exception: any) {
+            // Catch user already created.
+        }
     }
 
     async countByScope(

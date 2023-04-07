@@ -24,7 +24,8 @@ import {RolesGuard} from '../roles/roles.guard';
 import {ValidationPipe} from '../validation/validation.pipe';
 import {ValidationSchema} from '../validation/validation.schema';
 import {MailServiceErrorException} from '../exceptions/mail-service-error.exception';
-import {LocalAuthGuard} from "./local-auth-guard.service";
+import {LocalAuthGuard} from "./local-auth.guard";
+import {TenantService} from "../tenants/tenant.service";
 
 @Controller('oauth')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -33,6 +34,7 @@ export class AuthController {
         private readonly configService: ConfigService,
         private readonly authService: AuthService,
         private readonly usersService: UsersService,
+        private readonly tenantService: TenantService,
         private readonly mailService: MailService
     ) {
     }
@@ -75,9 +77,14 @@ export class AuthController {
     @UseGuards(LocalAuthGuard)
     async signin(
         @Request() request,
-        @Body(new ValidationPipe(ValidationSchema.SignInSchema)) body: any
+        @Body(new ValidationPipe(ValidationSchema.SignInSchema)) body: {
+            email: string,
+            password: string,
+            domain: string
+        }
     ): Promise<object> {
-        const token: string = await this.authService.createAccessToken(request.user);
+        const tenant = await this.tenantService.findByDomain(body.domain);
+        const token: string = await this.authService.createAccessToken(request.user, tenant);
         return {token: token, user: request.user};
     }
 

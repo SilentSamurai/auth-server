@@ -6,8 +6,9 @@ import {MailModule} from '../mail/mail.module';
 import {AuthController} from './auth.controller';
 import {ConfigService} from '../config/config.service';
 import {AuthService} from './auth.service';
-import {LocalAuthGuard} from './local-auth-guard.service';
-import {JwtStrategy} from './jwt.strategy';
+import {LocalAuthGuard} from './local-auth.guard';
+import {TenantModule} from "../tenants/tenant.module";
+import {JwtAuthGuard} from "./jwt-auth.guard";
 
 @Module(
     {
@@ -20,15 +21,18 @@ import {JwtStrategy} from './jwt.strategy';
                         inject: [ConfigService],
                         useFactory: (configService: ConfigService) => {
                             return {
-                                secret: configService.get('TOKEN_SECRET'),
-                                signOptions: {expiresIn: configService.get('TOKEN_EXPIRATION_TIME')}
+                                signOptions: {
+                                    algorithm: "RS256",
+                                    expiresIn: configService.get('TOKEN_EXPIRATION_TIME')
+                                }
                             };
                         }
                     }),
-                MailModule
+                MailModule,
+                forwardRef(() => TenantModule)
             ],
         controllers: [AuthController],
-        providers: [AuthService, LocalAuthGuard, JwtStrategy],
+        providers: [AuthService, LocalAuthGuard, JwtAuthGuard],
         exports: [AuthService]
     })
 export class AuthModule {

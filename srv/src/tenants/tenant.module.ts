@@ -9,16 +9,20 @@ import {Tenant} from "./tenant.entity";
 import {ScopeController} from "./scope.controller";
 import {ScopeService} from "./scope.service";
 import {Scope} from "./scope.entity";
+import {RolesModule} from "../roles/roles.module";
+import {AuthModule} from "../auth/auth.module";
 
 @Module(
     {
-        imports:
-            [
-                TypeOrmModule.forFeature([Tenant, Scope]),
-                forwardRef(() => UsersModule), // Circular dependency resolved.
-                PassportModule,
-                MailModule
-            ],
+            imports:
+                [
+                        TypeOrmModule.forFeature([Tenant, Scope]),
+                        forwardRef(() => UsersModule), // Circular dependency resolved.
+                        forwardRef(() => RolesModule), // Circular dependency resolved.
+                        forwardRef(() => AuthModule), // Circular dependency resolved.
+                        PassportModule,
+                        MailModule
+                ],
         controllers: [TenantController, ScopeController],
         providers: [TenantService, ScopeService],
         exports: [TenantService, ScopeService]

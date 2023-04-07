@@ -32,8 +32,7 @@ export class User {
     @ManyToMany(() => Tenant, (tenant) => tenant.members)
     tenants: Tenant[];
 
-    @ManyToMany(() => Scope)
-    @JoinTable()
+    @ManyToMany(() => Scope, scope => scope.users)
     scopes: Scope[];
 
     @Column({default: false})

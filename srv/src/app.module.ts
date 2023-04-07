@@ -33,7 +33,8 @@ import {TenantModule} from "./tenants/tenant.module";
                         password: configService.get('DATABASE_PASSWORD'),
                         database: configService.get('DATABASE_NAME'),
                         entities: [configService.get('DATABASE_ENTITIES')],
-                        synchronize: !configService.isProduction()
+                        synchronize: !configService.isProduction(),
+                        logging: true
                     };
                 },
             }),

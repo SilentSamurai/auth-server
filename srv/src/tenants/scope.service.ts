@@ -6,7 +6,6 @@ import {Repository} from "typeorm";
 import {Tenant} from "./tenant.entity";
 import {ValidationErrorException} from "../exceptions/validation-error.exception";
 import {Scope} from "./scope.entity";
-import {TenantService} from "./tenant.service";
 import {User} from "../users/user.entity";
 
 @Injectable()
@@ -15,7 +14,6 @@ export class ScopeService {
     constructor(
         private readonly configService: ConfigService,
         private readonly usersService: UsersService,
-        private readonly tenantService: TenantService,
         @InjectRepository(Scope) private scopeRepository: Repository<Scope>,
     ) {
     }
@@ -74,22 +72,44 @@ export class ScopeService {
         });
     }
 
-    async assignScopeToUser(name: string, tenant: Tenant, user: User) {
-        let scope: Scope = await this.findByNameAndTenant(name, tenant);
-        const isMember: boolean = await this.tenantService.isMember(tenant.id, user);
-        if (!isMember) {
-            throw new ValidationErrorException("user is not a member of this tenant");
-        }
-        return await this.usersService.addScope(user.id, scope);
+    async getMemberScopes(tenant: Tenant, user: User): Promise<Scope[]> {
+        return this.scopeRepository.find({
+            where: {
+                tenant: {id: tenant.id},
+                users: {id: user.id}
+            },
+        });
     }
 
-    async removeScopeFromUser(name: string, tenant: Tenant, user: User) {
-        let scope: Scope = await this.findByNameAndTenant(name, tenant);
-        const isMember: boolean = await this.tenantService.isMember(tenant.id, user);
-        if (!isMember) {
-            throw new ValidationErrorException("user is not a member of this tenant");
+    async assignScopeToUser(name: string, tenant: Tenant, user: User): Promise<Scope> {
+        let scope: Scope = await this.scopeRepository.findOne({
+            where: {
+                name,
+                tenant: {id: tenant.id}
+            },
+            relations: {
+                users: true
+            }
+        });
+        if (scope === null) {
+            throw new ValidationErrorException("scope not found");
         }
-        return this.usersService.removeScope(user.id, scope);
+        scope.users.push(user);
+        return await this.scopeRepository.save(scope);
+    }
+
+    async removeScopeFromUser(name: string, tenant: Tenant, deleteUser: User) {
+        let scope: Scope = await this.scopeRepository.findOne({
+            where: {
+                name,
+                tenant: {id: tenant.id}
+            },
+            relations: {
+                users: true
+            }
+        });
+        scope.users = scope.users.filter((user) => user.id !== deleteUser.id)
+        return await this.scopeRepository.save(scope);
     }
 
 

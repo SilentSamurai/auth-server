@@ -1,4 +1,4 @@
-import {Injectable} from "@nestjs/common";
+import {Injectable, OnModuleInit} from "@nestjs/common";
 import {ConfigService} from "../config/config.service";
 import {UsersService} from "../users/users.service";
 import {InjectRepository} from "@nestjs/typeorm";
@@ -7,15 +7,23 @@ import {Tenant} from "./tenant.entity";
 import {ValidationErrorException} from "../exceptions/validation-error.exception";
 import {generateKeyPairSync} from "crypto";
 import {User} from "../users/user.entity";
+import {Scope} from "./scope.entity";
+import {ForbiddenException} from "../exceptions/forbidden.exception";
+import {ScopeService} from "./scope.service";
 
 @Injectable()
-export class TenantService {
+export class TenantService implements OnModuleInit {
 
     constructor(
         private readonly configService: ConfigService,
         private readonly usersService: UsersService,
+        private readonly scopeService: ScopeService,
         @InjectRepository(Tenant) private tenantRepository: Repository<Tenant>,
     ) {
+    }
+
+    async onModuleInit() {
+        await this.populateGlobalTenant();
     }
 
 
@@ -88,7 +96,7 @@ export class TenantService {
         return tenant;
     }
 
-    async findByDomain(domain: string) {
+    async findByDomain(domain: string): Promise<Tenant> {
         let tenant = await this.tenantRepository.findOne({
             where: {domain}, relations: {
                 members: true,
@@ -119,6 +127,15 @@ export class TenantService {
         return this.tenantRepository.save(tenant)
     }
 
+    async getMemberScope(tenantId: string, user: User): Promise<Scope[]> {
+        let tenant: Tenant = await this.findById(tenantId);
+        let isMember = await this.isMember(tenant.id, user);
+        if (!isMember) {
+            throw new ForbiddenException("Not a Member.");
+        }
+        return this.scopeService.getMemberScopes(tenant, user);
+    }
+
     async addMember(tenantId: string, user: User): Promise<Tenant> {
         let tenant: Tenant = await this.findById(tenantId);
         tenant.members.push(user);
@@ -134,5 +151,48 @@ export class TenantService {
     async isMember(tenantId: string, user: User): Promise<boolean> {
         let tenant: Tenant = await this.findById(tenantId);
         return tenant.members.find((member) => user.id === member.id) !== undefined;
+    }
+
+    async addScopeToMember(name: string, tenantId: string, user: User): Promise<Scope> {
+        let tenant: Tenant = await this.findById(tenantId);
+        const isMember: boolean = await this.isMember(tenantId, user);
+        if (!isMember) {
+            throw new ValidationErrorException("user is not a member of this tenant");
+        }
+        return this.scopeService.assignScopeToUser(name, tenant, user)
+    }
+
+    async removeScopeFromMember(name: string, tenantId: string, user: User): Promise<Scope> {
+        let tenant: Tenant = await this.findById(tenantId);
+        const isMember: boolean = await this.isMember(tenantId, user);
+        if (!isMember) {
+            throw new ValidationErrorException("user is not a member of this tenant");
+        }
+        return this.scopeService.removeScopeFromUser(name, tenant, user)
+    }
+
+    async findGlobalTenant(): Promise<Tenant> {
+        return this.findByDomain("auth.server.com");
+    }
+
+    async populateGlobalTenant() {
+        try {
+            let globalTenant = await this.tenantRepository.findOne({
+                where: {domain: "auth.server.com"}, relations: {
+                    members: true,
+                    scopes: true
+                }
+            });
+            if (!globalTenant) {
+                const user = await this.usersService.findByEmail("admin@auth.server.com");
+                const tenant: Tenant = await this.create(
+                    "Global Default Tenant",
+                    "auth.server.com",
+                    user
+                );
+            }
+        } catch (e) {
+
+        }
     }
 }

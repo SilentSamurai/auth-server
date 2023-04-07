@@ -21,7 +21,6 @@ import {Roles} from "../roles/roles.decorator";
 import {RoleEnum} from "../roles/role.enum";
 import {ScopeService} from "./scope.service";
 import {Scope} from "./scope.entity";
-import {User} from "../users/user.entity";
 
 @Controller('scope')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -77,10 +76,9 @@ export class ScopeController {
         @Headers() headers,
         @Body(new ValidationPipe(ValidationSchema.OperatingScopeSchema)) body:
             { email: string, name: string, tenantId: string }
-    ): Promise<User> {
-        const tenant = await this.tenantService.findById(body.tenantId);
+    ): Promise<Scope> {
         const user = await this.usersService.findByEmail(body.email);
-        return this.scopeService.assignScopeToUser(body.name, tenant, user);
+        return this.tenantService.addScopeToMember(body.name, body.tenantId, user);
     }
 
     @Delete('/member')
@@ -90,10 +88,9 @@ export class ScopeController {
         @Headers() headers,
         @Body(new ValidationPipe(ValidationSchema.OperatingScopeSchema)) body:
             { email: string, name: string, tenantId: string }
-    ): Promise<User> {
-        const tenant = await this.tenantService.findById(body.tenantId);
+    ): Promise<Scope> {
         const user = await this.usersService.findByEmail(body.email);
-        return this.scopeService.removeScopeFromUser(body.name, tenant, user);
+        return this.tenantService.removeScopeFromMember(body.name, body.tenantId, user);
     }
 
 

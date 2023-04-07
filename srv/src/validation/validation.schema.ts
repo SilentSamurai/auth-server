@@ -34,7 +34,8 @@ const SignDownSchema = yup.object().shape(
 
 const SignInSchema = yup.object().shape({
     email: yup.string().email().required('Email is required'),
-    password: yup.string().required('Password is required').matches(PASSWORD_REGEXP, PASSWORD_MESSAGE)
+    password: yup.string().required('Password is required').matches(PASSWORD_REGEXP, PASSWORD_MESSAGE),
+    domain: yup.string().required('Domain is required')
 });
 
 const ForgotPasswordSchema = yup.object().shape(

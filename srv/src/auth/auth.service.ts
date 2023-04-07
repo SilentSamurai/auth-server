@@ -1,4 +1,4 @@
-import {Injectable} from '@nestjs/common';
+import {Injectable, Logger} from '@nestjs/common';
 import {ConfigService} from '../config/config.service';
 import {UsersService} from '../users/users.service';
 import {JwtService} from '@nestjs/jwt';
@@ -8,12 +8,18 @@ import {InvalidCredentialsException} from '../exceptions/invalid-credentials.exc
 import {EmailNotVerifiedException} from '../exceptions/email-not-verified.exception';
 import {InvalidTokenException} from '../exceptions/invalid-token.exception';
 import * as argon2 from 'argon2';
+import {Tenant} from "../tenants/tenant.entity";
+import {TenantService} from "../tenants/tenant.service";
 
 @Injectable()
 export class AuthService {
+
+    private readonly LOGGER = new Logger("AuthService");
+
     constructor(
         private readonly configService: ConfigService,
         private readonly usersService: UsersService,
+        private readonly tenantService: TenantService,
         private readonly jwtService: JwtService
     ) {
     }
@@ -23,31 +29,41 @@ export class AuthService {
      */
     async validate(email: string, password: string): Promise<User> {
         const user: User = await this.usersService.findByEmail(email);
-        if (!user) {
-            throw new UserNotFoundException();
-        }
-
         const valid: boolean = await argon2.verify(user.password, password);
         if (!valid) {
             throw new InvalidCredentialsException();
         }
-
         return user;
+    }
+
+    async validateAccessToken(token: string): Promise<User> {
+        let payload = this.jwtService.decode(token, {json: true});
+        let tenant = await this.tenantService.findById(payload["tenant"].id);
+        payload = await this.jwtService.verifyAsync(token, {publicKey: tenant.publicKey});
+        console.log("token verified with public Key");
+        return this.usersService.findByEmail(payload.email);
     }
 
     /**
      * Create an access token for the user.
      */
-    async createAccessToken(user: User): Promise<string> {
+    async createAccessToken(user: User, tenant: Tenant): Promise<string> {
         if (!user.verified) {
             throw new EmailNotVerifiedException();
         }
+        let scopes = await this.tenantService.getMemberScope(tenant.id, user);
         const payload: object = {
             sub: user.email,
             email: user.email,
             name: user.name,
+            tenant: {
+                id: tenant.id,
+                name: tenant.name,
+                domain: tenant.domain,
+            },
+            scopes: scopes.map(scope => scope.name)
         };
-        return this.jwtService.sign(payload);
+        return this.jwtService.sign(payload, {privateKey: tenant.privateKey,});
     }
 
     /**
@@ -57,7 +73,11 @@ export class AuthService {
         const payload: object = {
             sub: user.email
         };
-        return this.jwtService.sign(payload, {expiresIn: this.configService.get('TOKEN_VERIFICATION_EXPIRATION_TIME')});
+        let globalTenant = await this.tenantService.findGlobalTenant();
+        return this.jwtService.sign(payload, {
+            privateKey: globalTenant.privateKey,
+            expiresIn: this.configService.get('TOKEN_VERIFICATION_EXPIRATION_TIME')
+        });
     }
 
     /**
@@ -66,7 +86,10 @@ export class AuthService {
     async verifyEmail(token: string): Promise<boolean> {
         let payload: any;
         try {
-            payload = this.jwtService.verify(token, this.configService.get('TOKEN_SECRET'));
+            let globalTenant = await this.tenantService.findGlobalTenant();
+            payload = this.jwtService.verify(token, {
+                publicKey: globalTenant.publicKey
+            });
         } catch (exception: any) {
             throw new InvalidTokenException();
         }
