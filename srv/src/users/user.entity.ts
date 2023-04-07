@@ -7,7 +7,6 @@ import {Scope} from "../tenants/scope.entity";
 @Entity()
 export class User {
     @PrimaryGeneratedColumn("uuid")
-    @Exclude() // Exclude from responses.
     id: string;
 
     @CreateDateColumn()

@@ -1,6 +1,6 @@
 import {NgModule} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
-import {FormsModule} from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {HttpClientModule} from '@angular/common/http';
 
 import {AppRoutingModule} from './app-routing.module';
@@ -16,6 +16,8 @@ import {TableModule} from 'primeng/table';
 import {TenantModule} from "./board-tenants/tenant.module";
 import {UserModule} from "./board-user/user.module";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
+import {ToastModule} from "primeng/toast";
+import {MessageService} from "primeng/api";
 
 @NgModule({
     declarations: [
@@ -34,9 +36,11 @@ import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
         TableModule,
         TenantModule,
         UserModule,
-        BrowserAnimationsModule
+        BrowserAnimationsModule,
+        ReactiveFormsModule,
+        ToastModule
     ],
-    providers: [authInterceptorProviders, NgbDropdown],
+    providers: [authInterceptorProviders, NgbDropdown, MessageService],
     bootstrap: [AppComponent]
 })
 export class AppModule {

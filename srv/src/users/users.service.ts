@@ -149,16 +149,17 @@ export class UsersService implements OnModuleInit {
     ): Promise<User> {
         const user: User = await this.findById(id);
 
-        if (email) {
-            await this.updateEmail(id, email);
+        if (email !== null) {
+            const emailTaken = await this.usersRepository.findOne({where: {email}});
+            if (emailTaken) {
+                throw new EmailTakenException();
+            }
+            user.email = email;
         }
-
-        if (password) {
-            await this.updatePassword(id, password);
+        if (password !== null) {
+            user.password = await argon2.hash(password);
         }
-
         user.name = name || user.name;
-
         return await this.usersRepository.save(user);
     }
 

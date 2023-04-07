@@ -11,7 +11,8 @@ import {Router} from "@angular/router";
 export class LoginComponent implements OnInit {
     form: any = {
         email: null,
-        password: null
+        password: null,
+        domain: null
     };
     isLoggedIn = false;
     isLoginFailed = false;
@@ -32,9 +33,9 @@ export class LoginComponent implements OnInit {
     }
 
     onSubmit(): void {
-        const {email, password} = this.form;
+        const {email, password, domain} = this.form;
 
-        this.authService.login(email, password).subscribe({
+        this.authService.login(email, password, domain).subscribe({
             next: data => {
                 this.tokenStorage.saveToken(data.token);
                 this.tokenStorage.saveUser(data.user);

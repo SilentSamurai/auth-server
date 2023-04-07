@@ -7,6 +7,8 @@ import {
     Headers,
     Param,
     Patch,
+    Post,
+    Put,
     Request,
     UseGuards,
     UseInterceptors
@@ -23,6 +25,8 @@ import {RolesGuard} from '../roles/roles.guard';
 import {ValidationPipe} from '../validation/validation.pipe';
 import {ValidationSchema} from '../validation/validation.schema';
 import {MailServiceErrorException} from '../exceptions/mail-service-error.exception';
+import {TenantService} from "../tenants/tenant.service";
+import {Tenant} from "../tenants/tenant.entity";
 
 @Controller('users')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -30,8 +34,53 @@ export class UsersController {
     constructor(
         private readonly usersService: UsersService,
         private readonly authService: AuthService,
+        private readonly tenantService: TenantService,
         private readonly mailService: MailService
     ) {
+    }
+
+    @Post('/create')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(RoleEnum.ADMIN)
+    async createUser(
+        @Body(new ValidationPipe(ValidationSchema.CreateUserSchema)) body: {
+            name: string,
+            email: string,
+            password: string
+        }
+    ): Promise<User> {
+
+        let user: User = await this.usersService.create(
+            body.password,
+            body.email,
+            body.name,
+            ['user']
+        );
+
+        await this.usersService.updateVerified(user.id, true);
+        return user;
+    }
+
+    @Put('/update')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(RoleEnum.ADMIN)
+    async updateUser(
+        @Body(new ValidationPipe(ValidationSchema.UpdateUserSchema)) body: {
+            id: string,
+            name: string,
+            email: string,
+            password: string
+        }
+    ): Promise<User> {
+
+        let user: User = await this.usersService.update(
+            body.id,
+            body.name,
+            body.email,
+            body.password,
+        );
+
+        return user;
     }
 
     @Get('/me')
@@ -114,14 +163,22 @@ export class UsersController {
         return this.usersService.updateName(user.id, body.name);
     }
 
-    @Delete('/:email')
+    @Delete('/:id')
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(RoleEnum.ADMIN)
     async deleteUser(
-        @Param('email') email: string,
-        @Body(new ValidationPipe(ValidationSchema.DeleteUserSchema)) body: any
+        @Param('id') id: string
     ): Promise<User> {
+        return await this.usersService.delete(id);
+    }
+
+    @Get('/:email/tenants')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(RoleEnum.ADMIN)
+    async getTenants(
+        @Param('email') email: string
+    ): Promise<Tenant[]> {
         const user: User = await this.usersService.findByEmail(email);
-        return await this.usersService.delete(user.id);
+        return this.tenantService.findAllUserTenants(user);
     }
 }

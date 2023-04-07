@@ -27,17 +27,26 @@ export class BoardUserComponent implements OnInit {
         });
     }
 
-    openCreateModal() {
+    async openCreateModal() {
         const modalRef = this.modalService.open(CreateUserModalComponent);
+        const user = await modalRef.result;
+        console.log(user);
+        this.ngOnInit();
     }
 
-    openUpdateModal(user: any) {
+    async openUpdateModal(user: any) {
         const modalRef = this.modalService.open(EditUserModalComponent);
         modalRef.componentInstance.user = user;
+        const editedUser = await modalRef.result;
+        console.log(editedUser);
+        this.ngOnInit();
     }
 
-    openDeleteModal(user: any) {
+    async openDeleteModal(user: any) {
         const modalRef = this.modalService.open(DeleteUserModalComponent);
         modalRef.componentInstance.user = user;
+        const deletedUser = await modalRef.result;
+        console.log(deletedUser);
+        this.ngOnInit();
     }
 }

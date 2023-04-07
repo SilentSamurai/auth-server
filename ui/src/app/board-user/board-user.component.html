@@ -1,7 +1,7 @@
 <div class="row">
-    <div class="col-md-9">
+    <div class="col-xl-9">
         <div class="card my-2">
-            <p-table [value]="users" responsiveLayout="scroll">
+            <p-table [scrollable]="true" [value]="users" responsiveLayout="scroll" scrollHeight="80vh">
                 <ng-template pTemplate="caption">
                     <div class="d-flex justify-content-between">
                         <h5>User List</h5>
@@ -25,7 +25,7 @@
                             <span class="p-column-title">Price</span>
                             <a [routerLink]="['/user/', user.email]" href="javascript:void(0)">{{user.email}}</a>
                         </td>
-                        <td><span class="p-column-title">Created At</span>{{user.birthdate}}</td>
+                        <td><span class="p-column-title">Created At</span>{{user.createdAt | date }}</td>
                         <td class="d-flex ">
                             <button (click)="openUpdateModal(user)" class="btn btn-primary" type="button">
                                 <i class="fa fa-edit"></i>
@@ -39,7 +39,7 @@
             </p-table>
         </div>
     </div>
-    <div class="col-md-3">
+    <div class="col-xl-3">
     </div>
 
 </div>

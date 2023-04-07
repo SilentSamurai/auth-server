@@ -1,6 +1,8 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {UserService} from '../../_services/user.service';
 import {NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
+import {MessageService} from "primeng/api";
+import {lastValueFrom} from "rxjs";
 
 @Component({
     selector: 'create-user-modal',
@@ -11,15 +13,25 @@ export class DeleteUserModalComponent implements OnInit {
     @Input() user: any;
     @Output() passEntry: EventEmitter<any> = new EventEmitter();
 
-    constructor(private userService: UserService, public activeModal: NgbActiveModal) {
+    constructor(private userService: UserService,
+                private messageService: MessageService,
+                public activeModal: NgbActiveModal) {
     }
 
     ngOnInit() {
         console.log(this.user);
     }
 
-    onSubmit() {
-        this.passEntry.emit(this.user);
-        this.activeModal.close(this.user);
+    async onYes() {
+        try {
+            let deletedUser: any = this.userService.deleteUser(this.user.id);
+            deletedUser = await lastValueFrom(deletedUser);
+            this.messageService.add({severity: 'success', summary: 'Success', detail: 'User Deleted'});
+            this.passEntry.emit(deletedUser);
+            this.activeModal.close(deletedUser);
+        } catch (e) {
+            this.messageService.add({severity: 'error', summary: 'Error', detail: 'User Delete Failed'});
+        }
+
     }
 }

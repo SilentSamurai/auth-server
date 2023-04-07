@@ -16,7 +16,7 @@
                     <tr>
                         <th>Tenant Id</th>
                         <th>Name</th>
-                        <th>Subdomain</th>
+                        <th>Domain</th>
                         <th>Action</th>
                     </tr>
                 </ng-template>
@@ -26,8 +26,8 @@
                             <span class="p-column-title">Name</span>
                             <a [routerLink]="['/tenant/', tenant.id]" href="javascript:void(0)">{{tenant.id}}</a>
                         </td>
-                        <td><span class="p-column-title">Price</span>{{tenant.name}}</td>
-                        <td><span class="p-column-title">Price</span>{{tenant.subdomain}}</td>
+                        <td><span class="p-column-title">Name</span>{{tenant.name}}</td>
+                        <td><span class="p-column-title">Domain</span>{{tenant.domain}}</td>
                         <td class="d-flex ">
                             <button (click)="openUpdateModal(tenant)" class="btn btn-primary" type="button">
                                 <i class="fa fa-edit"></i>

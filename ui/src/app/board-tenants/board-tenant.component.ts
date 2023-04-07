@@ -1,9 +1,10 @@
 import {Component, OnInit} from '@angular/core';
-import {UserService} from '../_services/user.service';
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {CreateTenantComponent} from "./create-tenant/create-tenant.component";
 import {UpdateTenantComponent} from "./update-tenant/update-tenant.component";
 import {DeleteTenantComponent} from "./delete-tenant/delete-tenant.component";
+import {lastValueFrom} from "rxjs";
+import {TenantService} from "../_services/tenant.service";
 
 @Component({
     selector: 'app-board-tenants',
@@ -14,28 +15,26 @@ export class BoardTenantComponent implements OnInit {
 
     tenants: any[] = [];
 
-    constructor(private userService: UserService, private modalService: NgbModal) {
+    constructor(private tenantService: TenantService, private modalService: NgbModal) {
     }
 
-    ngOnInit(): void {
-        this.tenants = [{
-            id: "asjdbjkas-asndjans-ajsbn",
-            name: "tenant-1",
-            subdomain: "subdomain",
-        }, {
-            id: "asjdbjkas-asndjans-ajsbn",
-            name: "tenant-1",
-            subdomain: "subdomain",
-        }]
+    async ngOnInit(): Promise<void> {
+        this.tenants = await lastValueFrom(this.tenantService.getAllTenants());
     }
 
-    openCreateModal() {
+    async openCreateModal() {
         const modalRef = this.modalService.open(CreateTenantComponent);
+        const tenant = await modalRef.result;
+        console.log(tenant);
+        await this.ngOnInit();
     }
 
-    openUpdateModal(tenant: any) {
+    async openUpdateModal(tenant: any) {
         const modalRef = this.modalService.open(UpdateTenantComponent);
-        modalRef.componentInstance.form = tenant;
+        modalRef.componentInstance.tenant = tenant;
+        const editedTenant = await modalRef.result;
+        console.log(editedTenant);
+        await this.ngOnInit();
     }
 
     openDeleteModal(tenant: any) {

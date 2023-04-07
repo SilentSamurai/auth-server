@@ -2,6 +2,8 @@ import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from "@angular/router";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {EditUserModalComponent} from "../edit-user-modal/edit-user-modal.component";
+import {UserService} from "../../_services/user.service";
+import {lastValueFrom} from "rxjs";
 
 @Component({
     selector: 'tenant-details',
@@ -11,29 +13,22 @@ import {EditUserModalComponent} from "../edit-user-modal/edit-user-modal.compone
 export class UserDetailsComponent implements OnInit {
 
     user_email: string = "";
-    user = {
-        name: "apple pie",
-        email: "testmaim@asd.com",
-        username: "asdasd"
+    user: any = {
+        name: "",
+        createdAt: ""
     };
-    tenants = [
-        {
-            id: "asdasd-asdasd-asd",
-            name: "tenant-1",
-            subdomain: "asd.asd",
-            roles: [
-                "admin",
-                "user"
-            ]
-        }
-    ]
+    tenants: any = [];
 
-    constructor(private actRoute: ActivatedRoute, private modalService: NgbModal) {
+    constructor(private userService: UserService,
+                private actRoute: ActivatedRoute,
+                private modalService: NgbModal) {
     }
 
-    ngOnInit(): void {
+    async ngOnInit(): Promise<void> {
         this.user_email = this.actRoute.snapshot.params['email'];
         console.log(this.user_email)
+        this.user = await lastValueFrom(this.userService.getUser(this.user_email));
+        this.tenants = await lastValueFrom(this.userService.getUserTenants(this.user_email))
     }
 
     openUpdateModal() {

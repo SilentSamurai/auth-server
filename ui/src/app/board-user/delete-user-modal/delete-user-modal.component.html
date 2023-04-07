@@ -1,14 +1,22 @@
 <div class="modal-header">
     <h4 class="modal-title" id="modal-basic-title">Delete User</h4>
-    <button (click)="activeModal.dismiss('Cross click')" aria-label="Close" class="close" type="button">
+    <button (click)="activeModal.close('Cross click')" aria-label="Close" class="close" type="button">
         <span aria-hidden="true">&times;</span>
     </button>
 </div>
 <div class="modal-body">
     <p>Are you sure, you want to delete user {{ user.name }} ?</p>
     <div>
-        <button class="btn btn-secondary btn-sm" type="button">No</button>
-        <button class="btn btn-primary btn-sm" type="button">Yes</button>
+        <button (click)="activeModal.close('Cross click')"
+                class="btn btn-secondary btn-sm"
+                type="button">
+            No
+        </button>
+        <button (click)="onYes()"
+                class="btn btn-primary btn-sm"
+                type="button">
+            Yes
+        </button>
     </div>
 </div>
 

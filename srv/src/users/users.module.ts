@@ -7,6 +7,7 @@ import {MailModule} from '../mail/mail.module';
 import {User} from './user.entity';
 import {UsersController} from './users.controller';
 import {UsersService} from './users.service';
+import {TenantModule} from "../tenants/tenant.module";
 
 @Module(
     {
@@ -16,7 +17,8 @@ import {UsersService} from './users.service';
                         TypeOrmModule.forFeature([User]),
                         forwardRef(() => RolesModule), // Circular dependency resolved.
                         forwardRef(() => AuthModule), // Circular dependency resolved.
-                        MailModule
+                        MailModule,
+                        forwardRef(() => TenantModule)
                 ],
             controllers: [UsersController],
             providers: [UsersService],

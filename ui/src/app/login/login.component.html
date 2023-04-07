@@ -54,6 +54,29 @@
                         </div>
                     </div>
 
+                    <div class="form-group">
+                        <label for="domain">Domain</label>
+                        <input
+                            #domain="ngModel"
+                            [(ngModel)]="form.domain"
+                            class="form-control"
+                            id="domain"
+                            minlength="6"
+                            name="domain"
+                            required
+                            type="text"/>
+                        <div
+                            *ngIf="domain.errors && f.submitted"
+                            class="alert alert-danger"
+                            role="alert"
+                        >
+                            <div *ngIf="domain.errors['required']">Domain is required</div>
+                            <div *ngIf="domain.errors['minlength']">
+                                Password must be at least 6 characters
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="form-group d-grid gap-2 py-3 ">
                         <button class="btn btn-primary btn-block btn-lg">
                             Login

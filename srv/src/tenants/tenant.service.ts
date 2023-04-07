@@ -117,7 +117,7 @@ export class TenantService implements OnModuleInit {
     async updateTenant(id: string, name: string, domain: string) {
         const tenant: Tenant = await this.findById(id);
         if (domain) {
-            const domainTaken: Tenant = await this.findByDomain(domain);
+            const domainTaken: Tenant = await this.tenantRepository.findOne({where: {domain}});
             if (domainTaken) {
                 throw new ValidationErrorException("domain is already taken");
             }
@@ -194,5 +194,16 @@ export class TenantService implements OnModuleInit {
         } catch (e) {
 
         }
+    }
+
+    async findAllUserTenants(user: User) {
+        const tenants: Tenant[] = await this.tenantRepository.find({
+            where: {
+                members: {id: user.id}
+            }, relations: {
+                scopes: true
+            }
+        });
+        return tenants;
     }
 }

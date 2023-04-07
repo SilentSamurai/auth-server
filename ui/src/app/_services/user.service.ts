@@ -30,11 +30,32 @@ export class UserService {
         return this.http.get(API_URL + 'users', this.getHttpOptions());
     }
 
-    getModeratorBoard(): Observable<any> {
-        return this.http.get(API_URL + 'mod', {responseType: 'text'});
+    createUser(name: string, email: string, password: string) {
+        return this.http.post(API_URL + 'users/create', {
+            name,
+            email,
+            password
+        }, this.getHttpOptions());
     }
 
-    getAdminBoard(): Observable<any> {
-        return this.http.get(API_URL + 'admin', {responseType: 'text'});
+    editUser(id: string, name: string, email: string, password: string) {
+        return this.http.put(API_URL + 'users/update', {
+            id,
+            name,
+            email,
+            password
+        }, this.getHttpOptions())
+    }
+
+    deleteUser(id: string) {
+        return this.http.delete(API_URL + 'users/' + id, this.getHttpOptions())
+    }
+
+    getUser(email: string) {
+        return this.http.get(API_URL + 'users/' + email, this.getHttpOptions());
+    }
+
+    getUserTenants(email: string) {
+        return this.http.get(API_URL + 'users/' + email + "/tenants", this.getHttpOptions());
     }
 }

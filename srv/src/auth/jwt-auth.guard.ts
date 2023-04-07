@@ -1,6 +1,7 @@
 import {CanActivate, ExecutionContext, Injectable, Logger} from '@nestjs/common';
 import {ExtractJwt} from 'passport-jwt';
 import {AuthService} from "./auth.service";
+import {UnauthorizedException} from "../exceptions/unauthorized.exception";
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
@@ -24,7 +25,7 @@ export class JwtAuthGuard implements CanActivate {
             request['user'] = user;
         } catch (e) {
             JwtAuthGuard.LOGGER.error("Error occurred in Security Context", e)
-            throw e;
+            throw new UnauthorizedException(e);
         }
         return true;
     }

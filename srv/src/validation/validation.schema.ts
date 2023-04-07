@@ -122,8 +122,8 @@ const CreateTenantSchema = yup.object().shape(
 const UpdateTenantSchema = yup.object().shape(
     {
         id: yup.string().required('id is required'),
-        name: yup.string().max(20),
-        domain: yup.string().max(100),
+        name: yup.string().max(20).nullable(),
+        domain: yup.string().max(100).nullable(),
     });
 
 const CreateScopeSchema = yup.object().shape(
@@ -143,6 +143,21 @@ const MemberOperationsSchema = yup.object().shape(
     {
         tenantId: yup.string().required('TenantId is required'),
         email: yup.string().required('Email is required'),
+    });
+
+const CreateUserSchema = yup.object().shape(
+    {
+        email: yup.string().email().required('Email is required'),
+        name: yup.string().required('Name is required').max(15),
+        password: yup.string().required('Password is required').matches(PASSWORD_REGEXP, PASSWORD_MESSAGE),
+    });
+
+const UpdateUserSchema = yup.object().shape(
+    {
+        id: yup.string().required('Id is required'),
+        email: yup.string().email().nullable(),
+        name: yup.string().max(20).nullable(),
+        password: yup.string().matches(PASSWORD_REGEXP, PASSWORD_MESSAGE).nullable(),
     });
 
 export const ValidationSchema =
@@ -169,5 +184,7 @@ export const ValidationSchema =
         UpdateTenantSchema,
         CreateScopeSchema,
         OperatingScopeSchema,
-        MemberOperationsSchema
+        MemberOperationsSchema,
+        CreateUserSchema,
+        UpdateUserSchema
     };
