@@ -12,8 +12,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
         const context = host.switchToHttp();
         const request = context.getRequest<Request>();
         const response = context.getResponse<Response>();
-        let error = exception.getResponse();
-
+        let error = exception.getResponse ? exception.getResponse() : {};
         // Throwed http exception.
         if (exception instanceof HttpException) {
             // Throwed unknown http exception.
@@ -36,11 +35,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
                 }
 
             }
-        }
-        // Throwed unknown exception.
-        else {
+        } else {
             const message: string = (exception as Error)?.message;
             exception = new UnknownErrorException(message);
+            error['message'] = message;
         }
 
         error['url'] = request.url;

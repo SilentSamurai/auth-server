@@ -112,6 +112,38 @@ const UpdateBirthdateSchema = yup.object().shape(
 const DeleteUserSchema = yup.object().shape(
     {});
 
+const CreateTenantSchema = yup.object().shape(
+    {
+        name: yup.string().required('Name is required').max(20),
+        domain: yup.string().required('Domain is required').max(100),
+    });
+
+const UpdateTenantSchema = yup.object().shape(
+    {
+        id: yup.string().required('id is required'),
+        name: yup.string().max(20),
+        domain: yup.string().max(100),
+    });
+
+const CreateScopeSchema = yup.object().shape(
+    {
+        name: yup.string().required('Name is required').max(20),
+        tenantId: yup.string().required('TenantId is required'),
+    });
+
+const OperatingScopeSchema = yup.object().shape({
+        email: yup.string().required('Email is required'),
+        name: yup.string().required('Name is required').max(20),
+        tenantId: yup.string().required('TenantId is required'),
+    }
+);
+
+const MemberOperationsSchema = yup.object().shape(
+    {
+        tenantId: yup.string().required('TenantId is required'),
+        email: yup.string().required('Email is required'),
+    });
+
 export const ValidationSchema =
     {
         SignUpSchema,
@@ -131,5 +163,10 @@ export const ValidationSchema =
         UpdateSurnameSchema,
         UpdateMyBirthdateSchema,
         UpdateBirthdateSchema,
-        DeleteUserSchema
+        DeleteUserSchema,
+        CreateTenantSchema,
+        UpdateTenantSchema,
+        CreateScopeSchema,
+        OperatingScopeSchema,
+        MemberOperationsSchema
     };

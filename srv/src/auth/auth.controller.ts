@@ -43,13 +43,9 @@ export class AuthController {
         @Body(new ValidationPipe(ValidationSchema.SignUpSchema)) body: any
     ): Promise<User> {
         const user: User = await this.usersService.create(
-            body.username,
             body.password,
             body.email,
-            body.avatar,
             body.name,
-            body.surname,
-            body.birthdate
         );
 
         const token: string = await this.authService.createVerificationToken(user);
@@ -106,7 +102,7 @@ export class AuthController {
         @Headers() headers,
         @Body(new ValidationPipe(ValidationSchema.ForgotPasswordSchema)) body: any
     ): Promise<object> {
-        const user: User = await this.usersService.getByEmail(body.email);
+        const user: User = await this.usersService.findByEmail(body.email);
         const token: string = await this.authService.createResetPasswordToken(user);
 
         let link: any = this.configService.get('RESET_PASSWORD_LINK');

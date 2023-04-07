@@ -22,7 +22,7 @@ export class AuthService {
      * Validate the email and password.
      */
     async validate(email: string, password: string): Promise<User> {
-        const user: User = await this.usersService.getByEmail(email);
+        const user: User = await this.usersService.findByEmail(email);
         if (!user) {
             throw new UserNotFoundException();
         }
@@ -43,7 +43,9 @@ export class AuthService {
             throw new EmailNotVerifiedException();
         }
         const payload: object = {
-            sub: user.username
+            sub: user.email,
+            email: user.email,
+            name: user.name,
         };
         return this.jwtService.sign(payload);
     }
@@ -53,7 +55,7 @@ export class AuthService {
      */
     async createVerificationToken(user: User): Promise<string> {
         const payload: object = {
-            sub: user.username
+            sub: user.email
         };
         return this.jwtService.sign(payload, {expiresIn: this.configService.get('TOKEN_VERIFICATION_EXPIRATION_TIME')});
     }
@@ -69,7 +71,7 @@ export class AuthService {
             throw new InvalidTokenException();
         }
 
-        const user: User = await this.usersService.getByUsername(payload.sub);
+        const user: User = await this.usersService.findByEmail(payload.sub);
         if (user.verified) {
             return false;
         }
@@ -85,7 +87,7 @@ export class AuthService {
     async createResetPasswordToken(user: User): Promise<string> {
         const payload: object =
             {
-                sub: user.username
+                sub: user.email
             };
 
         // Use the user's current password's hash for signing the token.
@@ -103,7 +105,7 @@ export class AuthService {
     async resetPassword(token: string, password: string): Promise<boolean> {
         // Get the user.
         let payload: any = this.jwtService.decode(token);
-        const user: User = await this.usersService.getByUsername(payload.sub);
+        const user: User = await this.usersService.findByEmail(payload.sub);
         if (!user) {
             throw new UserNotFoundException();
         }
@@ -132,7 +134,7 @@ export class AuthService {
     async createChangeEmailToken(user: User, email: string): Promise<string> {
         const payload: object =
             {
-                sub: user.username,
+                sub: user.email,
                 email: email
             };
 
@@ -151,7 +153,7 @@ export class AuthService {
     async confirmEmailChange(token: string): Promise<boolean> {
         // Get the user.
         let payload: any = this.jwtService.decode(token);
-        const user: User = await this.usersService.getByUsername(payload.sub);
+        const user: User = await this.usersService.findByEmail(payload.sub);
         if (!user) {
             throw new UserNotFoundException();
         }

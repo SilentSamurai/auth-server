@@ -1,19 +1,30 @@
-import {Column, Entity, PrimaryGeneratedColumn} from "typeorm";
-import {Exclude} from 'class-transformer';
-import {Role} from "../roles/role.entity"; // Used with ClassSerializerInterceptor to exclude from responses.
+import {Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn} from "typeorm";
+import {Scope} from "./scope.entity";
+import {Exclude} from "class-transformer";
+import {User} from "../users/user.entity"; // Used with ClassSerializerInterceptor to exclude from responses.
 
 @Entity()
 export class Tenant {
     @PrimaryGeneratedColumn("uuid")
-    @Exclude() // Exclude from responses.
     id: string;
-
-    @Column({unique: true, nullable: false})
-    subdomain: string;
 
     @Column({nullable: false})
     name: string;
 
-    // Return the array of names.
-    roles: Role[];
+    @Column({unique: true, nullable: false})
+    domain: string;
+
+    @Column({nullable: false})
+    @Exclude()
+    privateKey: string;
+
+    @Column({nullable: false})
+    publicKey: string;
+
+    @OneToMany(type => Scope, scope => scope.tenant)
+    scopes: Scope[];
+
+    @ManyToMany(() => User, (user) => user.tenants)
+    @JoinTable()
+    members: User[];
 }

@@ -28,7 +28,7 @@ export class RolesGuard implements CanActivate {
             return false;
         }
 
-        const user: User = await this.userService.getByUsername(request.user.username);
+        const user: User = await this.userService.findByEmail(request.user.email);
         const roleNames: string[] = user.roles.map(r => r.name);
         const activate: boolean = requiredRoles.some(role => roleNames.includes(role))
 

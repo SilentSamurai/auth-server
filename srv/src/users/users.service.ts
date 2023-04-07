@@ -11,11 +11,14 @@ import {UserNotFoundException} from '../exceptions/user-not-found.exception';
 import {InvalidCredentialsException} from '../exceptions/invalid-credentials.exception';
 import * as argon2 from 'argon2';
 import * as ms from 'ms';
+import {Scope} from "../tenants/scope.entity";
+import {Tenant} from 'src/tenants/tenant.entity';
 
 const fs = require('fs');
 
 @Injectable()
 export class UsersService implements OnModuleInit {
+
     private readonly cronLogger = new Logger("CRON");
 
     constructor(
@@ -35,19 +38,11 @@ export class UsersService implements OnModuleInit {
      * Create a user.
      */
     async create(
-        username: string,
         password: string,
         email: string,
-        avatar: string,
         name: string,
-        surname: string,
-        birthdate: Date,
         roles: string[] = ['user']
     ): Promise<User> {
-        const usernameTaken: User = await this.usersRepository.findOne({where: {username}});
-        if (usernameTaken) {
-            throw new UsernameTakenException();
-        }
 
         const emailTaken: User = await this.usersRepository.findOne({where: {email}});
         if (emailTaken) {
@@ -63,13 +58,9 @@ export class UsersService implements OnModuleInit {
         }
 
         const user: User = this.usersRepository.create({
-            username: username,
-            password: await argon2.hash(password),
             email: email,
-            avatar: avatar,
+            password: await argon2.hash(password),
             name: name,
-            surname: surname,
-            birthdate: birthdate,
             roles: userRoles
         });
 
@@ -80,39 +71,32 @@ export class UsersService implements OnModuleInit {
      * Get all the users.
      */
     async getAll(): Promise<User[]> {
-        return await this.usersRepository.find({relations: ['roles']});
+        return await this.usersRepository.find({
+            relations: {}
+        });
     }
 
     /**
      * Get all the not verified users.
      * Roles relation is not returned.
      */
-    async getNotVerified(): Promise<User[]> {
+    async findByNotVerified(): Promise<User[]> {
         return await this.usersRepository.createQueryBuilder('user').select('*').where('verified = false').execute();
     }
 
     /**
      * Get a user by id.
      */
-    async getById(
+    async findById(
         id: string
     ): Promise<User> {
-        const user: User = await this.usersRepository.findOne({where: {id: id}, relations: ['roles']});
-        if (!user) {
-            throw new UserNotFoundException();
-        }
-
-        return user;
-    }
-
-    /**
-     * Get a user by username.
-     */
-    async getByUsername(
-        username: string
-    ): Promise<User> {
-        const user: User = await this.usersRepository.findOne({where: {username}, relations: ['roles']});
-        if (!user) {
+        const user: User = await this.usersRepository.findOne({
+            where: {id: id},
+            relations: {
+                roles: true
+            }
+        });
+        if (user === null) {
             throw new UserNotFoundException();
         }
 
@@ -122,29 +106,30 @@ export class UsersService implements OnModuleInit {
     /**
      * Get a user by email.
      */
-    async getByEmail(
+    async findByEmail(
         email: string
     ): Promise<User> {
-        const user: User = await this.usersRepository.findOne({where: {email}, relations: ['roles']});
-        if (!user) {
+        const user: User = await this.usersRepository.findOne({
+            where: {email},
+            relations: {
+                roles: true
+            }
+        });
+        if (user === null) {
             throw new UserNotFoundException();
         }
 
         return user;
     }
 
-    /**
-     * Get the user's avatar.
-     */
-    async getAvatar(
-        username: string
-    ): Promise<string> {
-        const user: User = await this.getByUsername(username);
-        if (!user) {
-            throw new UserNotFoundException();
-        }
-
-        return user.avatar;
+    async findByTenant(tenant: Tenant): Promise<User[]> {
+        const users: User[] = await this.usersRepository.find({
+            where: {tenants: {id: tenant.id}},
+            relations: {
+                scopes: true
+            }
+        });
+        return users;
     }
 
     /**
@@ -152,52 +137,21 @@ export class UsersService implements OnModuleInit {
      */
     async update(
         id: string,
-        username: string,
-        password: string,
-        avatar: string,
         name: string,
-        surname: string,
-        birthdate: Date
+        email: string,
+        password: string
     ): Promise<User> {
-        const user: User = await this.getById(id);
-        if (!user) {
-            throw new UserNotFoundException();
-        }
+        const user: User = await this.findById(id);
 
-        if (username) {
-            await this.updateUsername(id, username);
+        if (email) {
+            await this.updateEmail(id, email);
         }
 
         if (password) {
             await this.updatePassword(id, password);
         }
 
-        user.avatar = avatar || user.avatar;
         user.name = name || user.name;
-        user.surname = surname || user.surname;
-        user.birthdate = birthdate || user.birthdate;
-
-        return await this.usersRepository.save(user);
-    }
-
-    /**
-     * Update the user's username.
-     */
-    async updateUsername(
-        id: string,
-        username: string
-    ): Promise<User> {
-        const user: User = await this.getById(id);
-        if (!user) {
-            throw new UserNotFoundException();
-        }
-
-        const usernameTaken: User = await this.getByUsername(username);
-        if (usernameTaken) {
-            throw new UsernameTakenException();
-        }
-
-        user.username = username;
 
         return await this.usersRepository.save(user);
     }
@@ -205,27 +159,24 @@ export class UsersService implements OnModuleInit {
     /**
      * Update the user's username if the password is verified.
      */
-    async updateUsernameSecure(
+    async updateEmailSecure(
         id: string,
-        username: string,
+        email: string,
         password: string
     ): Promise<User> {
-        const user: User = await this.getById(id);
-        if (!user) {
-            throw new UserNotFoundException();
-        }
+        const user: User = await this.findById(id);
 
         const valid: boolean = await argon2.verify(user.password, password);
         if (!valid) {
             throw new InvalidCredentialsException();
         }
 
-        const usernameTaken: User = await this.getByUsername(username);
-        if (usernameTaken) {
+        const emailTaken: User = await this.findByEmail(email);
+        if (emailTaken) {
             throw new UsernameTakenException();
         }
 
-        user.username = username;
+        user.email = email;
 
         return await this.usersRepository.save(user);
     }
@@ -237,13 +188,8 @@ export class UsersService implements OnModuleInit {
         id: string,
         email: string
     ): Promise<User> {
-        const user: User = await this.getById(id);
-        if (!user) {
-            throw new UserNotFoundException();
-        }
-
+        const user: User = await this.findById(id);
         user.email = email;
-
         return await this.usersRepository.save(user);
     }
 
@@ -254,13 +200,8 @@ export class UsersService implements OnModuleInit {
         id: string,
         password: string
     ): Promise<User> {
-        const user: User = await this.getById(id);
-        if (!user) {
-            throw new UserNotFoundException();
-        }
-
+        const user: User = await this.findById(id);
         user.password = await argon2.hash(password);
-
         return await this.usersRepository.save(user);
     }
 
@@ -272,35 +213,12 @@ export class UsersService implements OnModuleInit {
         currentPassword: string,
         newPassword: string
     ): Promise<User> {
-        const user: User = await this.getById(id);
-        if (!user) {
-            throw new UserNotFoundException();
-        }
-
+        const user: User = await this.findById(id);
         const valid: boolean = await argon2.verify(user.password, currentPassword);
         if (!valid) {
             throw new InvalidCredentialsException();
         }
-
         user.password = await argon2.hash(newPassword);
-
-        return await this.usersRepository.save(user);
-    }
-
-    /**
-     * Update the user's avatar.
-     */
-    async updateAvatar(
-        id: string,
-        avatar: string = ''
-    ): Promise<User> {
-        const user: User = await this.getById(id);
-        if (!user) {
-            throw new UserNotFoundException();
-        }
-
-        user.avatar = avatar;
-
         return await this.usersRepository.save(user);
     }
 
@@ -311,47 +229,8 @@ export class UsersService implements OnModuleInit {
         id: string,
         name: string = ''
     ): Promise<User> {
-        const user: User = await this.getById(id);
-        if (!user) {
-            throw new UserNotFoundException();
-        }
-
+        const user: User = await this.findById(id);
         user.name = name;
-
-        return await this.usersRepository.save(user);
-    }
-
-    /**
-     * Update the user's surname.
-     */
-    async updateSurname(
-        id: string,
-        surname: string = ''
-    ): Promise<User> {
-        const user: User = await this.getById(id);
-        if (!user) {
-            throw new UserNotFoundException();
-        }
-
-        user.surname = surname;
-
-        return await this.usersRepository.save(user);
-    }
-
-    /**
-     * Update the user's birthdate.
-     */
-    async updateBirthdate(
-        id: string,
-        birthdate: Date = new Date('1900-01-01')
-    ): Promise<User> {
-        const user: User = await this.getById(id);
-        if (!user) {
-            throw new UserNotFoundException();
-        }
-
-        user.birthdate = birthdate;
-
         return await this.usersRepository.save(user);
     }
 
@@ -362,13 +241,8 @@ export class UsersService implements OnModuleInit {
         id: string,
         verified: boolean
     ): Promise<User> {
-        const user: User = await this.getById(id);
-        if (!user) {
-            throw new UserNotFoundException();
-        }
-
+        const user: User = await this.findById(id);
         user.verified = verified;
-
         return await this.usersRepository.save(user);
     }
 
@@ -378,11 +252,7 @@ export class UsersService implements OnModuleInit {
     async delete(
         id: string
     ): Promise<User> {
-        const user: User = await this.getById(id);
-        if (!user) {
-            throw new UserNotFoundException();
-        }
-
+        const user: User = await this.findById(id);
         return await this.usersRepository.remove(user);
     }
 
@@ -393,17 +263,50 @@ export class UsersService implements OnModuleInit {
         id: string,
         password: string
     ): Promise<User> {
-        const user: User = await this.getById(id);
-        if (!user) {
-            throw new UserNotFoundException();
-        }
-
+        const user: User = await this.findById(id);
         const valid: boolean = await argon2.verify(user.password, password);
         if (!valid) {
             throw new InvalidCredentialsException();
         }
-
         return await this.usersRepository.remove(user);
+    }
+
+    async addScope(
+        id: string,
+        scope: Scope
+    ): Promise<User> {
+        const user: User = await this.usersRepository.findOne({
+            where: {id},
+            relations: {
+                roles: true,
+                scopes: true
+            }
+        });
+        if (!user) {
+            throw new UserNotFoundException();
+        }
+
+        user.scopes.push(scope);
+
+        return await this.usersRepository.save(user);
+    }
+
+    async removeScope(
+        id: string,
+        deleteScope: Scope
+    ): Promise<User> {
+        const user: User = await this.usersRepository.findOne({
+            where: {id},
+            relations: {
+                roles: true,
+                scopes: true
+            }
+        });
+        if (!user) {
+            throw new UserNotFoundException();
+        }
+        user.scopes = user.scopes.filter((scope) => scope.id !== deleteScope.id)
+        return await this.usersRepository.save(user);
     }
 
     /**
@@ -416,16 +319,16 @@ export class UsersService implements OnModuleInit {
         const now: Date = new Date();
         const expirationTime: any = this.configService.get('TOKEN_VERIFICATION_EXPIRATION_TIME');
 
-        const users: User[] = await this.getNotVerified();
+        const users: User[] = await this.findByNotVerified();
         for (let i = 0; i < users.length; i++) {
             const user: User = users[i];
-            const createDate: Date = new Date(user.createdate);
+            const createDate: Date = new Date(user.createdAt);
             const expirationDate: Date = new Date(createDate.getTime() + ms(expirationTime));
 
             if (now > expirationDate) {
                 try {
                     this.delete(user.id);
-                    this.cronLogger.log('User ' + user.username + ' deleted');
+                    this.cronLogger.log('User ' + user.email + ' deleted');
                 } catch (exception) {
                 }
             }
@@ -445,13 +348,9 @@ export class UsersService implements OnModuleInit {
             users.records.forEach(async record => {
                 try {
                     let user: User = await this.create(
-                        record.username,
                         record.password,
                         record.email,
-                        record.avatar,
                         record.name,
-                        record.surname,
-                        record.birthdate,
                         record.roles
                     );
 
@@ -461,5 +360,23 @@ export class UsersService implements OnModuleInit {
                 }
             });
         });
+    }
+
+    async countByScope(
+        scope: Scope
+    ): Promise<number> {
+        const count: number = await this.usersRepository.count({
+            where: {
+                scopes: {id: scope.id}
+            }, relations: {
+                scopes: true
+            }
+        });
+        return count;
+    }
+
+    async isUserAssignedToScope(scope: Scope) {
+        let count = await this.countByScope(scope);
+        return count > 0;
     }
 }

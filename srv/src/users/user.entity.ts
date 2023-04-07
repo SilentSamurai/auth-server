@@ -1,6 +1,8 @@
 import {Column, CreateDateColumn, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn} from 'typeorm';
 import {Exclude, Transform} from 'class-transformer'; // Used with ClassSerializerInterceptor to exclude from responses.
 import {Role} from '../roles/role.entity';
+import {Tenant} from "../tenants/tenant.entity";
+import {Scope} from "../tenants/scope.entity";
 
 @Entity()
 export class User {
@@ -9,11 +11,7 @@ export class User {
     id: string;
 
     @CreateDateColumn()
-    @Exclude() // Exclude from responses.
-    createdate: Date;
-
-    @Column({unique: true, nullable: false})
-    username: string;
+    createdAt: Date;
 
     @Column({nullable: false})
     @Exclude() // Exclude from responses.
@@ -23,21 +21,20 @@ export class User {
     email: string;
 
     @Column({default: ''})
-    avatar: string;
-
-    @Column({default: ''})
     name: string;
-
-    @Column({default: ''})
-    surname: string;
-
-    @Column({type: 'date', default: '1900-01-01'})
-    birthdate: Date;
 
     @ManyToMany(() => Role)
     @JoinTable()
     @Transform(({value}) => value.map(x => x.name)) // Return the array of names.
+    @Exclude()
     roles: Role[];
+
+    @ManyToMany(() => Tenant, (tenant) => tenant.members)
+    tenants: Tenant[];
+
+    @ManyToMany(() => Scope)
+    @JoinTable()
+    scopes: Scope[];
 
     @Column({default: false})
     @Exclude() // Exclude from responses.

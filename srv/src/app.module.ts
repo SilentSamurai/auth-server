@@ -8,6 +8,7 @@ import {UsersModule} from './users/users.module';
 import {AuthModule} from './auth/auth.module';
 import {ConfigService} from './config/config.service';
 import {LoggerMiddleware} from './log/logger.middleware';
+import {TenantModule} from "./tenants/tenant.module";
 
 @Module({
     imports: [
@@ -38,7 +39,8 @@ import {LoggerMiddleware} from './log/logger.middleware';
             }),
         RolesModule,
         UsersModule,
-        AuthModule
+        AuthModule,
+        TenantModule
     ],
     controllers: [],
     providers: [],

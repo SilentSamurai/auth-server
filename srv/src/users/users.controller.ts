@@ -40,18 +40,18 @@ export class UsersController {
     async getMyUser(
         @Request() request
     ): Promise<User> {
-        const user: User = await this.usersService.getByUsername(request.user.username);
-        return this.usersService.getById(user.id);
+        const user: User = await this.usersService.findByEmail(request.user.email);
+        return this.usersService.findById(user.id);
     }
 
-    @Get('/:username')
+    @Get('/:email')
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(RoleEnum.ADMIN)
     async getUser(
-        @Param('username') username: string
+        @Param('email') email: string
     ): Promise<User> {
-        const user: User = await this.usersService.getByUsername(username);
-        return this.usersService.getById(user.id);
+        const user: User = await this.usersService.findByEmail(email);
+        return this.usersService.findById(user.id);
     }
 
     @Get('')
@@ -59,48 +59,6 @@ export class UsersController {
     @Roles(RoleEnum.ADMIN)
     async getUsers(): Promise<User[]> {
         return await this.usersService.getAll();
-    }
-
-    @Get('/me/avatar')
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(RoleEnum.USER, RoleEnum.ADMIN)
-    async getMyAvatar(
-        @Request() request,
-    ): Promise<object> {
-        const avatar: string = await this.usersService.getAvatar(request.user.username);
-        return {avatar: avatar};
-    }
-
-    @Get('/:username/avatar')
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(RoleEnum.USER, RoleEnum.ADMIN)
-    async getAvatar(
-        @Param('username') username: string
-    ): Promise<object> {
-        const avatar: string = await this.usersService.getAvatar(username);
-        return {avatar: avatar};
-    }
-
-    @Patch('/me/username')
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(RoleEnum.USER)
-    async updateMyUsername(
-        @Request() request,
-        @Body(new ValidationPipe(ValidationSchema.UpdateMyUsernameSchema)) body: any
-    ): Promise<User> {
-        const user: User = await this.usersService.getByUsername(request.user.username);
-        return this.usersService.updateUsernameSecure(user.id, body.username, body.password);
-    }
-
-    @Patch('/:username/username')
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(RoleEnum.ADMIN)
-    async updateUsername(
-        @Param('username') username: string,
-        @Body(new ValidationPipe(ValidationSchema.UpdateUsernameSchema)) body: any
-    ): Promise<User> {
-        const user: User = await this.usersService.getByUsername(username);
-        return this.usersService.updateUsername(user.id, body.username);
     }
 
     @Patch('/me/email')
@@ -111,7 +69,7 @@ export class UsersController {
         @Headers() headers,
         @Body(new ValidationPipe(ValidationSchema.UpdateMyEmailSchema)) body: any
     ): Promise<object> {
-        const user: User = await this.usersService.getByUsername(request.user.username);
+        const user: User = await this.usersService.findByEmail(request.user.username);
         const token: string = await this.authService.createChangeEmailToken(user, body.email);
         const link: string = 'https://' + headers.host + '/change-email/' + token;
 
@@ -130,30 +88,8 @@ export class UsersController {
         @Request() request,
         @Body(new ValidationPipe(ValidationSchema.UpdateMyPasswordSchema)) body: any
     ): Promise<User> {
-        const user: User = await this.usersService.getByUsername(request.user.username);
+        const user: User = await this.usersService.findByEmail(request.user.email);
         return this.usersService.updatePasswordSecure(user.id, body.currentPassword, body.newPassword);
-    }
-
-    @Patch('/me/avatar')
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(RoleEnum.USER)
-    async updateMyAvatar(
-        @Request() request,
-        @Body(new ValidationPipe(ValidationSchema.UpdateMyAvatarSchema)) body: any
-    ): Promise<User> {
-        const user: User = await this.usersService.getByUsername(request.user.username);
-        return this.usersService.updateAvatar(user.id, body.avatar);
-    }
-
-    @Patch('/:username/avatar')
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(RoleEnum.ADMIN)
-    async updateAvatar(
-        @Param('username') username: string,
-        @Body(new ValidationPipe(ValidationSchema.UpdateAvatarSchema)) body: any
-    ): Promise<User> {
-        const user: User = await this.usersService.getByUsername(username);
-        return this.usersService.updateAvatar(user.id, body.avatar);
     }
 
     @Patch('/me/name')
@@ -163,73 +99,29 @@ export class UsersController {
         @Request() request,
         @Body(new ValidationPipe(ValidationSchema.UpdateMyNameSchema)) body: any
     ): Promise<User> {
-        const user: User = await this.usersService.getByUsername(request.user.username);
+        const user: User = await this.usersService.findByEmail(request.user.email);
         return this.usersService.updateName(user.id, body.name);
     }
 
-    @Patch('/:username/name')
+    @Patch('/:email/name')
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(RoleEnum.ADMIN)
     async updateName(
-        @Param('username') username: string,
+        @Param('email') email: string,
         @Body(new ValidationPipe(ValidationSchema.UpdateNameSchema)) body: any
     ): Promise<User> {
-        const user: User = await this.usersService.getByUsername(username);
+        const user: User = await this.usersService.findByEmail(email);
         return this.usersService.updateName(user.id, body.name);
     }
 
-    @Patch('/me/surname')
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(RoleEnum.USER)
-    async updateMySurname(
-        @Request() request,
-        @Body(new ValidationPipe(ValidationSchema.UpdateMySurnameSchema)) body: any
-    ): Promise<User> {
-        const user: User = await this.usersService.getByUsername(request.user.username);
-        return this.usersService.updateSurname(user.id, body.surname);
-    }
-
-    @Patch('/:username/surname')
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(RoleEnum.ADMIN)
-    async updateSurname(
-        @Param('username') username: string,
-        @Body(new ValidationPipe(ValidationSchema.UpdateSurnameSchema)) body: any
-    ): Promise<User> {
-        const user: User = await this.usersService.getByUsername(username);
-        return this.usersService.updateSurname(user.id, body.surname);
-    }
-
-    @Patch('/me/birthdate')
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(RoleEnum.USER)
-    async updateMyBirthdate(
-        @Request() request,
-        @Body(new ValidationPipe(ValidationSchema.UpdateMyBirthdateSchema)) body: any
-    ): Promise<User> {
-        const user: User = await this.usersService.getByUsername(request.user.username);
-        return this.usersService.updateBirthdate(user.id, body.birthdate);
-    }
-
-    @Patch('/:username/birthdate')
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(RoleEnum.ADMIN)
-    async updateBirthdate(
-        @Param('username') username: string,
-        @Body(new ValidationPipe(ValidationSchema.UpdateBirthdateSchema)) body: any
-    ): Promise<User> {
-        const user: User = await this.usersService.getByUsername(username);
-        return this.usersService.updateBirthdate(user.id, body.birthdate);
-    }
-
-    @Delete('/:username')
+    @Delete('/:email')
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(RoleEnum.ADMIN)
     async deleteUser(
-        @Param('username') username: string,
+        @Param('email') email: string,
         @Body(new ValidationPipe(ValidationSchema.DeleteUserSchema)) body: any
     ): Promise<User> {
-        const user: User = await this.usersService.getByUsername(username);
+        const user: User = await this.usersService.findByEmail(email);
         return await this.usersService.delete(user.id);
     }
 }
