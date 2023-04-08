@@ -28,10 +28,10 @@ export class User {
     @Exclude()
     roles: Role[];
 
-    @ManyToMany(() => Tenant, (tenant) => tenant.members)
+    @ManyToMany(() => Tenant, (tenant) => tenant.members, {cascade: true})
     tenants: Tenant[];
 
-    @ManyToMany(() => Scope, scope => scope.users)
+    @ManyToMany(() => Scope, scope => scope.users, {cascade: true})
     scopes: Scope[];
 
     @Column({default: false})

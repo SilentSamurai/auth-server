@@ -113,7 +113,6 @@ export class TenantService implements OnModuleInit {
         return this.tenantRepository.find();
     }
 
-
     async updateTenant(id: string, name: string, domain: string) {
         const tenant: Tenant = await this.findById(id);
         if (domain) {
@@ -154,7 +153,7 @@ export class TenantService implements OnModuleInit {
         return tenant.members.find((member) => user.id === member.id) !== undefined;
     }
 
-    async updateScopeOfMember(scopes: [string] | [], tenantId: string, user: User): Promise<Scope[]> {
+    async updateScopeOfMember(scopes: string[], tenantId: string, user: User): Promise<Scope[]> {
         let tenant: Tenant = await this.findById(tenantId);
         const isMember: boolean = await this.isMember(tenantId, user);
         if (!isMember) {
@@ -182,9 +181,12 @@ export class TenantService implements OnModuleInit {
                     "auth.server.com",
                     user
                 );
+                const scopeAdmin = await this.scopeService.create("admin", tenant);
+                const scopeViewer = await this.scopeService.create("viewer", tenant);
+                await this.scopeService.updateUserScopes([scopeAdmin.name, scopeViewer.name], tenant, user);
             }
         } catch (e) {
-
+            console.error(e);
         }
     }
 

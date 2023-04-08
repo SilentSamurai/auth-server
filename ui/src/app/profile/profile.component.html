@@ -1,32 +1,55 @@
-<div *ngIf="currentUser; else loggedOut" class="container">
-    <header class="jumbotron">
-        <h3>
-            <strong>{{ currentUser.username }}</strong> Profile
-        </h3>
-    </header>
-    <p>
-        <strong>Token:</strong>
-        {{ token.substring(0, 20) }} ...
-        {{ token.substr(token.length - 20) }}
-    </p>
-    <p>
-        <strong>Email:</strong>
-        {{ currentUser.email }}
-    </p>
-    <p>
-        <strong>Name:</strong>
-        {{ currentUser.name }} {{ currentUser.surname }}
-    </p>
-    <p>
-        <strong>Birthday:</strong>
-        {{ currentUser.birthdate }}
-    </p>
-    <strong>Roles:</strong>
-    <ul>
-        <li *ngFor="let role of currentUser.roles">
-            {{ role }}
-        </li>
-    </ul>
+<div *ngIf="currentUser; else loggedOut" class="card my-2">
+    <div class="card-body">
+        <header class="jumbotron">
+            <div class="display-6">
+                <strong>{{ currentUser.name }}</strong>'s Profile
+            </div>
+        </header>
+        <br>
+        <ul class="list-group">
+            <li class="list-group-item">
+                Email
+                <div>
+                    <strong>{{ currentUser.email }}</strong>
+                </div>
+            </li>
+            <li class="list-group-item">
+                Name
+                <div>
+                    <strong>{{ currentUser.name }}</strong>
+                </div>
+            </li>
+            <li class="list-group-item">
+                Tenant Id
+                <div>
+                    <strong>{{ currentUser.tenant.id }}</strong>
+                </div>
+            </li>
+            <li class="list-group-item">
+                Tenant Name
+                <div>
+                    <strong>{{ currentUser.tenant.name }}</strong>
+                </div>
+            </li>
+            <li class="list-group-item">
+                Tenant Domain
+                <div>
+                    <strong>{{ currentUser.tenant.domain }}</strong>
+                </div>
+            </li>
+            <li class="list-group-item">
+                Scopes
+                <div>
+                    <ul>
+                        <li *ngFor="let scope of currentUser.scopes">
+                            <strong><code>{{currentUser.tenant.name}}::{{ scope }}</code></strong>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+        </ul>
+    </div>
+
 </div>
 
 <ng-template #loggedOut>

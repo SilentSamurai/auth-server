@@ -41,7 +41,7 @@ export class UsersController {
 
     @Post('/create')
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(RoleEnum.ADMIN)
+    @Roles(RoleEnum.ADMIN) // SUPER ADMIN
     async createUser(
         @Body(new ValidationPipe(ValidationSchema.CreateUserSchema)) body: {
             name: string,
@@ -53,8 +53,7 @@ export class UsersController {
         let user: User = await this.usersService.create(
             body.password,
             body.email,
-            body.name,
-            ['user']
+            body.name
         );
 
         await this.usersService.updateVerified(user.id, true);
@@ -63,7 +62,7 @@ export class UsersController {
 
     @Put('/update')
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(RoleEnum.ADMIN)
+    @Roles(RoleEnum.ADMIN) // SUPER ADMIN
     async updateUser(
         @Body(new ValidationPipe(ValidationSchema.UpdateUserSchema)) body: {
             id: string,
@@ -85,7 +84,7 @@ export class UsersController {
 
     @Get('/me')
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(RoleEnum.USER)
+    @Roles(RoleEnum.USER) // ANY SCOPE
     async getMyUser(
         @Request() request
     ): Promise<User> {
@@ -95,7 +94,7 @@ export class UsersController {
 
     @Get('/:email')
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(RoleEnum.ADMIN)
+    @Roles(RoleEnum.ADMIN) // SUPER ADMIN
     async getUser(
         @Param('email') email: string
     ): Promise<User> {
@@ -105,14 +104,14 @@ export class UsersController {
 
     @Get('')
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(RoleEnum.ADMIN)
+    @Roles(RoleEnum.ADMIN) // SUPER ADMIN
     async getUsers(): Promise<User[]> {
         return await this.usersService.getAll();
     }
 
     @Patch('/me/email')
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(RoleEnum.USER, RoleEnum.ADMIN)
+    @Roles(RoleEnum.USER, RoleEnum.ADMIN) // ANY ROLE
     async updateMyEmail(
         @Request() request,
         @Headers() headers,
@@ -149,17 +148,6 @@ export class UsersController {
         @Body(new ValidationPipe(ValidationSchema.UpdateMyNameSchema)) body: any
     ): Promise<User> {
         const user: User = await this.usersService.findByEmail(request.user.email);
-        return this.usersService.updateName(user.id, body.name);
-    }
-
-    @Patch('/:email/name')
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(RoleEnum.ADMIN)
-    async updateName(
-        @Param('email') email: string,
-        @Body(new ValidationPipe(ValidationSchema.UpdateNameSchema)) body: any
-    ): Promise<User> {
-        const user: User = await this.usersService.findByEmail(email);
         return this.usersService.updateName(user.id, body.name);
     }
 

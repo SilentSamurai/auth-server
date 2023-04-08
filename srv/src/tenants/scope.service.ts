@@ -85,7 +85,7 @@ export class ScopeService {
         });
     }
 
-    async updateUserScopes(scopes: [string] | [], tenant: Tenant, user: User): Promise<Scope[]> {
+    async updateUserScopes(scopes: string[], tenant: Tenant, user: User): Promise<Scope[]> {
 
         let memberScopes = await this.getMemberScopes(tenant, user);
         const previousScopeMap: Map<string, Scope> = new Map<string, Scope>();

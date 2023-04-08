@@ -18,4 +18,6 @@ export class ProfileComponent implements OnInit {
         this.token = this.tokenStorageService.getToken();
         console.log(this.currentUser);
     }
+
+
 }
