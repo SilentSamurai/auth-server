@@ -1,20 +1,20 @@
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import {AssignRoleComponent} from './assign-role.component';
+import {AssignScopeComponent} from './assign-scope.component';
 
 describe('CreateTenantComponent', () => {
-    let component: AssignRoleComponent;
-    let fixture: ComponentFixture<AssignRoleComponent>;
+    let component: AssignScopeComponent;
+    let fixture: ComponentFixture<AssignScopeComponent>;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [AssignRoleComponent]
+            declarations: [AssignScopeComponent]
         })
             .compileComponents();
     });
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(AssignRoleComponent);
+        fixture = TestBed.createComponent(AssignScopeComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

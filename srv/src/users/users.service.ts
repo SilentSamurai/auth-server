@@ -124,12 +124,7 @@ export class UsersService implements OnModuleInit {
     async findByTenant(tenant: Tenant): Promise<User[]> {
         const users: User[] = await this.usersRepository.find({
             where: {
-                tenants: {id: tenant.id},
-                scopes: {
-                    tenant: {
-                        id: tenant.id
-                    }
-                }
+                tenants: {id: tenant.id}
             },
             relations: {
                 scopes: true
@@ -278,24 +273,6 @@ export class UsersService implements OnModuleInit {
         return await this.usersRepository.remove(user);
     }
 
-    async removeScope(
-        id: string,
-        deleteScope: Scope
-    ): Promise<User> {
-        const user: User = await this.usersRepository.findOne({
-            where: {id},
-            relations: {
-                roles: true,
-                scopes: true
-            }
-        });
-        if (!user) {
-            throw new UserNotFoundException();
-        }
-        user.scopes = user.scopes.filter((scope) => scope.id !== deleteScope.id)
-        return await this.usersRepository.save(user);
-    }
-
     /**
      * Delete the expired not verified users.
      */
@@ -380,5 +357,13 @@ export class UsersService implements OnModuleInit {
     async isUserAssignedToScope(scope: Scope) {
         let count = await this.countByScope(scope);
         return count > 0;
+    }
+
+    async countByTenant(tenant: Tenant): Promise<number> {
+        return this.usersRepository.count({
+            where: {
+                tenants: {id: tenant.id}
+            }
+        });
     }
 }

@@ -1,0 +1,29 @@
+<div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Assign Role</h4>
+    <button (click)="activeModal.close('Cross click')"
+            aria-label="Close"
+            class="btn-sm btn "
+            type="button">
+        <span aria-hidden="true">
+            <i class="fa fa-icons fa-close"></i>
+        </span>
+    </button>
+</div>
+<div class="modal-body">
+    <form>
+        <div class="flex mb-3 form-group">
+            <p-multiSelect [(ngModel)]="selectedScopes" [filter]=false
+                           class="d-grid"
+                           defaultLabel="Assigned Roles"
+                           display="chip"
+                           [options]="scopes"
+                           id="add.role.name"
+                           name="name"
+                           optionLabel="name">
+            </p-multiSelect>
+        </div>
+
+
+        <button (click)="onSubmit()" class="btn btn-primary" type="submit">Update Scopes</button>
+    </form>
+</div>

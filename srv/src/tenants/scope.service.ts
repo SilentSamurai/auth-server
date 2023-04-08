@@ -37,6 +37,10 @@ export class ScopeService {
 
     async deleteById(id: string): Promise<Scope> {
         let scope: Scope = await this.findById(id);
+        const count = await this.usersService.countByScope(scope);
+        if (count > 0) {
+            throw new ValidationErrorException("scope is assigned to members");
+        }
         return this.scopeRepository.remove(scope);
     }
 
@@ -81,35 +85,68 @@ export class ScopeService {
         });
     }
 
-    async assignScopeToUser(name: string, tenant: Tenant, user: User): Promise<Scope> {
-        let scope: Scope = await this.scopeRepository.findOne({
-            where: {
-                name,
-                tenant: {id: tenant.id}
-            },
-            relations: {
-                users: true
-            }
-        });
-        if (scope === null) {
-            throw new ValidationErrorException("scope not found");
-        }
-        scope.users.push(user);
-        return await this.scopeRepository.save(scope);
-    }
+    async updateUserScopes(scopes: [string] | [], tenant: Tenant, user: User): Promise<Scope[]> {
 
-    async removeScopeFromUser(name: string, tenant: Tenant, deleteUser: User) {
-        let scope: Scope = await this.scopeRepository.findOne({
-            where: {
-                name,
-                tenant: {id: tenant.id}
-            },
-            relations: {
-                users: true
+        let memberScopes = await this.getMemberScopes(tenant, user);
+        const previousScopeMap: Map<string, Scope> = new Map<string, Scope>();
+        const currentScopeMap: Map<string, string> = new Map<string, string>();
+        memberScopes.forEach(scope => previousScopeMap.set(scope.name, scope));
+        scopes.forEach(name => currentScopeMap.set(name, name))
+
+        const removeScope = [];
+        const addScope = [];
+        scopes.forEach(name => {
+            if (!previousScopeMap.has(name)) {
+                addScope.push(name);
             }
-        });
-        scope.users = scope.users.filter((user) => user.id !== deleteUser.id)
-        return await this.scopeRepository.save(scope);
+        })
+
+        previousScopeMap.forEach((value, key, map) => {
+            if (!currentScopeMap.has(key)) {
+                removeScope.push(value.name);
+            }
+        })
+
+        await Promise.all(addScope.map(
+            async (name) => {
+                let scope: Scope = await this.scopeRepository.findOne({
+                    where: {
+                        name,
+                        tenant: {id: tenant.id}
+                    },
+                    relations: {
+                        users: true
+                    }
+                });
+                if (scope !== null) {
+                    scope.users.push(user);
+                    return this.scopeRepository.save(scope);
+                }
+                return null;
+            }
+        ));
+
+        await Promise.all(removeScope.map(
+            async (name) => {
+                let scope: Scope = await this.scopeRepository.findOne({
+                    where: {
+                        name,
+                        tenant: {id: tenant.id}
+                    },
+                    relations: {
+                        users: true
+                    }
+                });
+                if (scope !== null) {
+                    scope.users = scope.users.filter(scopeUser => scopeUser.id != user.id);
+                    return this.scopeRepository.save(scope);
+                }
+                return null;
+            }
+        ))
+
+
+        return this.getMemberScopes(tenant, user);
     }
 
 

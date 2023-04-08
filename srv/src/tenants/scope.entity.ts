@@ -1,5 +1,4 @@
 import {Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn, Unique} from "typeorm";
-import {Exclude} from "class-transformer";
 import {Tenant} from "./tenant.entity";
 import {User} from "../users/user.entity"; // Used with ClassSerializerInterceptor to exclude from responses.
 
@@ -7,7 +6,6 @@ import {User} from "../users/user.entity"; // Used with ClassSerializerIntercept
 @Unique("scope_uniqueness", ["name", "tenant"])
 export class Scope {
     @PrimaryGeneratedColumn("uuid")
-    @Exclude()
     id: string;
 
     @Column({nullable: false})

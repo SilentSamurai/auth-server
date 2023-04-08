@@ -8,11 +8,13 @@ import {CreateTenantComponent} from './create-tenant/create-tenant.component';
 import {FormsModule} from "@angular/forms";
 import {UpdateTenantComponent} from "./update-tenant/update-tenant.component";
 import {DeleteTenantComponent} from "./delete-tenant/delete-tenant.component";
-import {AddMemberComponent} from "./add-member/add-member.component";
-import {AddRoleComponent} from "./add-role/add-role.component";
-import {AssignRoleComponent} from "./assign-role/assign-role.component";
+import {AddMemberComponent} from "./tenant-details/add-member/add-member.component";
+import {AddScopeComponent} from "./tenant-details/add-scope/add-scope.component";
+import {AssignScopeComponent} from "./tenant-details/assign-scope/assign-scope.component";
 import {MultiSelectModule} from "primeng/multiselect";
-import {RemoveMemberComponent} from "./remove-member/remove-member.component";
+import {RemoveMemberComponent} from "./tenant-details/remove-member/remove-member.component";
+import {ChipModule} from "primeng/chip";
+import {RemoveScopeComponent} from "./tenant-details/remove-scope/remove-scope.component";
 
 @NgModule({
     declarations: [
@@ -22,9 +24,10 @@ import {RemoveMemberComponent} from "./remove-member/remove-member.component";
         UpdateTenantComponent,
         DeleteTenantComponent,
         AddMemberComponent,
-        AddRoleComponent,
-        AssignRoleComponent,
-        RemoveMemberComponent
+        AddScopeComponent,
+        AssignScopeComponent,
+        RemoveMemberComponent,
+        RemoveScopeComponent
     ],
     imports: [
         TableModule,
@@ -32,6 +35,7 @@ import {RemoveMemberComponent} from "./remove-member/remove-member.component";
         CommonModule,
         FormsModule,
         MultiSelectModule,
+        ChipModule,
     ],
     providers: [],
 })

@@ -1,4 +1,4 @@
-import {ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus} from '@nestjs/common';
+import {ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, Logger} from '@nestjs/common';
 import {Request, Response} from 'express';
 import {BackendError} from './backend-error.class';
 import {UnknownErrorException} from './unknown-error.exception';
@@ -7,12 +7,16 @@ import {ForbiddenException} from './forbidden.exception';
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
+
+    private static readonly LOGGER = new Logger(HttpExceptionFilter.name);
+
     // Exception may not be an HttpException.
     catch(exception: HttpException, host: ArgumentsHost) {
         const context = host.switchToHttp();
         const request = context.getRequest<Request>();
         const response = context.getResponse<Response>();
         let error = exception.getResponse ? exception.getResponse() : {};
+        console.error(exception);
         // Throwed http exception.
         if (exception instanceof HttpException) {
             // Throwed unknown http exception.

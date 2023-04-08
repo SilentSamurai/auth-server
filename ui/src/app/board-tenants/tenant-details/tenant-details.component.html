@@ -1,28 +1,37 @@
 <div class="row justify-content-center my-2">
     <div class="col-md-8">
         <div class="card text-black">
-            <i class="fa fa-apple fa-lg pt-3 pb-1 px-3"></i>
-            <div class="card-body">
-                <div>
+            <div class=" row card-body">
+                <div class="col-lg-5">
+                    <div class=" my-2 mb-4">
+                        <div class="p-disabled">Tenant Domain</div>
+                        <h4>{{ tenant.domain }}</h4>
+                    </div>
                     <div class="my-2">
                         <div class="p-disabled">Tenant Id</div>
-                        <h2>{{ tenant_id }}</h2>
-                    </div>
-                    <br>
-                    <div class="my-2">
-                        <div class="p-disabled">Subdomain</div>
-                        <div>{{ tenant.subdomain }}</div>
+                        <div>{{ tenant_id }}</div>
                     </div>
                     <div class="my-2">
                         <div class="p-disabled">Tenant Name</div>
                         <div>{{ tenant.name }}</div>
                     </div>
+                    <div class="d-flex justify-content-between total font-weight-bold mt-4">
+                        <button (click)="onUpdateTenant()" class="btn btn-primary btn-sm">
+                            Update
+                        </button>
+                    </div>
                 </div>
-                <div class="d-flex justify-content-between total font-weight-bold mt-4">
-                    <button (click)="onUpdateTenant()" class="btn btn-primary">
-                        Update
-                    </button>
+                <div class="col-lg-7">
+                    <div class="my-2">
+                        <div class="p-disabled">Public Key</div>
+                        <div>
+                            <code>
+                                <pre>{{ tenant.publicKey }}</pre>
+                            </code>
+                        </div>
+                    </div>
                 </div>
+
             </div>
         </div>
     </div>
@@ -30,20 +39,26 @@
         <div class="card text-black">
             <i class="fa fa-solid fa-user-cowboy"></i>
             <div class="card-body">
-                <div>
+                <div class="row">
                     <div class="my-2">
-                        <div class="p-disabled">Tenant Roles</div>
-                        <ul>
-                            <li *ngFor="let role of tenant.roles">
-                                <code>{{tenant.name}}::{{role}}</code>
-                            </li>
-                        </ul>
+                        <div class="p-disabled">Tenant Scopes</div>
+                        <div *ngFor="let scope of tenant.scopes" class="my-2">
+                            <p-chip>
+                                <code>{{tenant.name}}::{{scope.name}}</code>
+                                <button (click)="onRemoveScope(scope)"
+                                        aria-label="Close"
+                                        class="btn-sm btn"
+                                        style="height:100%"
+                                        type="button">
+                                    <i class="fa fa-close"></i>
+                                </button>
+                            </p-chip>
+                        </div>
                     </div>
-                    <br>
                 </div>
                 <div class="d-flex justify-content-between total font-weight-bold mt-4">
-                    <button (click)="onAddRole()" class="btn btn-primary">
-                        Add New Role
+                    <button (click)="onAddScope()" class="btn btn-primary btn-sm">
+                        Add New Scope
                     </button>
                 </div>
             </div>
@@ -54,50 +69,48 @@
 <div class="row justify-content-center my-2">
     <div class="col-md-8">
         <div class="card text-black">
-            <i class="fa fa-solid fa-user-cowboy"></i>
-            <div class="card-body my-2">
-                <p-table [value]="members" responsiveLayout="scroll">
-                    <ng-template pTemplate="caption">
-                        <div class="d-flex justify-content-between">
-                            <h5>Member List</h5>
-                            <button (click)="onAddMember()" class="btn btn-primary">
-                                Add Member
-                            </button>
-                        </div>
+            <p-table [value]="members" responsiveLayout="scroll">
+                <ng-template pTemplate="caption">
+                    <div class="d-flex justify-content-between">
+                        <h5>Member List</h5>
+                        <button (click)="onAddMember()" class="btn btn-primary btn-sm">
+                            Add Member
+                        </button>
+                    </div>
 
-                    </ng-template>
-                    <ng-template let-columns pTemplate="header">
-                        <tr>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Assigned Roles</th>
-                            <th>Actions</th>
-                        </tr>
-                    </ng-template>
-                    <ng-template let-columns="columns" let-user pTemplate="body">
-                        <tr>
-                            <td><span class="p-column-title">Name</span>{{user.name}} {{user.surname}}</td>
-                            <td><span class="p-column-title">Price</span>{{user.email}}</td>
-                            <td><span class="p-column-title">Roles</span>
-                                <ul>
-                                    <li *ngFor="let role of user.roles">
-                                        <code>{{tenant.name}}::{{role}}</code>
-                                    </li>
-                                </ul>
-                            </td>
-                            <td class="">
-                                <button (click)="onAssignRole(user)" class="btn btn-secondary" type="button">
-                                    <i class="fa fa-solid fa-user"></i>
-                                </button>
-                                <button (click)="removeMember(user)" class="btn btn-secondary" type="button">
-                                    <i class="fa fa-solid fa-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    </ng-template>
-                </p-table>
-            </div>
+                </ng-template>
+                <ng-template let-columns pTemplate="header">
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Assigned Scopes</th>
+                        <th>Actions</th>
+                    </tr>
+                </ng-template>
+                <ng-template let-columns="columns" let-user pTemplate="body">
+                    <tr>
+                        <td><span class="p-column-title">Name</span>{{user.name}}</td>
+                        <td><span class="p-column-title">Email</span>{{user.email}}</td>
+                        <td><span class="p-column-title">Scopes</span>
+                            <ul>
+                                <li *ngFor="let scope of user.scopes">
+                                    <code>{{tenant.name}}::{{scope.name}}</code>
+                                </li>
+                            </ul>
+                        </td>
+                        <td class="">
+                            <button (click)="onAssignRole(user)" class="btn" type="button">
+                                <i class="fa fa-solid fa-user"></i>
+                            </button>
+                            <button (click)="removeMember(user)" class="btn" type="button">
+                                <i class="fa fa-solid fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
         </div>
     </div>
-    <div class="col-md-4"></div>
+    <div class="col-md-4">
+    </div>
 </div>

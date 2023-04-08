@@ -134,7 +134,9 @@ const CreateScopeSchema = yup.object().shape(
 
 const OperatingScopeSchema = yup.object().shape({
         email: yup.string().required('Email is required'),
-        name: yup.string().required('Name is required').max(20),
+        scopes: yup.array().of(
+            yup.string().max(20)
+        ),
         tenantId: yup.string().required('TenantId is required'),
     }
 );

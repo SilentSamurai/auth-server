@@ -21,7 +21,7 @@ export class Tenant {
     @Column({nullable: false})
     publicKey: string;
 
-    @OneToMany(type => Scope, scope => scope.tenant)
+    @OneToMany(type => Scope, scope => scope.tenant, {cascade: true, orphanedRowAction: "delete"})
     scopes: Scope[];
 
     @ManyToMany(() => User, (user) => user.tenants)

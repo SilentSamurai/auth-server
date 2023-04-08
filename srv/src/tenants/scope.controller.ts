@@ -3,7 +3,6 @@ import {
     ClassSerializerInterceptor,
     Controller,
     Delete,
-    Get,
     Headers,
     Param,
     Post,
@@ -48,49 +47,26 @@ export class ScopeController {
         );
     }
 
-    @Get('/:tenantId')
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(RoleEnum.ADMIN)
-    async getTenantScopes(
-        @Param('tenantId') tenantId: string
-    ): Promise<Scope[]> {
-        const tenant = await this.tenantService.findById(tenantId);
-        return this.scopeService.getTenantScopes(tenant)
-    }
-
-    @Delete('/delete')
+    @Delete('/:id')
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(RoleEnum.ADMIN)
     async deleteScope(
-        @Headers() headers,
-        @Body(new ValidationPipe(ValidationSchema.CreateScopeSchema)) body: { name: string, tenantId: string }
+        @Param('id') id: string
     ): Promise<Scope> {
-        const tenant = await this.tenantService.findById(body.tenantId);
-        return await this.scopeService.deleteByName(body.name, tenant);
+        const scope = await this.scopeService.findById(id);
+        return await this.scopeService.deleteById(scope.id);
     }
 
     @Post('/member')
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(RoleEnum.ADMIN)
-    async addScope(
+    async updateScope(
         @Headers() headers,
         @Body(new ValidationPipe(ValidationSchema.OperatingScopeSchema)) body:
-            { email: string, name: string, tenantId: string }
-    ): Promise<Scope> {
+            { email: string, scopes: [string], tenantId: string }
+    ): Promise<Scope[]> {
         const user = await this.usersService.findByEmail(body.email);
-        return this.tenantService.addScopeToMember(body.name, body.tenantId, user);
-    }
-
-    @Delete('/member')
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(RoleEnum.ADMIN)
-    async removeScope(
-        @Headers() headers,
-        @Body(new ValidationPipe(ValidationSchema.OperatingScopeSchema)) body:
-            { email: string, name: string, tenantId: string }
-    ): Promise<Scope> {
-        const user = await this.usersService.findByEmail(body.email);
-        return this.tenantService.removeScopeFromMember(body.name, body.tenantId, user);
+        return this.tenantService.updateScopeOfMember(body.scopes, body.tenantId, user);
     }
 
 

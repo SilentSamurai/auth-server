@@ -23,6 +23,7 @@ import {RolesGuard} from "../roles/roles.guard";
 import {Roles} from "../roles/roles.decorator";
 import {RoleEnum} from "../roles/role.enum";
 import {User} from "../users/user.entity";
+import {Scope} from "./scope.entity";
 
 @Controller('tenant')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -74,6 +75,15 @@ export class TenantController {
         return tenant;
     }
 
+    @Delete('/:tenantId')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(RoleEnum.ADMIN)
+    async deleteTenant(
+        @Param('tenantId') tenantId: string
+    ): Promise<Tenant> {
+        return this.tenantService.deleteTenant(tenantId);
+    }
+
     @Get('/:tenantId')
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(RoleEnum.ADMIN)
@@ -105,16 +115,25 @@ export class TenantController {
         return this.tenantService.addMember(body.tenantId, user);
     }
 
-    @Delete('/member')
+    @Delete('/:tenantId/member/:email')
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(RoleEnum.ADMIN)
     async removeMember(
-        @Headers() headers,
-        @Body(new ValidationPipe(ValidationSchema.MemberOperationsSchema)) body:
-            { tenantId: string, email: string }
+        @Param('tenantId') tenantId: string,
+        @Param('email') email: string
     ): Promise<Tenant> {
-        const user = await this.usersService.findByEmail(body.email);
-        return this.tenantService.removeMember(body.tenantId, user);
+        const user = await this.usersService.findByEmail(email);
+        return this.tenantService.removeMember(tenantId, user);
+    }
+
+    @Get('/:tenantId/scopes')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(RoleEnum.ADMIN)
+    async getTenantScopes(
+        @Param('tenantId') tenantId: string
+    ): Promise<Scope[]> {
+        const tenant = await this.tenantService.findById(tenantId);
+        return this.tenantService.getTenantScopes(tenant)
     }
 
 }

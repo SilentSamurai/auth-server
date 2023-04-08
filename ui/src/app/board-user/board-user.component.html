@@ -1,12 +1,12 @@
 <div class="row">
-    <div class="col-xl-9">
+    <div class="col-xl-12">
         <div class="card my-2">
             <p-table [scrollable]="true" [value]="users" responsiveLayout="scroll" scrollHeight="80vh">
                 <ng-template pTemplate="caption">
                     <div class="d-flex justify-content-between">
                         <h5>User List</h5>
                         <button (click)="openCreateModal()" class="btn btn-primary" type="button">
-                            <i class="fa fa-solid fa-plus"></i>
+                            <i class="fa fa-solid fa-plus me-2"></i> Add User
                         </button>
                     </div>
                 </ng-template>
@@ -27,10 +27,10 @@
                         </td>
                         <td><span class="p-column-title">Created At</span>{{user.createdAt | date }}</td>
                         <td class="d-flex ">
-                            <button (click)="openUpdateModal(user)" class="btn btn-primary" type="button">
+                            <button (click)="openUpdateModal(user)" class="btn " type="button">
                                 <i class="fa fa-edit"></i>
                             </button>
-                            <button (click)="openDeleteModal(user)" class="btn btn-secondary" type="button">
+                            <button (click)="openDeleteModal(user)" class="btn " type="button">
                                 <i class="fa fa-solid fa-trash"></i>
                             </button>
                         </td>
@@ -39,7 +39,7 @@
             </p-table>
         </div>
     </div>
-    <div class="col-xl-3">
+    <div class="">
     </div>
 
 </div>

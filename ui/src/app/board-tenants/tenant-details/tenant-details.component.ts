@@ -1,11 +1,14 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from "@angular/router";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
-import {AddMemberComponent} from "../add-member/add-member.component";
+import {AddMemberComponent} from "./add-member/add-member.component";
 import {UpdateTenantComponent} from "../update-tenant/update-tenant.component";
-import {AddRoleComponent} from "../add-role/add-role.component";
-import {AssignRoleComponent} from "../assign-role/assign-role.component";
-import {RemoveMemberComponent} from "../remove-member/remove-member.component";
+import {AddScopeComponent} from "./add-scope/add-scope.component";
+import {AssignScopeComponent} from "./assign-scope/assign-scope.component";
+import {RemoveMemberComponent} from "./remove-member/remove-member.component";
+import {TenantService} from "../../_services/tenant.service";
+import {MessageService} from "primeng/api";
+import {RemoveScopeComponent} from "./remove-scope/remove-scope.component";
 
 @Component({
     selector: 'tenant-details',
@@ -15,53 +18,70 @@ import {RemoveMemberComponent} from "../remove-member/remove-member.component";
 export class TenantDetailsComponent implements OnInit {
 
     tenant_id: string = "";
-    tenant = {
-        id: "abcd",
-        name: "tenant-1",
-        subdomain: "asdasd.asd.asd",
-        roles: [
-            "Admin",
-            "User"
-        ]
-    };
-    members = [
-        {
-            name: "apple pie",
-            email: "testmaim@asd.com",
-            username: "asdasd",
-            roles: [
-                "Admin",
-                "User"
-            ]
-        }
-    ]
+    tenant: any = {};
+    members: any = []
 
-    constructor(private actRoute: ActivatedRoute, private modalService: NgbModal) {
+    constructor(private tenantService: TenantService,
+                private messageService: MessageService,
+                private actRoute: ActivatedRoute,
+                private modalService: NgbModal) {
     }
 
-    ngOnInit(): void {
+    async ngOnInit() {
         this.tenant_id = this.actRoute.snapshot.params['tenantId'];
         console.log(this.tenant_id)
+        this.tenant = await this.tenantService.getTenantDetails(this.tenant_id);
+        this.members = await this.tenantService.getMembers(this.tenant_id);
     }
 
-    onUpdateTenant() {
+    async onUpdateTenant() {
         const modalRef = this.modalService.open(UpdateTenantComponent);
-        modalRef.componentInstance.form = this.tenant;
+        modalRef.componentInstance.tenant = this.tenant;
+        const editedTenant = await modalRef.result;
+        console.log(editedTenant);
+        await this.ngOnInit();
     }
 
-    onAddMember() {
+    async onAddMember() {
         const modalRef = this.modalService.open(AddMemberComponent);
+        modalRef.componentInstance.tenant = this.tenant;
+        const addedMember = await modalRef.result;
+        console.log(addedMember);
+        await this.ngOnInit();
     }
 
-    onAddRole() {
-        const modalRef = this.modalService.open(AddRoleComponent);
+    async onAddScope() {
+        const modalRef = this.modalService.open(AddScopeComponent);
+        modalRef.componentInstance.tenant = this.tenant;
+        const addedScope = await modalRef.result;
+        console.log(addedScope);
+        await this.ngOnInit();
     }
 
-    onAssignRole(user: any) {
-        const modalRef = this.modalService.open(AssignRoleComponent);
+    async onRemoveScope(scope: any) {
+        const modalRef = this.modalService.open(RemoveScopeComponent);
+        modalRef.componentInstance.scope = scope;
+        const deletedScope = await modalRef.result;
+        console.log(deletedScope);
+        await this.ngOnInit();
     }
 
-    removeMember(user: any) {
+    async onAssignRole(user: any) {
+        const modalRef = this.modalService.open(AssignScopeComponent);
+        modalRef.componentInstance.tenant = this.tenant;
+        modalRef.componentInstance.user = user;
+        const addedScopes = await modalRef.result;
+        console.log(addedScopes);
+        await this.ngOnInit();
+    }
+
+    async removeMember(user: any) {
         const modalRef = this.modalService.open(RemoveMemberComponent);
+        modalRef.componentInstance.tenant = this.tenant;
+        modalRef.componentInstance.member = user;
+        const removedMember = await modalRef.result;
+        console.log(removedMember);
+        await this.ngOnInit();
     }
+
 }

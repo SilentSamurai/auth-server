@@ -145,6 +145,7 @@ export class TenantService implements OnModuleInit {
     async removeMember(tenantId: string, user: User): Promise<Tenant> {
         let tenant: Tenant = await this.findById(tenantId);
         tenant.members = tenant.members.filter((member) => member.id != user.id);
+        await this.updateScopeOfMember([], tenantId, user);
         return this.tenantRepository.save(tenant)
     }
 
@@ -153,22 +154,13 @@ export class TenantService implements OnModuleInit {
         return tenant.members.find((member) => user.id === member.id) !== undefined;
     }
 
-    async addScopeToMember(name: string, tenantId: string, user: User): Promise<Scope> {
+    async updateScopeOfMember(scopes: [string] | [], tenantId: string, user: User): Promise<Scope[]> {
         let tenant: Tenant = await this.findById(tenantId);
         const isMember: boolean = await this.isMember(tenantId, user);
         if (!isMember) {
             throw new ValidationErrorException("user is not a member of this tenant");
         }
-        return this.scopeService.assignScopeToUser(name, tenant, user)
-    }
-
-    async removeScopeFromMember(name: string, tenantId: string, user: User): Promise<Scope> {
-        let tenant: Tenant = await this.findById(tenantId);
-        const isMember: boolean = await this.isMember(tenantId, user);
-        if (!isMember) {
-            throw new ValidationErrorException("user is not a member of this tenant");
-        }
-        return this.scopeService.removeScopeFromUser(name, tenant, user)
+        return this.scopeService.updateUserScopes(scopes, tenant, user)
     }
 
     async findGlobalTenant(): Promise<Tenant> {
@@ -205,5 +197,18 @@ export class TenantService implements OnModuleInit {
             }
         });
         return tenants;
+    }
+
+    async deleteTenant(tenantId: string) {
+        let tenant: Tenant = await this.findById(tenantId);
+        let count = await this.usersService.countByTenant(tenant);
+        if (count > 0) {
+            throw new ValidationErrorException("tenant contains members");
+        }
+        return this.tenantRepository.remove(tenant);
+    }
+
+    getTenantScopes(tenant: Tenant): Promise<Scope[]> {
+        return this.scopeService.getTenantScopes(tenant);
     }
 }

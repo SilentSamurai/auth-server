@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {Observable} from 'rxjs';
+import {lastValueFrom, Observable} from 'rxjs';
 import {TokenStorageService} from "./token-storage.service";
 
 const API_URL = 'http://localhost:9000/';
@@ -39,5 +39,44 @@ export class TenantService {
             name,
             domain
         }, this.getHttpOptions());
+    }
+
+    deleteTenant(id: string) {
+        return lastValueFrom(this.http.delete(API_URL + 'tenant/' + id, this.getHttpOptions()))
+    }
+
+    async getTenantDetails(id: string) {
+        return lastValueFrom(this.http.get(API_URL + 'tenant/' + id, this.getHttpOptions()))
+    }
+
+    async getMembers(id: string) {
+        return lastValueFrom(this.http.get(`${API_URL}tenant/${id}/members`, this.getHttpOptions()))
+    }
+
+    async addMember(email: string, tenantId: string) {
+        return lastValueFrom(this.http.post(`${API_URL}tenant/member`, {
+            email, tenantId
+        }, this.getHttpOptions()))
+    }
+
+    async addScope(name: string, tenantId: string) {
+        return lastValueFrom(this.http.post(`${API_URL}scope/create`, {
+            name, tenantId
+        }, this.getHttpOptions()))
+    }
+
+    async assignScope(selectedScopes: any[], tenantId: string, email: string) {
+        const scopes = selectedScopes.map(scope => scope.name);
+        return lastValueFrom(this.http.post(`${API_URL}scope/member`, {
+            email, scopes, tenantId,
+        }, this.getHttpOptions()))
+    }
+
+    async removeMember(email: string, tenantId: string) {
+        return lastValueFrom(this.http.delete(`${API_URL}tenant/${tenantId}/member/${email}`, this.getHttpOptions()))
+    }
+
+    async removeScope(id: string) {
+        return lastValueFrom(this.http.delete(`${API_URL}scope/${id}`, this.getHttpOptions()))
     }
 }
