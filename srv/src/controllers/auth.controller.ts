@@ -23,7 +23,7 @@ import {ValidationSchema} from '../validation/validation.schema';
 import {MailServiceErrorException} from '../exceptions/mail-service-error.exception';
 import {TenantService} from "../tenants/tenant.service";
 
-@Controller('oauth')
+@Controller('api/oauth')
 @UseInterceptors(ClassSerializerInterceptor)
 export class AuthController {
     constructor(
@@ -68,7 +68,7 @@ export class AuthController {
         return user;
     }
 
-    @Post('/signin')
+    @Post('/token')
     async signin(
         @Body(new ValidationPipe(ValidationSchema.SignInSchema)) body: {
             email: string,

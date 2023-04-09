@@ -22,7 +22,7 @@ import {TenantService} from "../tenants/tenant.service";
 import {Tenant} from "../tenants/tenant.entity";
 import {SecurityService} from "../scopes/security.service";
 
-@Controller('users')
+@Controller('api/users')
 @UseInterceptors(ClassSerializerInterceptor)
 export class UsersController {
     constructor(

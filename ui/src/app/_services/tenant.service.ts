@@ -3,7 +3,7 @@ import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {lastValueFrom, Observable} from 'rxjs';
 import {TokenStorageService} from "./token-storage.service";
 
-const API_URL = 'http://localhost:9000';
+const API_URL = '/api';
 
 
 @Injectable({

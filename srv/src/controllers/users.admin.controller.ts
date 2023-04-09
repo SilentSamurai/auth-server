@@ -24,7 +24,7 @@ import {ValidationSchema} from '../validation/validation.schema';
 import {TenantService} from "../tenants/tenant.service";
 import {Tenant} from "../tenants/tenant.entity";
 
-@Controller('users')
+@Controller('api/users')
 @UseInterceptors(ClassSerializerInterceptor)
 export class UsersAdminController {
     constructor(

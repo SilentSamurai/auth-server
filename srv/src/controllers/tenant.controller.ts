@@ -23,7 +23,7 @@ import {Scopes} from "../scopes/scopes.decorator";
 import {ScopeEnum} from "../scopes/scope.enum";
 import {SecurityService} from "../scopes/security.service";
 
-@Controller('tenant')
+@Controller('api/tenant')
 @UseInterceptors(ClassSerializerInterceptor)
 export class TenantController {
 

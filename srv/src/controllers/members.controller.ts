@@ -26,7 +26,7 @@ import {Scope} from "../scopes/scope.entity";
 import {SecurityService} from "../scopes/security.service";
 import {ScopeService} from "../scopes/scope.service";
 
-@Controller('tenant')
+@Controller('api/tenant')
 @UseInterceptors(ClassSerializerInterceptor)
 export class MemberController {
 
