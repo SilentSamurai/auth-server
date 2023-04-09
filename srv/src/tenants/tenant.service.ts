@@ -5,7 +5,7 @@ import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 import {Tenant} from "./tenant.entity";
 import {ValidationErrorException} from "../exceptions/validation-error.exception";
-import {generateKeyPairSync} from "crypto";
+import {generateKeyPairSync, randomBytes, scryptSync, timingSafeEqual} from "crypto";
 import {User} from "../users/user.entity";
 import {Scope} from "../scopes/scope.entity";
 import {ForbiddenException} from "../exceptions/forbidden.exception";
@@ -34,6 +34,7 @@ export class TenantService implements OnModuleInit {
         }
 
         const {privateKey, publicKey} = this.generateKeyPair();
+        const {key, secretHash} = this.generateClientIdAndSecret();
 
 
         let tenant: Tenant = this.tenantRepository.create({
@@ -41,6 +42,8 @@ export class TenantService implements OnModuleInit {
             domain: domain,
             privateKey: privateKey,
             publicKey: publicKey,
+            clientId: key,
+            clientSecret: secretHash,
             members: [owner],
             scopes: []
         });
@@ -226,6 +229,31 @@ export class TenantService implements OnModuleInit {
             }
         });
     }
+
+    private generateClientIdAndSecret() {
+        const key = this.generateKey();
+        const secretHash = this.generateSecretHash(key);
+        return {key, secretHash};
+    }
+
+    private generateKey(size = 32) {
+        const buffer = randomBytes(size);
+        return buffer.toString("base64");
+    }
+
+    private generateSecretHash(key) {
+        const salt = randomBytes(8).toString('hex');
+        const buffer = scryptSync(key, salt, 64) as Buffer;
+        return `${buffer.toString('hex')}.${salt}`;
+    }
+
+    private compareKeys(storedKey, suppliedKey) {
+        const [hashedPassword, salt] = storedKey.split('.');
+
+        const buffer = scryptSync(suppliedKey, salt, 64) as Buffer;
+        return timingSafeEqual(Buffer.from(hashedPassword, 'hex'), buffer);
+    }
+
 
     getTenantScopes(tenant: Tenant): Promise<Scope[]> {
         return this.scopeService.getTenantScopes(tenant);

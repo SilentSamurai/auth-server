@@ -21,7 +21,6 @@ import {JwtAuthGuard} from '../auth/jwt-auth.guard';
 import {ValidationPipe} from '../validation/validation.pipe';
 import {ValidationSchema} from '../validation/validation.schema';
 import {MailServiceErrorException} from '../exceptions/mail-service-error.exception';
-import {LocalAuthGuard} from "../auth/local-auth.guard";
 import {TenantService} from "../tenants/tenant.service";
 
 @Controller('oauth')
@@ -70,17 +69,16 @@ export class AuthController {
     }
 
     @Post('/signin')
-    @UseGuards(LocalAuthGuard)
     async signin(
-        @Request() request,
         @Body(new ValidationPipe(ValidationSchema.SignInSchema)) body: {
             email: string,
             password: string,
             domain: string
         }
     ): Promise<object> {
+        const user: User = await this.authService.validate(body.email, body.password);
         const tenant = await this.tenantService.findByDomain(body.domain);
-        const token: string = await this.authService.createAccessToken(request.user, tenant);
+        const token: string = await this.authService.createAccessToken(user, tenant);
         return {token: token};
     }
 

@@ -14,6 +14,13 @@ export class Tenant {
     @Column({unique: true, nullable: false})
     domain: string;
 
+    @Column({unique: true, nullable: false})
+    clientId: string;
+
+    @Column({nullable: false})
+    @Exclude()
+    clientSecret: string;
+
     @Column({nullable: false})
     @Exclude()
     privateKey: string;
