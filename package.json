@@ -2,8 +2,8 @@
     "name": "auth-server",
     "version": "1.0.0",
     "scripts": {
-        "ui:build": "cd ./ui && npm run build",
-        "backend:build": "cd ./srv && npm run build",
+        "ui:build": "cd ./ui && npm i && npm run build",
+        "backend:build": "cd ./srv && npm i && npm run build",
         "build": "npm run ui:build && npm run backend:build",
         "start": "cd ./srv && npm run start:prod"
     },
