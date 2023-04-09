@@ -18,7 +18,6 @@ export class Tenant {
     clientId: string;
 
     @Column({nullable: false})
-    @Exclude()
     clientSecret: string;
 
     @Column({nullable: false})

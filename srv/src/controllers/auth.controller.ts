@@ -79,7 +79,10 @@ export class AuthController {
         const user: User = await this.authService.validate(body.email, body.password);
         const tenant = await this.tenantService.findByDomain(body.domain);
         const token: string = await this.authService.createAccessToken(user, tenant);
-        return {token: token};
+        return {
+            token: token,
+            expires_in: this.configService.get('TOKEN_EXPIRATION_TIME')
+        };
     }
 
     @Get('/verify/:token')

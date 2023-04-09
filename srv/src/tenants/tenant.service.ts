@@ -113,7 +113,7 @@ export class TenantService implements OnModuleInit {
         let tenant: Tenant = await this.findById(tenantId);
         tenant.members.push(user);
         let saveTenant = await this.tenantRepository.save(tenant);
-        await this.scopeService.updateUserScopes([ScopeEnum.TENANT_VIEWER], tenant, user);
+        // await this.scopeService.updateUserScopes([ScopeEnum.TENANT_VIEWER], tenant, user);
         return saveTenant;
     }
 
