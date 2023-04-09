@@ -10,6 +10,7 @@ import {TenantService} from "../../../_services/tenant.service";
 })
 export class RemoveScopeComponent implements OnInit {
     @Input() scope: any;
+    @Input() tenant: any;
     @Output() passEntry: EventEmitter<any> = new EventEmitter();
 
     constructor(private tenantService: TenantService,
@@ -23,7 +24,7 @@ export class RemoveScopeComponent implements OnInit {
 
     async onYes() {
         try {
-            let deletedScope = await this.tenantService.removeScope(this.scope.id);
+            let deletedScope = await this.tenantService.removeScope(this.scope.name, this.tenant.id);
             this.messageService.add({severity: 'success', summary: 'Success', detail: 'Scope Deleted'});
             this.passEntry.emit(deletedScope);
             this.activeModal.close(deletedScope);

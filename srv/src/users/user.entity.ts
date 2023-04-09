@@ -1,8 +1,7 @@
-import {Column, CreateDateColumn, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn} from 'typeorm';
-import {Exclude, Transform} from 'class-transformer'; // Used with ClassSerializerInterceptor to exclude from responses.
-import {Role} from '../roles/role.entity';
+import {Column, CreateDateColumn, Entity, ManyToMany, PrimaryGeneratedColumn} from 'typeorm';
+import {Exclude} from 'class-transformer'; // Used with ClassSerializerInterceptor to exclude from responses.
 import {Tenant} from "../tenants/tenant.entity";
-import {Scope} from "../tenants/scope.entity";
+import {Scope} from "../scopes/scope.entity";
 
 @Entity()
 export class User {
@@ -22,16 +21,10 @@ export class User {
     @Column({default: ''})
     name: string;
 
-    @ManyToMany(() => Role)
-    @JoinTable()
-    @Transform(({value}) => value.map(x => x.name)) // Return the array of names.
-    @Exclude()
-    roles: Role[];
-
-    @ManyToMany(() => Tenant, (tenant) => tenant.members, {cascade: true})
+    @ManyToMany(() => Tenant, (tenant) => tenant.members)
     tenants: Tenant[];
 
-    @ManyToMany(() => Scope, scope => scope.users, {cascade: true})
+    @ManyToMany(() => Scope, scope => scope.users)
     scopes: Scope[];
 
     @Column({default: false})

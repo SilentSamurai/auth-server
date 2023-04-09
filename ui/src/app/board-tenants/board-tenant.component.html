@@ -6,7 +6,8 @@
                 <ng-template pTemplate="caption">
                     <div class="d-flex justify-content-between">
                         <h5>Tenant List</h5>
-                        <button (click)="openCreateModal()" class="btn btn-primary" type="button">
+                        <button (click)="openCreateModal()" [disabled]="!this.creationAllowed" class="btn btn-primary"
+                                type="button">
                             <i class="fa fa-solid fa-plus me-2"></i> Add Tenant
                         </button>
                     </div>
@@ -29,10 +30,12 @@
                         <td><span class="p-column-title">Name</span>{{tenant.name}}</td>
                         <td><span class="p-column-title">Domain</span>{{tenant.domain}}</td>
                         <td class="d-flex ">
-                            <button (click)="openUpdateModal(tenant)" class="btn" type="button">
+                            <button (click)="openUpdateModal(tenant)" [disabled]="!this.isTenantAdmin" class="btn"
+                                    type="button">
                                 <i class="fa fa-edit"></i>
                             </button>
-                            <button (click)="openDeleteModal(tenant)" class="btn" type="button">
+                            <button (click)="openDeleteModal(tenant)" [disabled]="!this.creationAllowed" class="btn"
+                                    type="button">
                                 <i class="fa fa-solid fa-trash"></i>
                             </button>
                         </td>

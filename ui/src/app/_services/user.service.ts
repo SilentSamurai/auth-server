@@ -22,10 +22,6 @@ export class UserService {
         };
     }
 
-    getPublicContent(): Observable<any> {
-        return this.http.get(API_URL + 'all', {responseType: 'text'});
-    }
-
     getAllUsers(): Observable<any> {
         return this.http.get(API_URL + 'users', this.getHttpOptions());
     }

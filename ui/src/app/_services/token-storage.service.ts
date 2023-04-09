@@ -51,4 +51,12 @@ export class TokenStorageService {
     public isLoggedIn(): boolean {
         return !!this.getToken();
     }
+
+    public isSuperAdmin(): boolean {
+        return this.isLoggedIn() && this.getUser().scopes.find((scope: string) => scope === "SUPER_ADMIN") !== undefined;
+    }
+
+    public isTenantAdmin(): boolean {
+        return this.isSuperAdmin() || this.isLoggedIn() && this.getUser().scopes.find((scope: string) => scope === "TENANT_ADMIN") !== undefined;
+    }
 }

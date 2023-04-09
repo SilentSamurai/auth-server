@@ -3,12 +3,14 @@ import {ConfigModule} from './config/config.module';
 import {ServeStaticModule} from '@nestjs/serve-static';
 import {ScheduleModule} from '@nestjs/schedule';
 import {TypeOrmModule} from '@nestjs/typeorm';
-import {RolesModule} from './roles/roles.module';
+import {ScopesModule} from './scopes/scopes.module';
 import {UsersModule} from './users/users.module';
 import {AuthModule} from './auth/auth.module';
 import {ConfigService} from './config/config.service';
 import {LoggerMiddleware} from './log/logger.middleware';
 import {TenantModule} from "./tenants/tenant.module";
+import {StartUpService} from "./startUp.service";
+import {ControllersModule} from "./controllers/controller.module";
 
 @Module({
     imports: [
@@ -38,13 +40,14 @@ import {TenantModule} from "./tenants/tenant.module";
                     };
                 },
             }),
-        RolesModule,
         UsersModule,
+        TenantModule,
+        ScopesModule,
         AuthModule,
-        TenantModule
+        ControllersModule,
     ],
     controllers: [],
-    providers: [],
+    providers: [StartUpService],
 })
 export class AppModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {

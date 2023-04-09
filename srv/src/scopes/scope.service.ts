@@ -3,7 +3,7 @@ import {ConfigService} from "../config/config.service";
 import {UsersService} from "../users/users.service";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
-import {Tenant} from "./tenant.entity";
+import {Tenant} from "../tenants/tenant.entity";
 import {ValidationErrorException} from "../exceptions/validation-error.exception";
 import {Scope} from "./scope.entity";
 import {User} from "../users/user.entity";
@@ -19,10 +19,11 @@ export class ScopeService {
     }
 
 
-    async create(name: string, tenant: Tenant): Promise<Scope> {
+    async create(name: string, tenant: Tenant, removable: boolean = true): Promise<Scope> {
         let scope: Scope = this.scopeRepository.create({
             name: name,
-            tenant: tenant
+            tenant: tenant,
+            removable: removable
         });
         return this.scopeRepository.save(scope);
     }
@@ -35,11 +36,15 @@ export class ScopeService {
         return scope;
     }
 
+    async deleteByIdCascade(scope: Scope): Promise<Scope> {
+        return this.scopeRepository.remove(scope);
+    }
+
     async deleteById(id: string): Promise<Scope> {
         let scope: Scope = await this.findById(id);
         const count = await this.usersService.countByScope(scope);
-        if (count > 0) {
-            throw new ValidationErrorException("scope is assigned to members");
+        if (count > 0 || !scope.removable) {
+            throw new ValidationErrorException("scope is assigned to members | scope is protected");
         }
         return this.scopeRepository.remove(scope);
     }
@@ -57,21 +62,10 @@ export class ScopeService {
         return scope;
     }
 
-    async deleteByName(name: string, tenant: Tenant): Promise<Scope> {
-        let scope: Scope = await this.findByNameAndTenant(name, tenant);
-        let isAssigned = this.usersService.isUserAssignedToScope(scope);
-        if (isAssigned) {
-            throw new ValidationErrorException("users are assigned to the scope")
-        }
-        return this.scopeRepository.remove(scope);
-    }
-
     async getTenantScopes(tenant: Tenant): Promise<Scope[]> {
         return this.scopeRepository.find({
             where: {
                 tenant: {id: tenant.id}
-            }, relations: {
-                tenant: true
             }
         });
     }
@@ -119,10 +113,11 @@ export class ScopeService {
                     }
                 });
                 if (scope !== null) {
-                    scope.users.push(user);
-                    return this.scopeRepository.save(scope);
+                    await this.scopeRepository.createQueryBuilder()
+                        .relation(Scope, "users")
+                        .of(scope.id)
+                        .add(user.id);
                 }
-                return null;
             }
         ));
 
@@ -138,10 +133,11 @@ export class ScopeService {
                     }
                 });
                 if (scope !== null) {
-                    scope.users = scope.users.filter(scopeUser => scopeUser.id != user.id);
-                    return this.scopeRepository.save(scope);
+                    await this.scopeRepository.createQueryBuilder()
+                        .relation(Scope, "users")
+                        .of(scope.id)
+                        .remove(user.id);
                 }
-                return null;
             }
         ))
 

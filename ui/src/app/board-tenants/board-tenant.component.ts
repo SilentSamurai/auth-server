@@ -5,6 +5,7 @@ import {UpdateTenantComponent} from "./update-tenant/update-tenant.component";
 import {DeleteTenantComponent} from "./delete-tenant/delete-tenant.component";
 import {lastValueFrom} from "rxjs";
 import {TenantService} from "../_services/tenant.service";
+import {TokenStorageService} from "../_services/token-storage.service";
 
 @Component({
     selector: 'app-board-tenants',
@@ -14,12 +15,22 @@ import {TenantService} from "../_services/tenant.service";
 export class BoardTenantComponent implements OnInit {
 
     tenants: any[] = [];
+    creationAllowed = false;
+    isTenantAdmin = false;
 
-    constructor(private tenantService: TenantService, private modalService: NgbModal) {
+    constructor(private tokenStorageService: TokenStorageService,
+                private tenantService: TenantService,
+                private modalService: NgbModal) {
     }
 
     async ngOnInit(): Promise<void> {
         this.tenants = await lastValueFrom(this.tenantService.getAllTenants());
+        if (this.tokenStorageService.isSuperAdmin()) {
+            this.creationAllowed = true;
+        }
+        if (this.tokenStorageService.isTenantAdmin()) {
+            this.isTenantAdmin = true;
+        }
     }
 
     async openCreateModal() {
@@ -37,8 +48,11 @@ export class BoardTenantComponent implements OnInit {
         await this.ngOnInit();
     }
 
-    openDeleteModal(tenant: any) {
+    async openDeleteModal(tenant: any) {
         const modalRef = this.modalService.open(DeleteTenantComponent);
         modalRef.componentInstance.tenant = tenant;
+        const deletedTenant = await modalRef.result;
+        console.log(deletedTenant);
+        await this.ngOnInit();
     }
 }

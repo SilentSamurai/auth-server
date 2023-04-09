@@ -14,17 +14,14 @@ import {
 
 import {User} from '../users/user.entity';
 import {ConfigService} from '../config/config.service';
-import {AuthService} from './auth.service';
+import {AuthService} from '../auth/auth.service';
 import {UsersService} from '../users/users.service';
 import {MailService} from '../mail/mail.service';
-import {JwtAuthGuard} from './jwt-auth.guard';
-import {Roles} from '../roles/roles.decorator';
-import {RoleEnum} from '../roles/role.enum';
-import {RolesGuard} from '../roles/roles.guard';
+import {JwtAuthGuard} from '../auth/jwt-auth.guard';
 import {ValidationPipe} from '../validation/validation.pipe';
 import {ValidationSchema} from '../validation/validation.schema';
 import {MailServiceErrorException} from '../exceptions/mail-service-error.exception';
-import {LocalAuthGuard} from "./local-auth.guard";
+import {LocalAuthGuard} from "../auth/local-auth.guard";
 import {TenantService} from "../tenants/tenant.service";
 
 @Controller('oauth')
@@ -63,8 +60,7 @@ export class AuthController {
     }
 
     @Post('/signdown')
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(RoleEnum.USER)
+    @UseGuards(JwtAuthGuard)
     async signdown(
         @Request() request,
         @Body(new ValidationPipe(ValidationSchema.SignDownSchema)) body: any
@@ -85,7 +81,7 @@ export class AuthController {
     ): Promise<object> {
         const tenant = await this.tenantService.findByDomain(body.domain);
         const token: string = await this.authService.createAccessToken(request.user, tenant);
-        return {token: token, user: request.user};
+        return {token: token};
     }
 
     @Get('/verify/:token')

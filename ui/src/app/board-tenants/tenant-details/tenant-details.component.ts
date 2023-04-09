@@ -9,6 +9,7 @@ import {RemoveMemberComponent} from "./remove-member/remove-member.component";
 import {TenantService} from "../../_services/tenant.service";
 import {MessageService} from "primeng/api";
 import {RemoveScopeComponent} from "./remove-scope/remove-scope.component";
+import {TokenStorageService} from "../../_services/token-storage.service";
 
 @Component({
     selector: 'tenant-details',
@@ -20,8 +21,10 @@ export class TenantDetailsComponent implements OnInit {
     tenant_id: string = "";
     tenant: any = {};
     members: any = []
+    isTenantAdmin = false;
 
     constructor(private tenantService: TenantService,
+                private tokenStorageService: TokenStorageService,
                 private messageService: MessageService,
                 private actRoute: ActivatedRoute,
                 private modalService: NgbModal) {
@@ -32,6 +35,10 @@ export class TenantDetailsComponent implements OnInit {
         console.log(this.tenant_id)
         this.tenant = await this.tenantService.getTenantDetails(this.tenant_id);
         this.members = await this.tenantService.getMembers(this.tenant_id);
+        if (this.tokenStorageService.isTenantAdmin()) {
+            this.isTenantAdmin = true;
+        }
+
     }
 
     async onUpdateTenant() {
@@ -61,6 +68,7 @@ export class TenantDetailsComponent implements OnInit {
     async onRemoveScope(scope: any) {
         const modalRef = this.modalService.open(RemoveScopeComponent);
         modalRef.componentInstance.scope = scope;
+        modalRef.componentInstance.tenant = this.tenant;
         const deletedScope = await modalRef.result;
         console.log(deletedScope);
         await this.ngOnInit();

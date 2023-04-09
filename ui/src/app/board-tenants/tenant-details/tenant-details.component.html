@@ -16,7 +16,7 @@
                         <div>{{ tenant.name }}</div>
                     </div>
                     <div class="d-flex justify-content-between total font-weight-bold mt-4">
-                        <button (click)="onUpdateTenant()" class="btn btn-primary btn-sm">
+                        <button (click)="onUpdateTenant()" [disabled]="!isTenantAdmin" class="btn btn-primary btn-sm">
                             Update
                         </button>
                     </div>
@@ -45,7 +45,8 @@
                         <div *ngFor="let scope of tenant.scopes" class="my-2">
                             <p-chip>
                                 <code>{{tenant.name}}::{{scope.name}}</code>
-                                <button (click)="onRemoveScope(scope)"
+                                <button (click)="onRemoveScope(scope)" *ngIf="scope.removable"
+                                        [disabled]="!isTenantAdmin"
                                         aria-label="Close"
                                         class="btn-sm btn"
                                         style="height:100%"
@@ -57,7 +58,7 @@
                     </div>
                 </div>
                 <div class="d-flex justify-content-between total font-weight-bold mt-4">
-                    <button (click)="onAddScope()" class="btn btn-primary btn-sm">
+                    <button (click)="onAddScope()" [disabled]="!isTenantAdmin" class="btn btn-primary btn-sm">
                         Add New Scope
                     </button>
                 </div>
@@ -73,7 +74,7 @@
                 <ng-template pTemplate="caption">
                     <div class="d-flex justify-content-between">
                         <h5>Member List</h5>
-                        <button (click)="onAddMember()" class="btn btn-primary btn-sm">
+                        <button (click)="onAddMember()" [disabled]="!isTenantAdmin" class="btn btn-primary btn-sm">
                             Add Member
                         </button>
                     </div>
@@ -99,10 +100,10 @@
                             </ul>
                         </td>
                         <td class="">
-                            <button (click)="onAssignRole(user)" class="btn" type="button">
+                            <button (click)="onAssignRole(user)" [disabled]="!isTenantAdmin" class="btn" type="button">
                                 <i class="fa fa-solid fa-user"></i>
                             </button>
-                            <button (click)="removeMember(user)" class="btn" type="button">
+                            <button (click)="removeMember(user)" [disabled]="!isTenantAdmin" class="btn" type="button">
                                 <i class="fa fa-solid fa-trash"></i>
                             </button>
                         </td>

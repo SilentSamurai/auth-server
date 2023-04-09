@@ -7,9 +7,10 @@ import {Tenant} from "./tenant.entity";
 import {ValidationErrorException} from "../exceptions/validation-error.exception";
 import {generateKeyPairSync} from "crypto";
 import {User} from "../users/user.entity";
-import {Scope} from "./scope.entity";
+import {Scope} from "../scopes/scope.entity";
 import {ForbiddenException} from "../exceptions/forbidden.exception";
-import {ScopeService} from "./scope.service";
+import {ScopeService} from "../scopes/scope.service";
+import {ScopeEnum} from "../scopes/scope.enum";
 
 @Injectable()
 export class TenantService implements OnModuleInit {
@@ -23,28 +24,16 @@ export class TenantService implements OnModuleInit {
     }
 
     async onModuleInit() {
-        await this.populateGlobalTenant();
     }
-
 
     async create(name: string, domain: string, owner: User): Promise<Tenant> {
 
-        const subdomainTaken: Tenant = await this.tenantRepository.findOne({where: {domain}});
-        if (subdomainTaken) {
+        const domainTaken: Tenant = await this.tenantRepository.findOne({where: {domain}});
+        if (domainTaken) {
             throw new ValidationErrorException("Domain already Taken");
         }
 
-        const {privateKey, publicKey} = generateKeyPairSync('rsa', {
-            modulusLength: 2048,
-            publicKeyEncoding: {
-                type: 'spki',
-                format: 'pem'
-            },
-            privateKeyEncoding: {
-                type: 'pkcs8',
-                format: 'pem'
-            }
-        });
+        const {privateKey, publicKey} = this.generateKeyPair();
 
 
         let tenant: Tenant = this.tenantRepository.create({
@@ -56,7 +45,19 @@ export class TenantService implements OnModuleInit {
             scopes: []
         });
 
-        return this.tenantRepository.save(tenant);
+        tenant = await this.tenantRepository.save(tenant);
+
+        let adminScope = await this.scopeService.create(ScopeEnum.TENANT_ADMIN, tenant, false);
+        let viewerScope = await this.scopeService.create(ScopeEnum.TENANT_VIEWER, tenant, false);
+
+        await this.tenantRepository.createQueryBuilder()
+            .relation(Tenant, "scopes")
+            .of(tenant.id)
+            .add([adminScope.id, viewerScope.id]);
+
+        await this.updateScopeOfMember([adminScope.name], tenant.id, owner);
+
+        return tenant;
     }
 
     async updateKeys(id: string): Promise<Tenant> {
@@ -65,22 +66,18 @@ export class TenantService implements OnModuleInit {
             throw new ValidationErrorException("tenant id not found");
         }
 
-        const {privateKey, publicKey} = generateKeyPairSync('rsa', {
-            modulusLength: 2048,
-            publicKeyEncoding: {
-                type: 'spki',
-                format: 'pem'
-            },
-            privateKeyEncoding: {
-                type: 'pkcs8',
-                format: 'pem'
-            }
-        });
+        const {privateKey, publicKey} = this.generateKeyPair();
 
         tenant.publicKey = publicKey;
         tenant.privateKey = privateKey;
 
         return this.tenantRepository.save(tenant)
+    }
+
+    async existByDomain(domain: string): Promise<boolean> {
+        return this.tenantRepository.exist({
+            where: {domain}
+        });
     }
 
     async findById(id: string) {
@@ -109,6 +106,14 @@ export class TenantService implements OnModuleInit {
         return tenant;
     }
 
+    async addMember(tenantId: string, user: User): Promise<Tenant> {
+        let tenant: Tenant = await this.findById(tenantId);
+        tenant.members.push(user);
+        let saveTenant = await this.tenantRepository.save(tenant);
+        await this.scopeService.updateUserScopes([ScopeEnum.TENANT_VIEWER], tenant, user);
+        return saveTenant;
+    }
+
     async getAllTenants() {
         return this.tenantRepository.find();
     }
@@ -135,10 +140,14 @@ export class TenantService implements OnModuleInit {
         return this.scopeService.getMemberScopes(tenant, user);
     }
 
-    async addMember(tenantId: string, user: User): Promise<Tenant> {
+    async isViewer(tenantId: string, user: User): Promise<boolean> {
         let tenant: Tenant = await this.findById(tenantId);
-        tenant.members.push(user);
-        return this.tenantRepository.save(tenant)
+        if (tenant.members.find((member) => user.id === member.id) === undefined) {
+            return false;
+        }
+        let memberScopes = await this.getMemberScope(tenantId, user);
+        return memberScopes.some(scope => scope.name === ScopeEnum.TENANT_VIEWER
+            || scope.name === ScopeEnum.TENANT_ADMIN);
     }
 
     async removeMember(tenantId: string, user: User): Promise<Tenant> {
@@ -153,6 +162,19 @@ export class TenantService implements OnModuleInit {
         return tenant.members.find((member) => user.id === member.id) !== undefined;
     }
 
+    async isAdmin(tenantId: string, user: User): Promise<boolean> {
+        let tenant: Tenant = await this.findById(tenantId);
+        if (tenant.members.find((member) => user.id === member.id) === undefined) {
+            return false;
+        }
+        let memberScopes = await this.getMemberScope(tenantId, user);
+        return memberScopes.some(scope => scope.name === ScopeEnum.TENANT_ADMIN);
+    }
+
+    async findGlobalTenant(): Promise<Tenant> {
+        return this.findByDomain(this.configService.get("SUPER_TENANT_DOMAIN"));
+    }
+
     async updateScopeOfMember(scopes: string[], tenantId: string, user: User): Promise<Scope[]> {
         let tenant: Tenant = await this.findById(tenantId);
         const isMember: boolean = await this.isMember(tenantId, user);
@@ -162,35 +184,7 @@ export class TenantService implements OnModuleInit {
         return this.scopeService.updateUserScopes(scopes, tenant, user)
     }
 
-    async findGlobalTenant(): Promise<Tenant> {
-        return this.findByDomain("auth.server.com");
-    }
-
-    async populateGlobalTenant() {
-        try {
-            let globalTenant = await this.tenantRepository.findOne({
-                where: {domain: "auth.server.com"}, relations: {
-                    members: true,
-                    scopes: true
-                }
-            });
-            if (!globalTenant) {
-                const user = await this.usersService.findByEmail("admin@auth.server.com");
-                const tenant: Tenant = await this.create(
-                    "Global Default Tenant",
-                    "auth.server.com",
-                    user
-                );
-                const scopeAdmin = await this.scopeService.create("admin", tenant);
-                const scopeViewer = await this.scopeService.create("viewer", tenant);
-                await this.scopeService.updateUserScopes([scopeAdmin.name, scopeViewer.name], tenant, user);
-            }
-        } catch (e) {
-            console.error(e);
-        }
-    }
-
-    async findAllUserTenants(user: User) {
+    async findByMembership(user: User) {
         const tenants: Tenant[] = await this.tenantRepository.find({
             where: {
                 members: {id: user.id}
@@ -203,11 +197,34 @@ export class TenantService implements OnModuleInit {
 
     async deleteTenant(tenantId: string) {
         let tenant: Tenant = await this.findById(tenantId);
+        let tenantScopes = await this.getTenantScopes(tenant);
+        for (const scope of tenantScopes) {
+            await this.scopeService.deleteByIdCascade(scope);
+        }
+        return this.tenantRepository.remove(tenant);
+    }
+
+    async deleteTenantSecure(tenantId: string) {
+        let tenant: Tenant = await this.findById(tenantId);
         let count = await this.usersService.countByTenant(tenant);
         if (count > 0) {
             throw new ValidationErrorException("tenant contains members");
         }
         return this.tenantRepository.remove(tenant);
+    }
+
+    private generateKeyPair() {
+        return generateKeyPairSync('rsa', {
+            modulusLength: 2048,
+            publicKeyEncoding: {
+                type: 'spki',
+                format: 'pem'
+            },
+            privateKeyEncoding: {
+                type: 'pkcs8',
+                format: 'pem'
+            }
+        });
     }
 
     getTenantScopes(tenant: Tenant): Promise<Scope[]> {

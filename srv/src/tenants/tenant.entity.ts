@@ -1,5 +1,5 @@
-import {Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn} from "typeorm";
-import {Scope} from "./scope.entity";
+import {Column, Entity, JoinColumn, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn} from "typeorm";
+import {Scope} from "../scopes/scope.entity";
 import {Exclude} from "class-transformer";
 import {User} from "../users/user.entity"; // Used with ClassSerializerInterceptor to exclude from responses.
 
@@ -21,7 +21,11 @@ export class Tenant {
     @Column({nullable: false})
     publicKey: string;
 
-    @OneToMany(type => Scope, scope => scope.tenant, {cascade: true, orphanedRowAction: "delete"})
+    @OneToMany(type => Scope, scope => scope.tenant, {
+        cascade: true,
+        onDelete: "CASCADE"
+    })
+    @JoinColumn()
     scopes: Scope[];
 
     @ManyToMany(() => User, (user) => user.tenants)

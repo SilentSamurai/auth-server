@@ -1,7 +1,6 @@
 import {CanActivate, ExecutionContext, Injectable, Logger} from '@nestjs/common';
-import {ExtractJwt} from 'passport-jwt';
-import {AuthService} from "./auth.service";
 import {UnauthorizedException} from "../exceptions/unauthorized.exception";
+import {SecurityService} from "../scopes/security.service";
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
@@ -9,7 +8,7 @@ export class JwtAuthGuard implements CanActivate {
     private static readonly LOGGER = new Logger("JwtAuthGuard");
 
     constructor(
-        private readonly authService: AuthService
+        private readonly securityService: SecurityService
     ) {
     }
 
@@ -17,12 +16,9 @@ export class JwtAuthGuard implements CanActivate {
         const request = context.switchToHttp().getRequest();
 
         try {
-            const token = this.extractToken(request);
-            const user = await this.authService.validateAccessToken(token);
-
             // 💡 We're assigning the payload to the request object here
             // so that we can access it in our route handlers
-            request['user'] = user;
+            const payload = await this.securityService.setSecurityContextFromRequest(request);
         } catch (e) {
             JwtAuthGuard.LOGGER.error("Error occurred in Security Context", e)
             throw new UnauthorizedException(e);
@@ -30,8 +26,5 @@ export class JwtAuthGuard implements CanActivate {
         return true;
     }
 
-    private extractToken(request: any) {
-        let extractor = ExtractJwt.fromAuthHeaderAsBearerToken();
-        return extractor(request)
-    }
+
 }

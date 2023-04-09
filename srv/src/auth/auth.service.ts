@@ -11,6 +11,18 @@ import * as argon2 from 'argon2';
 import {Tenant} from "../tenants/tenant.entity";
 import {TenantService} from "../tenants/tenant.service";
 
+export class SecurityContext {
+    sub: string;
+    email: string;
+    name: string;
+    tenant: {
+        id: string;
+        name: string;
+        domain: string;
+    };
+    scopes: string[];
+}
+
 @Injectable()
 export class AuthService {
 
@@ -36,12 +48,13 @@ export class AuthService {
         return user;
     }
 
-    async validateAccessToken(token: string): Promise<User> {
-        let payload = this.jwtService.decode(token, {json: true});
+    async validateAccessToken(token: string): Promise<SecurityContext> {
+        let payload: SecurityContext = this.jwtService.decode(token, {json: true}) as SecurityContext;
         let tenant = await this.tenantService.findById(payload["tenant"].id);
         payload = await this.jwtService.verifyAsync(token, {publicKey: tenant.publicKey});
         console.log("token verified with public Key");
-        return this.usersService.findByEmail(payload.email);
+        let user = await this.usersService.findByEmail(payload.email);
+        return payload;
     }
 
     /**
@@ -52,7 +65,7 @@ export class AuthService {
             throw new EmailNotVerifiedException();
         }
         let scopes = await this.tenantService.getMemberScope(tenant.id, user);
-        const payload: object = {
+        const payload: SecurityContext = {
             sub: user.email,
             email: user.email,
             name: user.name,

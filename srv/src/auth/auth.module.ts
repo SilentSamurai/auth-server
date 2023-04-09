@@ -3,12 +3,13 @@ import {UsersModule} from '../users/users.module';
 import {PassportModule} from '@nestjs/passport';
 import {JwtModule} from '@nestjs/jwt';
 import {MailModule} from '../mail/mail.module';
-import {AuthController} from './auth.controller';
+import {AuthController} from '../controllers/auth.controller';
 import {ConfigService} from '../config/config.service';
 import {AuthService} from './auth.service';
 import {LocalAuthGuard} from './local-auth.guard';
 import {TenantModule} from "../tenants/tenant.module";
 import {JwtAuthGuard} from "./jwt-auth.guard";
+import {ScopesModule} from "../scopes/scopes.module";
 
 @Module(
     {
@@ -29,7 +30,8 @@ import {JwtAuthGuard} from "./jwt-auth.guard";
                         }
                     }),
                 MailModule,
-                forwardRef(() => TenantModule)
+                forwardRef(() => TenantModule),
+                forwardRef(() => ScopesModule)
             ],
         controllers: [AuthController],
         providers: [AuthService, LocalAuthGuard, JwtAuthGuard],

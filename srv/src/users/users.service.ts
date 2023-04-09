@@ -1,20 +1,17 @@
-import {forwardRef, Inject, Injectable, Logger, OnModuleInit} from '@nestjs/common';
+import {Injectable, Logger, OnModuleInit} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {Repository} from 'typeorm';
 import {Cron} from '@nestjs/schedule';
 import {User} from './user.entity';
 import {ConfigService} from '../config/config.service';
-import {RolesService} from '../roles/roles.service';
 import {UsernameTakenException} from '../exceptions/username-taken.exception';
 import {EmailTakenException} from '../exceptions/email-taken.exception';
 import {UserNotFoundException} from '../exceptions/user-not-found.exception';
 import {InvalidCredentialsException} from '../exceptions/invalid-credentials.exception';
 import * as argon2 from 'argon2';
 import * as ms from 'ms';
-import {Scope} from "../tenants/scope.entity";
+import {Scope} from "../scopes/scope.entity";
 import {Tenant} from 'src/tenants/tenant.entity';
-
-const fs = require('fs');
 
 @Injectable()
 export class UsersService implements OnModuleInit {
@@ -23,16 +20,11 @@ export class UsersService implements OnModuleInit {
 
     constructor(
         @InjectRepository(User) private usersRepository: Repository<User>,
-        private readonly configService: ConfigService,
-        @Inject(forwardRef(() => RolesService)) private readonly rolesService: RolesService
+        private readonly configService: ConfigService
     ) {
     }
 
     async onModuleInit() {
-        if (!this.configService.isProduction()) {
-            await this.populateDummyUsers();
-        }
-        await this.createAdminUser();
     }
 
     /**
@@ -41,8 +33,7 @@ export class UsersService implements OnModuleInit {
     async create(
         password: string,
         email: string,
-        name: string,
-        roles: string[] = ['user']
+        name: string
     ): Promise<User> {
 
         const emailTaken: User = await this.usersRepository.findOne({where: {email}});
@@ -50,19 +41,10 @@ export class UsersService implements OnModuleInit {
             throw new EmailTakenException();
         }
 
-        let userRoles: any[] = [];
-        for (let i in roles) {
-            let role = await this.rolesService.getByName(roles[i]);
-            if (role) {
-                userRoles.push(role);
-            }
-        }
-
         const user: User = this.usersRepository.create({
             email: email,
             password: await argon2.hash(password),
-            name: name,
-            roles: userRoles
+            name: name
         });
 
         return this.usersRepository.save(user);
@@ -90,10 +72,7 @@ export class UsersService implements OnModuleInit {
         id: string
     ): Promise<User> {
         const user: User = await this.usersRepository.findOne({
-            where: {id: id},
-            relations: {
-                roles: true
-            }
+            where: {id: id}
         });
         if (user === null) {
             throw new UserNotFoundException();
@@ -109,15 +88,11 @@ export class UsersService implements OnModuleInit {
         email: string
     ): Promise<User> {
         const user: User = await this.usersRepository.findOne({
-            where: {email},
-            relations: {
-                roles: true
-            }
+            where: {email}
         });
         if (user === null) {
             throw new UserNotFoundException();
         }
-
         return user;
     }
 
@@ -125,12 +100,15 @@ export class UsersService implements OnModuleInit {
         const users: User[] = await this.usersRepository.find({
             where: {
                 tenants: {id: tenant.id}
-            },
-            relations: {
-                scopes: true
             }
         });
         return users;
+    }
+
+    async existByEmail(email: string): Promise<boolean> {
+        return this.usersRepository.exist({
+            where: {email}
+        });
     }
 
     /**
@@ -296,48 +274,6 @@ export class UsersService implements OnModuleInit {
                 } catch (exception) {
                 }
             }
-        }
-    }
-
-    /**
-     * Populate the database with dummy users.
-     */
-    async populateDummyUsers() {
-        fs.readFile('./users.json', 'utf8', (error, data) => {
-            if (error) {
-                return
-            }
-
-            const users: any = JSON.parse(data);
-            users.records.forEach(async record => {
-                try {
-                    let user: User = await this.create(
-                        record.password,
-                        record.email,
-                        record.name,
-                        record.roles
-                    );
-
-                    await this.updateVerified(user.id, true);
-                } catch (exception: any) {
-                    // Catch user already created.
-                }
-            });
-        });
-    }
-
-    async createAdminUser() {
-        try {
-            let user: User = await this.create(
-                "admin9000",
-                "admin@auth.server.com",
-                "admin",
-                ["admin", "user"]
-            );
-
-            await this.updateVerified(user.id, true);
-        } catch (exception: any) {
-            // Catch user already created.
         }
     }
 

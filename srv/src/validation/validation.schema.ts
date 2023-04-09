@@ -121,7 +121,6 @@ const CreateTenantSchema = yup.object().shape(
 
 const UpdateTenantSchema = yup.object().shape(
     {
-        id: yup.string().required('id is required'),
         name: yup.string().max(20).nullable(),
         domain: yup.string().max(100).nullable(),
     });
@@ -133,11 +132,9 @@ const CreateScopeSchema = yup.object().shape(
     });
 
 const OperatingScopeSchema = yup.object().shape({
-        email: yup.string().required('Email is required'),
         scopes: yup.array().of(
             yup.string().max(20)
-        ),
-        tenantId: yup.string().required('TenantId is required'),
+        )
     }
 );
 

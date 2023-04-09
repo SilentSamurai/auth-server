@@ -9,7 +9,8 @@ import {TokenStorageService} from './_services/token-storage.service';
 export class AppComponent {
     isLoggedIn = false;
     email?: string;
-    private roles: string[] = [];
+    isUserViewable = false;
+    private scopes: string[] = [];
 
     constructor(private tokenStorageService: TokenStorageService) {
     }
@@ -19,7 +20,10 @@ export class AppComponent {
 
         if (this.isLoggedIn) {
             const user = this.tokenStorageService.getUser();
-            this.roles = user.roles;
+            this.scopes = user.scopes;
+            if (this.tokenStorageService.isSuperAdmin()) {
+                this.isUserViewable = true;
+            }
 
             this.email = user.email;
         }
