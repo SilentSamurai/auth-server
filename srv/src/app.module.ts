@@ -36,6 +36,7 @@ import {ControllersModule} from "./controllers/controller.module";
                         database: configService.get('DATABASE_NAME'),
                         entities: [configService.get('DATABASE_ENTITIES')],
                         synchronize: true,
+                        ssl: configService.get('DATABASE_SSL'),
                         logging: !configService.isProduction()
                     };
                 },
