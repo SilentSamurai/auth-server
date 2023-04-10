@@ -6,12 +6,13 @@ import {TenantModule} from "../tenants/tenant.module";
 import {AuthModule} from "../auth/auth.module";
 import {TypeOrmModule} from "@nestjs/typeorm";
 import {Scope} from "./scope.entity";
+import {UserScope} from "./user.scopes.entity";
 
 @Module(
     {
         imports:
             [
-                TypeOrmModule.forFeature([Scope]),
+                TypeOrmModule.forFeature([Scope, UserScope]),
                 UsersModule, // Circular dependency resolved.
                 TenantModule,
                 AuthModule

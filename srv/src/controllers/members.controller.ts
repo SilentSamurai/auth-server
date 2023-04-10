@@ -65,8 +65,9 @@ export class MemberController {
     ): Promise<Tenant> {
         const user = await this.usersService.findByEmail(email);
         let tenant = await this.tenantService.findById(tenantId);
-        await this.securityService.currentUserShouldBeTenantAdmin(request, tenant.domain)
-        return this.tenantService.addMember(tenantId, user);
+        await this.securityService.currentUserShouldBeTenantAdmin(request, tenant.domain);
+        await this.tenantService.addMember(tenantId, user);
+        return tenant;
     }
 
     @Delete('/:tenantId/member/:email')

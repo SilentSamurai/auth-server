@@ -1,4 +1,5 @@
 import {
+    BadRequestException,
     Body,
     ClassSerializerInterceptor,
     Controller,
@@ -6,9 +7,7 @@ import {
     Headers,
     Param,
     Post,
-    Request,
     Response,
-    UseGuards,
     UseInterceptors
 } from '@nestjs/common';
 
@@ -17,11 +16,11 @@ import {ConfigService} from '../config/config.service';
 import {AuthService} from '../auth/auth.service';
 import {UsersService} from '../users/users.service';
 import {MailService} from '../mail/mail.service';
-import {JwtAuthGuard} from '../auth/jwt-auth.guard';
 import {ValidationPipe} from '../validation/validation.pipe';
 import {ValidationSchema} from '../validation/validation.schema';
 import {MailServiceErrorException} from '../exceptions/mail-service-error.exception';
 import {TenantService} from "../tenants/tenant.service";
+import {Tenant} from "../tenants/tenant.entity";
 
 @Controller('api/oauth')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -35,54 +34,43 @@ export class AuthController {
     ) {
     }
 
-    @Post('/signup')
-    async signup(
-        @Headers() headers,
-        @Body(new ValidationPipe(ValidationSchema.SignUpSchema)) body: any
-    ): Promise<User> {
-        const user: User = await this.usersService.create(
-            body.password,
-            body.email,
-            body.name,
-        );
-
-        const token: string = await this.authService.createVerificationToken(user);
-        const link: string = 'https://' + headers.host + '/verify/' + token;
-
-        const sent: boolean = await this.mailService.sendVerificationMail(user, link);
-        if (!sent) {
-            this.usersService.delete(user.id);
-            throw new MailServiceErrorException();
-        }
-
-        return user;
-    }
-
-    @Post('/signdown')
-    @UseGuards(JwtAuthGuard)
-    async signdown(
-        @Request() request,
-        @Body(new ValidationPipe(ValidationSchema.SignDownSchema)) body: any
-    ): Promise<User> {
-        const user: User = await this.usersService.deleteSecure(request.user.id, body.password);
-        return user;
-    }
-
     @Post('/token')
     async signin(
-        @Body(new ValidationPipe(ValidationSchema.SignInSchema)) body: {
-            email: string,
+        @Body() body: {
+            client_id: string,
+            client_secret: string,
+            domain: string,
             password: string,
-            domain: string
+            email: string;
+            grant_type: string
         }
     ): Promise<object> {
-        const user: User = await this.authService.validate(body.email, body.password);
-        const tenant = await this.tenantService.findByDomain(body.domain);
-        const token: string = await this.authService.createAccessToken(user, tenant);
-        return {
-            token: token,
-            expires_in: this.configService.get('TOKEN_EXPIRATION_TIME')
-        };
+
+        switch (body.grant_type) {
+            case "password": {
+                let validationPipe = new ValidationPipe(ValidationSchema.PasswordGrantSchema);
+                await validationPipe.transform(body, null);
+                const user: User = await this.authService.validate(body.email, body.password);
+                const tenant = await this.tenantService.findByDomain(body.domain);
+                const token: string = await this.authService.createUserAccessToken(user, tenant);
+                return {
+                    token: token,
+                    expires_in: this.configService.get('TOKEN_EXPIRATION_TIME')
+                };
+            }
+            case "client_credential": {
+                let validationPipe = new ValidationPipe(ValidationSchema.ClientCredentialGrantSchema);
+                await validationPipe.transform(body, null);
+                const tenant: Tenant = await this.authService.validateClientCredentials(body.client_id, body.client_secret);
+                const token: string = await this.authService.createTechnicalAccessToken(tenant);
+                return {
+                    token: token,
+                    expires_in: this.configService.get('TOKEN_EXPIRATION_TIME')
+                };
+            }
+            default:
+                throw new BadRequestException("grant type not recognised.");
+        }
     }
 
     @Get('/verify/:token')

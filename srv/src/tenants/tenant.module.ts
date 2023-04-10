@@ -7,17 +7,18 @@ import {TypeOrmModule} from "@nestjs/typeorm";
 import {Tenant} from "./tenant.entity";
 import {ScopesModule} from "../scopes/scopes.module";
 import {AuthModule} from "../auth/auth.module";
+import {TenantMember} from "./tenant.members.entity";
 
 @Module(
     {
             imports:
                 [
-                        TypeOrmModule.forFeature([Tenant]),
-                        forwardRef(() => UsersModule), // Circular dependency resolved.
-                        forwardRef(() => ScopesModule), // Circular dependency resolved.
-                        forwardRef(() => AuthModule), // Circular dependency resolved.
-                        PassportModule,
-                        MailModule
+                    TypeOrmModule.forFeature([Tenant, TenantMember]),
+                    forwardRef(() => UsersModule), // Circular dependency resolved.
+                    forwardRef(() => ScopesModule), // Circular dependency resolved.
+                    forwardRef(() => AuthModule), // Circular dependency resolved.
+                    PassportModule,
+                    MailModule
                 ],
             controllers: [],
             providers: [TenantService],

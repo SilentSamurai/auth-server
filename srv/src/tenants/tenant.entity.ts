@@ -1,9 +1,9 @@
-import {Column, Entity, JoinColumn, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn} from "typeorm";
+import {Column, CreateDateColumn, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn} from "typeorm";
 import {Scope} from "../scopes/scope.entity";
 import {Exclude} from "class-transformer";
 import {User} from "../users/user.entity"; // Used with ClassSerializerInterceptor to exclude from responses.
 
-@Entity()
+@Entity({name: "tenant"})
 export class Tenant {
     @PrimaryGeneratedColumn("uuid")
     id: string;
@@ -14,27 +14,39 @@ export class Tenant {
     @Column({unique: true, nullable: false})
     domain: string;
 
-    @Column({unique: true, nullable: false})
+    @Column({unique: true, nullable: false, name: "client_id"})
     clientId: string;
 
-    @Column({nullable: false})
+    @Column({nullable: false, name: "client_secret"})
     clientSecret: string;
 
-    @Column({nullable: false})
+    @Column({nullable: false, name: "private_key"})
     @Exclude()
     privateKey: string;
 
-    @Column({nullable: false})
+    @Column({nullable: false, name: "public_key"})
     publicKey: string;
 
     @OneToMany(type => Scope, scope => scope.tenant, {
         cascade: true,
         onDelete: "CASCADE"
     })
-    @JoinColumn()
     scopes: Scope[];
 
     @ManyToMany(() => User, (user) => user.tenants)
-    @JoinTable()
+    @JoinTable({
+        name: "tenant_members",
+        joinColumn: {
+            name: "tenant_id",
+            referencedColumnName: "id"
+        },
+        inverseJoinColumn: {
+            name: "user_id",
+            referencedColumnName: "id"
+        }
+    })
     members: User[];
+
+    @CreateDateColumn({name: "created_at"})
+    createdAt: Date;
 }

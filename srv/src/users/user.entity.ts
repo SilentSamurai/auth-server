@@ -3,13 +3,10 @@ import {Exclude} from 'class-transformer'; // Used with ClassSerializerIntercept
 import {Tenant} from "../tenants/tenant.entity";
 import {Scope} from "../scopes/scope.entity";
 
-@Entity()
+@Entity({name: "user"})
 export class User {
     @PrimaryGeneratedColumn("uuid")
     id: string;
-
-    @CreateDateColumn()
-    createdAt: Date;
 
     @Column({nullable: false})
     @Exclude() // Exclude from responses.
@@ -18,7 +15,7 @@ export class User {
     @Column({unique: true, nullable: false})
     email: string;
 
-    @Column({default: ''})
+    @Column({nullable: false})
     name: string;
 
     @ManyToMany(() => Tenant, (tenant) => tenant.members)
@@ -30,4 +27,7 @@ export class User {
     @Column({default: false})
     @Exclude() // Exclude from responses.
     verified: boolean;
+
+    @CreateDateColumn({name: "created_at"})
+    createdAt: Date;
 }

@@ -10,6 +10,7 @@ import {InvalidTokenException} from '../exceptions/invalid-token.exception';
 import * as argon2 from 'argon2';
 import {Tenant} from "../tenants/tenant.entity";
 import {TenantService} from "../tenants/tenant.service";
+import {CryptUtil} from "../util/crypt.util";
 
 export class SecurityContext {
     sub: string;
@@ -57,10 +58,39 @@ export class AuthService {
         return payload;
     }
 
+    async validateClientCredentials(clientId: string, clientSecret: string): Promise<Tenant> {
+        const tenant: Tenant = await this.tenantService.findByClientId(clientId);
+        let valid: boolean = CryptUtil.verifyClientId(tenant.clientSecret, clientId);
+        if (!valid) {
+            throw new InvalidCredentialsException();
+        }
+        valid = CryptUtil.verifyClientSecret(tenant.clientSecret, clientSecret);
+        if (!valid) {
+            throw new InvalidCredentialsException();
+        }
+        return tenant;
+    }
+
+    async createTechnicalAccessToken(tenant: Tenant): Promise<string> {
+        let scopes = await this.tenantService.getTenantScopes(tenant);
+        const payload: SecurityContext = {
+            sub: "oauth",
+            email: "oauth@" + tenant.domain,
+            name: "oauth",
+            tenant: {
+                id: tenant.id,
+                name: tenant.name,
+                domain: tenant.domain,
+            },
+            scopes: scopes.map(scope => scope.name)
+        };
+        return this.jwtService.sign(payload, {privateKey: tenant.privateKey,});
+    }
+
     /**
      * Create an access token for the user.
      */
-    async createAccessToken(user: User, tenant: Tenant): Promise<string> {
+    async createUserAccessToken(user: User, tenant: Tenant): Promise<string> {
         if (!user.verified) {
             throw new EmailNotVerifiedException();
         }

@@ -7,6 +7,7 @@ import {Tenant} from "../tenants/tenant.entity";
 import {ValidationErrorException} from "../exceptions/validation-error.exception";
 import {Scope} from "./scope.entity";
 import {User} from "../users/user.entity";
+import {UserScope} from "./user.scopes.entity";
 
 @Injectable()
 export class ScopeService {
@@ -15,6 +16,7 @@ export class ScopeService {
         private readonly configService: ConfigService,
         private readonly usersService: UsersService,
         @InjectRepository(Scope) private scopeRepository: Repository<Scope>,
+        @InjectRepository(UserScope) private userScopeRepository: Repository<UserScope>,
     ) {
     }
 
@@ -36,8 +38,16 @@ export class ScopeService {
         return scope;
     }
 
-    async deleteByIdCascade(scope: Scope): Promise<Scope> {
-        return this.scopeRepository.remove(scope);
+    async deleteByTenant(tenant: Tenant): Promise<number> {
+        let deleteResult = await this.userScopeRepository.delete({
+            tenantId: tenant.id
+        });
+        let deleteResult1 = await this.scopeRepository.delete({
+            tenant: {
+                id: tenant.id
+            }
+        });
+        return deleteResult1.affected;
     }
 
     async deleteById(id: string): Promise<Scope> {
@@ -79,6 +89,36 @@ export class ScopeService {
         });
     }
 
+    async hasAllScopes(scopes: string[], tenant: Tenant, user: User): Promise<boolean> {
+        for (let name of scopes) {
+            let scope = await this.findByNameAndTenant(name, tenant);
+            const hasScope = await this.userScopeRepository.exist({
+                where: {
+                    tenantId: tenant.id,
+                    userId: user.id,
+                    scopeId: scope.id
+                },
+            })
+            if (!hasScope) return false;
+        }
+        return true;
+    }
+
+    async hasAnyOfScopes(scopes: string[], tenant: Tenant, user: User): Promise<boolean> {
+        for (let name of scopes) {
+            let scope = await this.findByNameAndTenant(name, tenant);
+            const hasScope = await this.userScopeRepository.exist({
+                where: {
+                    tenantId: tenant.id,
+                    userId: user.id,
+                    scopeId: scope.id
+                },
+            })
+            if (hasScope) return true;
+        }
+        return false;
+    }
+
     async updateUserScopes(scopes: string[], tenant: Tenant, user: User): Promise<Scope[]> {
 
         let memberScopes = await this.getMemberScopes(tenant, user);
@@ -113,10 +153,12 @@ export class ScopeService {
                     }
                 });
                 if (scope !== null) {
-                    await this.scopeRepository.createQueryBuilder()
-                        .relation(Scope, "users")
-                        .of(scope.id)
-                        .add(user.id);
+                    let userScope = this.userScopeRepository.create({
+                        userId: user.id,
+                        tenantId: tenant.id,
+                        scopeId: scope.id
+                    });
+                    await this.userScopeRepository.save(userScope);
                 }
             }
         ));
@@ -133,10 +175,14 @@ export class ScopeService {
                     }
                 });
                 if (scope !== null) {
-                    await this.scopeRepository.createQueryBuilder()
-                        .relation(Scope, "users")
-                        .of(scope.id)
-                        .remove(user.id);
+                    let userScope = await this.userScopeRepository.findOne({
+                        where: {
+                            tenantId: tenant.id,
+                            userId: user.id,
+                            scopeId: scope.id
+                        }
+                    });
+                    await this.userScopeRepository.remove(userScope);
                 }
             }
         ))

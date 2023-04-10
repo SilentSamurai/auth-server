@@ -5,6 +5,7 @@ import {
     Get,
     Headers,
     Patch,
+    Post,
     Request,
     UseGuards,
     UseInterceptors
@@ -32,6 +33,39 @@ export class UsersController {
         private readonly mailService: MailService,
         private readonly securityService: SecurityService
     ) {
+    }
+
+    @Post('/signup')
+    async signup(
+        @Headers() headers,
+        @Body(new ValidationPipe(ValidationSchema.SignUpSchema)) body: any
+    ): Promise<User> {
+        const user: User = await this.usersService.create(
+            body.password,
+            body.email,
+            body.name,
+        );
+
+        const token: string = await this.authService.createVerificationToken(user);
+        const link: string = 'https://' + headers.host + '/verify/' + token;
+
+        const sent: boolean = await this.mailService.sendVerificationMail(user, link);
+        if (!sent) {
+            this.usersService.delete(user.id);
+            throw new MailServiceErrorException();
+        }
+
+        return user;
+    }
+
+    @Post('/signdown')
+    @UseGuards(JwtAuthGuard)
+    async signdown(
+        @Request() request,
+        @Body(new ValidationPipe(ValidationSchema.SignDownSchema)) body: any
+    ): Promise<User> {
+        const user: User = await this.usersService.deleteSecure(request.user.id, body.password);
+        return user;
     }
 
     @Get('/me')
@@ -95,4 +129,6 @@ export class UsersController {
         const user: User = await this.usersService.findByEmail(securityContext.email);
         return this.tenantService.findByMembership(user);
     }
+
+
 }

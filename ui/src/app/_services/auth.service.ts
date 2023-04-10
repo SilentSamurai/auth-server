@@ -17,6 +17,7 @@ export class AuthService {
 
     login(email: string, password: string, domain: string): Observable<any> {
         return this.http.post(`${AUTH_API}/token`, {
+            grant_type: "password",
             email,
             password,
             domain

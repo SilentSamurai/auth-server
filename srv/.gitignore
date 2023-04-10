@@ -109,3 +109,4 @@ dist
 
 db
 static
+.env.prod

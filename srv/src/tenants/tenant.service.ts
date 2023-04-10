@@ -5,12 +5,13 @@ import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 import {Tenant} from "./tenant.entity";
 import {ValidationErrorException} from "../exceptions/validation-error.exception";
-import {generateKeyPairSync, randomBytes, scryptSync, timingSafeEqual} from "crypto";
 import {User} from "../users/user.entity";
 import {Scope} from "../scopes/scope.entity";
 import {ForbiddenException} from "../exceptions/forbidden.exception";
 import {ScopeService} from "../scopes/scope.service";
 import {ScopeEnum} from "../scopes/scope.enum";
+import {CryptUtil} from "../util/crypt.util";
+import {TenantMember} from "./tenant.members.entity";
 
 @Injectable()
 export class TenantService implements OnModuleInit {
@@ -20,6 +21,7 @@ export class TenantService implements OnModuleInit {
         private readonly usersService: UsersService,
         private readonly scopeService: ScopeService,
         @InjectRepository(Tenant) private tenantRepository: Repository<Tenant>,
+        @InjectRepository(TenantMember) private tenantMemberRepository: Repository<TenantMember>,
     ) {
     }
 
@@ -33,8 +35,8 @@ export class TenantService implements OnModuleInit {
             throw new ValidationErrorException("Domain already Taken");
         }
 
-        const {privateKey, publicKey} = this.generateKeyPair();
-        const {key, secretHash} = this.generateClientIdAndSecret();
+        const {privateKey, publicKey} = CryptUtil.generateKeyPair();
+        const {clientId, clientSecret} = CryptUtil.generateClientIdAndSecret();
 
 
         let tenant: Tenant = this.tenantRepository.create({
@@ -42,13 +44,15 @@ export class TenantService implements OnModuleInit {
             domain: domain,
             privateKey: privateKey,
             publicKey: publicKey,
-            clientId: key,
-            clientSecret: secretHash,
-            members: [owner],
+            clientId: clientId,
+            clientSecret: clientSecret,
+            members: [],
             scopes: []
         });
 
         tenant = await this.tenantRepository.save(tenant);
+
+        await this.addMember(tenant.id, owner);
 
         let adminScope = await this.scopeService.create(ScopeEnum.TENANT_ADMIN, tenant, false);
         let viewerScope = await this.scopeService.create(ScopeEnum.TENANT_VIEWER, tenant, false);
@@ -69,7 +73,7 @@ export class TenantService implements OnModuleInit {
             throw new ValidationErrorException("tenant id not found");
         }
 
-        const {privateKey, publicKey} = this.generateKeyPair();
+        const {privateKey, publicKey} = CryptUtil.generateKeyPair();
 
         tenant.publicKey = publicKey;
         tenant.privateKey = privateKey;
@@ -109,12 +113,27 @@ export class TenantService implements OnModuleInit {
         return tenant;
     }
 
-    async addMember(tenantId: string, user: User): Promise<Tenant> {
+    async findByClientId(clientId: string): Promise<Tenant> {
+        let tenant = await this.tenantRepository.findOne({
+            where: {clientId}, relations: {
+                members: true,
+                scopes: true
+            }
+        });
+        if (tenant === null) {
+            throw new ValidationErrorException("tenant not found");
+        }
+        return tenant;
+    }
+
+    async addMember(tenantId: string, user: User): Promise<TenantMember> {
         let tenant: Tenant = await this.findById(tenantId);
-        tenant.members.push(user);
-        let saveTenant = await this.tenantRepository.save(tenant);
+        let tenantMember = this.tenantMemberRepository.create({
+            tenantId: tenant.id,
+            userId: user.id
+        });
         // await this.scopeService.updateUserScopes([ScopeEnum.TENANT_VIEWER], tenant, user);
-        return saveTenant;
+        return this.tenantMemberRepository.save(tenantMember);
     }
 
     async getAllTenants() {
@@ -145,33 +164,49 @@ export class TenantService implements OnModuleInit {
 
     async isViewer(tenantId: string, user: User): Promise<boolean> {
         let tenant: Tenant = await this.findById(tenantId);
-        if (tenant.members.find((member) => user.id === member.id) === undefined) {
+        if (!(await this.isMember(tenantId, user))) {
             return false;
         }
-        let memberScopes = await this.getMemberScope(tenantId, user);
-        return memberScopes.some(scope => scope.name === ScopeEnum.TENANT_VIEWER
-            || scope.name === ScopeEnum.TENANT_ADMIN);
+        return this.scopeService.hasAnyOfScopes([ScopeEnum.TENANT_ADMIN, ScopeEnum.TENANT_VIEWER],
+            tenant, user);
     }
 
     async removeMember(tenantId: string, user: User): Promise<Tenant> {
         let tenant: Tenant = await this.findById(tenantId);
-        tenant.members = tenant.members.filter((member) => member.id != user.id);
+        let tenantMember = await this.findMembership(tenant, user);
         await this.updateScopeOfMember([], tenantId, user);
-        return this.tenantRepository.save(tenant)
+        await this.tenantMemberRepository.remove(tenantMember);
+        return tenant;
     }
 
     async isMember(tenantId: string, user: User): Promise<boolean> {
-        let tenant: Tenant = await this.findById(tenantId);
-        return tenant.members.find((member) => user.id === member.id) !== undefined;
+        return this.tenantMemberRepository.exist({
+            where: {
+                tenantId: tenantId,
+                userId: user.id
+            }
+        });
+    }
+
+    async findMembership(tenant: Tenant, user: User): Promise<TenantMember> {
+        let tenantMember = await this.tenantMemberRepository.findOne({
+            where: {
+                tenantId: tenant.id,
+                userId: user.id
+            }
+        });
+        if (tenantMember === null) {
+            throw new ValidationErrorException("user is not a member of this tenant");
+        }
+        return tenantMember;
     }
 
     async isAdmin(tenantId: string, user: User): Promise<boolean> {
         let tenant: Tenant = await this.findById(tenantId);
-        if (tenant.members.find((member) => user.id === member.id) === undefined) {
+        if (!(await this.isMember(tenantId, user))) {
             return false;
         }
-        let memberScopes = await this.getMemberScope(tenantId, user);
-        return memberScopes.some(scope => scope.name === ScopeEnum.TENANT_ADMIN);
+        return this.scopeService.hasAllScopes([ScopeEnum.TENANT_ADMIN], tenant, user);
     }
 
     async findGlobalTenant(): Promise<Tenant> {
@@ -200,10 +235,7 @@ export class TenantService implements OnModuleInit {
 
     async deleteTenant(tenantId: string) {
         let tenant: Tenant = await this.findById(tenantId);
-        let tenantScopes = await this.getTenantScopes(tenant);
-        for (const scope of tenantScopes) {
-            await this.scopeService.deleteByIdCascade(scope);
-        }
+        await this.scopeService.deleteByTenant(tenant);
         return this.tenantRepository.remove(tenant);
     }
 
@@ -216,46 +248,9 @@ export class TenantService implements OnModuleInit {
         return this.tenantRepository.remove(tenant);
     }
 
-    private generateKeyPair() {
-        return generateKeyPairSync('rsa', {
-            modulusLength: 2048,
-            publicKeyEncoding: {
-                type: 'spki',
-                format: 'pem'
-            },
-            privateKeyEncoding: {
-                type: 'pkcs8',
-                format: 'pem'
-            }
-        });
-    }
-
-    private generateClientIdAndSecret() {
-        const key = this.generateKey();
-        const secretHash = this.generateSecretHash(key);
-        return {key, secretHash};
-    }
-
-    private generateKey(size = 32) {
-        const buffer = randomBytes(size);
-        return buffer.toString("base64");
-    }
-
-    private generateSecretHash(key) {
-        const salt = randomBytes(8).toString('hex');
-        const buffer = scryptSync(key, salt, 64) as Buffer;
-        return `${buffer.toString('hex')}.${salt}`;
-    }
-
-    private compareKeys(storedKey, suppliedKey) {
-        const [hashedPassword, salt] = storedKey.split('.');
-
-        const buffer = scryptSync(suppliedKey, salt, 64) as Buffer;
-        return timingSafeEqual(Buffer.from(hashedPassword, 'hex'), buffer);
-    }
-
-
     getTenantScopes(tenant: Tenant): Promise<Scope[]> {
         return this.scopeService.getTenantScopes(tenant);
     }
+
+
 }

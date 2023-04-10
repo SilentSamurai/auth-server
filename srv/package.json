@@ -6,6 +6,8 @@
     "private": true,
     "license": "MIT",
     "scripts": {
+        "typeorm": "typeorm",
+        "generate-migration": "typeorm migration:create ./src/migrations/new-migration ",
         "prebuild": "rimraf dist",
         "build": "nest build",
         "backend:start": "nest start",
