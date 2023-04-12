@@ -1,0 +1,37 @@
+<div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Add Role</h4>
+    <button (click)="activeModal.close('Cross click')"
+            aria-label="Close"
+            class="btn-sm btn "
+            type="button">
+        <span aria-hidden="true">
+            <i class="fa fa-icons fa-close"></i>
+        </span>
+    </button>
+</div>
+<div class="modal-body">
+    <form #addScopeForm="ngForm"
+          (ngSubmit)="addScopeForm.form.valid && onSubmit()"
+          name="addScopeForm"
+          novalidate>
+        <div class="mb-3">
+            <label class="form-label" for="add.scope.name">Scope Name</label>
+            <input #name="ngModel"
+                   [(ngModel)]="form.name"
+                   class="form-control"
+                   id="add.scope.name"
+                   name="name"
+                   required type="text">
+
+            <div
+                *ngIf="name.errors && addScopeForm.submitted"
+                class="alert alert-danger"
+                role="alert">
+                Scope Name is required!
+            </div>
+        </div>
+
+
+        <button class="btn btn-primary" type="submit">Add Scope</button>
+    </form>
+</div>

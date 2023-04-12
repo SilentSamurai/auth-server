@@ -1,0 +1,133 @@
+<div class="row justify-content-center my-2">
+    <div class="col-md-8">
+        <div class="card text-black">
+            <div class=" row card-body">
+                <div class="col-lg-5">
+                    <div class=" my-2 mb-4">
+                        <div class="p-disabled">Tenant Domain</div>
+                        <h4>{{ tenant.domain }}</h4>
+                    </div>
+                    <div class="my-2">
+                        <div class="p-disabled">Tenant Id</div>
+                        <div>{{ tenant_id }}</div>
+                    </div>
+                    <div class="my-2">
+                        <div class="p-disabled">Tenant Name</div>
+                        <div>{{ tenant.name }}</div>
+                    </div>
+                    <div class="d-flex justify-content-between total font-weight-bold mt-4">
+                        <button (click)="onUpdateTenant()" [disabled]="!isTenantAdmin" class="btn btn-primary btn-sm">
+                            Update
+                        </button>
+                    </div>
+                </div>
+                <div class="col-lg-7">
+                    <div class="my-2">
+                        <div class="p-disabled">Client Id</div>
+                        <div>
+                            <code>
+                                <pre class="text-wrap text-break">{{ tenant.clientId }}</pre>
+                            </code>
+                        </div>
+                    </div>
+                    <div class="my-2">
+                        <div class="p-disabled">Client Secret</div>
+                        <div>
+                            <code>
+                                <pre class="text-wrap text-break">{{ tenant.clientSecret }}</pre>
+                            </code>
+                        </div>
+                    </div>
+                    <div class="my-2">
+                        <div class="p-disabled">Public Key</div>
+                        <div>
+                            <code>
+                                <pre class="text-wrap text-break">{{ tenant.publicKey }}</pre>
+                            </code>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-black">
+            <i class="fa fa-solid fa-user-cowboy"></i>
+            <div class="card-body">
+                <div class="row">
+                    <div class="my-2">
+                        <div class="p-disabled">Tenant Scopes</div>
+                        <div *ngFor="let scope of tenant.scopes" class="my-2">
+                            <p-chip>
+                                <code>{{tenant.name}}::{{scope.name}}</code>
+                                <button (click)="onRemoveScope(scope)" *ngIf="scope.removable"
+                                        [disabled]="!isTenantAdmin"
+                                        aria-label="Close"
+                                        class="btn-sm btn"
+                                        style="height:100%"
+                                        type="button">
+                                    <i class="fa fa-close"></i>
+                                </button>
+                            </p-chip>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between total font-weight-bold mt-4">
+                    <button (click)="onAddScope()" [disabled]="!isTenantAdmin" class="btn btn-primary btn-sm">
+                        Add New Scope
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center my-2">
+    <div class="col-md-8">
+        <div class="card text-black">
+            <p-table [value]="members" responsiveLayout="scroll">
+                <ng-template pTemplate="caption">
+                    <div class="d-flex justify-content-between">
+                        <h5>Member List</h5>
+                        <button (click)="onAddMember()" [disabled]="!isTenantAdmin" class="btn btn-primary btn-sm">
+                            Add Member
+                        </button>
+                    </div>
+
+                </ng-template>
+                <ng-template let-columns pTemplate="header">
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Assigned Scopes</th>
+                        <th>Actions</th>
+                    </tr>
+                </ng-template>
+                <ng-template let-columns="columns" let-user pTemplate="body">
+                    <tr>
+                        <td><span class="p-column-title">Name</span>{{user.name}}</td>
+                        <td><span class="p-column-title">Email</span>{{user.email}}</td>
+                        <td><span class="p-column-title">Scopes</span>
+                            <ul>
+                                <li *ngFor="let scope of user.scopes">
+                                    <code>{{tenant.name}}::{{scope.name}}</code>
+                                </li>
+                            </ul>
+                        </td>
+                        <td class="">
+                            <button (click)="onAssignRole(user)" [disabled]="!isTenantAdmin" class="btn" type="button">
+                                <i class="fa fa-solid fa-user"></i>
+                            </button>
+                            <button (click)="removeMember(user)" [disabled]="!isTenantAdmin" class="btn" type="button">
+                                <i class="fa fa-solid fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </div>
+    <div class="col-md-4">
+    </div>
+</div>
