@@ -69,7 +69,7 @@ export class ScopeController {
         @Param('tenantId') tenantId: string
     ): Promise<Scope[]> {
         const tenant = await this.tenantService.findById(tenantId);
-        await this.securityService.currentUserShouldBeTenantViewer(request, tenant.domain)
+        await this.securityService.contextShouldBeTenantViewer(request, tenant.domain)
         return this.tenantService.getTenantScopes(tenant)
     }
 

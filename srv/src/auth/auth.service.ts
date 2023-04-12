@@ -11,18 +11,10 @@ import * as argon2 from 'argon2';
 import {Tenant} from "../tenants/tenant.entity";
 import {TenantService} from "../tenants/tenant.service";
 import {CryptUtil} from "../util/crypt.util";
+import {GRANT_TYPES, SecurityContext} from "../scopes/security.service";
+import {UnauthorizedException} from "../exceptions/unauthorized.exception";
+import {ScopeEnum} from "../scopes/scope.enum";
 
-export class SecurityContext {
-    sub: string;
-    email: string;
-    name: string;
-    tenant: {
-        id: string;
-        name: string;
-        domain: string;
-    };
-    scopes: string[];
-}
 
 @Injectable()
 export class AuthService {
@@ -54,7 +46,13 @@ export class AuthService {
         let tenant = await this.tenantService.findById(payload["tenant"].id);
         payload = await this.jwtService.verifyAsync(token, {publicKey: tenant.publicKey});
         console.log("token verified with public Key");
-        let user = await this.usersService.findByEmail(payload.email);
+        if (payload.grant_type === GRANT_TYPES.CLIENT_CREDENTIAL) {
+            if (payload.sub !== "oauth") {
+                throw new UnauthorizedException();
+            }
+        } else {
+            let user = await this.usersService.findByEmail(payload.email);
+        }
         return payload;
     }
 
@@ -71,8 +69,8 @@ export class AuthService {
         return tenant;
     }
 
-    async createTechnicalAccessToken(tenant: Tenant): Promise<string> {
-        let scopes = await this.tenantService.getTenantScopes(tenant);
+    async createTechnicalAccessToken(tenant: Tenant, scopes: string[]): Promise<string> {
+        scopes = scopes instanceof Array ? scopes : [];
         const payload: SecurityContext = {
             sub: "oauth",
             email: "oauth@" + tenant.domain,
@@ -82,7 +80,8 @@ export class AuthService {
                 name: tenant.name,
                 domain: tenant.domain,
             },
-            scopes: scopes.map(scope => scope.name)
+            scopes: [ScopeEnum.TENANT_VIEWER, ...scopes],
+            grant_type: GRANT_TYPES.CLIENT_CREDENTIAL
         };
         return this.jwtService.sign(payload, {privateKey: tenant.privateKey,});
     }
@@ -90,7 +89,7 @@ export class AuthService {
     /**
      * Create an access token for the user.
      */
-    async createUserAccessToken(user: User, tenant: Tenant): Promise<string> {
+    async createUserAccessToken(user: User, tenant: Tenant): Promise<{ accessToken: string, refreshToken: string }> {
         if (!user.verified) {
             throw new EmailNotVerifiedException();
         }
@@ -104,9 +103,12 @@ export class AuthService {
                 name: tenant.name,
                 domain: tenant.domain,
             },
-            scopes: scopes.map(scope => scope.name)
+            scopes: scopes.map(scope => scope.name),
+            grant_type: GRANT_TYPES.PASSWORD
         };
-        return this.jwtService.sign(payload, {privateKey: tenant.privateKey,});
+        const refreshToken = await this.tenantService.needRefreshTokenForUser(tenant, user);
+        const accessToken = await this.jwtService.signAsync(payload, {privateKey: tenant.privateKey,});
+        return {accessToken, refreshToken};
     }
 
     /**

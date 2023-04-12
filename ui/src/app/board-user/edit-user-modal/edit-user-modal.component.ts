@@ -40,8 +40,9 @@ export class EditUserModalComponent implements OnInit {
             this.messageService.add({severity: 'success', summary: 'Success', detail: 'User Updated'});
             this.passEntry.emit(editedUser);
             this.activeModal.close(editedUser);
-        } catch (e) {
-            this.messageService.add({severity: 'error', summary: 'Error', detail: 'User Update Failed'});
+        } catch (e: any) {
+            console.error(e);
+            this.messageService.add({severity: 'error', summary: 'Error', detail: e.error.message});
         }
     }
 }

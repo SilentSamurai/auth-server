@@ -21,6 +21,7 @@ import {ValidationSchema} from '../validation/validation.schema';
 import {MailServiceErrorException} from '../exceptions/mail-service-error.exception';
 import {TenantService} from "../tenants/tenant.service";
 import {Tenant} from "../tenants/tenant.entity";
+import {GRANT_TYPES} from "../scopes/security.service";
 
 @Controller('api/oauth')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -42,30 +43,34 @@ export class AuthController {
             domain: string,
             password: string,
             email: string;
-            grant_type: string
+            grant_type: GRANT_TYPES,
+            scopes: string[]
         }
     ): Promise<object> {
 
         switch (body.grant_type) {
-            case "password": {
+            case GRANT_TYPES.PASSWORD: {
                 let validationPipe = new ValidationPipe(ValidationSchema.PasswordGrantSchema);
                 await validationPipe.transform(body, null);
                 const user: User = await this.authService.validate(body.email, body.password);
                 const tenant = await this.tenantService.findByDomain(body.domain);
-                const token: string = await this.authService.createUserAccessToken(user, tenant);
+                const {accessToken, refreshToken} = await this.authService.createUserAccessToken(user, tenant);
                 return {
-                    token: token,
-                    expires_in: this.configService.get('TOKEN_EXPIRATION_TIME')
+                    token: accessToken,
+                    expires_in: this.configService.get('TOKEN_EXPIRATION_TIME'),
+                    token_type: "bearer",
+                    refresh_token: refreshToken
                 };
             }
-            case "client_credential": {
+            case GRANT_TYPES.CLIENT_CREDENTIAL: {
                 let validationPipe = new ValidationPipe(ValidationSchema.ClientCredentialGrantSchema);
                 await validationPipe.transform(body, null);
                 const tenant: Tenant = await this.authService.validateClientCredentials(body.client_id, body.client_secret);
-                const token: string = await this.authService.createTechnicalAccessToken(tenant);
+                const token: string = await this.authService.createTechnicalAccessToken(tenant, body.scopes);
                 return {
                     token: token,
-                    expires_in: this.configService.get('TOKEN_EXPIRATION_TIME')
+                    expires_in: this.configService.get('TOKEN_EXPIRATION_TIME'),
+                    token_type: "bearer"
                 };
             }
             default:

@@ -157,13 +157,19 @@ const PasswordGrantSchema = yup.object().shape({
     grant_type: yup.string().required().matches(/^password$/g, {message: "grant type not recognised"}),
     email: yup.string().email().required('Email is required'),
     password: yup.string().required('Password is required').matches(PASSWORD_REGEXP, PASSWORD_MESSAGE),
-    domain: yup.string().required('Domain is required')
+    domain: yup.string().required('Domain is required'),
+    scopes: yup.array().of(
+        yup.string().max(20)
+    )
 });
 
 const ClientCredentialGrantSchema = yup.object().shape({
     grant_type: yup.string().required().matches(/^client_credential$/g, {message: "grant type not recognised"}),
     client_id: yup.string().required('client_id is required'),
     client_secret: yup.string().required('client_secret is required'),
+    scopes: yup.array().of(
+        yup.string().max(20)
+    )
 });
 
 export const ValidationSchema =

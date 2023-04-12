@@ -12,6 +12,7 @@ import * as argon2 from 'argon2';
 import * as ms from 'ms';
 import {Scope} from "../scopes/scope.entity";
 import {Tenant} from 'src/tenants/tenant.entity';
+import {ForbiddenException} from "../exceptions/forbidden.exception";
 
 @Injectable()
 export class UsersService implements OnModuleInit {
@@ -233,6 +234,9 @@ export class UsersService implements OnModuleInit {
         id: string
     ): Promise<User> {
         const user: User = await this.findById(id);
+        if (user.email === this.configService.get("SUPER_ADMIN_EMAIL")) {
+            throw new ForbiddenException("cannot delete super admin");
+        }
         return await this.usersRepository.remove(user);
     }
 

@@ -85,6 +85,17 @@ export class TenantController {
         return await this.tenantService.getAllTenants();
     }
 
+    @Get('/me')
+    @UseGuards(JwtAuthGuard, ScopeGuard)
+    @Scopes(ScopeEnum.TENANT_VIEWER)
+    async getTenantCredentials(
+        @Request() request
+    ): Promise<Tenant> {
+        let securityContext = this.securityService.getUserOrTechnicalSecurityContext(request);
+        await this.securityService.contextShouldBeTenantViewer(request, securityContext.tenant.domain)
+        return this.tenantService.findById(securityContext.tenant.id);
+    }
+
     @Get('/:tenantId')
     @UseGuards(JwtAuthGuard, ScopeGuard)
     @Scopes(ScopeEnum.TENANT_ADMIN, ScopeEnum.TENANT_VIEWER)
@@ -93,8 +104,9 @@ export class TenantController {
         @Param('tenantId') tenantId: string
     ): Promise<Tenant> {
         let tenant = await this.tenantService.findById(tenantId);
-        await this.securityService.currentUserShouldBeTenantViewer(request, tenant.domain)
+        await this.securityService.contextShouldBeTenantViewer(request, tenant.domain);
         return tenant;
     }
+
 
 }

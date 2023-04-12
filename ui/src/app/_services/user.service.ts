@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {Observable} from 'rxjs';
+import {lastValueFrom, Observable} from 'rxjs';
 import {TokenStorageService} from "./token-storage.service";
 
 const API_URL = '/api';
@@ -27,11 +27,11 @@ export class UserService {
     }
 
     createUser(name: string, email: string, password: string) {
-        return this.http.post(`${API_URL}/users/create`, {
+        return lastValueFrom(this.http.post(`${API_URL}/users/create`, {
             name,
             email,
             password
-        }, this.getHttpOptions());
+        }, this.getHttpOptions()));
     }
 
     editUser(id: string, name: string, email: string, password: string) {

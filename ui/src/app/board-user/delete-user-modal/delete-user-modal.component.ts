@@ -29,8 +29,9 @@ export class DeleteUserModalComponent implements OnInit {
             this.messageService.add({severity: 'success', summary: 'Success', detail: 'User Deleted'});
             this.passEntry.emit(deletedUser);
             this.activeModal.close(deletedUser);
-        } catch (e) {
-            this.messageService.add({severity: 'error', summary: 'Error', detail: 'User Delete Failed'});
+        } catch (e: any) {
+            console.error(e);
+            this.messageService.add({severity: 'error', summary: 'Error', detail: e.error.message});
         }
 
     }

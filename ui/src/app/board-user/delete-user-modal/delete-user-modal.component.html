@@ -10,18 +10,10 @@
     </button>
 </div>
 <div class="modal-body">
-    <p>Are you sure, you want to delete user {{ user.name }} ?</p>
-    <div>
-        <button (click)="activeModal.close('Cross click')"
-                class="btn btn-secondary btn-sm"
-                type="button">
-            No
-        </button>
-        <button (click)="onYes()"
-                class="btn btn-primary btn-sm"
-                type="button">
-            Yes
-        </button>
+    <p>Are you sure, you want to delete user <strong>{{ user.name }}</strong> ?</p>
+    <div class="align-items-end">
+        <button (click)="activeModal.close('Cross click')" class="btn btn-secondary btn-md" type="button">No</button>
+        <button (click)="onYes()" class="btn btn-primary btn-md m-2" type="button">Yes</button>
     </div>
 </div>
 

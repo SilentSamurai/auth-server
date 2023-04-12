@@ -2,7 +2,6 @@ import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {UserService} from '../../_services/user.service';
 import {NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
 import {MessageService} from "primeng/api";
-import {lastValueFrom} from "rxjs";
 
 @Component({
     selector: 'create-user-modal',
@@ -28,13 +27,13 @@ export class CreateUserModalComponent implements OnInit {
 
     async onSubmit() {
         try {
-            let createdUser = this.userService.createUser(this.form.name, this.form.email, this.form.password);
-            const user = await lastValueFrom(createdUser);
+            let createdUser = await this.userService.createUser(this.form.name, this.form.email, this.form.password);
             this.messageService.add({severity: 'success', summary: 'Success', detail: 'User Created'});
-            this.passEntry.emit(user);
-            this.activeModal.close(user);
-        } catch (e) {
-            this.messageService.add({severity: 'error', summary: 'Error', detail: 'User Creation Failed'});
+            this.passEntry.emit(createdUser);
+            this.activeModal.close(createdUser);
+        } catch (e: any) {
+            console.error(e);
+            this.messageService.add({severity: 'error', summary: 'Error', detail: e.error.message});
         }
     }
 }

@@ -31,18 +31,19 @@ export class CryptUtil {
     }
 
     public static verifyClientSecret(storedSecret, providedSecret) {
-        const [hashedPassword, salt] = storedSecret.split('.');
-        return timingSafeEqual(Buffer.from(hashedPassword, 'hex'), providedSecret);
+        const [storedPass, salt1] = storedSecret.split('.');
+        const [providedPass, salt2] = providedSecret.split('.');
+        return timingSafeEqual(Buffer.from(storedPass, 'hex'), Buffer.from(providedPass, 'hex'));
     }
 
     public static generateRefreshToken() {
         const buffer = randomBytes(32);
-        return buffer.toString("base64") + "-r";
+        return buffer.toString("hex") + "-r";
     }
 
     private static generateClientId() {
         const buffer = randomBytes(16);
-        return buffer.toString("base64");
+        return buffer.toString("hex");
     }
 
     private static generateClientSecret(clientId: string) {

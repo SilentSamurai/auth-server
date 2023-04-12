@@ -47,7 +47,7 @@ export class MemberController {
         @Param('tenantId') tenantId: string
     ): Promise<User[]> {
         let tenant = await this.tenantService.findById(tenantId);
-        await this.securityService.currentUserShouldBeTenantViewer(request, tenant.domain);
+        await this.securityService.contextShouldBeTenantViewer(request, tenant.domain);
         let members = await this.usersService.findByTenant(tenant);
         for (const member of members) {
             member.scopes = await this.scopeService.getMemberScopes(tenant, member);

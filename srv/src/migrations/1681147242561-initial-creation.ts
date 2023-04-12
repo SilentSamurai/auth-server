@@ -163,6 +163,17 @@ export class CreateInitialTables1681147242561 implements MigrationInterface {
                         length: "36",
                         isNullable: false
                     },
+                    {
+                        name: "refresh_token",
+                        type: "nvarchar",
+                        length: "40",
+                        isNullable: true
+                    },
+                    {
+                        name: "refreshed_at",
+                        type: "timestamp",
+                        isNullable: true
+                    },
                 ],
                 uniques: [
                     {

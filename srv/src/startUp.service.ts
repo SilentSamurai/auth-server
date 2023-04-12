@@ -73,12 +73,6 @@ export class StartUpService implements OnModuleInit {
     }
 
     async populateGlobalTenant() {
-        const user = await this.usersService.findByEmail(this.configService.get("SUPER_ADMIN_EMAIL"));
-        const tenant: Tenant = await this.tenantService.findByDomain(this.configService.get("SUPER_TENANT_DOMAIN"));
-        const scopeSuperAdmin = await this.scopeService.findByNameAndTenant(ScopeEnum.SUPER_ADMIN, tenant);
-        const scopeAdmin = await this.scopeService.findByNameAndTenant(ScopeEnum.TENANT_ADMIN, tenant);
-        const scopeViewer = await this.scopeService.findByNameAndTenant(ScopeEnum.TENANT_VIEWER, tenant);
-        await this.scopeService.updateUserScopes([scopeAdmin.name, scopeViewer.name, scopeSuperAdmin.name], tenant, user);
         try {
             let globalTenantExists = await this.tenantService.existByDomain(this.configService.get("SUPER_TENANT_DOMAIN"));
             if (!globalTenantExists) {
