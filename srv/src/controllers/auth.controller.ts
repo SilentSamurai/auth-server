@@ -79,7 +79,16 @@ export class AuthController {
     }
 
     @Get('/verify/:token')
-    async verify(
+    async verifyAccessToken(
+        @Param('token') token: string,
+        @Response() response
+    ): Promise<any> {
+        return this.authService.validateAccessToken(token)
+    }
+
+
+    @Get('/verify-email/:token')
+    async verifyEmail(
         @Param('token') token: string,
         @Response() response
     ): Promise<any> {
