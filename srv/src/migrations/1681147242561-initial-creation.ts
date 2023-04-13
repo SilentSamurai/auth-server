@@ -172,7 +172,7 @@ export class CreateInitialTables1681147242561 implements MigrationInterface {
                     {
                         name: "refresh_token",
                         type: DB_STRING_TYPE,
-                        length: "40",
+                        length: "128",
                         isNullable: true
                     },
                     {
