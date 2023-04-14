@@ -80,7 +80,7 @@ export class AuthController {
 
     @Post('/verify')
     async verifyAccessToken(
-        @Body() body: { token: string }
+        @Body(new ValidationPipe(ValidationSchema.VerifyTokenSchema)) body: { token: string }
     ): Promise<object> {
         return this.authService.validateAccessToken(body.token);
     }

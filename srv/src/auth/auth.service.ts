@@ -42,18 +42,22 @@ export class AuthService {
     }
 
     async validateAccessToken(token: string): Promise<SecurityContext> {
-        let payload: SecurityContext = this.jwtService.decode(token, {json: true}) as SecurityContext;
-        let tenant = await this.tenantService.findById(payload["tenant"].id);
-        payload = await this.jwtService.verifyAsync(token, {publicKey: tenant.publicKey});
-        console.log("token verified with public Key");
-        if (payload.grant_type === GRANT_TYPES.CLIENT_CREDENTIAL) {
-            if (payload.sub !== "oauth") {
-                throw new UnauthorizedException();
+        try {
+            let payload: SecurityContext = this.jwtService.decode(token, {json: true}) as SecurityContext;
+            let tenant = await this.tenantService.findById(payload["tenant"].id);
+            payload = await this.jwtService.verifyAsync(token, {publicKey: tenant.publicKey});
+            console.log("token verified with public Key");
+            if (payload.grant_type === GRANT_TYPES.CLIENT_CREDENTIAL) {
+                if (payload.sub !== "oauth") {
+                    throw new UnauthorizedException();
+                }
+            } else {
+                let user = await this.usersService.findByEmail(payload.email);
             }
-        } else {
-            let user = await this.usersService.findByEmail(payload.email);
+            return payload;
+        } catch (e) {
+            throw new UnauthorizedException(e);
         }
-        return payload;
     }
 
     async validateClientCredentials(clientId: string, clientSecret: string): Promise<Tenant> {

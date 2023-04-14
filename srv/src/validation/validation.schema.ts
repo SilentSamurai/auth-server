@@ -172,6 +172,11 @@ const ClientCredentialGrantSchema = yup.object().shape({
     )
 });
 
+const VerifyTokenSchema = yup.object().shape(
+    {
+        token: yup.string().required('token is required')
+    });
+
 export const ValidationSchema =
     {
         SignUpSchema,
@@ -199,5 +204,6 @@ export const ValidationSchema =
         OperatingScopeSchema,
         MemberOperationsSchema,
         CreateUserSchema,
-        UpdateUserSchema
+        UpdateUserSchema,
+        VerifyTokenSchema
     };
