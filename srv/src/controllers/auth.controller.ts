@@ -78,12 +78,11 @@ export class AuthController {
         }
     }
 
-    @Get('/verify/:token')
+    @Post('/verify')
     async verifyAccessToken(
-        @Param('token') token: string,
-        @Response() response
-    ): Promise<any> {
-        return this.authService.validateAccessToken(token)
+        @Body() body: { token: string }
+    ): Promise<object> {
+        return this.authService.validateAccessToken(body.token);
     }
 
 
