@@ -20,7 +20,7 @@ import {ScopeController} from "./scope.controller";
                 MailModule,
                 TenantModule,
                 UsersModule,
-                ScopesModule
+                ScopesModule,
             ],
         controllers: [
             UsersController,

@@ -3,11 +3,11 @@ import {AuthService} from "../auth/auth.service";
 import {ExtractJwt} from 'passport-jwt';
 import {ScopeEnum} from "./scope.enum";
 import {ConfigService} from "../config/config.service";
-import {Tenant} from "../tenants/tenant.entity";
-import {User} from "../users/user.entity";
 import {ForbiddenException} from "../exceptions/forbidden.exception";
 import {TenantService} from "../tenants/tenant.service";
 import {UsersService} from "../users/users.service";
+import {CaslAbilityFactory} from "./casl-ability.factory";
+import {AnyAbility} from "@casl/ability/dist/types/PureAbility";
 
 export enum GRANT_TYPES {
     PASSWORD = "password",
@@ -38,7 +38,8 @@ export class SecurityService implements OnModuleInit {
     constructor(private readonly configService: ConfigService,
                 private readonly tenantService: TenantService,
                 private readonly usersService: UsersService,
-                private readonly authService: AuthService) {
+                private readonly authService: AuthService,
+                private readonly caslAbilityFactory: CaslAbilityFactory) {
 
     }
 
@@ -52,12 +53,22 @@ export class SecurityService implements OnModuleInit {
         if (payload.grant_type === GRANT_TYPES.PASSWORD) {
             request['user'] = payload;
         }
+        const ability = await this.caslAbilityFactory.createForSecurityContext(payload);
         request["SECURITY_CONTEXT"] = payload;
+        request["SCOPE_ABILITIES"] = ability;
         return payload;
     }
 
-    async setSecurityContextFromToken(token: string): Promise<SecurityContext> {
-        return this.authService.validateAccessToken(token);
+    getAbility(request: any): AnyAbility {
+        return request["SCOPE_ABILITIES"];
+    }
+
+    check(request: any, ...args: any): boolean {
+        let ability = this.getAbility(request);
+        if (!ability.can(...args)) {
+            throw new ForbiddenException();
+        }
+        return true;
     }
 
     getUserSecurityContext(request: any): SecurityContext {
@@ -92,42 +103,6 @@ export class SecurityService implements OnModuleInit {
     isSuperAdmin(securityContext: SecurityContext) {
         return securityContext.scopes.some(scope => scope === ScopeEnum.SUPER_ADMIN)
             && securityContext.tenant.domain === this.configService.get("SUPER_TENANT_DOMAIN");
-    }
-
-    async currentUserShouldBeTenantAdmin(request, domain: string,) {
-        const securityContext = this.getUserSecurityContext(request);
-        const tenant: Tenant = await this.tenantService.findByDomain(domain);
-        const user: User = await this.usersService.findByEmail(securityContext.email);
-        let isAdmin = await this.tenantService.isAdmin(tenant.id, user);
-        if (!isAdmin) {
-            throw new ForbiddenException("only admin can update tenant info.");
-        }
-    }
-
-    async currentUserShouldBeTenantViewer(request, domain: string,) {
-        const securityContext = this.getUserSecurityContext(request);
-        const tenant: Tenant = await this.tenantService.findByDomain(domain);
-        const user: User = await this.usersService.findByEmail(securityContext.email);
-        let viewer = await this.tenantService.isViewer(tenant.id, user);
-        if (!viewer) {
-            throw new ForbiddenException("access to this tenant is denied.");
-        }
-    }
-
-    async contextShouldBeTenantViewer(request, domain: string,) {
-        const securityContext = this.getUserOrTechnicalSecurityContext(request);
-        const tenant: Tenant = await this.tenantService.findByDomain(domain);
-        if (this.isClientCredentials(request)) {
-            if (securityContext.scopes.find(scope => scope === ScopeEnum.TENANT_VIEWER) === undefined) {
-                throw new ForbiddenException("access to this tenant is denied.");
-            }
-        } else {
-            const user: User = await this.usersService.findByEmail(securityContext.email);
-            let viewer = await this.tenantService.isViewer(tenant.id, user);
-            if (!viewer) {
-                throw new ForbiddenException("access to this tenant is denied.");
-            }
-        }
     }
 
 }

@@ -16,13 +16,14 @@ import {UsersService} from '../users/users.service';
 import {AuthService} from '../auth/auth.service';
 import {MailService} from '../mail/mail.service';
 import {JwtAuthGuard} from '../auth/jwt-auth.guard';
-import {Scopes} from '../scopes/scopes.decorator';
-import {ScopeEnum} from '../scopes/scope.enum';
+import {Rules, ScopeRule} from '../scopes/scopes.decorator';
 import {ScopeGuard} from '../scopes/scope.guard';
 import {ValidationPipe} from '../validation/validation.pipe';
 import {ValidationSchema} from '../validation/validation.schema';
 import {TenantService} from "../tenants/tenant.service";
 import {Tenant} from "../tenants/tenant.entity";
+import {Action} from "../scopes/actions.enum";
+import {SubjectEnum} from "../scopes/subjectEnum";
 
 @Controller('api/users')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -37,7 +38,9 @@ export class UsersAdminController {
 
     @Post('/create')
     @UseGuards(JwtAuthGuard, ScopeGuard)
-    @Scopes(ScopeEnum.SUPER_ADMIN) // SUPER ADMIN
+    @Rules(
+        ScopeRule.can(Action.Create, SubjectEnum.USER),
+    )
     async createUser(
         @Body(new ValidationPipe(ValidationSchema.CreateUserSchema)) body: {
             name: string,
@@ -58,7 +61,9 @@ export class UsersAdminController {
 
     @Put('/update')
     @UseGuards(JwtAuthGuard, ScopeGuard)
-    @Scopes(ScopeEnum.SUPER_ADMIN) // SUPER ADMIN
+    @Rules(
+        ScopeRule.can(Action.Update, SubjectEnum.USER),
+    )
     async updateUser(
         @Body(new ValidationPipe(ValidationSchema.UpdateUserSchema)) body: {
             id: string,
@@ -67,7 +72,6 @@ export class UsersAdminController {
             password: string
         }
     ): Promise<User> {
-
         let user: User = await this.usersService.update(
             body.id,
             body.name,
@@ -81,7 +85,9 @@ export class UsersAdminController {
 
     @Get('/:email')
     @UseGuards(JwtAuthGuard, ScopeGuard)
-    @Scopes(ScopeEnum.SUPER_ADMIN) // SUPER ADMIN
+    @Rules(
+        ScopeRule.can(Action.Read, SubjectEnum.USER),
+    )
     async getUser(
         @Param('email') email: string
     ): Promise<User> {
@@ -91,14 +97,18 @@ export class UsersAdminController {
 
     @Get('')
     @UseGuards(JwtAuthGuard, ScopeGuard)
-    @Scopes(ScopeEnum.SUPER_ADMIN) // SUPER ADMIN
+    @Rules(
+        ScopeRule.can(Action.Manage, SubjectEnum.USER),
+    )
     async getUsers(): Promise<User[]> {
         return await this.usersService.getAll();
     }
 
     @Delete('/:id')
     @UseGuards(JwtAuthGuard, ScopeGuard)
-    @Scopes(ScopeEnum.SUPER_ADMIN)
+    @Rules(
+        ScopeRule.can(Action.Delete, SubjectEnum.USER),
+    )
     async deleteUser(
         @Param('id') id: string
     ): Promise<User> {
@@ -107,7 +117,9 @@ export class UsersAdminController {
 
     @Get('/:email/tenants')
     @UseGuards(JwtAuthGuard, ScopeGuard)
-    @Scopes(ScopeEnum.SUPER_ADMIN)
+    @Rules(
+        ScopeRule.can(Action.Read, SubjectEnum.USER),
+    )
     async getTenants(
         @Param('email') email: string
     ): Promise<Tenant[]> {

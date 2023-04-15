@@ -7,19 +7,20 @@ import {AuthModule} from "../auth/auth.module";
 import {TypeOrmModule} from "@nestjs/typeorm";
 import {Scope} from "./scope.entity";
 import {UserScope} from "./user.scopes.entity";
+import {CaslAbilityFactory} from "./casl-ability.factory";
 
 @Module(
     {
         imports:
             [
                 TypeOrmModule.forFeature([Scope, UserScope]),
-                UsersModule, // Circular dependency resolved.
+                UsersModule,
                 TenantModule,
                 AuthModule
             ],
         controllers: [],
-        providers: [SecurityService, ScopeService],
-        exports: [SecurityService, ScopeService]
+        providers: [SecurityService, ScopeService, CaslAbilityFactory],
+        exports: [SecurityService, ScopeService, CaslAbilityFactory]
     })
 export class ScopesModule {
 }

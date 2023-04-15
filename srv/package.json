@@ -8,6 +8,7 @@
     "scripts": {
         "typeorm": "typeorm",
         "generate-migration": "typeorm migration:create ./src/migrations/new-migration ",
+        "nest-cmd": "nest g class casl/casl-ability.factory",
         "prebuild": "rimraf dist",
         "build": "nest build",
         "backend:start": "nest start",
@@ -16,6 +17,7 @@
         "start:prod": "node dist/main"
     },
     "dependencies": {
+        "@casl/ability": "^6.4.0",
         "@nestjs/common": "^9.2.1",
         "@nestjs/core": "^9.2.1",
         "@nestjs/jwt": "^9.0.0",
