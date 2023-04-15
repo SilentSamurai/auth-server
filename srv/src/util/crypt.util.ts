@@ -28,7 +28,10 @@ export class CryptUtil {
         return timingSafeEqual(Buffer.from(storedSecret, 'hex'), buffer);
     }
 
-    public static verifyClientSecret(storedSecret, providedSecret) {
+    public static verifyClientSecret(storedSecret: string, providedSecret: string) {
+        if (storedSecret.length !== providedSecret.length) {
+            return false;
+        }
         return timingSafeEqual(Buffer.from(storedSecret, 'hex'), Buffer.from(providedSecret, 'hex'));
     }
 

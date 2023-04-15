@@ -23,6 +23,7 @@ import {TenantService} from "../tenants/tenant.service";
 import {Tenant} from "../tenants/tenant.entity";
 import {GRANT_TYPES} from "../scopes/security.service";
 import {ForbiddenException} from "../exceptions/forbidden.exception";
+import {InvalidTokenException} from "../exceptions/invalid-token.exception";
 
 @Controller('api/oauth')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -94,19 +95,25 @@ export class AuthController {
 
     @Post('/verify')
     async verifyAccessToken(
-        @Body(new ValidationPipe(ValidationSchema.VerifyTokenSchema)) body: { token: string }
+        @Body(new ValidationPipe(ValidationSchema.VerifyTokenSchema)) body: { token: string, client_id: string, client_secret: string }
     ): Promise<object> {
-        return this.authService.validateAccessToken(body.token);
+        const tenant = await this.authService.validateClientCredentials(body.client_id, body.client_secret);
+        let securityContext = await this.authService.validateAccessToken(body.token);
+        if (securityContext.tenant.id !== tenant.id) {
+            throw new InvalidTokenException("not a valid token");
+        }
+        return securityContext;
     }
 
     @Post('/exchange')
     async exchangeAccessToken(
-        @Body(new ValidationPipe(ValidationSchema.ExchangeTokenSchema)) body: { token: string, client_id: string }
+        @Body(new ValidationPipe(ValidationSchema.ExchangeTokenSchema)) body: { token: string, client_id: string, client_secret: string }
     ): Promise<object> {
         let securityContext = await this.authService.validateAccessToken(body.token);
         if (securityContext.grant_type !== GRANT_TYPES.PASSWORD) {
             throw new ForbiddenException("token grant_type not allowed");
         }
+        await this.authService.validateClientCredentials(body.client_id, body.client_secret);
         const user = await this.usersService.findByEmail(securityContext.email);
         const tenant = await this.tenantService.findByClientId(body.client_id);
         const {accessToken, refreshToken} = await this.authService.createUserAccessToken(user, tenant);

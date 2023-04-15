@@ -49,7 +49,7 @@ export class TenantService {
     }
 
     async getTenantCredentials(tenantId: string) {
-        return lastValueFrom(this.http.get(`${API_URL}/tenant/credentials`, this.getHttpOptions()))
+        return lastValueFrom(this.http.get(`${API_URL}/tenant/${tenantId}/credentials`, this.getHttpOptions()))
     }
 
     async getMembers(tenantId: string) {

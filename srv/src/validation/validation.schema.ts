@@ -172,13 +172,16 @@ const RefreshTokenGrantSchema = yup.object().shape({
 
 const VerifyTokenSchema = yup.object().shape(
     {
-        token: yup.string().required('token is required')
+        token: yup.string().required('token is required'),
+        client_id: yup.string().required('client_id is required'),
+        client_secret: yup.string().required('client_secret is required'),
     });
 
 const ExchangeTokenSchema = yup.object().shape(
     {
         token: yup.string().required('token is required'),
         client_id: yup.string().required('client_id is required'),
+        client_secret: yup.string().required('client_secret is required'),
     });
 
 export const ValidationSchema =

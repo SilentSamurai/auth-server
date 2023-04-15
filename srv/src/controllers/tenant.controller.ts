@@ -85,19 +85,23 @@ export class TenantController {
         return await this.tenantService.getAllTenants();
     }
 
-    @Get('/credentials')
+    @Get('/:tenantId/credentials')
     @UseGuards(JwtAuthGuard, ScopeGuard)
-    @Scopes(ScopeEnum.TENANT_VIEWER)
+    @Scopes(ScopeEnum.TENANT_VIEWER, ScopeEnum.TENANT_ADMIN)
     async getTenantCredentials(
-        @Request() request
+        @Request() request,
+        @Param('tenantId') tenantId: string
     ): Promise<any> {
         let securityContext = this.securityService.getUserOrTechnicalSecurityContext(request);
-        if (securityContext.grant_type === GRANT_TYPES.CLIENT_CREDENTIAL) {
-            await this.securityService.contextShouldBeTenantViewer(request, securityContext.tenant.domain);
-        } else if (securityContext.grant_type === GRANT_TYPES.PASSWORD) {
-            await this.securityService.currentUserShouldBeTenantAdmin(request, securityContext.tenant.domain)
+        if (tenantId === "my") {
+            tenantId = securityContext.tenant.id;
         }
-        let tenant = await this.tenantService.findById(securityContext.tenant.id);
+        let tenant = await this.tenantService.findById(tenantId);
+        if (securityContext.grant_type === GRANT_TYPES.CLIENT_CREDENTIAL) {
+            await this.securityService.contextShouldBeTenantViewer(request, tenant.domain);
+        } else if (securityContext.grant_type === GRANT_TYPES.PASSWORD) {
+            await this.securityService.currentUserShouldBeTenantAdmin(request, tenant.domain)
+        }
         return {
             id: tenant.id,
             clientId: tenant.clientId,
