@@ -14,6 +14,7 @@ import {CryptUtil} from "../util/crypt.util";
 import {GRANT_TYPES, SecurityContext} from "../scopes/security.service";
 import {UnauthorizedException} from "../exceptions/unauthorized.exception";
 import {ScopeEnum} from "../scopes/scope.enum";
+import * as ms from "ms";
 
 
 @Injectable()
@@ -39,6 +40,17 @@ export class AuthService {
             throw new InvalidCredentialsException();
         }
         return user;
+    }
+
+    async validateRefreshToken(refreshToken: string) {
+        let tenantMember = await this.tenantService.findMembershipByRefreshToken(refreshToken);
+        let expiration = ms(this.configService.get("REFRESH_TOKEN_EXPIRATION_TIME"));
+        if (tenantMember.isTokenExpired(expiration)) {
+            throw new UnauthorizedException("refresh token expired");
+        }
+        let tenant = await this.tenantService.findById(tenantMember.tenantId);
+        let user = await this.usersService.findById(tenantMember.userId);
+        return {tenant, user};
     }
 
     async validateAccessToken(token: string): Promise<SecurityContext> {
@@ -243,4 +255,6 @@ export class AuthService {
 
         return true;
     }
+
+
 }

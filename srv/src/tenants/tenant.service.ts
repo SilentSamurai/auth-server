@@ -131,7 +131,9 @@ export class TenantService implements OnModuleInit {
         let tenant: Tenant = await this.findById(tenantId);
         let tenantMember = this.tenantMemberRepository.create({
             tenantId: tenant.id,
-            userId: user.id
+            userId: user.id,
+            refreshToken: CryptUtil.generateRefreshToken(),
+            refreshedAt: new Date(Date.now())
         });
         // await this.scopeService.updateUserScopes([ScopeEnum.TENANT_VIEWER], tenant, user);
         return this.tenantMemberRepository.save(tenantMember);
@@ -187,6 +189,18 @@ export class TenantService implements OnModuleInit {
                 userId: user.id
             }
         });
+    }
+
+    async findMembershipByRefreshToken(refreshToken: string): Promise<TenantMember> {
+        let tenantMember = await this.tenantMemberRepository.findOne({
+            where: {
+                refreshToken: refreshToken
+            }
+        });
+        if (tenantMember === null) {
+            throw new ValidationErrorException("user is not a member of this tenant");
+        }
+        return tenantMember;
     }
 
     async findMembership(tenant: Tenant, user: User): Promise<TenantMember> {
@@ -266,16 +280,13 @@ export class TenantService implements OnModuleInit {
 
     async needRefreshTokenForUser(tenant: Tenant, user: User): Promise<string> {
         let tenantMember = await this.findMembership(tenant, user);
-
-        if (tenantMember.refreshToken !== null) {
-            let expiredAt = tenantMember.refreshedAt.getTime() + ms(this.configService.get("REFRESH_TOKEN_EXPIRATION_TIME"));
-            if (Date.now() < expiredAt) {
-                return tenantMember.refreshToken;
-            }
-            // console.log(ms(this.configService.get("REFRESH_TOKEN_EXPIRATION_TIME")), tenantMember.refreshedAt.getTime(),
-            //     Date.now(), tenantMember)
+        let expiration = ms(this.configService.get("REFRESH_TOKEN_EXPIRATION_TIME"));
+        if (tenantMember.isTokenExpired(expiration)) {
+            tenantMember.refreshToken = CryptUtil.generateRefreshToken();
         }
-        tenantMember.refreshToken = CryptUtil.generateRefreshToken();
+        // console.log(ms(this.configService.get("REFRESH_TOKEN_EXPIRATION_TIME")), tenantMember.refreshedAt.getTime(),
+        //     Date.now(), tenantMember)
+        // tenantMember.refreshToken = CryptUtil.generateRefreshToken();
         tenantMember.refreshedAt = new Date(Date.now());
         await this.tenantMemberRepository.save(tenantMember);
         return tenantMember.refreshToken;

@@ -172,6 +172,14 @@ const ClientCredentialGrantSchema = yup.object().shape({
     )
 });
 
+const RefreshTokenGrantSchema = yup.object().shape({
+    grant_type: yup.string().required().matches(/^refresh_token$/g, {message: "grant type not recognised"}),
+    refresh_token: yup.string().required('refresh_token is required'),
+    scopes: yup.array().of(
+        yup.string().max(20)
+    )
+});
+
 const VerifyTokenSchema = yup.object().shape(
     {
         token: yup.string().required('token is required')
@@ -183,6 +191,7 @@ export const ValidationSchema =
         SignDownSchema,
         PasswordGrantSchema,
         ClientCredentialGrantSchema,
+        RefreshTokenGrantSchema,
         ForgotPasswordSchema,
         ResetPasswordSchema,
         UpdateMyUsernameSchema,

@@ -12,6 +12,7 @@ import {UsersService} from "../users/users.service";
 export enum GRANT_TYPES {
     PASSWORD = "password",
     CLIENT_CREDENTIAL = "client_credential",
+    REFRESH_TOKEN = "refresh_token"
 }
 
 export class SecurityContext {

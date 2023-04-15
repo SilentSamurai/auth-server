@@ -43,6 +43,7 @@ export class AuthController {
             domain: string,
             password: string,
             email: string;
+            refresh_token: string;
             grant_type: GRANT_TYPES,
             scopes: string[]
         }
@@ -71,6 +72,18 @@ export class AuthController {
                     token: token,
                     expires_in: this.configService.get('TOKEN_EXPIRATION_TIME'),
                     token_type: "bearer"
+                };
+            }
+            case GRANT_TYPES.REFRESH_TOKEN: {
+                let validationPipe = new ValidationPipe(ValidationSchema.RefreshTokenGrantSchema);
+                await validationPipe.transform(body, null);
+                const {tenant, user} = await this.authService.validateRefreshToken(body.refresh_token);
+                const {accessToken, refreshToken} = await this.authService.createUserAccessToken(user, tenant);
+                return {
+                    token: accessToken,
+                    expires_in: this.configService.get('TOKEN_EXPIRATION_TIME'),
+                    token_type: "bearer",
+                    refresh_token: refreshToken
                 };
             }
             default:
