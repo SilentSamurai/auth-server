@@ -22,6 +22,7 @@ import {MailServiceErrorException} from '../exceptions/mail-service-error.except
 import {TenantService} from "../tenants/tenant.service";
 import {Tenant} from "../tenants/tenant.entity";
 import {GRANT_TYPES} from "../scopes/security.service";
+import {ForbiddenException} from "../exceptions/forbidden.exception";
 
 @Controller('api/oauth')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -96,6 +97,25 @@ export class AuthController {
         @Body(new ValidationPipe(ValidationSchema.VerifyTokenSchema)) body: { token: string }
     ): Promise<object> {
         return this.authService.validateAccessToken(body.token);
+    }
+
+    @Post('/exchange')
+    async exchangeAccessToken(
+        @Body(new ValidationPipe(ValidationSchema.ExchangeTokenSchema)) body: { token: string, client_id: string }
+    ): Promise<object> {
+        let securityContext = await this.authService.validateAccessToken(body.token);
+        if (securityContext.grant_type !== GRANT_TYPES.PASSWORD) {
+            throw new ForbiddenException("token grant_type not allowed");
+        }
+        const user = await this.usersService.findByEmail(securityContext.email);
+        const tenant = await this.tenantService.findByClientId(body.client_id);
+        const {accessToken, refreshToken} = await this.authService.createUserAccessToken(user, tenant);
+        return {
+            token: accessToken,
+            expires_in: this.configService.get('TOKEN_EXPIRATION_TIME'),
+            token_type: "bearer",
+            refresh_token: refreshToken
+        };
     }
 
 

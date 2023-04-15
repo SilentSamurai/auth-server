@@ -14,7 +14,6 @@ import {CryptUtil} from "../util/crypt.util";
 import {GRANT_TYPES, SecurityContext} from "../scopes/security.service";
 import {UnauthorizedException} from "../exceptions/unauthorized.exception";
 import {ScopeEnum} from "../scopes/scope.enum";
-import * as ms from "ms";
 
 
 @Injectable()
@@ -43,13 +42,11 @@ export class AuthService {
     }
 
     async validateRefreshToken(refreshToken: string) {
-        let tenantMember = await this.tenantService.findMembershipByRefreshToken(refreshToken);
-        let expiration = ms(this.configService.get("REFRESH_TOKEN_EXPIRATION_TIME"));
-        if (tenantMember.isTokenExpired(expiration)) {
-            throw new UnauthorizedException("refresh token expired");
-        }
-        let tenant = await this.tenantService.findById(tenantMember.tenantId);
-        let user = await this.usersService.findById(tenantMember.userId);
+        let payload = this.jwtService.decode(refreshToken, {json: true}) as { email, domain };
+        let tenant = await this.tenantService.findByDomain(payload.domain);
+        let user = await this.usersService.findByEmail(payload.email);
+        await this.jwtService
+            .verifyAsync(refreshToken, {publicKey: tenant.publicKey});
         return {tenant, user};
     }
 
@@ -74,7 +71,7 @@ export class AuthService {
 
     async validateClientCredentials(clientId: string, clientSecret: string): Promise<Tenant> {
         const tenant: Tenant = await this.tenantService.findByClientId(clientId);
-        let valid: boolean = CryptUtil.verifyClientId(tenant.clientSecret, clientId);
+        let valid: boolean = CryptUtil.verifyClientId(tenant.clientSecret, clientId, tenant.secretSalt);
         if (!valid) {
             throw new InvalidCredentialsException();
         }
@@ -105,12 +102,15 @@ export class AuthService {
     /**
      * Create an access token for the user.
      */
-    async createUserAccessToken(user: User, tenant: Tenant): Promise<{ accessToken: string, refreshToken: string }> {
+    async createUserAccessToken(user: User, tenant: Tenant):
+        Promise<{ accessToken: string, refreshToken: string }> {
         if (!user.verified) {
             throw new EmailNotVerifiedException();
         }
+
         let scopes = await this.tenantService.getMemberScope(tenant.id, user);
-        const payload: SecurityContext = {
+
+        const accessTokenPayload: SecurityContext = {
             sub: user.email,
             email: user.email,
             name: user.name,
@@ -122,8 +122,25 @@ export class AuthService {
             scopes: scopes.map(scope => scope.name),
             grant_type: GRANT_TYPES.PASSWORD
         };
-        const refreshToken = await this.tenantService.needRefreshTokenForUser(tenant, user);
-        const accessToken = await this.jwtService.signAsync(payload, {privateKey: tenant.privateKey,});
+
+        const refreshTokenPayload = {
+            email: user.email,
+            domain: tenant.domain
+        }
+
+        const accessToken = await this.jwtService
+            .signAsync(accessTokenPayload, {
+                privateKey: tenant.privateKey,
+                issuer: this.configService.get("SUPER_TENANT_DOMAIN")
+            });
+
+        const refreshToken = await this.jwtService
+            .signAsync(refreshTokenPayload, {
+                privateKey: tenant.privateKey,
+                expiresIn: this.configService.get("REFRESH_TOKEN_EXPIRATION_TIME"),
+                issuer: this.configService.get("SUPER_TENANT_DOMAIN")
+            });
+
         return {accessToken, refreshToken};
     }
 

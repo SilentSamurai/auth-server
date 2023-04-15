@@ -21,7 +21,7 @@ import {JwtAuthGuard} from "../auth/jwt-auth.guard";
 import {ScopeGuard} from "../scopes/scope.guard";
 import {Scopes} from "../scopes/scopes.decorator";
 import {ScopeEnum} from "../scopes/scope.enum";
-import {SecurityService} from "../scopes/security.service";
+import {GRANT_TYPES, SecurityService} from "../scopes/security.service";
 
 @Controller('api/tenant')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -85,15 +85,25 @@ export class TenantController {
         return await this.tenantService.getAllTenants();
     }
 
-    @Get('/me')
+    @Get('/credentials')
     @UseGuards(JwtAuthGuard, ScopeGuard)
     @Scopes(ScopeEnum.TENANT_VIEWER)
     async getTenantCredentials(
         @Request() request
-    ): Promise<Tenant> {
+    ): Promise<any> {
         let securityContext = this.securityService.getUserOrTechnicalSecurityContext(request);
-        await this.securityService.contextShouldBeTenantViewer(request, securityContext.tenant.domain)
-        return this.tenantService.findById(securityContext.tenant.id);
+        if (securityContext.grant_type === GRANT_TYPES.CLIENT_CREDENTIAL) {
+            await this.securityService.contextShouldBeTenantViewer(request, securityContext.tenant.domain);
+        } else if (securityContext.grant_type === GRANT_TYPES.PASSWORD) {
+            await this.securityService.currentUserShouldBeTenantAdmin(request, securityContext.tenant.domain)
+        }
+        let tenant = await this.tenantService.findById(securityContext.tenant.id);
+        return {
+            id: tenant.id,
+            clientId: tenant.clientId,
+            clientSecret: tenant.clientSecret,
+            publicKey: tenant.publicKey
+        };
     }
 
     @Get('/:tenantId')

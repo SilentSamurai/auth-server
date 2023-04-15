@@ -19,26 +19,17 @@ export class CryptUtil {
 
     public static generateClientIdAndSecret() {
         const clientId = this.generateClientId();
-        const clientSecret = this.generateClientSecret(clientId);
-        return {clientId, clientSecret};
+        const {clientSecret, salt} = this.generateClientSecret(clientId);
+        return {clientId, clientSecret, salt};
     }
 
-    public static verifyClientId(storedSecret, suppliedKey) {
-        const [hashedPassword, salt] = storedSecret.split('.');
-
+    public static verifyClientId(storedSecret, suppliedKey, salt) {
         const buffer = scryptSync(suppliedKey, salt, 64) as Buffer;
-        return timingSafeEqual(Buffer.from(hashedPassword, 'hex'), buffer);
+        return timingSafeEqual(Buffer.from(storedSecret, 'hex'), buffer);
     }
 
     public static verifyClientSecret(storedSecret, providedSecret) {
-        const [storedPass, salt1] = storedSecret.split('.');
-        const [providedPass, salt2] = providedSecret.split('.');
-        return timingSafeEqual(Buffer.from(storedPass, 'hex'), Buffer.from(providedPass, 'hex'));
-    }
-
-    public static generateRefreshToken() {
-        const buffer = randomBytes(32);
-        return buffer.toString("hex") + "-r";
+        return timingSafeEqual(Buffer.from(storedSecret, 'hex'), Buffer.from(providedSecret, 'hex'));
     }
 
     private static generateClientId() {
@@ -49,6 +40,6 @@ export class CryptUtil {
     private static generateClientSecret(clientId: string) {
         const salt = randomBytes(8).toString('hex');
         const buffer = scryptSync(clientId, salt, 64) as Buffer;
-        return `${buffer.toString('hex')}.${salt}`;
+        return {clientSecret: buffer.toString('hex'), salt};
     }
 }

@@ -18,13 +18,19 @@ export class Tenant {
     clientId: string;
 
     @Column({nullable: false, name: "client_secret"})
+    @Exclude()
     clientSecret: string;
+
+    @Column({nullable: false, name: "secret_salt"})
+    @Exclude()
+    secretSalt: string;
 
     @Column({nullable: false, name: "private_key"})
     @Exclude()
     privateKey: string;
 
     @Column({nullable: false, name: "public_key"})
+    @Exclude()
     publicKey: string;
 
     @OneToMany(type => Scope, scope => scope.tenant, {

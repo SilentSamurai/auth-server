@@ -87,6 +87,11 @@ export class CreateInitialTables1681147242561 implements MigrationInterface {
                         isNullable: false
                     },
                     {
+                        name: "secret_salt",
+                        type: DB_STRING_TYPE,
+                        isNullable: false
+                    },
+                    {
                         name: "private_key",
                         type: DB_STRING_TYPE,
                         isNullable: false
@@ -168,19 +173,7 @@ export class CreateInitialTables1681147242561 implements MigrationInterface {
                         type: DB_STRING_TYPE,
                         length: "36",
                         isNullable: false
-                    },
-                    {
-                        name: "refresh_token",
-                        type: DB_STRING_TYPE,
-                        length: "128",
-                        isNullable: false,
-                        isUnique: true,
-                    },
-                    {
-                        name: "refreshed_at",
-                        type: "timestamp",
-                        isNullable: false
-                    },
+                    }
                 ],
                 uniques: [
                     {

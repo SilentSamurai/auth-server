@@ -64,16 +64,6 @@ const UpdateMyPasswordSchema = yup.object().shape(
         newPassword: yup.string().required('New password is required').matches(PASSWORD_REGEXP, PASSWORD_MESSAGE)
     });
 
-const UpdateMyAvatarSchema = yup.object().shape(
-    {
-        avatar: yup.string().defined('Avatar is required').url().max(500)
-    });
-
-const UpdateAvatarSchema = yup.object().shape(
-    {
-        avatar: yup.string().defined('Avatar is required').url().max(500)
-    });
-
 const UpdateMyNameSchema = yup.object().shape(
     {
         name: yup.string().defined('Name is required').max(15)
@@ -185,6 +175,12 @@ const VerifyTokenSchema = yup.object().shape(
         token: yup.string().required('token is required')
     });
 
+const ExchangeTokenSchema = yup.object().shape(
+    {
+        token: yup.string().required('token is required'),
+        client_id: yup.string().required('client_id is required'),
+    });
+
 export const ValidationSchema =
     {
         SignUpSchema,
@@ -198,8 +194,6 @@ export const ValidationSchema =
         UpdateUsernameSchema,
         UpdateMyEmailSchema,
         UpdateMyPasswordSchema,
-        UpdateMyAvatarSchema,
-        UpdateAvatarSchema,
         UpdateMyNameSchema,
         UpdateNameSchema,
         UpdateMySurnameSchema,
@@ -214,5 +208,6 @@ export const ValidationSchema =
         MemberOperationsSchema,
         CreateUserSchema,
         UpdateUserSchema,
-        VerifyTokenSchema
+        VerifyTokenSchema,
+        ExchangeTokenSchema,
     };
