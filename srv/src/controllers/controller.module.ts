@@ -10,6 +10,7 @@ import {MemberController} from "./members.controller";
 import {UsersModule} from "../users/users.module";
 import {ScopesModule} from "../scopes/scopes.module";
 import {ScopeController} from "./scope.controller";
+import {MainController} from "./main.controller";
 
 @Module(
     {
@@ -27,7 +28,8 @@ import {ScopeController} from "./scope.controller";
             UsersAdminController,
             TenantController,
             MemberController,
-            ScopeController
+            ScopeController,
+            MainController
         ],
         providers: [],
         exports: []

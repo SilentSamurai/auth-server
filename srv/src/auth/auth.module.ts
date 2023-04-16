@@ -6,7 +6,6 @@ import {MailModule} from '../mail/mail.module';
 import {AuthController} from '../controllers/auth.controller';
 import {ConfigService} from '../config/config.service';
 import {AuthService} from './auth.service';
-import {LocalAuthGuard} from './local-auth.guard';
 import {TenantModule} from "../tenants/tenant.module";
 import {JwtAuthGuard} from "./jwt-auth.guard";
 import {ScopesModule} from "../scopes/scopes.module";
@@ -34,7 +33,7 @@ import {ScopesModule} from "../scopes/scopes.module";
                 forwardRef(() => ScopesModule)
             ],
         controllers: [AuthController],
-        providers: [AuthService, LocalAuthGuard, JwtAuthGuard],
+        providers: [AuthService, JwtAuthGuard],
         exports: [AuthService]
     })
 export class AuthModule {

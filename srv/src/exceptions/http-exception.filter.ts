@@ -5,7 +5,7 @@ import {UnknownErrorException} from './unknown-error.exception';
 import {InvalidRequestException} from './invalid-request.exception';
 import {ForbiddenException} from './forbidden.exception';
 
-@Catch(HttpException)
+@Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
 
     private static readonly LOGGER = new Logger(HttpExceptionFilter.name);

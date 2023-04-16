@@ -1,5 +1,6 @@
 import {Injectable} from '@nestjs/common';
 import {config} from 'dotenv';
+import * as path from 'path';
 import {join} from 'path';
 
 @Injectable()
@@ -8,12 +9,32 @@ export class ConfigService {
     }
 
     static config(): any {
-        config();
+        let envPath = path.resolve(process.cwd(), '.env.prod');
+        console.log("Environment path :", envPath);
+        config({
+            path: envPath
+        })
 
         console.log("Environment variables:");
         Object.keys(process.env).forEach(function (key) {
             console.log(key + '=' + process.env[key]);
         });
+    }
+
+    static configTest(print = false): any {
+        let envPath = path.resolve(process.cwd(), '.env.testing');
+        console.log("Environment path :", envPath);
+        config({
+            path: envPath
+        })
+
+
+        if (print) {
+            console.log("Environment variables:");
+            Object.keys(process.env).forEach(function (key) {
+                console.log(key + '=' + process.env[key]);
+            });
+        }
     }
 
     /**
@@ -68,7 +89,11 @@ export class ConfigService {
     /**
      * Is a production environment?
      */
-    isProduction(): boolean {
+    static isProduction(): boolean {
         return process.env.NODE_ENV === 'production';
+    }
+
+    isProduction() {
+        return ConfigService.isProduction();
     }
 }

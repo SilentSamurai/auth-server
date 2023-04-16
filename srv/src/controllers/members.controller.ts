@@ -23,6 +23,7 @@ import {Scope} from "../scopes/scope.entity";
 import {SecurityService} from "../scopes/security.service";
 import {ScopeService} from "../scopes/scope.service";
 import {Action} from "../scopes/actions.enum";
+import {ForbiddenException} from "../exceptions/forbidden.exception";
 
 @Controller('api/tenant')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -76,6 +77,10 @@ export class MemberController {
         const user = await this.usersService.findByEmail(email);
         let tenant = await this.tenantService.findById(tenantId);
         this.securityService.check(request, Action.Update, tenant);
+        let securityContext = this.securityService.getUserSecurityContext(request);
+        if (securityContext.email === email) {
+            throw new ForbiddenException("cannot remove self");
+        }
         return this.tenantService.removeMember(tenantId, user);
     }
 

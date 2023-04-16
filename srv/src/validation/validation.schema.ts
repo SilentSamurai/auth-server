@@ -184,6 +184,29 @@ const ExchangeTokenSchema = yup.object().shape(
         client_secret: yup.string().required('client_secret is required'),
     });
 
+const SecurityContextSchema = yup.object().shape(
+    {
+        sub: yup.string().required('token is invalid'),
+        email: yup.string().required('token is invalid'),
+        name: yup.string().required('token is invalid'),
+        tenant: yup.object().shape({
+            id: yup.string().required('token is invalid'),
+            name: yup.string().required('token is invalid'),
+            domain: yup.string().required('token is invalid'),
+        }),
+        scopes: yup.array().of(
+            yup.string().max(20)
+        ),
+        grant_type: yup.string().required('token is invalid')
+    });
+
+const RefreshTokenSchema = yup.object().shape(
+    {
+        email: yup.string().required('token is invalid'),
+        domain: yup.string().required('token is invalid')
+    });
+
+
 export const ValidationSchema =
     {
         SignUpSchema,
@@ -213,4 +236,6 @@ export const ValidationSchema =
         UpdateUserSchema,
         VerifyTokenSchema,
         ExchangeTokenSchema,
+        SecurityContextSchema,
+        RefreshTokenSchema
     };

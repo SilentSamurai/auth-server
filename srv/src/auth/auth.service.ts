@@ -14,6 +14,8 @@ import {CryptUtil} from "../util/crypt.util";
 import {GRANT_TYPES, SecurityContext} from "../scopes/security.service";
 import {UnauthorizedException} from "../exceptions/unauthorized.exception";
 import {ScopeEnum} from "../scopes/scope.enum";
+import {ValidationPipe} from "../validation/validation.pipe";
+import {ValidationSchema} from "../validation/validation.schema";
 
 
 @Injectable()
@@ -42,7 +44,12 @@ export class AuthService {
     }
 
     async validateRefreshToken(refreshToken: string) {
-        let payload = this.jwtService.decode(refreshToken, {json: true}) as { email, domain };
+
+        let validationPipe = new ValidationPipe(ValidationSchema.RefreshTokenSchema);
+        let payload = await validationPipe.transform(
+            this.jwtService.decode(refreshToken, {json: true}),
+            null) as { email, domain };
+
         let tenant = await this.tenantService.findByDomain(payload.domain);
         let user = await this.usersService.findByEmail(payload.email);
         await this.jwtService
@@ -52,8 +59,13 @@ export class AuthService {
 
     async validateAccessToken(token: string): Promise<SecurityContext> {
         try {
-            let payload: SecurityContext = this.jwtService.decode(token, {json: true}) as SecurityContext;
-            let tenant = await this.tenantService.findById(payload["tenant"].id);
+
+            let validationPipe = new ValidationPipe(ValidationSchema.SecurityContextSchema);
+            let payload: SecurityContext = await validationPipe.transform(
+                this.jwtService.decode(token, {json: true}),
+                null) as SecurityContext;
+
+            let tenant = await this.tenantService.findById(payload.tenant.id);
             payload = await this.jwtService.verifyAsync(token, {publicKey: tenant.publicKey});
             console.log("token verified with public Key");
             if (payload.grant_type === GRANT_TYPES.CLIENT_CREDENTIAL) {

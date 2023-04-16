@@ -12,6 +12,7 @@ import {ScopeService} from "../scopes/scope.service";
 import {ScopeEnum} from "../scopes/scope.enum";
 import {CryptUtil} from "../util/crypt.util";
 import {TenantMember} from "./tenant.members.entity";
+import {NotFoundException} from "../exceptions/not-found.exception";
 
 @Injectable()
 export class TenantService implements OnModuleInit {
@@ -71,7 +72,7 @@ export class TenantService implements OnModuleInit {
     async updateKeys(id: string): Promise<Tenant> {
         const tenant: Tenant = await this.findById(id);
         if (!tenant) {
-            throw new ValidationErrorException("tenant id not found");
+            throw new NotFoundException("tenant id not found");
         }
 
         const {privateKey, publicKey} = CryptUtil.generateKeyPair();
@@ -96,7 +97,7 @@ export class TenantService implements OnModuleInit {
             }
         });
         if (tenant === null) {
-            throw new ValidationErrorException("tenant not found");
+            throw new NotFoundException("tenant not found");
         }
         return tenant;
     }
@@ -109,7 +110,7 @@ export class TenantService implements OnModuleInit {
             }
         });
         if (tenant === null) {
-            throw new ValidationErrorException("tenant not found");
+            throw new NotFoundException("tenant not found");
         }
         return tenant;
     }
@@ -122,7 +123,7 @@ export class TenantService implements OnModuleInit {
             }
         });
         if (tenant === null) {
-            throw new ValidationErrorException("tenant not found");
+            throw new NotFoundException("tenant not found");
         }
         return tenant;
     }
@@ -197,7 +198,7 @@ export class TenantService implements OnModuleInit {
             }
         });
         if (tenantMember === null) {
-            throw new ValidationErrorException("user is not a member of this tenant");
+            throw new NotFoundException("user is not a member of this tenant");
         }
         return tenantMember;
     }
@@ -218,7 +219,7 @@ export class TenantService implements OnModuleInit {
         let tenant: Tenant = await this.findById(tenantId);
         const isMember: boolean = await this.isMember(tenantId, user);
         if (!isMember) {
-            throw new ValidationErrorException("user is not a member of this tenant");
+            throw new NotFoundException("user is not a member of this tenant");
         }
         return this.scopeService.updateUserScopes(scopes, tenant, user)
     }

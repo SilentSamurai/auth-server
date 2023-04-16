@@ -49,7 +49,7 @@ export class AuthController {
             grant_type: GRANT_TYPES,
             scopes: string[]
         }
-    ): Promise<object> {
+    ): Promise<any> {
 
         switch (body.grant_type) {
             case GRANT_TYPES.PASSWORD: {
