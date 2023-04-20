@@ -9,16 +9,18 @@ export class ConfigService {
     }
 
     static config(): any {
-        let envPath = path.resolve(process.cwd(), '.env.prod');
-        console.log("Environment path :", envPath);
-        config({
-            path: envPath
-        })
+        if (!this.isProduction()) {
+            let envPath = path.resolve(process.cwd(), '.env.dev');
+            console.log("Environment path :", envPath);
+            config({
+                path: envPath
+            })
 
-        console.log("Environment variables:");
-        Object.keys(process.env).forEach(function (key) {
-            console.log(key + '=' + process.env[key]);
-        });
+            console.log("Environment variables:");
+            Object.keys(process.env).forEach(function (key) {
+                console.log(key + '=' + process.env[key]);
+            });
+        }
     }
 
     static configTest(print = false): any {
@@ -83,7 +85,7 @@ export class ConfigService {
      * Get the static path.
      */
     getStaticPath(): string {
-        return join(__dirname, process.env.STATIC_PATH);
+        return join(process.cwd(), process.env.STATIC_PATH);
     }
 
     /**
