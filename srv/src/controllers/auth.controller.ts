@@ -59,7 +59,7 @@ export class AuthController {
                 const tenant = await this.tenantService.findByDomain(body.domain);
                 const {accessToken, refreshToken} = await this.authService.createUserAccessToken(user, tenant);
                 return {
-                    token: accessToken,
+                    access_token: accessToken,
                     expires_in: this.configService.get('TOKEN_EXPIRATION_TIME'),
                     token_type: "bearer",
                     refresh_token: refreshToken
@@ -71,7 +71,7 @@ export class AuthController {
                 const tenant: Tenant = await this.authService.validateClientCredentials(body.client_id, body.client_secret);
                 const token: string = await this.authService.createTechnicalAccessToken(tenant, body.scopes);
                 return {
-                    token: token,
+                    access_token: token,
                     expires_in: this.configService.get('TOKEN_EXPIRATION_TIME'),
                     token_type: "bearer"
                 };
@@ -82,7 +82,7 @@ export class AuthController {
                 const {tenant, user} = await this.authService.validateRefreshToken(body.refresh_token);
                 const {accessToken, refreshToken} = await this.authService.createUserAccessToken(user, tenant);
                 return {
-                    token: accessToken,
+                    access_token: accessToken,
                     expires_in: this.configService.get('TOKEN_EXPIRATION_TIME'),
                     token_type: "bearer",
                     refresh_token: refreshToken
@@ -95,10 +95,10 @@ export class AuthController {
 
     @Post('/verify')
     async verifyAccessToken(
-        @Body(new ValidationPipe(ValidationSchema.VerifyTokenSchema)) body: { token: string, client_id: string, client_secret: string }
+        @Body(new ValidationPipe(ValidationSchema.VerifyTokenSchema)) body: { access_token: string, client_id: string, client_secret: string }
     ): Promise<object> {
         const tenant = await this.authService.validateClientCredentials(body.client_id, body.client_secret);
-        let securityContext = await this.authService.validateAccessToken(body.token);
+        let securityContext = await this.authService.validateAccessToken(body.access_token);
         if (securityContext.tenant.id !== tenant.id) {
             throw new InvalidTokenException("not a valid token");
         }
@@ -107,18 +107,18 @@ export class AuthController {
 
     @Post('/exchange')
     async exchangeAccessToken(
-        @Body(new ValidationPipe(ValidationSchema.ExchangeTokenSchema)) body: { token: string, client_id: string, client_secret: string }
+        @Body(new ValidationPipe(ValidationSchema.ExchangeTokenSchema)) body: { access_token: string, client_id: string, client_secret: string }
     ): Promise<object> {
-        let securityContext = await this.authService.validateAccessToken(body.token);
+        let securityContext = await this.authService.validateAccessToken(body.access_token);
         if (securityContext.grant_type !== GRANT_TYPES.PASSWORD) {
-            throw new ForbiddenException("token grant_type not allowed");
+            throw new ForbiddenException("grant_type not allowed");
         }
         await this.authService.validateClientCredentials(body.client_id, body.client_secret);
         const user = await this.usersService.findByEmail(securityContext.email);
         const tenant = await this.tenantService.findByClientId(body.client_id);
         const {accessToken, refreshToken} = await this.authService.createUserAccessToken(user, tenant);
         return {
-            token: accessToken,
+            access_token: accessToken,
             expires_in: this.configService.get('TOKEN_EXPIRATION_TIME'),
             token_type: "bearer",
             refresh_token: refreshToken

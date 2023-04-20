@@ -1,47 +1,34 @@
-import * as request from 'supertest';
-import {Test, TestingModule} from '@nestjs/testing';
-import {INestApplication} from '@nestjs/common';
-import {AppModule} from "../src/app.module";
-import {ConfigService} from "../src/config/config.service";
+import {TestAppFixture} from "./test-app.fixture";
+import {TokenFixture} from "./token.fixture";
 
 describe('e2e positive token flow', () => {
-    let app: INestApplication;
+    let app: TestAppFixture;
     let refreshToken = "";
     let accessToken = "";
     let clientId = "";
     let clientSecret = "";
 
     beforeAll(async () => {
-        ConfigService.configTest();
-        const moduleRef: TestingModule = await Test.createTestingModule({
-            imports: [AppModule],
-        }).compile()
-        app = moduleRef.createNestApplication();
-        await app.init();
+        app = await new TestAppFixture().init();
+    });
+
+    afterAll(async () => {
+        await app.close();
     });
 
     it(`/POST Access Token`, async () => {
-        const response = await request(app.getHttpServer())
-            .post('/api/oauth/token')
-            .send({
-                "grant_type": "password",
-                "email": "admin@auth.server.com",
-                "password": "admin9000",
-                "domain": "auth.server.com"
-            })
-            .set('Accept', 'application/json');
-
-        expect(response.status).toEqual(201);
-        expect(response.body.token).toBeDefined();
-        expect(response.body.expires_in).toBeDefined();
-        expect(response.body.token_type).toEqual('bearer');
-        expect(response.body.refresh_token).toBeDefined();
-        refreshToken = response.body.refresh_token;
-        accessToken = response.body.token;
+        let tokenFixture = new TokenFixture(app);
+        let response = await tokenFixture.fetchAccessToken(
+            "admin@auth.server.com",
+            "admin9000",
+            "auth.server.com"
+        );
+        refreshToken = response.refreshToken;
+        accessToken = response.accessToken;
     });
 
     it(`/POST Refresh Token`, async () => {
-        const response = await request(app.getHttpServer())
+        const response = await app.getHttpServer()
             .post('/api/oauth/token')
             .send({
                 "grant_type": "refresh_token",
@@ -50,14 +37,14 @@ describe('e2e positive token flow', () => {
             .set('Accept', 'application/json');
 
         expect(response.status).toEqual(201);
-        expect(response.body.token).toBeDefined();
+        expect(response.body.access_token).toBeDefined();
         expect(response.body.expires_in).toBeDefined();
         expect(response.body.token_type).toEqual('bearer');
         expect(response.body.refresh_token).toBeDefined();
     });
 
     it(`/GET Global Tenant Credentials`, async () => {
-        const creds = await request(app.getHttpServer())
+        const creds = await app.getHttpServer()
             .get("/api/tenant/my/credentials")
             .set('Authorization', `Bearer ${accessToken}`);
 
@@ -71,7 +58,7 @@ describe('e2e positive token flow', () => {
     });
 
     it(`/POST Client Credentials`, async () => {
-        const response = await request(app.getHttpServer())
+        const response = await app.getHttpServer()
             .post('/api/oauth/token')
             .send({
                 "grant_type": "client_credential",
@@ -81,30 +68,27 @@ describe('e2e positive token flow', () => {
             .set('Accept', 'application/json');
 
         expect(response.status).toEqual(201);
-        expect(response.body.token).toBeDefined();
+        expect(response.body.access_token).toBeDefined();
         expect(response.body.expires_in).toBeDefined();
         expect(response.body.token_type).toEqual('bearer');
     });
 
     it(`/POST Verify Token`, async () => {
-        const response = await request(app.getHttpServer())
+        const response = await app.getHttpServer()
             .post('/api/oauth/verify')
             .send({
-                "token": accessToken,
+                "access_token": accessToken,
                 "client_id": clientId,
                 "client_secret": clientSecret
             })
             .set('Accept', 'application/json');
 
+        console.log(response.body);
         expect(response.status).toEqual(201);
         expect(response.body.email).toBeDefined();
         expect(response.body.name).toBeDefined();
         expect(response.body.grant_type).toEqual('password');
         expect(response.body.scopes).toBeDefined();
-    });
-
-    afterAll(async () => {
-        await app.close();
     });
 });
 

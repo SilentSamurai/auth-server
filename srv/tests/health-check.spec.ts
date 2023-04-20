@@ -1,32 +1,23 @@
-import * as request from 'supertest';
-import {Test, TestingModule} from '@nestjs/testing';
-import {INestApplication} from '@nestjs/common';
-import {AppModule} from "../src/app.module";
-import {ConfigService} from "../src/config/config.service";
+import {TestAppFixture} from "./test-app.fixture";
 
 describe('e2e health-check', () => {
-    let app: INestApplication;
+    let app: TestAppFixture;
 
     beforeAll(async () => {
-        ConfigService.configTest();
-        const moduleRef: TestingModule = await Test.createTestingModule({
-            imports: [AppModule],
-        }).compile()
-        app = moduleRef.createNestApplication();
-        await app.init();
+        app = await new TestAppFixture().init();
+    });
+
+    afterAll(async () => {
+        await app.close();
     });
 
     it(`/GET Health Check`, () => {
-        return request(app.getHttpServer())
+        return app.getHttpServer()
             .get('/api/v1/into/health-check')
             .expect(200)
             .expect({
                 health: true
             });
-    });
-
-    afterAll(async () => {
-        await app.close();
     });
 });
 

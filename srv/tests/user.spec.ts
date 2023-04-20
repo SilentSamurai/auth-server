@@ -1,11 +1,7 @@
-import * as request from 'supertest';
-import {Test, TestingModule} from '@nestjs/testing';
-import {INestApplication} from '@nestjs/common';
-import {AppModule} from "../src/app.module";
-import {ConfigService} from "../src/config/config.service";
+import {TestAppFixture} from "./test-app.fixture";
 
 describe('e2e users', () => {
-    let app: INestApplication;
+    let app: TestAppFixture;
     let refreshToken = "";
     let accessToken = "";
     let user = {
@@ -14,16 +10,15 @@ describe('e2e users', () => {
     };
 
     beforeAll(async () => {
-        ConfigService.configTest();
-        const moduleRef: TestingModule = await Test.createTestingModule({
-            imports: [AppModule],
-        }).compile()
-        app = moduleRef.createNestApplication();
-        await app.init();
+        app = await new TestAppFixture().init();
+    });
+
+    afterAll(async () => {
+        await app.close();
     });
 
     it(`/POST Fetch Access Token`, async () => {
-        const response = await request(app.getHttpServer())
+        const response = await app.getHttpServer()
             .post('/api/oauth/token')
             .send({
                 "grant_type": "password",
@@ -36,16 +31,16 @@ describe('e2e users', () => {
         expect(response.status).toEqual(201);
         console.log(response.body);
 
-        expect(response.body.token).toBeDefined();
+        expect(response.body.access_token).toBeDefined();
         expect(response.body.expires_in).toBeDefined();
         expect(response.body.token_type).toEqual('bearer');
         expect(response.body.refresh_token).toBeDefined();
         refreshToken = response.body.refresh_token;
-        accessToken = response.body.token;
+        accessToken = response.body.access_token;
     });
 
     it(`/POST Create User`, async () => {
-        const response = await request(app.getHttpServer())
+        const response = await app.getHttpServer()
             .post('/api/users/create')
             .send({
                 "name": "TestUser",
@@ -66,7 +61,7 @@ describe('e2e users', () => {
     });
 
     it(`/GET User Details`, async () => {
-        const response = await request(app.getHttpServer())
+        const response = await app.getHttpServer()
             .get(`/api/users/${user.email}`)
             .set('Authorization', `Bearer ${accessToken}`)
             .set('Accept', 'application/json');
@@ -81,7 +76,7 @@ describe('e2e users', () => {
     });
 
     it(`/PUT Update User`, async () => {
-        const response = await request(app.getHttpServer())
+        const response = await app.getHttpServer()
             .put('/api/users/update')
             .send({
                 id: user.id,
@@ -103,7 +98,7 @@ describe('e2e users', () => {
     });
 
     it(`/GET All Users`, async () => {
-        const response = await request(app.getHttpServer())
+        const response = await app.getHttpServer()
             .get(`/api/users`)
             .set('Authorization', `Bearer ${accessToken}`)
             .set('Accept', 'application/json');
@@ -118,7 +113,7 @@ describe('e2e users', () => {
     });
 
     it(`/GET User Tenants`, async () => {
-        const response = await request(app.getHttpServer())
+        const response = await app.getHttpServer()
             .get(`/api/users/${user.email}/tenants`)
             .set('Authorization', `Bearer ${accessToken}`)
             .set('Accept', 'application/json');
@@ -133,7 +128,7 @@ describe('e2e users', () => {
 
 
     it(`/DELETE User`, async () => {
-        const response = await request(app.getHttpServer())
+        const response = await app.getHttpServer()
             .delete(`/api/users/${user.id}`)
             .set('Authorization', `Bearer ${accessToken}`)
             .set('Accept', 'application/json');
@@ -143,8 +138,5 @@ describe('e2e users', () => {
     });
 
 
-    afterAll(async () => {
-        await app.close();
-    });
 });
 

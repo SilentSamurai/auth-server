@@ -1,11 +1,8 @@
-import * as request from 'supertest';
-import {Test, TestingModule} from '@nestjs/testing';
-import {INestApplication} from '@nestjs/common';
-import {AppModule} from "../src/app.module";
-import {ConfigService} from "../src/config/config.service";
+import {TestAppFixture} from "./test-app.fixture";
+import {TokenFixture} from "./token.fixture";
 
 describe('e2e tenant technical credential', () => {
-    let app: INestApplication;
+    let app: TestAppFixture;
     let tenant = {
         id: "",
         clientId: "",
@@ -15,37 +12,25 @@ describe('e2e tenant technical credential', () => {
     let adminAccessToken = "";
 
     beforeAll(async () => {
-        ConfigService.configTest();
-        const moduleRef: TestingModule = await Test.createTestingModule({
-            imports: [AppModule],
-        }).compile()
-        app = moduleRef.createNestApplication();
-        await app.init();
+        app = await new TestAppFixture().init();
+    });
+
+    afterAll(async () => {
+        await app.close();
     });
 
     it(`/POST Fetch Access Token`, async () => {
-        const response = await request(app.getHttpServer())
-            .post('/api/oauth/token')
-            .send({
-                "grant_type": "password",
-                "email": "admin@auth.server.com",
-                "password": "admin9000",
-                "domain": "auth.server.com"
-            })
-            .set('Accept', 'application/json');
-
-        expect(response.status).toEqual(201);
-        console.log(response.body);
-
-        expect(response.body.token).toBeDefined();
-        expect(response.body.expires_in).toBeDefined();
-        expect(response.body.token_type).toEqual('bearer');
-        expect(response.body.refresh_token).toBeDefined();
-        adminAccessToken = response.body.token;
+        let tokenFixture = new TokenFixture(app);
+        let response = await tokenFixture.fetchAccessToken(
+            "admin@auth.server.com",
+            "admin9000",
+            "auth.server.com"
+        );
+        adminAccessToken = response.accessToken;
     });
 
     it(`/POST Create Tenant`, async () => {
-        const response = await request(app.getHttpServer())
+        const response = await app.getHttpServer()
             .post('/api/tenant/create')
             .send({
                 "name": "tenant-1",
@@ -65,7 +50,7 @@ describe('e2e tenant technical credential', () => {
     });
 
     it(`/GET Tenant Credentials`, async () => {
-        const response = await request(app.getHttpServer())
+        const response = await app.getHttpServer()
             .get(`/api/tenant/${tenant.id}/credentials`)
             .set('Authorization', `Bearer ${adminAccessToken}`)
             .set('Accept', 'application/json');
@@ -81,7 +66,7 @@ describe('e2e tenant technical credential', () => {
     });
 
     it(`/POST Client Credentials`, async () => {
-        const response = await request(app.getHttpServer())
+        const response = await app.getHttpServer()
             .post('/api/oauth/token')
             .send({
                 "grant_type": "client_credential",
@@ -91,14 +76,14 @@ describe('e2e tenant technical credential', () => {
             .set('Accept', 'application/json');
 
         expect(response.status).toEqual(201);
-        expect(response.body.token).toBeDefined();
+        expect(response.body.access_token).toBeDefined();
         expect(response.body.expires_in).toBeDefined();
         expect(response.body.token_type).toEqual('bearer');
-        techinalAccessToken = response.body.token;
+        techinalAccessToken = response.body.access_token;
     });
 
     it(`/POST Wrong Client Credentials`, async () => {
-        const response = await request(app.getHttpServer())
+        const response = await app.getHttpServer()
             .post('/api/oauth/token')
             .send({
                 "grant_type": "client_credential",
@@ -111,7 +96,7 @@ describe('e2e tenant technical credential', () => {
     });
 
     it(`/GET Tenant Credentials`, async () => {
-        const response = await request(app.getHttpServer())
+        const response = await app.getHttpServer()
             .get(`/api/tenant/${tenant.id}/credentials`)
             .set('Authorization', `Bearer ${techinalAccessToken}`)
             .set('Accept', 'application/json');
@@ -126,7 +111,7 @@ describe('e2e tenant technical credential', () => {
     });
 
     it(`/GET Tenant Details`, async () => {
-        const response = await request(app.getHttpServer())
+        const response = await app.getHttpServer()
             .get(`/api/tenant/${tenant.id}`)
             .set('Authorization', `Bearer ${techinalAccessToken}`)
             .set('Accept', 'application/json');
@@ -141,7 +126,7 @@ describe('e2e tenant technical credential', () => {
     });
 
     it(`/GET Tenant Members`, async () => {
-        const response = await request(app.getHttpServer())
+        const response = await app.getHttpServer()
             .get(`/api/tenant/${tenant.id}/members`)
             .set('Authorization', `Bearer ${techinalAccessToken}`)
             .set('Accept', 'application/json');
@@ -158,7 +143,7 @@ describe('e2e tenant technical credential', () => {
     });
 
     it(`/GET Tenant Scopes`, async () => {
-        const response = await request(app.getHttpServer())
+        const response = await app.getHttpServer()
             .get(`/api/tenant/${tenant.id}/scopes`)
             .set('Authorization', `Bearer ${techinalAccessToken}`)
             .set('Accept', 'application/json');
@@ -174,7 +159,7 @@ describe('e2e tenant technical credential', () => {
     });
 
     it(`/PATCH Update Tenant`, async () => {
-        const response = await request(app.getHttpServer())
+        const response = await app.getHttpServer()
             .patch(`/api/tenant/${tenant.id}`)
             .set('Authorization', `Bearer ${techinalAccessToken}`)
             .send({
@@ -189,7 +174,7 @@ describe('e2e tenant technical credential', () => {
 
     it(`/POST Create Scope`, async () => {
         const name = "auditor";
-        const response = await request(app.getHttpServer())
+        const response = await app.getHttpServer()
             .post(`/api/tenant/${tenant.id}/scope/${name}`)
             .set('Authorization', `Bearer ${techinalAccessToken}`)
             .set('Accept', 'application/json');
@@ -200,7 +185,7 @@ describe('e2e tenant technical credential', () => {
 
     it(`/POST Add Members`, async () => {
         const email = "legolas@mail.com";
-        const response = await request(app.getHttpServer())
+        const response = await app.getHttpServer()
             .post(`/api/tenant/${tenant.id}/member/${email}`)
             .set('Authorization', `Bearer ${techinalAccessToken}`)
             .set('Accept', 'application/json');
@@ -212,7 +197,7 @@ describe('e2e tenant technical credential', () => {
 
     it(`/PUT Update Member Scope`, async () => {
         const email = "legolas@mail.com";
-        const response = await request(app.getHttpServer())
+        const response = await app.getHttpServer()
             .put(`/api/tenant/${tenant.id}/member/${email}/scope`)
             .set('Authorization', `Bearer ${techinalAccessToken}`)
             .send({
@@ -227,7 +212,7 @@ describe('e2e tenant technical credential', () => {
 
     it(`/DELETE Remove Members`, async () => {
         const email = "legolas@mail.com";
-        const response = await request(app.getHttpServer())
+        const response = await app.getHttpServer()
             .delete(`/api/tenant/${tenant.id}/member/${email}`)
             .set('Authorization', `Bearer ${techinalAccessToken}`)
             .set('Accept', 'application/json');
@@ -239,7 +224,7 @@ describe('e2e tenant technical credential', () => {
 
     it(`/DELETE Remove Scope`, async () => {
         const name = "auditor";
-        const response = await request(app.getHttpServer())
+        const response = await app.getHttpServer()
             .delete(`/api/tenant/${tenant.id}/scope/${name}`)
             .set('Authorization', `Bearer ${techinalAccessToken}`)
             .set('Accept', 'application/json');
@@ -250,7 +235,7 @@ describe('e2e tenant technical credential', () => {
     });
 
     it(`/DELETE Remove Tenant`, async () => {
-        const response = await request(app.getHttpServer())
+        const response = await app.getHttpServer()
             .delete(`/api/tenant/${tenant.id}`)
             .set('Authorization', `Bearer ${techinalAccessToken}`)
             .set('Accept', 'application/json');
@@ -260,9 +245,5 @@ describe('e2e tenant technical credential', () => {
 
     });
 
-
-    afterAll(async () => {
-        await app.close();
-    });
 });
 

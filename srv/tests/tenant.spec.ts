@@ -1,11 +1,8 @@
-import * as request from 'supertest';
-import {Test, TestingModule} from '@nestjs/testing';
-import {INestApplication} from '@nestjs/common';
-import {AppModule} from "../src/app.module";
-import {ConfigService} from "../src/config/config.service";
+import {TestAppFixture} from "./test-app.fixture";
+import {TokenFixture} from "./token.fixture";
 
 describe('e2e tenant', () => {
-    let app: INestApplication;
+    let app: TestAppFixture;
     let tenant = {
         id: "",
         clientId: ""
@@ -14,38 +11,26 @@ describe('e2e tenant', () => {
     let accessToken = "";
 
     beforeAll(async () => {
-        ConfigService.configTest();
-        const moduleRef: TestingModule = await Test.createTestingModule({
-            imports: [AppModule],
-        }).compile()
-        app = moduleRef.createNestApplication();
-        await app.init();
+        app = await new TestAppFixture().init();
+    });
+
+    afterAll(async () => {
+        await app.close();
     });
 
     it(`/POST Fetch Access Token`, async () => {
-        const response = await request(app.getHttpServer())
-            .post('/api/oauth/token')
-            .send({
-                "grant_type": "password",
-                "email": "admin@auth.server.com",
-                "password": "admin9000",
-                "domain": "auth.server.com"
-            })
-            .set('Accept', 'application/json');
-
-        expect(response.status).toEqual(201);
-        console.log(response.body);
-
-        expect(response.body.token).toBeDefined();
-        expect(response.body.expires_in).toBeDefined();
-        expect(response.body.token_type).toEqual('bearer');
-        expect(response.body.refresh_token).toBeDefined();
-        refreshToken = response.body.refresh_token;
-        accessToken = response.body.token;
+        let tokenFixture = new TokenFixture(app);
+        let response = await tokenFixture.fetchAccessToken(
+            "admin@auth.server.com",
+            "admin9000",
+            "auth.server.com"
+        );
+        refreshToken = response.refreshToken;
+        accessToken = response.accessToken;
     });
 
     it(`/POST Create Tenant`, async () => {
-        const response = await request(app.getHttpServer())
+        const response = await app.getHttpServer()
             .post('/api/tenant/create')
             .send({
                 "name": "tenant-1",
@@ -65,7 +50,7 @@ describe('e2e tenant', () => {
     });
 
     it(`/GET Tenant Details`, async () => {
-        const response = await request(app.getHttpServer())
+        const response = await app.getHttpServer()
             .get(`/api/tenant/${tenant.id}`)
             .set('Authorization', `Bearer ${accessToken}`)
             .set('Accept', 'application/json');
@@ -80,7 +65,7 @@ describe('e2e tenant', () => {
     });
 
     it(`/GET Tenant Credentials`, async () => {
-        const response = await request(app.getHttpServer())
+        const response = await app.getHttpServer()
             .get(`/api/tenant/${tenant.id}/credentials`)
             .set('Authorization', `Bearer ${accessToken}`)
             .set('Accept', 'application/json');
@@ -96,7 +81,7 @@ describe('e2e tenant', () => {
     });
 
     it(`/GET Tenant Scopes`, async () => {
-        const response = await request(app.getHttpServer())
+        const response = await app.getHttpServer()
             .get(`/api/tenant/${tenant.id}/scopes`)
             .set('Authorization', `Bearer ${accessToken}`)
             .set('Accept', 'application/json');
@@ -113,7 +98,7 @@ describe('e2e tenant', () => {
     });
 
     it(`/PATCH Update Tenant`, async () => {
-        const response = await request(app.getHttpServer())
+        const response = await app.getHttpServer()
             .patch(`/api/tenant/${tenant.id}`)
             .set('Authorization', `Bearer ${accessToken}`)
             .send({
@@ -134,7 +119,7 @@ describe('e2e tenant', () => {
 
     it(`/POST Create Scope`, async () => {
         const name = "auditor";
-        const response = await request(app.getHttpServer())
+        const response = await app.getHttpServer()
             .post(`/api/tenant/${tenant.id}/scope/${name}`)
             .set('Authorization', `Bearer ${accessToken}`)
             .set('Accept', 'application/json');
@@ -145,7 +130,7 @@ describe('e2e tenant', () => {
 
     it(`/POST Add Members`, async () => {
         const email = "legolas@mail.com";
-        const response = await request(app.getHttpServer())
+        const response = await app.getHttpServer()
             .post(`/api/tenant/${tenant.id}/member/${email}`)
             .set('Authorization', `Bearer ${accessToken}`)
             .set('Accept', 'application/json');
@@ -155,7 +140,7 @@ describe('e2e tenant', () => {
     });
 
     it(`/GET Tenant Members`, async () => {
-        const response = await request(app.getHttpServer())
+        const response = await app.getHttpServer()
             .get(`/api/tenant/${tenant.id}/members`)
             .set('Authorization', `Bearer ${accessToken}`)
             .set('Accept', 'application/json');
@@ -170,7 +155,7 @@ describe('e2e tenant', () => {
 
     it(`/PUT Update Member Scope`, async () => {
         const email = "legolas@mail.com";
-        const response = await request(app.getHttpServer())
+        const response = await app.getHttpServer()
             .put(`/api/tenant/${tenant.id}/member/${email}/scope`)
             .set('Authorization', `Bearer ${accessToken}`)
             .send({
@@ -184,7 +169,7 @@ describe('e2e tenant', () => {
 
     it(`/DELETE Remove Members`, async () => {
         const email = "legolas@mail.com";
-        const response = await request(app.getHttpServer())
+        const response = await app.getHttpServer()
             .delete(`/api/tenant/${tenant.id}/member/${email}`)
             .set('Authorization', `Bearer ${accessToken}`)
             .set('Accept', 'application/json');
@@ -196,7 +181,7 @@ describe('e2e tenant', () => {
 
     it(`/DELETE Remove Scope`, async () => {
         const name = "auditor";
-        const response = await request(app.getHttpServer())
+        const response = await app.getHttpServer()
             .delete(`/api/tenant/${tenant.id}/scope/${name}`)
             .set('Authorization', `Bearer ${accessToken}`)
             .set('Accept', 'application/json');
@@ -207,7 +192,7 @@ describe('e2e tenant', () => {
     });
 
     it(`/DELETE Remove Tenant`, async () => {
-        const response = await request(app.getHttpServer())
+        const response = await app.getHttpServer()
             .delete(`/api/tenant/${tenant.id}`)
             .set('Authorization', `Bearer ${accessToken}`)
             .set('Accept', 'application/json');
@@ -218,7 +203,7 @@ describe('e2e tenant', () => {
     });
 
     it(`/GET All Tenant`, async () => {
-        const response = await request(app.getHttpServer())
+        const response = await app.getHttpServer()
             .get(`/api/tenant`)
             .set('Authorization', `Bearer ${accessToken}`)
             .set('Accept', 'application/json');
@@ -233,8 +218,5 @@ describe('e2e tenant', () => {
         expect(response.body[0].domain).toBeDefined();
     });
 
-    afterAll(async () => {
-        await app.close();
-    });
 });
 
