@@ -1,62 +1,6 @@
 <div id="app">
     <p-toast position="bottom-right"></p-toast>
-    <nav *ngIf="isLoggedIn" class="navbar navbar-expand-lg navbar-dark bg-dark " ngbNav>
-        <a class="navbar-brand" href="javascript:void(0)" routerLink="/home">
-            <img alt="" class="rounded-circle mx-2" height="30" src="/assets/logo-img.jpg" width="30">
-            My Identity
-        </a>
-        <button aria-controls="navbarSupportedContent"
-                aria-expanded="false"
-                aria-label="Toggle navigation"
-                class="navbar-toggler"
-                data-bs-target="#navbarSupportedContent"
-                data-bs-toggle="collapse"
-                type="button">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav">
-                <li *ngIf="this.isSuperAdmin" [ngbNavItem]="1">
-                    <a class="text-white mt-1" href="javascript:void(0)" ngbNavLink routerLink="/users">
-                        Users
-                    </a>
-                </li>
-                <li *ngIf="this.isSuperAdmin" [ngbNavItem]="2">
-                    <a class="text-white mt-1" href="javascript:void(0)" ngbNavLink routerLink="/tenants">
-                        Tenants
-                    </a>
-                </li>
-                <li class="nav-item" ngbDropdown placement="bottom-left">
-                    <a class="text-white nav-link mt-1"
-                       id="dropdownUser1"
-                       ngbDropdownToggle>
-                        <svg class="bi me-2" height="16" width="16">
-                            <use xlink:href="#home"></use>
-                        </svg>
-                        <span class="mt-1">{{email}}</span>
-                    </a>
-                    <div aria-labelledby="dropdownUser1"
-                         class="dropdown-menu dropdown-menu-dark text-small shadow" ngbDropdownMenu>
-                        <a href="#" ngbDropdownItem>Settings</a>
-                        <a href="javascript:void(0)"
-                           ngbDropdownItem
-                           routerLink="/profile">Profile</a>
-                        <hr class="dropdown-divider">
-                        <a (click)="logout()" href="javascript:void(0)" ngbDropdownItem>
-                            Sign Out
-                        </a>
-                    </div>
-
-                </li>
-            </ul>
-        </div>
-    </nav>
-
-    <!-- Page content-->
-    <div class="container">
-
-        <router-outlet></router-outlet>
-    </div>
+    <router-outlet></router-outlet>
 </div>
 
 

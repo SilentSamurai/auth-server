@@ -1,4 +1,4 @@
-import {NgModule} from '@angular/core';
+import {CUSTOM_ELEMENTS_SCHEMA, NgModule} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {HttpClientModule} from '@angular/common/http';
@@ -18,17 +18,23 @@ import {UserModule} from "./board-user/user.module";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {ToastModule} from "primeng/toast";
 import {MessageService} from "primeng/api";
+import {ApiDocsComponent} from "./api-docs/api-docs.component";
+import {NavBarModule} from "./nav-bar/nav-bar.module";
+import {RouterModule} from "@angular/router";
 
 @NgModule({
+    schemas: [CUSTOM_ELEMENTS_SCHEMA],
     declarations: [
         AppComponent,
         LoginComponent,
         RegisterComponent,
         HomeComponent,
-        ProfileComponent
+        ProfileComponent,
+        ApiDocsComponent
     ],
     imports: [
         BrowserModule,
+        RouterModule,
         AppRoutingModule,
         FormsModule,
         HttpClientModule,
@@ -38,9 +44,11 @@ import {MessageService} from "primeng/api";
         UserModule,
         BrowserAnimationsModule,
         ReactiveFormsModule,
-        ToastModule
+        ToastModule,
+        NavBarModule
     ],
     providers: [authInterceptorProviders, NgbDropdown, MessageService],
+    exports: [],
     bootstrap: [AppComponent]
 })
 export class AppModule {
