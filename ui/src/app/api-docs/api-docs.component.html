@@ -1,629 +1,106 @@
-<div class="menu">
-    <div class="title">
-        <span>Identity Server</span>
-    </div>
-    <div class="navbar">
-        <ul>
-            <li><a (click)="scroll(signup)" href="javascript:void(0)">Sign Up</a></li>
-            <li><a href="#signdown">Sign Down</a></li>
-            <li><a href="#signin">Sign In</a></li>
-            <li><a href="#verify">Verify</a></li>
-            <li><a href="#forgotPassword">Forgot Password</a></li>
-            <li><a href="#resetPassword">Reset Password</a></li>
-            <li><a href="#getMyUser">Get My User</a></li>
-            <li><a href="#getUser">Get User</a></li>
-            <li><a href="#getUsers">Get Users</a></li>
-            <li><a href="#getMyAvatar">Get My Avatar</a></li>
-            <li><a href="#getAvatar">Get Avatar</a></li>
-            <li><a href="#updateMyUsername">Update My Username</a></li>
-            <li><a href="#updateUsername">Update Username</a></li>
-            <li><a href="#updateMyEmail">Update My Email</a></li>
-            <li><a href="#changeEmail">Change Email</a></li>
-            <li><a href="#updateMyPassword">Update My Password</a></li>
-            <li><a href="#updateMyAvatar">Update My Avatar</a></li>
-            <li><a href="#updateAvatar">Update Avatar</a></li>
-            <li><a href="#updateMyName">Update My Name</a></li>
-            <li><a href="#updateName">Update Name</a></li>
-            <li><a href="#updateMySurname">Update My Surname</a></li>
-            <li><a href="#updateSurname">Update Surname</a></li>
-            <li><a href="#updateMyBirthdate">Update My Birthdate</a></li>
-            <li><a href="#updateBirthdate">Update Birthdate</a></li>
-            <li><a href="#deleteUser">Delete User</a></li>
-            <li><a href="#errors">Errors</a></li>
-        </ul>
-    </div>
-</div>
+<div class="container-fluid">
+    <div class="row row-height">
+        <div class="col-md-3 left">
+            <div class="m-4 ">
+                <h2 class="mx-2">🌐 Identity API</h2>
+            </div>
+            <div class="navbar">
+                <ul class="">
 
-<div class="content-page">
-    <div class="content">
-
-
-        <!-- API -->
-        <div id="api" class="content-section mt-4">
-            <h1>🌐 Identity API</h1>
-            <p>
-                Auth Server is a general-purpose HTTP-based authentication and authorization server.
-            </p>
-            <p>
-                The authentication method used to make requests is <a href="https://jwt.io/" target="_blank">JSON Web
-                Token</a>. After a successful registration and email verification users can request authorization to
-                resources using their credentials. Then the server responds with an access token.
-            </p>
-            <span class="mx-4">
-                <code>
-                    <pre>{{JWT_STRUCTURE | json}}</pre>
-                </code>
-            </span>
-            <p>
-                The client must send the token in the <span class="highlight">Authorization</span> header when making
-                protected requests.
-            </p>
-            <p>
-                <code ngNonBindable>Authorization: Bearer {{access_token}}</code>
-            </p>
-            <br/>
+                    <li *ngFor="let api of APIS">
+                        <a (click)="scroll(api.id)" href="javascript:void(0)">{{api.title}}</a>
+                    </li>
+                </ul>
+            </div>
         </div>
 
-        <!-- Sign Up -->
-        <div id="signup" #signup class="content-section">
-            <div class="post">/signup</div>
-            <p>Sign up to the server.<br></p>
-            <br>
+        <div class="col-md-9 right">
+            <div class="content mx-4">
 
-            <h3>
-                Request
-                <span class="json"></span>
-                <span class="public"></span>
-            </h3>
-            <table>
-                <thead>
-                <tr>
-                    <th>Field</th>
-                    <th>Type</th>
-                    <th>Description</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>username</td>
-                    <td>string</td>
-                    <td class="required">The user's username.</td>
-                </tr>
-                <tr>
-                    <td>email</td>
-                    <td>string</td>
-                    <td class="required">The user's email.</td>
-                </tr>
-                <tr>
-                    <td>password</td>
-                    <td>string</td>
-                    <td class="required">The user's password.</td>
-                </tr>
-                <tr>
-                    <td>avatar</td>
-                    <td>string</td>
-                    <td>The user's avatar URL.</td>
-                </tr>
-                <tr>
-                    <td>name</td>
-                    <td>string</td>
-                    <td>The user's name.</td>
-                </tr>
-                <tr>
-                    <td>surname</td>
-                    <td>string</td>
-                    <td>The user's surname.</td>
-                </tr>
-                <tr>
-                    <td>birthdate</td>
-                    <td>string</td>
-                    <td>The user's birthdate (yyyy-MM-dd).</td>
-                </tr>
-                </tbody>
-            </table>
-            <br>
+                <h2 class="my-4">Api Documentation</h2>
 
-            <h3 class="json">Response</h3>
-            <table>
-                <thead>
-                <tr>
-                    <th>Field</th>
-                    <th>Type</th>
-                    <th>Description</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>username</td>
-                    <td>string</td>
-                    <td>The user's username.</td>
-                </tr>
-                <tr>
-                    <td>email</td>
-                    <td>string</td>
-                    <td>The user's email.</td>
-                </tr>
-                <tr>
-                    <td>avatar</td>
-                    <td>string</td>
-                    <td>The user's avatar URL.</td>
-                </tr>
-                <tr>
-                    <td>name</td>
-                    <td>string</td>
-                    <td>The user's name.</td>
-                </tr>
-                <tr>
-                    <td>surname</td>
-                    <td>string</td>
-                    <td>The user's surname.</td>
-                </tr>
-                <tr>
-                    <td>birthdate</td>
-                    <td>string</td>
-                    <td>The user's birthdate (yyyy-MM-dd).</td>
-                </tr>
-                </tbody>
-            </table>
-            <br>
+                <!-- API -->
+                <div class="content-section mt-4" id="api">
+
+                    <p>
+                        Auth Server is a general-purpose HTTP-based authentication and authorization server.
+                    </p>
+                    <p>
+                        The authentication method used to make requests is <a href="https://jwt.io/" target="_blank">JSON
+                        Web
+                        Token</a>. After a successful registration and email verification users can request
+                        authorization to
+                        resources using their credentials. Then the server responds with an access token.
+                    </p>
+                    <span class="mx-4">
+                        <pre class="rounded-2"><code class="lang-json">{{ JWT_STRUCTURE | json }}</code></pre>
+                    </span>
+                    <p>
+                        The client must send the token in the <span class="highlight">Authorization</span> header when
+                        making
+                        protected requests.
+                    </p>
+                    <p>
+                        <code ngNonBindable>Authorization: Bearer {{access_token}}</code>
+                    </p>
+                    <br/>
+                </div>
+
+                <div #{{api.id}} *ngFor="let api of APIS" class="content-section" id="{{api.id}}">
+                    <span class="h4">{{api.title}}</span>
+                    <div [class]="{'post': api.method === 'POST'}">{{api.path}}</div>
+                    <p>{{api.description}}<br></p>
+
+                    <div>
+                        <h3>
+                            Request
+                            <span class="json"></span>
+                            <span class="public"></span>
+                        </h3>
+                        <h3 *ngIf="api.request.parameters != null && api.request.parameters.length > 0">Parameters</h3>
+                        <table *ngIf="api.request.parameters != null && api.request.parameters.length > 0">
+                            <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                            </tr>
+                            </thead>
+                            <tbody *ngIf="api.request.parameters != null && api.request.parameters.length > 0">
+                            <tr *ngFor="let params of api.request.parameters">
+                                <td>{{params.name}}</td>
+                                <td>{{params.type}}</td>
+                                <td [class]="{'required': params.required}">{{params.description}}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                        <h3>Body</h3>
+                        <div>
+                            <pre class="rounded-2"><code class="lang-json">{{ api.request.body | json }}</code></pre>
+                        </div>
+                    </div>
+                    <br>
+                    <div>
+                        <h3>
+                            Response
+                            <span class="json"></span>
+                        </h3>
+                        <h3>Body</h3>
+                        <div>
+                            <pre class="rounded-2"><code class="lang-json">{{ api.response.body | json }}</code></pre>
+                        </div>
+                    </div>
+
+                    <br>
+                    <br>
+                </div>
+
+
+            </div>
         </div>
-
-        <!-- Sign Down -->
-        <div id="signdown" class="content-section">
-            <div class="post">/signdown</div>
-            <p>Sign down from the server.<br></p>
-            <br>
-
-            <h3>
-                Request
-                <span class="json"></span>
-                <span class="protected"></span>
-                <span class="role">user / admin</span>
-            </h3>
-            <table>
-                <thead>
-                <tr>
-                    <th>Field</th>
-                    <th>Type</th>
-                    <th>Description</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>password</td>
-                    <td>string</td>
-                    <td class="required">The user's password.</td>
-                </tr>
-                </tbody>
-            </table>
-            <br>
-
-            <h3 class="json">Response</h3>
-            <table>
-                <thead>
-                <tr>
-                    <th>Field</th>
-                    <th>Type</th>
-                    <th>Description</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>username</td>
-                    <td>string</td>
-                    <td>The user's username.</td>
-                </tr>
-                <tr>
-                    <td>email</td>
-                    <td>string</td>
-                    <td>The user's email.</td>
-                </tr>
-                <tr>
-                    <td>avatar</td>
-                    <td>string</td>
-                    <td>The user's avatar URL.</td>
-                </tr>
-                <tr>
-                    <td>name</td>
-                    <td>string</td>
-                    <td>The user's name.</td>
-                </tr>
-                <tr>
-                    <td>surname</td>
-                    <td>string</td>
-                    <td>The user's surname.</td>
-                </tr>
-                <tr>
-                    <td>birthdate</td>
-                    <td>string</td>
-                    <td>The user's birthdate (yyyy-MM-dd).</td>
-                </tr>
-                <tr>
-                    <td>roles</td>
-                    <td>string[]</td>
-                    <td>The user's roles.</td>
-                </tr>
-                </tbody>
-            </table>
-            <br>
-        </div>
-
-        <!-- Sign In -->
-        <div id="signin" class="content-section">
-            <div class="post">/signin</div>
-            <p>Sign in authenticating with email and password.<br></p>
-            <br>
-
-            <h3>
-                Request
-                <span class="json"></span>
-                <span class="public"></span>
-            </h3>
-            <table>
-                <thead>
-                <tr>
-                    <th>Field</th>
-                    <th>Type</th>
-                    <th>Description</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>email</td>
-                    <td>string</td>
-                    <td class="required">The user's email.</td>
-                </tr>
-                <tr>
-                    <td>password</td>
-                    <td>string</td>
-                    <td class="required">The user's password.</td>
-                </tr>
-                </tbody>
-            </table>
-            <br>
-
-            <h3 class="json">Response</h3>
-            <table>
-                <thead>
-                <tr>
-                    <th>Field</th>
-                    <th>Type</th>
-                    <th>Description</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>token</td>
-                    <td>string</td>
-                    <td class="key">The token used to make protected requests.</td>
-                </tr>
-                </tbody>
-            </table>
-            <br>
-        </div>
-
-        <!-- Verify -->
-        <div id="verify" class="content-section">
-            <div class="get">/verify/:token</div>
-            <p>Verify the user's email.<br></p>
-            <br>
-
-            <h3>
-                Request
-                <span class="public"></span>
-            </h3>
-            <p>This request doesn't have a body.</p>
-            <br>
-
-            <h3 class="json">Response</h3>
-            <table>
-                <thead>
-                <tr>
-                    <th>Field</th>
-                    <th>Type</th>
-                    <th>Description</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>status</td>
-                    <td>boolean</td>
-                    <td>The response status.</td>
-                </tr>
-                </tbody>
-            </table>
-            <br>
-        </div>
-
-        <!-- Forgot Password -->
-        <div id="forgotPassword" class="content-section">
-            <div class="post">/forgot-password</div>
-            <p>Request the server an email to reset the password.<br></p>
-            <br>
-
-            <h3>
-                Request
-                <span class="json"></span>
-                <span class="public"></span>
-            </h3>
-            <table>
-                <thead>
-                <tr>
-                    <th>Field</th>
-                    <th>Type</th>
-                    <th>Description</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>email</td>
-                    <td>string</td>
-                    <td class="required">The user's email.</td>
-                </tr>
-                </tbody>
-            </table>
-            <br>
-
-            <h3 class="json">Response</h3>
-            <table>
-                <thead>
-                <tr>
-                    <th>Field</th>
-                    <th>Type</th>
-                    <th>Description</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>status</td>
-                    <td>boolean</td>
-                    <td>The response status.</td>
-                </tr>
-                </tbody>
-            </table>
-            <br>
-        </div>
-
-        <!-- Reset Password -->
-        <div id="resetPassword" class="content-section">
-            <div class="post">/reset-password/:token</div>
-            <p>Reset the user's password.<br></p>
-            <br>
-
-            <h3>
-                Request
-                <span class="json"></span>
-                <span class="public"></span>
-            </h3>
-            <table>
-                <thead>
-                <tr>
-                    <th>Field</th>
-                    <th>Type</th>
-                    <th>Description</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>password</td>
-                    <td>string</td>
-                    <td class="required">The new user's password.</td>
-                </tr>
-                </tbody>
-            </table>
-            <br>
-
-            <h3 class="json">Response</h3>
-            <table>
-                <thead>
-                <tr>
-                    <th>Field</th>
-                    <th>Type</th>
-                    <th>Description</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>status</td>
-                    <td>boolean</td>
-                    <td>The response status.</td>
-                </tr>
-                </tbody>
-            </table>
-            <br>
-        </div>
-
-        <!-- Get My User -->
-        <div id="getMyUser" class="content-section">
-            <div class="get">/users/me</div>
-            <p>Get my user's data.<br></p>
-            <br>
-
-            <h3>
-                Request
-                <span class="protected"></span>
-                <span class="role">user / admin</span>
-            </h3>
-            <p>This request doesn't have a body.</p>
-            <br>
-
-            <h3 class="json">Response</h3>
-            <table>
-                <thead>
-                <tr>
-                    <th>Field</th>
-                    <th>Type</th>
-                    <th>Description</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>username</td>
-                    <td>string</td>
-                    <td>The user's username.</td>
-                </tr>
-                <tr>
-                    <td>email</td>
-                    <td>string</td>
-                    <td>The user's email.</td>
-                </tr>
-                <tr>
-                    <td>avatar</td>
-                    <td>string</td>
-                    <td>The user's avatar URL.</td>
-                </tr>
-                <tr>
-                    <td>name</td>
-                    <td>string</td>
-                    <td>The user's name.</td>
-                </tr>
-                <tr>
-                    <td>surname</td>
-                    <td>string</td>
-                    <td>The user's surname.</td>
-                </tr>
-                <tr>
-                    <td>birthdate</td>
-                    <td>string</td>
-                    <td>The user's birthdate (yyyy-MM-dd).</td>
-                </tr>
-                <tr>
-                    <td>roles</td>
-                    <td>string[]</td>
-                    <td>The user's roles.</td>
-                </tr>
-                </tbody>
-            </table>
-            <br>
-        </div>
-
-        <!-- Get User -->
-        <div id="getUser" class="content-section">
-            <div class="get">/users/:username</div>
-            <p>Get the user's data.<br></p>
-            <br>
-
-            <h3>
-                Request
-                <span class="protected"></span>
-                <span class="role">admin</span>
-            </h3>
-            <p>This request doesn't have a body.</p>
-            <br>
-
-            <h3 class="json">Response</h3>
-            <table>
-                <thead>
-                <tr>
-                    <th>Field</th>
-                    <th>Type</th>
-                    <th>Description</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>username</td>
-                    <td>string</td>
-                    <td>The user's username.</td>
-                </tr>
-                <tr>
-                    <td>email</td>
-                    <td>string</td>
-                    <td>The user's email.</td>
-                </tr>
-                <tr>
-                    <td>avatar</td>
-                    <td>string</td>
-                    <td>The user's avatar URL.</td>
-                </tr>
-                <tr>
-                    <td>name</td>
-                    <td>string</td>
-                    <td>The user's name.</td>
-                </tr>
-                <tr>
-                    <td>surname</td>
-                    <td>string</td>
-                    <td>The user's surname.</td>
-                </tr>
-                <tr>
-                    <td>birthdate</td>
-                    <td>string</td>
-                    <td>The user's birthdate (yyyy-MM-dd).</td>
-                </tr>
-                <tr>
-                    <td>roles</td>
-                    <td>string[]</td>
-                    <td>The user's roles.</td>
-                </tr>
-                </tbody>
-            </table>
-            <br>
-        </div>
-
-        <!-- Get Users -->
-        <div id="getUsers" class="content-section">
-            <div class="get">/users/</div>
-            <p>Get all the users' data.<br></p>
-            <br>
-
-            <h3>
-                Request
-                <span class="protected"></span>
-                <span class="role">admin</span>
-            </h3>
-            <p>This request doesn't have a body.</p>
-            <br>
-
-            <h3 class="json">Response</h3>
-            <table>
-                <thead>
-                <tr>
-                    <th>Field</th>
-                    <th>Type</th>
-                    <th>Description</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>username</td>
-                    <td>string</td>
-                    <td>The user's username.</td>
-                </tr>
-                <tr>
-                    <td>email</td>
-                    <td>string</td>
-                    <td>The user's email.</td>
-                </tr>
-                <tr>
-                    <td>avatar</td>
-                    <td>string</td>
-                    <td>The user's avatar URL.</td>
-                </tr>
-                <tr>
-                    <td>name</td>
-                    <td>string</td>
-                    <td>The user's name.</td>
-                </tr>
-                <tr>
-                    <td>surname</td>
-                    <td>string</td>
-                    <td>The user's surname.</td>
-                </tr>
-                <tr>
-                    <td>birthdate</td>
-                    <td>string</td>
-                    <td>The user's birthdate (yyyy-MM-dd).</td>
-                </tr>
-                <tr>
-                    <td>roles</td>
-                    <td>string[]</td>
-                    <td>The user's roles.</td>
-                </tr>
-                </tbody>
-            </table>
-            <br>
-        </div>
-
     </div>
 </div>
+
+

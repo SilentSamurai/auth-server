@@ -18,7 +18,6 @@
 :root {
     --background-color: hsla(210, 24.1%, 11.4%, 1);
     --code-color: hsla(185, 100%, 98%, 0.07);
-    --code-font: 'Source Code Pro', monospace;
     --font: 'Roboto', sans-serif;
     --font-color: hsla(180, 46%, 89%, 1);
     --highlight-color: hsla(0, 0%, 0%, 0.2);
@@ -28,140 +27,20 @@
     --table-header-color: hsla(189, 30%, 36%, 1);
 }
 
-* {
-    /* Style */
-    transition: all 0.25s ease;
-    -moz-transition: all 0.25s ease;
-    -ms-transition: all 0.25s ease;
-    -o-transition: all 0.25s ease;
-    -webkit-transition: all 0.25s ease;
+.row-height {
+    height: 100vh;
 }
 
-html,
-body {
-    /* Position */
-    position: relative;
-
-    /* Size */
-    min-height: 100%;
+.left {
     height: 100%;
-
-    /* Space */
-    margin: 0;
-    padding: 0;
-
-    /* Text */
-    font-family: var(--font);
-
-    /* Style */
-    background-color: var(--background-color);
-    color: var(--font-color);
-    scroll-behavior: smooth;
+    overflow-y: scroll;
 }
 
-a {
-    /* Text */
-    text-decoration: none;
-
-    /* Style */
-    color: hsla(196, 100%, 45%, 1);
+.right {
+    height: 100%;
+    overflow-y: scroll;
 }
 
-a:hover {
-    /* Text */
-    font-style: bold;
-
-    /* Style */
-    color: hsla(196, 100%, 65%, 1);
-}
-
-code,
-pre {
-    /* Layout */
-    display: inline-block;
-
-    /* Size */
-    width: 100%;
-
-    /* Space */
-    padding: 8px;
-
-    /* Text */
-    font-family: var(--code-font);
-
-    /* Style */
-    background-color: var(--code-color);
-    border-radius: 3px;
-}
-
-.highlight {
-    /* Space */
-    padding: 3px;
-
-    /* Text */
-    font-family: var(--code-font);
-
-    /* Style */
-    background-color: var(--highlight-color);
-    border-radius: 4px;
-}
-
-/* 2. Menu */
-
-.menu {
-    /* Position */
-    position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    z-index: 3;
-
-    /* Size */
-    box-sizing: border-box;
-    width: 300px;
-
-    /* Text */
-    font-size: 18px;
-
-    /* Style */
-    background-color: var(--background-color);
-    overflow-x: hidden;
-}
-
-.title {
-    /* Layout */
-    display: block;
-
-    /* Position */
-    position: relative;
-
-    /* Size */
-    box-sizing: border-box;
-    width: 100%;
-
-    /* Space */
-    padding-top: 1.5em;
-    padding-bottom: 10px;
-    padding-left: 20px;
-}
-
-.title span {
-    /* Layout */
-    display: inline-block;
-
-    /* Position */
-    vertical-align: middle;
-
-    /* Space */
-    margin-left: 10px;
-
-    /* Text */
-    font-family: 'Roboto Condensed', sans-serif;
-    font-size: 1.75em;
-
-    /* Style */
-    color: var(--title-color);
-}
 
 .navbar ul {
     /* Space */
@@ -170,6 +49,22 @@ pre {
 
     /* List */
     list-style: none;
+
+    a {
+        /* Text */
+        text-decoration: none;
+
+        /* Style */
+        color: hsla(196, 100%, 45%, 1);
+    }
+
+    a:hover {
+        /* Text */
+        font-style: bold;
+
+        /* Style */
+        color: hsla(196, 100%, 65%, 1);
+    }
 }
 
 .navbar ul li {
@@ -209,6 +104,18 @@ pre {
     color: hsla(180, 1%, 47%, 1);
 }
 
+.highlight {
+    /* Space */
+    padding: 3px;
+
+    /* Style */
+    background-color: var(--highlight-color);
+    border-radius: 4px;
+}
+
+/* 2. Menu */
+
+
 /* 3. Content */
 
 .content-page {
@@ -217,11 +124,10 @@ pre {
 
     /* Size */
     box-sizing: border-box;
-    min-height: 100%;
+    /*min-height: 100%;*/
 
     /* Space */
-    margin-left: 300px;
-    padding-bottom: 1px;
+    /*margin-left: 300px;*/
 
     /* Style */
     background-color: var(--background-color);
@@ -244,7 +150,7 @@ pre {
     max-width: 100%;
 
     /* Space */
-    padding: 0 28px;
+    /*padding: 0 28px;*/
 }
 
 .content h1,
@@ -328,12 +234,14 @@ pre {
 /* 4. Badges */
 
 .post {
+    margin-top: 0.5rem !important;
+    margin-bottom: 0.5rem !important;
     /* Space */
-    margin: 10px;
+    /*margin: 10px;*/
     padding: 10px;
 
     /* Text */
-    font-family: var(--code-font);
+    font-family: var(--bs-font-monospace);
 
     /* Style */
     background-color: hsla(115, 98%, 62%, 0.3);
@@ -347,7 +255,7 @@ pre {
     padding: 6px 15px;
 
     /* Text */
-    font-family: var(--code-font);
+    font-family: var(--bs-font-monospace);
     font-size: 14px;
     font-weight: 700;
     text-align: center;
@@ -362,11 +270,12 @@ pre {
 
 .get {
     /* Space */
-    margin: 10px;
+    margin-top: 0.5rem !important;
+    margin-bottom: 0.5rem !important;
     padding: 10px;
 
     /* Text */
-    font-family: var(--code-font);
+    font-family: var(--bs-font-monospace);
 
     /* Style */
     background-color: hsla(204, 98%, 62%, 0.3);
@@ -380,7 +289,7 @@ pre {
     padding: 6px 15px;
 
     /* Text */
-    font-family: var(--code-font);
+    font-family: var(--bs-font-monospace);
     font-size: 14px;
     font-weight: 700;
     text-align: center;
@@ -395,11 +304,12 @@ pre {
 
 .put {
     /* Space */
-    margin: 10px;
+    margin-top: 0.5rem !important;
+    margin-bottom: 0.5rem !important;
     padding: 10px;
 
     /* Text */
-    font-family: var(--code-font);
+    font-family: var(--bs-font-monospace);
 
     /* Style */
     background-color: hsla(27, 98%, 62%, 0.3);
@@ -413,7 +323,7 @@ pre {
     padding: 6px 15px;
 
     /* Text */
-    font-family: var(--code-font);
+    font-family: var(--bs-font-monospace);
     font-size: 14px;
     font-weight: 700;
     text-align: center;
@@ -428,11 +338,12 @@ pre {
 
 .patch {
     /* Space */
-    margin: 10px;
+    margin-top: 0.5rem !important;
+    margin-bottom: 0.5rem !important;
     padding: 10px;
 
     /* Text */
-    font-family: var(--code-font);
+    font-family: var(--bs-font-monospace);
 
     /* Style */
     background-color: hsla(27, 98%, 62%, 0.3);
@@ -446,7 +357,7 @@ pre {
     padding: 6px 15px;
 
     /* Text */
-    font-family: var(--code-font);
+    font-family: var(--bs-font-monospace);
     font-size: 14px;
     font-weight: 700;
     text-align: center;
@@ -461,11 +372,12 @@ pre {
 
 .delete {
     /* Space */
-    margin: 10px;
+    margin-top: 0.5rem !important;
+    margin-bottom: 0.5rem !important;
     padding: 10px;
 
     /* Text */
-    font-family: var(--code-font);
+    font-family: var(--bs-font-monospace);
 
     /* Style */
     background-color: hsla(0, 98%, 62%, 0.3);
@@ -479,7 +391,7 @@ pre {
     padding: 6px 15px;
 
     /* Text */
-    font-family: var(--code-font);
+    font-family: var(--bs-font-monospace);
     font-size: 14px;
     font-weight: 700;
     text-align: center;
@@ -494,11 +406,12 @@ pre {
 
 .websocket {
     /* Space */
-    margin: 10px;
+    margin-top: 0.5rem !important;
+    margin-bottom: 0.5rem !important;
     padding: 10px;
 
     /* Text */
-    font-family: var(--code-font);
+    font-family: var(--bs-font-monospace);
 
     /* Style */
     background-color: hsla(24, 100%, 50%, 0.3);
@@ -512,7 +425,7 @@ pre {
     padding: 6px 15px;
 
     /* Text */
-    font-family: var(--code-font);
+    font-family: var(--bs-font-monospace);
     font-size: 14px;
     font-weight: 700;
     text-align: center;
@@ -527,11 +440,12 @@ pre {
 
 .json::after {
     /* Space */
-    margin-left: 10px;
+    margin-top: 0.5rem !important;
+    margin-bottom: 0.5rem !important;
     padding: 5px 5px;
 
     /* Text */
-    font-family: var(--code-font);
+    font-family: var(--bs-font-monospace);
     font-size: 12px;
     font-weight: 700;
     text-align: center;
@@ -543,7 +457,7 @@ pre {
     border-color: hsla(24, 82%, 46%, 1);
     border-radius: 3px;
     color: var(--font-color);
-    content: "json";
+    content: "application/json";
 }
 
 .public::after {
@@ -552,7 +466,7 @@ pre {
     padding: 5px 5px;
 
     /* Text */
-    font-family: var(--code-font);
+    font-family: var(--bs-font-monospace);
     font-size: 12px;
     font-weight: 700;
     text-align: center;
@@ -573,7 +487,7 @@ pre {
     padding: 5px 5px;
 
     /* Text */
-    font-family: var(--code-font);
+    font-family: var(--bs-font-monospace);
     font-size: 12px;
     font-weight: 700;
     text-align: center;
@@ -594,7 +508,7 @@ pre {
     padding: 3px 3px;
 
     /* Text */
-    font-family: var(--code-font);
+    font-family: var(--bs-font-monospace);
     font-size: 12px;
     font-weight: 700;
     text-align: center;
@@ -615,7 +529,7 @@ pre {
     padding: 3px 3px;
 
     /* Text */
-    font-family: var(--code-font);
+    font-family: var(--bs-font-monospace);
     font-size: 10px;
     font-weight: 700;
     text-align: center;
@@ -644,7 +558,7 @@ pre {
     padding: 5px 5px;
 
     /* Text */
-    font-family: var(--code-font);
+    font-family: var(--bs-font-monospace);
     font-size: 12px;
     font-weight: 700;
     text-align: center;
@@ -660,22 +574,6 @@ pre {
 
 /* 5. Responsive */
 
-@media only screen and (max-width: 680px) {
-    .menu {
-        /* Position */
-        position: relative;
-
-        /* Size */
-        width: auto;
-    }
-
-    .menu .navbar {
-        /* Layout */
-        display: none;
-    }
-
-    .content-page {
-        /* Space */
-        margin-left: 0;
-    }
+.token.tag {
+    color: #e06c75;
 }
