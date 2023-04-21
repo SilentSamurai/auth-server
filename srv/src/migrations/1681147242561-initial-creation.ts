@@ -4,6 +4,9 @@ export class CreateInitialTables1681147242561 implements MigrationInterface {
 
     public async up(queryRunner: QueryRunner): Promise<void> {
 
+        const DB_STRING_TYPE = "VARCHAR";
+        const DB_UUID_GENERATOR = "uuid_generate_v4()";
+
         // User table
         await queryRunner.createTable(
             new Table({
@@ -11,24 +14,25 @@ export class CreateInitialTables1681147242561 implements MigrationInterface {
                 columns: [
                     {
                         name: "id",
-                        type: "nvarchar",
+                        type: DB_STRING_TYPE,
                         length: "36",
                         generationStrategy: "uuid",
                         isPrimary: true,
+                        default: DB_UUID_GENERATOR
                     },
                     {
                         name: "name",
-                        type: "nvarchar",
+                        type: DB_STRING_TYPE,
                         isNullable: false
                     },
                     {
                         name: "password",
-                        type: "nvarchar",
+                        type: DB_STRING_TYPE,
                         isNullable: false
                     },
                     {
                         name: "email",
-                        type: "nvarchar",
+                        type: DB_STRING_TYPE,
                         isUnique: true,
                         isNullable: false
                     },
@@ -54,41 +58,47 @@ export class CreateInitialTables1681147242561 implements MigrationInterface {
                 columns: [
                     {
                         name: "id",
-                        type: "nvarchar",
+                        type: DB_STRING_TYPE,
                         length: "36",
                         generationStrategy: "uuid",
                         isPrimary: true,
+                        default: DB_UUID_GENERATOR
                     },
                     {
                         name: "name",
-                        type: "nvarchar",
+                        type: DB_STRING_TYPE,
                         isNullable: false
                     },
                     {
                         name: "domain",
-                        type: "nvarchar",
+                        type: DB_STRING_TYPE,
                         isUnique: true,
                         isNullable: false
                     },
                     {
                         name: "client_id",
-                        type: "nvarchar",
+                        type: DB_STRING_TYPE,
                         isUnique: true,
                         isNullable: false
                     },
                     {
                         name: "client_secret",
-                        type: "nvarchar",
+                        type: DB_STRING_TYPE,
+                        isNullable: false
+                    },
+                    {
+                        name: "secret_salt",
+                        type: DB_STRING_TYPE,
                         isNullable: false
                     },
                     {
                         name: "private_key",
-                        type: "nvarchar",
+                        type: DB_STRING_TYPE,
                         isNullable: false
                     },
                     {
                         name: "public_key",
-                        type: "nvarchar",
+                        type: DB_STRING_TYPE,
                         isNullable: false
                     },
                     {
@@ -107,19 +117,20 @@ export class CreateInitialTables1681147242561 implements MigrationInterface {
                 columns: [
                     {
                         name: "id",
-                        type: "nvarchar",
+                        type: DB_STRING_TYPE,
                         length: "36",
                         generationStrategy: "uuid",
                         isPrimary: true,
+                        default: DB_UUID_GENERATOR
                     },
                     {
                         name: "name",
-                        type: "nvarchar",
+                        type: DB_STRING_TYPE,
                         isNullable: false
                     },
                     {
                         name: "tenant_id",
-                        type: "nvarchar",
+                        type: DB_STRING_TYPE,
                         length: "36",
                         isNullable: false
                     },
@@ -153,27 +164,16 @@ export class CreateInitialTables1681147242561 implements MigrationInterface {
                 columns: [
                     {
                         name: "tenant_id",
-                        type: "nvarchar",
+                        type: DB_STRING_TYPE,
                         length: "36",
                         isNullable: false
                     },
                     {
                         name: "user_id",
-                        type: "nvarchar",
+                        type: DB_STRING_TYPE,
                         length: "36",
                         isNullable: false
-                    },
-                    {
-                        name: "refresh_token",
-                        type: "nvarchar",
-                        length: "40",
-                        isNullable: true
-                    },
-                    {
-                        name: "refreshed_at",
-                        type: "timestamp",
-                        isNullable: true
-                    },
+                    }
                 ],
                 uniques: [
                     {
@@ -210,19 +210,19 @@ export class CreateInitialTables1681147242561 implements MigrationInterface {
                 columns: [
                     {
                         name: "tenant_id",
-                        type: "nvarchar",
+                        type: DB_STRING_TYPE,
                         length: "36",
                         isNullable: false
                     },
                     {
                         name: "user_id",
-                        type: "nvarchar",
+                        type: DB_STRING_TYPE,
                         length: "36",
                         isNullable: false
                     },
                     {
                         name: "scope_id",
-                        type: "nvarchar",
+                        type: DB_STRING_TYPE,
                         length: "36",
                         isNullable: false
                     },

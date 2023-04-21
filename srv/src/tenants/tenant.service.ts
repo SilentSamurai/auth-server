@@ -12,7 +12,7 @@ import {ScopeService} from "../scopes/scope.service";
 import {ScopeEnum} from "../scopes/scope.enum";
 import {CryptUtil} from "../util/crypt.util";
 import {TenantMember} from "./tenant.members.entity";
-import * as ms from "ms";
+import {NotFoundException} from "../exceptions/not-found.exception";
 
 @Injectable()
 export class TenantService implements OnModuleInit {
@@ -37,7 +37,7 @@ export class TenantService implements OnModuleInit {
         }
 
         const {privateKey, publicKey} = CryptUtil.generateKeyPair();
-        const {clientId, clientSecret} = CryptUtil.generateClientIdAndSecret();
+        const {clientId, clientSecret, salt} = CryptUtil.generateClientIdAndSecret();
 
 
         let tenant: Tenant = this.tenantRepository.create({
@@ -47,6 +47,7 @@ export class TenantService implements OnModuleInit {
             publicKey: publicKey,
             clientId: clientId,
             clientSecret: clientSecret,
+            secretSalt: salt,
             members: [],
             scopes: []
         });
@@ -71,7 +72,7 @@ export class TenantService implements OnModuleInit {
     async updateKeys(id: string): Promise<Tenant> {
         const tenant: Tenant = await this.findById(id);
         if (!tenant) {
-            throw new ValidationErrorException("tenant id not found");
+            throw new NotFoundException("tenant id not found");
         }
 
         const {privateKey, publicKey} = CryptUtil.generateKeyPair();
@@ -96,7 +97,7 @@ export class TenantService implements OnModuleInit {
             }
         });
         if (tenant === null) {
-            throw new ValidationErrorException("tenant not found");
+            throw new NotFoundException("tenant not found");
         }
         return tenant;
     }
@@ -109,7 +110,7 @@ export class TenantService implements OnModuleInit {
             }
         });
         if (tenant === null) {
-            throw new ValidationErrorException("tenant not found");
+            throw new NotFoundException("tenant not found");
         }
         return tenant;
     }
@@ -122,7 +123,7 @@ export class TenantService implements OnModuleInit {
             }
         });
         if (tenant === null) {
-            throw new ValidationErrorException("tenant not found");
+            throw new NotFoundException("tenant not found");
         }
         return tenant;
     }
@@ -197,7 +198,7 @@ export class TenantService implements OnModuleInit {
             }
         });
         if (tenantMember === null) {
-            throw new ValidationErrorException("user is not a member of this tenant");
+            throw new NotFoundException("user is not a member of this tenant");
         }
         return tenantMember;
     }
@@ -218,7 +219,7 @@ export class TenantService implements OnModuleInit {
         let tenant: Tenant = await this.findById(tenantId);
         const isMember: boolean = await this.isMember(tenantId, user);
         if (!isMember) {
-            throw new ValidationErrorException("user is not a member of this tenant");
+            throw new NotFoundException("user is not a member of this tenant");
         }
         return this.scopeService.updateUserScopes(scopes, tenant, user)
     }
@@ -262,23 +263,6 @@ export class TenantService implements OnModuleInit {
 
     async getTenantScopes(tenant: Tenant): Promise<Scope[]> {
         return this.scopeService.getTenantScopes(tenant);
-    }
-
-    async needRefreshTokenForUser(tenant: Tenant, user: User): Promise<string> {
-        let tenantMember = await this.findMembership(tenant, user);
-
-        if (tenantMember.refreshToken !== null) {
-            let expiredAt = tenantMember.refreshedAt.getTime() + ms(this.configService.get("REFRESH_TOKEN_EXPIRATION_TIME"));
-            if (Date.now() < expiredAt) {
-                return tenantMember.refreshToken;
-            }
-            // console.log(ms(this.configService.get("REFRESH_TOKEN_EXPIRATION_TIME")), tenantMember.refreshedAt.getTime(),
-            //     Date.now(), tenantMember)
-        }
-        tenantMember.refreshToken = CryptUtil.generateRefreshToken();
-        tenantMember.refreshedAt = new Date(Date.now());
-        await this.tenantMemberRepository.save(tenantMember);
-        return tenantMember.refreshToken;
     }
 
 

@@ -17,7 +17,7 @@ export class LoginComponent implements OnInit {
     isLoggedIn = false;
     isLoginFailed = false;
     errorMessage = '';
-    roles: string[] = [];
+    scopes: string[] = [];
 
     constructor(private authService: AuthService,
                 private router: Router,
@@ -27,7 +27,7 @@ export class LoginComponent implements OnInit {
     ngOnInit(): void {
         if (this.tokenStorage.isLoggedIn()) {
             this.isLoggedIn = true;
-            this.roles = this.tokenStorage.getUser().roles;
+            this.scopes = this.tokenStorage.getUser().scopes;
             this.router.navigateByUrl("/home");
         }
     }
@@ -37,11 +37,11 @@ export class LoginComponent implements OnInit {
 
         this.authService.login(email, password, domain).subscribe({
             next: data => {
-                this.tokenStorage.saveToken(data.token);
+                this.tokenStorage.saveToken(data.access_token);
 
                 this.isLoginFailed = false;
                 this.isLoggedIn = true;
-                this.roles = this.tokenStorage.getUser().roles;
+                this.scopes = this.tokenStorage.getUser().scopes;
                 this.reloadPage();
             },
             error: err => {

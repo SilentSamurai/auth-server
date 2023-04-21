@@ -64,16 +64,6 @@ const UpdateMyPasswordSchema = yup.object().shape(
         newPassword: yup.string().required('New password is required').matches(PASSWORD_REGEXP, PASSWORD_MESSAGE)
     });
 
-const UpdateMyAvatarSchema = yup.object().shape(
-    {
-        avatar: yup.string().defined('Avatar is required').url().max(500)
-    });
-
-const UpdateAvatarSchema = yup.object().shape(
-    {
-        avatar: yup.string().defined('Avatar is required').url().max(500)
-    });
-
 const UpdateMyNameSchema = yup.object().shape(
     {
         name: yup.string().defined('Name is required').max(15)
@@ -172,20 +162,64 @@ const ClientCredentialGrantSchema = yup.object().shape({
     )
 });
 
+const RefreshTokenGrantSchema = yup.object().shape({
+    grant_type: yup.string().required().matches(/^refresh_token$/g, {message: "grant type not recognised"}),
+    refresh_token: yup.string().required('refresh_token is required'),
+    scopes: yup.array().of(
+        yup.string().max(20)
+    )
+});
+
+const VerifyTokenSchema = yup.object().shape(
+    {
+        access_token: yup.string().required('access_token is required'),
+        client_id: yup.string().required('client_id is required'),
+        client_secret: yup.string().required('client_secret is required'),
+    });
+
+const ExchangeTokenSchema = yup.object().shape(
+    {
+        access_token: yup.string().required('access_token is required'),
+        client_id: yup.string().required('client_id is required'),
+        client_secret: yup.string().required('client_secret is required'),
+    });
+
+const SecurityContextSchema = yup.object().shape(
+    {
+        sub: yup.string().required('token is invalid'),
+        email: yup.string().required('token is invalid'),
+        name: yup.string().required('token is invalid'),
+        tenant: yup.object().shape({
+            id: yup.string().required('token is invalid'),
+            name: yup.string().required('token is invalid'),
+            domain: yup.string().required('token is invalid'),
+        }),
+        scopes: yup.array().of(
+            yup.string().max(20)
+        ),
+        grant_type: yup.string().required('token is invalid')
+    });
+
+const RefreshTokenSchema = yup.object().shape(
+    {
+        email: yup.string().required('token is invalid'),
+        domain: yup.string().required('token is invalid')
+    });
+
+
 export const ValidationSchema =
     {
         SignUpSchema,
         SignDownSchema,
         PasswordGrantSchema,
         ClientCredentialGrantSchema,
+        RefreshTokenGrantSchema,
         ForgotPasswordSchema,
         ResetPasswordSchema,
         UpdateMyUsernameSchema,
         UpdateUsernameSchema,
         UpdateMyEmailSchema,
         UpdateMyPasswordSchema,
-        UpdateMyAvatarSchema,
-        UpdateAvatarSchema,
         UpdateMyNameSchema,
         UpdateNameSchema,
         UpdateMySurnameSchema,
@@ -199,5 +233,9 @@ export const ValidationSchema =
         OperatingScopeSchema,
         MemberOperationsSchema,
         CreateUserSchema,
-        UpdateUserSchema
+        UpdateUserSchema,
+        VerifyTokenSchema,
+        ExchangeTokenSchema,
+        SecurityContextSchema,
+        RefreshTokenSchema
     };

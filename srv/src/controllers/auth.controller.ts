@@ -22,6 +22,8 @@ import {MailServiceErrorException} from '../exceptions/mail-service-error.except
 import {TenantService} from "../tenants/tenant.service";
 import {Tenant} from "../tenants/tenant.entity";
 import {GRANT_TYPES} from "../scopes/security.service";
+import {ForbiddenException} from "../exceptions/forbidden.exception";
+import {InvalidTokenException} from "../exceptions/invalid-token.exception";
 
 @Controller('api/oauth')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -43,10 +45,11 @@ export class AuthController {
             domain: string,
             password: string,
             email: string;
+            refresh_token: string;
             grant_type: GRANT_TYPES,
             scopes: string[]
         }
-    ): Promise<object> {
+    ): Promise<any> {
 
         switch (body.grant_type) {
             case GRANT_TYPES.PASSWORD: {
@@ -56,7 +59,7 @@ export class AuthController {
                 const tenant = await this.tenantService.findByDomain(body.domain);
                 const {accessToken, refreshToken} = await this.authService.createUserAccessToken(user, tenant);
                 return {
-                    token: accessToken,
+                    access_token: accessToken,
                     expires_in: this.configService.get('TOKEN_EXPIRATION_TIME'),
                     token_type: "bearer",
                     refresh_token: refreshToken
@@ -68,9 +71,21 @@ export class AuthController {
                 const tenant: Tenant = await this.authService.validateClientCredentials(body.client_id, body.client_secret);
                 const token: string = await this.authService.createTechnicalAccessToken(tenant, body.scopes);
                 return {
-                    token: token,
+                    access_token: token,
                     expires_in: this.configService.get('TOKEN_EXPIRATION_TIME'),
                     token_type: "bearer"
+                };
+            }
+            case GRANT_TYPES.REFRESH_TOKEN: {
+                let validationPipe = new ValidationPipe(ValidationSchema.RefreshTokenGrantSchema);
+                await validationPipe.transform(body, null);
+                const {tenant, user} = await this.authService.validateRefreshToken(body.refresh_token);
+                const {accessToken, refreshToken} = await this.authService.createUserAccessToken(user, tenant);
+                return {
+                    access_token: accessToken,
+                    expires_in: this.configService.get('TOKEN_EXPIRATION_TIME'),
+                    token_type: "bearer",
+                    refresh_token: refreshToken
                 };
             }
             default:
@@ -78,8 +93,41 @@ export class AuthController {
         }
     }
 
-    @Get('/verify/:token')
-    async verify(
+    @Post('/verify')
+    async verifyAccessToken(
+        @Body(new ValidationPipe(ValidationSchema.VerifyTokenSchema)) body: { access_token: string, client_id: string, client_secret: string }
+    ): Promise<object> {
+        const tenant = await this.authService.validateClientCredentials(body.client_id, body.client_secret);
+        let securityContext = await this.authService.validateAccessToken(body.access_token);
+        if (securityContext.tenant.id !== tenant.id) {
+            throw new InvalidTokenException("not a valid token");
+        }
+        return securityContext;
+    }
+
+    @Post('/exchange')
+    async exchangeAccessToken(
+        @Body(new ValidationPipe(ValidationSchema.ExchangeTokenSchema)) body: { access_token: string, client_id: string, client_secret: string }
+    ): Promise<object> {
+        let securityContext = await this.authService.validateAccessToken(body.access_token);
+        if (securityContext.grant_type !== GRANT_TYPES.PASSWORD) {
+            throw new ForbiddenException("grant_type not allowed");
+        }
+        await this.authService.validateClientCredentials(body.client_id, body.client_secret);
+        const user = await this.usersService.findByEmail(securityContext.email);
+        const tenant = await this.tenantService.findByClientId(body.client_id);
+        const {accessToken, refreshToken} = await this.authService.createUserAccessToken(user, tenant);
+        return {
+            access_token: accessToken,
+            expires_in: this.configService.get('TOKEN_EXPIRATION_TIME'),
+            token_type: "bearer",
+            refresh_token: refreshToken
+        };
+    }
+
+
+    @Get('/verify-email/:token')
+    async verifyEmail(
         @Param('token') token: string,
         @Response() response
     ): Promise<any> {

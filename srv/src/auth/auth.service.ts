@@ -14,6 +14,8 @@ import {CryptUtil} from "../util/crypt.util";
 import {GRANT_TYPES, SecurityContext} from "../scopes/security.service";
 import {UnauthorizedException} from "../exceptions/unauthorized.exception";
 import {ScopeEnum} from "../scopes/scope.enum";
+import {ValidationPipe} from "../validation/validation.pipe";
+import {ValidationSchema} from "../validation/validation.schema";
 
 
 @Injectable()
@@ -41,24 +43,47 @@ export class AuthService {
         return user;
     }
 
+    async validateRefreshToken(refreshToken: string) {
+
+        let validationPipe = new ValidationPipe(ValidationSchema.RefreshTokenSchema);
+        let payload = await validationPipe.transform(
+            this.jwtService.decode(refreshToken, {json: true}),
+            null) as { email, domain };
+
+        let tenant = await this.tenantService.findByDomain(payload.domain);
+        let user = await this.usersService.findByEmail(payload.email);
+        await this.jwtService
+            .verifyAsync(refreshToken, {publicKey: tenant.publicKey});
+        return {tenant, user};
+    }
+
     async validateAccessToken(token: string): Promise<SecurityContext> {
-        let payload: SecurityContext = this.jwtService.decode(token, {json: true}) as SecurityContext;
-        let tenant = await this.tenantService.findById(payload["tenant"].id);
-        payload = await this.jwtService.verifyAsync(token, {publicKey: tenant.publicKey});
-        console.log("token verified with public Key");
-        if (payload.grant_type === GRANT_TYPES.CLIENT_CREDENTIAL) {
-            if (payload.sub !== "oauth") {
-                throw new UnauthorizedException();
+        try {
+
+            let validationPipe = new ValidationPipe(ValidationSchema.SecurityContextSchema);
+            let payload: SecurityContext = await validationPipe.transform(
+                this.jwtService.decode(token, {json: true}),
+                null) as SecurityContext;
+
+            let tenant = await this.tenantService.findById(payload.tenant.id);
+            payload = await this.jwtService.verifyAsync(token, {publicKey: tenant.publicKey});
+            console.log("token verified with public Key");
+            if (payload.grant_type === GRANT_TYPES.CLIENT_CREDENTIAL) {
+                if (payload.sub !== "oauth") {
+                    throw new UnauthorizedException();
+                }
+            } else {
+                let user = await this.usersService.findByEmail(payload.email);
             }
-        } else {
-            let user = await this.usersService.findByEmail(payload.email);
+            return payload;
+        } catch (e) {
+            throw new UnauthorizedException(e);
         }
-        return payload;
     }
 
     async validateClientCredentials(clientId: string, clientSecret: string): Promise<Tenant> {
         const tenant: Tenant = await this.tenantService.findByClientId(clientId);
-        let valid: boolean = CryptUtil.verifyClientId(tenant.clientSecret, clientId);
+        let valid: boolean = CryptUtil.verifyClientId(tenant.clientSecret, clientId, tenant.secretSalt);
         if (!valid) {
             throw new InvalidCredentialsException();
         }
@@ -89,12 +114,15 @@ export class AuthService {
     /**
      * Create an access token for the user.
      */
-    async createUserAccessToken(user: User, tenant: Tenant): Promise<{ accessToken: string, refreshToken: string }> {
+    async createUserAccessToken(user: User, tenant: Tenant):
+        Promise<{ accessToken: string, refreshToken: string }> {
         if (!user.verified) {
             throw new EmailNotVerifiedException();
         }
+
         let scopes = await this.tenantService.getMemberScope(tenant.id, user);
-        const payload: SecurityContext = {
+
+        const accessTokenPayload: SecurityContext = {
             sub: user.email,
             email: user.email,
             name: user.name,
@@ -106,8 +134,25 @@ export class AuthService {
             scopes: scopes.map(scope => scope.name),
             grant_type: GRANT_TYPES.PASSWORD
         };
-        const refreshToken = await this.tenantService.needRefreshTokenForUser(tenant, user);
-        const accessToken = await this.jwtService.signAsync(payload, {privateKey: tenant.privateKey,});
+
+        const refreshTokenPayload = {
+            email: user.email,
+            domain: tenant.domain
+        }
+
+        const accessToken = await this.jwtService
+            .signAsync(accessTokenPayload, {
+                privateKey: tenant.privateKey,
+                issuer: this.configService.get("SUPER_TENANT_DOMAIN")
+            });
+
+        const refreshToken = await this.jwtService
+            .signAsync(refreshTokenPayload, {
+                privateKey: tenant.privateKey,
+                expiresIn: this.configService.get("REFRESH_TOKEN_EXPIRATION_TIME"),
+                issuer: this.configService.get("SUPER_TENANT_DOMAIN")
+            });
+
         return {accessToken, refreshToken};
     }
 
@@ -239,4 +284,6 @@ export class AuthService {
 
         return true;
     }
+
+
 }

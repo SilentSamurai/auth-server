@@ -20,6 +20,11 @@ export class TenantDetailsComponent implements OnInit {
 
     tenant_id: string = "";
     tenant: any = {};
+    credentials: any = {
+        clientId: "NA",
+        clientSecret: "NA",
+        publicKey: "NA"
+    };
     members: any = []
     isTenantAdmin = false;
 
@@ -32,13 +37,13 @@ export class TenantDetailsComponent implements OnInit {
 
     async ngOnInit() {
         this.tenant_id = this.actRoute.snapshot.params['tenantId'];
-        console.log(this.tenant_id)
-        this.tenant = await this.tenantService.getTenantDetails(this.tenant_id);
-        this.members = await this.tenantService.getMembers(this.tenant_id);
         if (this.tokenStorageService.isTenantAdmin()) {
             this.isTenantAdmin = true;
+            this.credentials = await this.tenantService.getTenantCredentials(this.tenant_id);
         }
-
+        console.log(this.tenant_id);
+        this.tenant = await this.tenantService.getTenantDetails(this.tenant_id);
+        this.members = await this.tenantService.getMembers(this.tenant_id);
     }
 
     async onUpdateTenant() {

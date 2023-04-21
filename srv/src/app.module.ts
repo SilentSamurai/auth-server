@@ -11,6 +11,12 @@ import {LoggerMiddleware} from './log/logger.middleware';
 import {TenantModule} from "./tenants/tenant.module";
 import {StartUpService} from "./startUp.service";
 import {ControllersModule} from "./controllers/controller.module";
+import {User} from "./users/user.entity";
+import {Tenant} from "./tenants/tenant.entity";
+import {TenantMember} from "./tenants/tenant.members.entity";
+import {UserScope} from "./scopes/user.scopes.entity";
+import {Scope} from "./scopes/scope.entity";
+import {CreateInitialTables1681147242561} from "./migrations/1681147242561-initial-creation";
 
 @Module({
     imports: [
@@ -34,11 +40,11 @@ import {ControllersModule} from "./controllers/controller.module";
                         username: configService.get('DATABASE_USERNAME'),
                         password: configService.get('DATABASE_PASSWORD'),
                         database: configService.get('DATABASE_NAME'),
-                        entities: [configService.get('DATABASE_ENTITIES')],
-                        migrations: [configService.get('DATABASE_MIGRATIONS')],
+                        entities: [Tenant, User, TenantMember, Scope, UserScope],
+                        migrations: [CreateInitialTables1681147242561],
                         synchronize: false,
                         ssl: configService.get('DATABASE_SSL'),
-                        logging: !configService.isProduction(),
+                        logging: configService.get('DATABASE_LOGGING'),
                     };
                 },
             }),

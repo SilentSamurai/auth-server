@@ -48,6 +48,10 @@ export class TenantService {
         return lastValueFrom(this.http.get(`${API_URL}/tenant/${tenantId}`, this.getHttpOptions()))
     }
 
+    async getTenantCredentials(tenantId: string) {
+        return lastValueFrom(this.http.get(`${API_URL}/tenant/${tenantId}/credentials`, this.getHttpOptions()))
+    }
+
     async getMembers(tenantId: string) {
         return lastValueFrom(this.http.get(`${API_URL}/tenant/${tenantId}/members`, this.getHttpOptions()))
     }
