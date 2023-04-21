@@ -9,6 +9,7 @@ import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
 import {FormsModule} from "@angular/forms";
 import {RouterModule} from "@angular/router";
 import {CommonModule} from "@angular/common";
+import {NavBarModule} from "../nav-bar/nav-bar.module";
 
 @NgModule({
     declarations: [
@@ -24,6 +25,7 @@ import {CommonModule} from "@angular/common";
         TableModule,
         RouterModule,
         CommonModule,
+        NavBarModule
     ],
     providers: [],
 })

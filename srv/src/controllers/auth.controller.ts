@@ -38,14 +38,14 @@ export class AuthController {
     }
 
     @Post('/token')
-    async signin(
+    async oauthToken(
         @Body() body: {
             client_id: string,
             client_secret: string,
             domain: string,
             password: string,
-            email: string;
-            refresh_token: string;
+            email: string,
+            refresh_token: string,
             grant_type: GRANT_TYPES,
             scopes: string[]
         }

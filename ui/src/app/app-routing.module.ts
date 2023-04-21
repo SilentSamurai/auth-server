@@ -10,8 +10,10 @@ import {BoardTenantComponent} from './board-tenants/board-tenant.component';
 import {UserAuthGuard} from "./shared/user-auth-guard.service";
 import {TenantDetailsComponent} from "./board-tenants/tenant-details/tenant-details.component";
 import {UserDetailsComponent} from "./board-user/user-details/user-details.component";
+import {ApiDocsComponent} from "./api-docs/api-docs.component";
 
 const routes: Routes = [
+    {path: 'api-docs', component: ApiDocsComponent},
     {path: 'home', component: HomeComponent, canActivate: [UserAuthGuard]},
     {path: 'login', component: LoginComponent},
     {path: 'register', component: RegisterComponent},
