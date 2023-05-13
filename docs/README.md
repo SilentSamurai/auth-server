@@ -11,4 +11,4 @@ and [Nest.js](https://nestjs.com/).
 - Delete not verified users after the verification token expires.
 - Reset password via email.
 - Change email address via email.
-- API [documentation](https://silentsamurai.github.io/Speedy-API) available.
+- API [documentation](https://silentsamurai.github.io/auth-server) available.
