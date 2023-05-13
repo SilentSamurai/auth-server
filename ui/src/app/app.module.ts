@@ -18,7 +18,6 @@ import {UserModule} from "./board-user/user.module";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {ToastModule} from "primeng/toast";
 import {MessageService} from "primeng/api";
-import {ApiDocsComponent} from "./api-docs/api-docs.component";
 import {NavBarModule} from "./nav-bar/nav-bar.module";
 import {RouterModule} from "@angular/router";
 
@@ -30,7 +29,6 @@ import {RouterModule} from "@angular/router";
         RegisterComponent,
         HomeComponent,
         ProfileComponent,
-        ApiDocsComponent
     ],
     imports: [
         BrowserModule,

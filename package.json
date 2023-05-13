@@ -5,7 +5,9 @@
         "ui:build": "cd ./ui && npm i && npm run build",
         "backend:build": "cd ./srv && npm i && npm run build",
         "build": "npm run ui:build && npm run backend:build",
-        "start": "cd ./srv && npm run start:prod"
+        "start": "cd ./srv && npm run start:prod",
+        "dev:ui:start": "cd ./ui && npm run UI:BUILD:WATCH",
+        "dev:backend:start": "cd ./srv && npm run start:debug"
     },
     "dependencies": {
     }
