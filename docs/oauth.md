@@ -1,10 +1,13 @@
 ### OAuth Token (Password Grant Type)
 
-**POST `/api/oauth/token`**
+
+```http
+[POST] /api/oauth/token
+```
 
 `public`  `application/json`
 
-**Request Body**
+**Request**
 
 ```json
 {
@@ -15,7 +18,7 @@
 }
 ```
 
-**Response Body**
+**Response**
 
 ```json
 {
@@ -26,13 +29,17 @@
 }
 ```
 
+<hr>
+
 ### OAuth Token (Client Grant Type)
 
-**POST `/api/oauth/token`**
+```http
+[POST] /api/oauth/token
+```
 
 `public`  `application/json`
 
-**Request Body**
+**Request**
 
 ```json
 {
@@ -42,7 +49,7 @@
 }
 ```
 
-**Response Body**
+**Response**
 
 ```json
 {
@@ -52,13 +59,17 @@
 }
 ```
 
+<HR> 
+
 ### OAuth Token (Refresh Grant Type)
 
-**POST `/api/oauth/token`**
+```http
+[POST] /api/oauth/token
+```
 
 `public`  `application/json`
 
-**Request Body**
+**Request**
 
 ```json
 {
@@ -67,7 +78,7 @@
 }
 ```
 
-**Response Body**
+**Response**
 
 ```json
 {

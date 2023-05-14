@@ -64,6 +64,7 @@
                             minlength="6"
                             name="domain"
                             required
+                            [disabled]="freezeDomain"
                             type="text"/>
                         <div
                             *ngIf="domain.errors && f.submitted"
