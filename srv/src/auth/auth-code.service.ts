@@ -50,7 +50,9 @@ export class AuthCodeService {
      * Create a verification token for the user.
      */
     async createAuthToken(user: User, tenant: Tenant, code_challenge: string): Promise<string> {
-        let code = CryptUtil.generateRandomString(16);
+        let scopes = await this.tenantService.getMemberScope(tenant.id, user);
+
+        let code = CryptUtil.generateOTP(6);
 
         if (await this.existByCode(code)) {
             code = CryptUtil.generateRandomString(16);

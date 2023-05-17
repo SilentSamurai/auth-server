@@ -1,4 +1,5 @@
 import {createHash, generateKeyPairSync, randomBytes, scryptSync, timingSafeEqual} from "crypto";
+import {generate} from 'otp-generator';
 
 function base64UrlEncode(input: Buffer | string): string {
     let encoded = Buffer.from(input).toString('base64');
@@ -70,4 +71,16 @@ export class CryptUtil {
         }
         return randomString;
     }
+
+    public static generateOTP(length: number): string {
+        return generate(length, {
+            digits: true,
+            lowerCaseAlphabets: false,
+            upperCaseAlphabets: false,
+            specialChars: false
+        });
+    }
+
 }
+
+

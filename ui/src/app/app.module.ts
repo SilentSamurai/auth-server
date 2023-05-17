@@ -20,6 +20,7 @@ import {ToastModule} from "primeng/toast";
 import {MessageService} from "primeng/api";
 import {NavBarModule} from "./nav-bar/nav-bar.module";
 import {RouterModule} from "@angular/router";
+import {OtpDisplayComponent} from "./opt-page/otp-display.component";
 
 @NgModule({
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -29,6 +30,7 @@ import {RouterModule} from "@angular/router";
         RegisterComponent,
         HomeComponent,
         ProfileComponent,
+        OtpDisplayComponent,
     ],
     imports: [
         BrowserModule,

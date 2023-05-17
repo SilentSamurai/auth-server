@@ -15,6 +15,7 @@ export class LoginComponent implements OnInit {
         password: null,
         domain: "auth.server.com"
     };
+    loading = true;
     isLoggedIn = false;
     isLoginFailed = false;
     errorMessage = '';
@@ -35,11 +36,15 @@ export class LoginComponent implements OnInit {
         console.log(params, this.freezeDomain);
         this.code_challenge = await this.tokenStorage.getCodeChallenge();
 
-        const externalLogin = params.has("redirect_uri") && params.has("code_challenge") && params.has("domain");
+        const externalLogin = params.has("redirect") && params.has("code_challenge") && params.has("domain");
         if (externalLogin) {
             this.form.domain = params.get("domain");
-            this.redirectUri = params.get("redirect_uri")!;
+            this.redirectUri = params.get("redirect")!;
             this.code_challenge = params.get("code_challenge")!;
+            if (this.redirectUri === "otp") {
+                this.redirectUri = "/opt-page"
+                this.code_challenge = await this.tokenStorage.getCodeChallenge();
+            }
         }
 
 
@@ -49,9 +54,9 @@ export class LoginComponent implements OnInit {
                 return;
             } else {
                 let user = this.tokenStorage.getUser();
-                if (user.tenant.domain == params.get("domain")) {
+                if (user.tenant.domain === this.form.domain) {
                     try {
-                        let codeChallenge = params.get("code_challenge")!;
+                        let codeChallenge = this.code_challenge;
                         let token = this.tokenStorage.getToken()!;
                         const code = await lastValueFrom(this.authService.getAuthCode(token, codeChallenge));
                         await this.redirect(code.authentication_code);
@@ -59,9 +64,10 @@ export class LoginComponent implements OnInit {
                     } catch (e: any) {
                     }
                 }
-                // this.tokenStorage.signOut();
+                this.tokenStorage.signOut();
             }
         }
+        this.loading = false;
     }
 
     async redirect(code: string) {
