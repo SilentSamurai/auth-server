@@ -23,6 +23,7 @@ import {Rules, ScopeRule} from "../scopes/scopes.decorator";
 import {SecurityService} from "../scopes/security.service";
 import {SubjectEnum} from "../scopes/subjectEnum";
 import {Action} from "../scopes/actions.enum";
+import {subject} from "@casl/ability";
 
 @Controller('api/tenant')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -62,7 +63,7 @@ export class TenantController {
         @Body(new ValidationPipe(ValidationSchema.UpdateTenantSchema)) body: { name: string, domain: string }
     ): Promise<Tenant> {
         let tenant = await this.tenantService.findById(tenantId);
-        this.securityService.check(request, Action.Update, tenant);
+        this.securityService.check(request, Action.Update, subject(SubjectEnum.TENANT, tenant));
         return this.tenantService.updateTenant(
             tenantId,
             body.name,
@@ -101,7 +102,7 @@ export class TenantController {
     ): Promise<any> {
         let securityContext = this.securityService.getUserOrTechnicalSecurityContext(request);
         let tenant = await this.tenantService.findById(securityContext.tenant.id);
-        this.securityService.check(request, Action.ReadCredentials, tenant);
+        this.securityService.check(request, Action.ReadCredentials, subject(SubjectEnum.TENANT, tenant));
         return {
             id: tenant.id,
             clientId: tenant.clientId,
@@ -118,7 +119,7 @@ export class TenantController {
         @Param('tenantId') tenantId: string
     ): Promise<any> {
         let tenant = await this.tenantService.findById(tenantId);
-        this.securityService.check(request, Action.ReadCredentials, tenant);
+        this.securityService.check(request, Action.ReadCredentials, subject(SubjectEnum.TENANT, tenant));
         return {
             id: tenant.id,
             clientId: tenant.clientId,
@@ -134,7 +135,7 @@ export class TenantController {
         @Param('tenantId') tenantId: string
     ): Promise<Tenant> {
         let tenant = await this.tenantService.findById(tenantId);
-        this.securityService.check(request, Action.Read, tenant);
+        this.securityService.check(request, Action.Read, subject(SubjectEnum.TENANT, tenant));
         return tenant;
     }
 

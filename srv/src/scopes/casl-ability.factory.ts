@@ -35,7 +35,11 @@ export class CaslAbilityFactory {
             let user = await this.usersService.findByEmail(securityContext.email);
 
             // User Permissions
-            can(Action.Manage, SubjectEnum.USER, {id: user.id});
+            cannot(Action.Manage, SubjectEnum.USER);
+            // can(Action.Manage, SubjectEnum.USER, {
+            //     id: {$eq: user.id}
+            // });
+
 
             if (scopes.includes(ScopeEnum.TENANT_VIEWER)) {
                 can(Action.Read, SubjectEnum.TENANT, {id: tenant.id});

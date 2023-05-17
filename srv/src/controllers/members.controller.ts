@@ -24,6 +24,8 @@ import {SecurityService} from "../scopes/security.service";
 import {ScopeService} from "../scopes/scope.service";
 import {Action} from "../scopes/actions.enum";
 import {ForbiddenException} from "../exceptions/forbidden.exception";
+import {subject} from "@casl/ability";
+import {SubjectEnum} from "../scopes/subjectEnum";
 
 @Controller('api/tenant')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -45,7 +47,7 @@ export class MemberController {
         @Param('tenantId') tenantId: string
     ): Promise<User[]> {
         let tenant = await this.tenantService.findById(tenantId);
-        this.securityService.check(request, Action.Read, tenant);
+        this.securityService.check(request, Action.Read, subject(SubjectEnum.TENANT, tenant));
         let members = await this.usersService.findByTenant(tenant);
         for (const member of members) {
             member.scopes = await this.scopeService.getMemberScopes(tenant, member);
@@ -62,7 +64,7 @@ export class MemberController {
     ): Promise<Tenant> {
         const user = await this.usersService.findByEmail(email);
         const tenant = await this.tenantService.findById(tenantId);
-        this.securityService.check(request, Action.Update, tenant);
+        this.securityService.check(request, Action.Update, subject(SubjectEnum.TENANT, tenant));
         await this.tenantService.addMember(tenantId, user);
         return tenant;
     }
@@ -76,7 +78,7 @@ export class MemberController {
     ): Promise<Tenant> {
         const user = await this.usersService.findByEmail(email);
         let tenant = await this.tenantService.findById(tenantId);
-        this.securityService.check(request, Action.Update, tenant);
+        this.securityService.check(request, Action.Update, subject(SubjectEnum.TENANT, tenant));
         let securityContext = this.securityService.getUserSecurityContext(request);
         if (securityContext.email === email) {
             throw new ForbiddenException("cannot remove self");
@@ -94,7 +96,7 @@ export class MemberController {
     ): Promise<Scope[]> {
         const user = await this.usersService.findByEmail(email);
         let tenant = await this.tenantService.findById(tenantId);
-        this.securityService.check(request, Action.Update, tenant);
+        this.securityService.check(request, Action.Update, subject(SubjectEnum.TENANT, tenant));
         return this.tenantService.updateScopeOfMember(body.scopes, tenantId, user);
     }
 
