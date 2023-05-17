@@ -12,7 +12,7 @@ import {TenantDetailsComponent} from "./board-tenants/tenant-details/tenant-deta
 import {UserDetailsComponent} from "./board-user/user-details/user-details.component";
 
 const routes: Routes = [
-    {path: 'home', component: HomeComponent, canActivate: [UserAuthGuard]},
+    {path: 'home', component: HomeComponent, canActivate: []},
     {path: 'login', component: LoginComponent},
     {path: 'register', component: RegisterComponent},
     {path: 'profile', component: ProfileComponent, canActivate: [UserAuthGuard]},
@@ -20,7 +20,7 @@ const routes: Routes = [
     {path: 'tenants', component: BoardTenantComponent, canActivate: [UserAuthGuard]},
     {path: 'tenant/:tenantId', component: TenantDetailsComponent, canActivate: [UserAuthGuard]},
     {path: 'user/:email', component: UserDetailsComponent, canActivate: [UserAuthGuard]},
-    {path: '', redirectTo: 'login', pathMatch: 'full'}
+    {path: '', redirectTo: 'home', pathMatch: 'full'}
 ];
 
 @NgModule({

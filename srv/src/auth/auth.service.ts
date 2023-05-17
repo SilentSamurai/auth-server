@@ -44,7 +44,6 @@ export class AuthService {
     }
 
     async validateRefreshToken(refreshToken: string) {
-
         let validationPipe = new ValidationPipe(ValidationSchema.RefreshTokenSchema);
         let payload = await validationPipe.transform(
             this.jwtService.decode(refreshToken, {json: true}),
@@ -59,7 +58,6 @@ export class AuthService {
 
     async validateAccessToken(token: string): Promise<SecurityContext> {
         try {
-
             let validationPipe = new ValidationPipe(ValidationSchema.SecurityContextSchema);
             let payload: SecurityContext = await validationPipe.transform(
                 this.jwtService.decode(token, {json: true}),

@@ -9,6 +9,9 @@ import {AuthService} from './auth.service';
 import {TenantModule} from "../tenants/tenant.module";
 import {JwtAuthGuard} from "./jwt-auth.guard";
 import {ScopesModule} from "../scopes/scopes.module";
+import {AuthCodeService} from "./auth-code.service";
+import {TypeOrmModule} from "@nestjs/typeorm";
+import {AuthCode} from "./auth_code.entity";
 
 @Module(
     {
@@ -16,6 +19,7 @@ import {ScopesModule} from "../scopes/scopes.module";
             [
                 forwardRef(() => UsersModule), // Circular dependency resolved.
                 PassportModule,
+                TypeOrmModule.forFeature([AuthCode]),
                 JwtModule.registerAsync( // Get the configuration settings from the config service asynchronously.
                     {
                         inject: [ConfigService],
@@ -33,8 +37,8 @@ import {ScopesModule} from "../scopes/scopes.module";
                 forwardRef(() => ScopesModule)
             ],
         controllers: [AuthController],
-        providers: [AuthService, JwtAuthGuard],
-        exports: [AuthService]
+        providers: [AuthService, JwtAuthGuard, AuthCodeService],
+        exports: [AuthService, AuthCodeService]
     })
 export class AuthModule {
 }

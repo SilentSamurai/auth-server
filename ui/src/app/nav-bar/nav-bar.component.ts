@@ -12,6 +12,7 @@ export class NavBarComponent implements OnInit {
     isLoggedIn = false;
     email?: string;
     _isSuperAdmin = false;
+    public isCollapsed = true;
 
     constructor(private userService: UserService,
                 private router: Router,

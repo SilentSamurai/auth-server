@@ -1,109 +1,109 @@
 <div class="col-md-12 ">
-    <div class="d-flex  align-items-center justify-content-center">
-        <div class="m-5 align-middle" style="width: 30%">
-            <div class="card-body">
-                <img
-                    class="profile-img-card my-4"
-                    id="profile-img"
-                    src="/assets/logo-img.jpg"/>
-                <form
-                    #f="ngForm"
-                    (ngSubmit)="f.form.valid && onSubmit()"
-                    *ngIf="!isLoggedIn"
-                    name="form"
-                    novalidate
+    <div class="card card-container">
+        <img
+            alt=""
+            class="profile-img-card"
+            id="profile-img"
+            src="/assets/logo-img.jpg"/>
+        <form
+            #f="ngForm"
+            (ngSubmit)="f.form.valid && onSubmit()"
+            *ngIf="!isLoggedIn"
+            name="form"
+            novalidate
+        >
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input
+                    #username="ngModel"
+                    [(ngModel)]="form.email"
+                    class="form-control"
+                    id="email"
+                    name="email"
+                    required
+                    type="text"/>
+                <div
+                    *ngIf="username.errors && f.submitted"
+                    class="alert alert-danger"
+                    role="alert"
                 >
-                    <div class="form-group">
-                        <label for="email">Email</label>
-                        <input
-                            #username="ngModel"
-                            [(ngModel)]="form.email"
-                            class="form-control"
-                            id="email"
-                            name="email"
-                            required
-                            type="text"/>
-                        <div
-                            *ngIf="username.errors && f.submitted"
-                            class="alert alert-danger"
-                            role="alert"
-                        >
-                            Email is required!
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="password">Password</label>
-                        <input
-                            #password="ngModel"
-                            [(ngModel)]="form.password"
-                            class="form-control"
-                            id="password"
-                            minlength="6"
-                            name="password"
-                            required
-                            type="password"/>
-                        <div
-                            *ngIf="password.errors && f.submitted"
-                            class="alert alert-danger"
-                            role="alert"
-                        >
-                            <div *ngIf="password.errors['required']">Password is required</div>
-                            <div *ngIf="password.errors['minlength']">
-                                Password must be at least 6 characters
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="domain">Domain</label>
-                        <input
-                            #domain="ngModel"
-                            [(ngModel)]="form.domain"
-                            class="form-control"
-                            id="domain"
-                            minlength="6"
-                            name="domain"
-                            required
-                            [disabled]="freezeDomain"
-                            type="text"/>
-                        <div
-                            *ngIf="domain.errors && f.submitted"
-                            class="alert alert-danger"
-                            role="alert"
-                        >
-                            <div *ngIf="domain.errors['required']">Domain is required</div>
-                            <div *ngIf="domain.errors['minlength']">
-                                Password must be at least 6 characters
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group d-grid gap-2 py-3 ">
-                        <button class="btn btn-primary btn-block btn-lg">
-                            Login
-                        </button>
-                    </div>
-                    <div class="form-group">
-                        <div
-                            *ngIf="f.submitted && isLoginFailed"
-                            class="alert alert-danger"
-                            role="alert"
-                        >
-                            Login failed: {{ errorMessage }}
-                        </div>
-                    </div>
-                </form>
-
-                <div *ngIf="isLoggedIn" class="alert alert-success">
-                    Logged in as {{ scopes }}.
+                    Email is required!
                 </div>
-                <div class="text-center">
-                    <a class="mt-1 " href="https://silentsamurai.github.io/auth-server">
-                        Api Docs
-                    </a>
-                </div>
-
             </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input
+                    #password="ngModel"
+                    [(ngModel)]="form.password"
+                    class="form-control"
+                    id="password"
+                    minlength="6"
+                    name="password"
+                    required
+                    type="password"/>
+                <div
+                    *ngIf="password.errors && f.submitted"
+                    class="alert alert-danger"
+                    role="alert"
+                >
+                    <div *ngIf="password.errors['required']">Password is required</div>
+                    <div *ngIf="password.errors['minlength']">
+                        Password must be at least 6 characters
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="domain">Domain</label>
+                <input
+                    #domain="ngModel"
+                    [(ngModel)]="form.domain"
+                    [disabled]="freezeDomain"
+                    class="form-control"
+                    id="domain"
+                    minlength="6"
+                    name="domain"
+                    required
+                    type="text"/>
+                <div
+                    *ngIf="domain.errors && f.submitted"
+                    class="alert alert-danger"
+                    role="alert"
+                >
+                    <div *ngIf="domain.errors['required']">Domain is required</div>
+                    <div *ngIf="domain.errors['minlength']">
+                        Password must be at least 6 characters
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group d-grid gap-2 py-3 ">
+                <button class="btn btn-primary btn-block btn-lg">
+                    Login
+                </button>
+            </div>
+            <div class="form-group">
+                <div
+                    *ngIf="f.submitted && isLoginFailed"
+                    class="alert alert-danger"
+                    role="alert"
+                >
+                    Login failed: {{ errorMessage }}
+                </div>
+            </div>
+        </form>
+
+        <div *ngIf="isLoggedIn" class="alert alert-success">
+            Logged in as {{ scopes }}.
         </div>
+        <div class="d-flex justify-content-evenly">
+            <a class="mt-1 " href="https://silentsamurai.github.io/auth-server">
+                Api Docs
+            </a>
+            <a class=" mt-1" href="javascript:void(0)" routerLink="/register">
+                Sign Up
+            </a>
+        </div>
+
     </div>
 </div>

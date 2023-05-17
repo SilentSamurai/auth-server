@@ -18,13 +18,9 @@ function parseDateString(value, originalValue) {
 
 const SignUpSchema = yup.object().shape(
     {
-        username: yup.string().required('Username is required').matches(USERNAME_REGEXP, USERNAME_MESSAGE),
+        name: yup.string().required('name is required').matches(USERNAME_REGEXP, USERNAME_MESSAGE),
         password: yup.string().required('Password is required').matches(PASSWORD_REGEXP, PASSWORD_MESSAGE),
-        email: yup.string().email().required('Email is required'),
-        avatar: yup.string().url().max(500),
-        name: yup.string().max(15),
-        surname: yup.string().max(15),
-        birthdate: yup.date().transform(parseDateString).typeError('Invalid birthdate format YYYY/MM/DD')
+        email: yup.string().email().required('Email is required')
     });
 
 const SignDownSchema = yup.object().shape(
@@ -143,6 +139,13 @@ const UpdateUserSchema = yup.object().shape(
         password: yup.string().matches(PASSWORD_REGEXP, PASSWORD_MESSAGE).nullable(),
     });
 
+const LoginSchema = yup.object().shape({
+    email: yup.string().email().required('Email is required'),
+    password: yup.string().required('Password is required').matches(PASSWORD_REGEXP, PASSWORD_MESSAGE),
+    domain: yup.string().required('Domain is required'),
+    code_challenge: yup.string().required('code_challenge is required')
+});
+
 const PasswordGrantSchema = yup.object().shape({
     grant_type: yup.string().required().matches(/^password$/g, {message: "grant type not recognised"}),
     email: yup.string().email().required('Email is required'),
@@ -165,6 +168,15 @@ const ClientCredentialGrantSchema = yup.object().shape({
 const RefreshTokenGrantSchema = yup.object().shape({
     grant_type: yup.string().required().matches(/^refresh_token$/g, {message: "grant type not recognised"}),
     refresh_token: yup.string().required('refresh_token is required'),
+    scopes: yup.array().of(
+        yup.string().max(20)
+    )
+});
+
+const CodeGrantSchema = yup.object().shape({
+    grant_type: yup.string().required().matches(/^authorization_code$/g, {message: "grant type not recognised"}),
+    code: yup.string().required('code is required'),
+    code_verifier: yup.string().required('code_verifier is required'),
     scopes: yup.array().of(
         yup.string().max(20)
     )
@@ -211,9 +223,11 @@ export const ValidationSchema =
     {
         SignUpSchema,
         SignDownSchema,
+        LoginSchema,
         PasswordGrantSchema,
         ClientCredentialGrantSchema,
         RefreshTokenGrantSchema,
+        CodeGrantSchema,
         ForgotPasswordSchema,
         ResetPasswordSchema,
         UpdateMyUsernameSchema,

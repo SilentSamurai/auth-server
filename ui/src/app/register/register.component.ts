@@ -1,5 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {AuthService} from '../_services/auth.service';
+import {lastValueFrom} from "rxjs";
+import {Router} from "@angular/router";
 
 @Component({
     selector: 'app-register',
@@ -8,7 +10,7 @@ import {AuthService} from '../_services/auth.service';
 })
 export class RegisterComponent implements OnInit {
     form: any = {
-        username: null,
+        name: null,
         email: null,
         password: null
     };
@@ -16,25 +18,26 @@ export class RegisterComponent implements OnInit {
     isSignUpFailed = false;
     errorMessage = '';
 
-    constructor(private authService: AuthService) {
+    constructor(private authService: AuthService,
+                private router: Router,) {
     }
 
     ngOnInit(): void {
     }
 
-    onSubmit(): void {
-        const {username, email, password} = this.form;
+    async onSubmit(): Promise<void> {
+        const {name, email, password} = this.form;
+        this.isSignUpFailed = false;
+        try {
+            const user = await lastValueFrom(this.authService.register(name, email, password));
+            await this.router.navigateByUrl("/login");
+            this.isSuccessful = false;
+        } catch (e: any) {
+            console.error(e);
+            this.isSignUpFailed = true;
+            this.errorMessage = e.error.message;
+        }
 
-        this.authService.register(username, email, password).subscribe({
-            next: data => {
-                console.log(data);
-                this.isSuccessful = true;
-                this.isSignUpFailed = false;
-            },
-            error: err => {
-                this.errorMessage = err.error.message;
-                this.isSignUpFailed = true;
-            }
-        });
+
     }
 }
