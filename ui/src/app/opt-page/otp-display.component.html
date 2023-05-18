@@ -1,0 +1,17 @@
+<nav-bar *ngIf="!loading"></nav-bar>
+<div *ngIf="!loading" class="container">
+    <header class="jumbotron">
+        <h5 class="mt-4">Welcome "{{ user.name }}"</h5>
+        <p>Hey, please find your login otp here.</p>
+        <div>
+            <span class="h4">OTP :</span><span class="h1"> {{ code }}</span>
+        </div>
+
+    </header>
+    <div class="mt-5">
+        <a class="mt-1" href="https://silentsamurai.github.io/auth-server">
+            Api Docs
+        </a>
+    </div>
+
+</div>

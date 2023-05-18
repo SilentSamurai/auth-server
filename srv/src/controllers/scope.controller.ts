@@ -16,6 +16,8 @@ import {ScopeService} from "../scopes/scope.service";
 import {Scope} from "../scopes/scope.entity";
 import {SecurityService} from "../scopes/security.service";
 import {Action} from "../scopes/actions.enum";
+import {subject} from "@casl/ability";
+import {SubjectEnum} from "../scopes/subjectEnum";
 
 @Controller('api/tenant')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -37,7 +39,7 @@ export class ScopeController {
         @Param('name') name: string,
     ): Promise<Scope> {
         let tenant = await this.tenantService.findById(tenantId);
-        this.securityService.check(request, Action.Update, tenant);
+        this.securityService.check(request, Action.Update, subject(SubjectEnum.TENANT, tenant));
         return this.scopeService.create(
             name,
             tenant
@@ -52,7 +54,7 @@ export class ScopeController {
         @Param('name') name: string,
     ): Promise<Scope> {
         let tenant = await this.tenantService.findById(tenantId);
-        this.securityService.check(request, Action.Update, tenant);
+        this.securityService.check(request, Action.Update, subject(SubjectEnum.TENANT, tenant));
         let scope = await this.scopeService.findByNameAndTenant(name, tenant);
         return await this.scopeService.deleteById(scope.id);
     }
@@ -64,7 +66,7 @@ export class ScopeController {
         @Param('tenantId') tenantId: string
     ): Promise<Scope[]> {
         const tenant = await this.tenantService.findById(tenantId);
-        this.securityService.check(request, Action.Read, tenant);
+        this.securityService.check(request, Action.Read, subject(SubjectEnum.TENANT, tenant));
         return this.tenantService.getTenantScopes(tenant)
     }
 

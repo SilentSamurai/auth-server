@@ -17,6 +17,8 @@ import {TenantMember} from "./tenants/tenant.members.entity";
 import {UserScope} from "./scopes/user.scopes.entity";
 import {Scope} from "./scopes/scope.entity";
 import {CreateInitialTables1681147242561} from "./migrations/1681147242561-initial-creation";
+import {SessionMigration1684308185392} from "./migrations/1684308185392-session-migration";
+import {AuthCode} from "./auth/auth_code.entity";
 
 @Module({
     imports: [
@@ -40,8 +42,8 @@ import {CreateInitialTables1681147242561} from "./migrations/1681147242561-initi
                         username: configService.get('DATABASE_USERNAME'),
                         password: configService.get('DATABASE_PASSWORD'),
                         database: configService.get('DATABASE_NAME'),
-                        entities: [Tenant, User, TenantMember, Scope, UserScope],
-                        migrations: [CreateInitialTables1681147242561],
+                        entities: [Tenant, User, TenantMember, Scope, UserScope, AuthCode],
+                        migrations: [CreateInitialTables1681147242561, SessionMigration1684308185392],
                         synchronize: false,
                         ssl: configService.get('DATABASE_SSL'),
                         logging: configService.get('DATABASE_LOGGING'),

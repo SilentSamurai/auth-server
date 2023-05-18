@@ -5,6 +5,9 @@ import {ScopeService} from "./scope.service";
 import {SecurityService} from "./security.service";
 import {TenantService} from "../tenants/tenant.service";
 import {ScopeRule} from "./scopes.decorator";
+import {Action} from "./actions.enum";
+import {SubjectEnum} from "./subjectEnum";
+import {subject} from "@casl/ability";
 
 @Injectable()
 export class ScopeGuard implements CanActivate {
@@ -35,9 +38,10 @@ export class ScopeGuard implements CanActivate {
 
         // let securityContext: SecurityContext = this.securityService.getUserOrTechnicalSecurityContext(request);
         const ability = this.securityService.getAbility(request);
-
+        const cas = ability.can(Action.Read, subject(SubjectEnum.USER, {id: '6aeccc50-2f92-4368-9ae5-e0f24aaae2a6'}));
+        console.log("cas ", cas);
         for (const requiredScope of requiredScopes) {
-            if (!ability.can(requiredScope.action, requiredScope.subject)) {
+            if (!ability.can(requiredScope.action, subject(requiredScope.subject, {}))) {
                 return false;
             }
         }

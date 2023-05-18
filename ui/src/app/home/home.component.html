@@ -1,9 +1,9 @@
 
 
 
-<nav-bar></nav-bar>
+<nav-bar *ngIf="!loading"></nav-bar>
 
-<div class="container">
+<div *ngIf="!loading" class="container">
     <header class="jumbotron">
         <h1 class="mt-4">Welcome "{{ user.name }}"</h1>
         <p>Hey, Checkout the user and tenant content present</p>

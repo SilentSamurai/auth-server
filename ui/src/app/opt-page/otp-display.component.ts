@@ -7,13 +7,14 @@ import {AuthService} from "../_services/auth.service";
 
 @Component({
     selector: 'app-home',
-    templateUrl: './home.component.html',
-    styleUrls: ['./home.component.css']
+    templateUrl: './otp-display.component.html',
+    styleUrls: ['./otp-display.component.css']
 })
-export class HomeComponent implements OnInit {
+export class OtpDisplayComponent implements OnInit {
     content?: string;
     user: any;
     loading = true;
+    code = "";
 
     constructor(private userService: UserService,
                 private router: Router,
@@ -26,9 +27,9 @@ export class HomeComponent implements OnInit {
         let params = this.route.snapshot.queryParamMap;
         if (params.has("code")) {
             try {
-                let code = params.get("code")!;
+                this.code = params.get("code")!;
                 let verifier = this.tokenStorage.getCodeVerifier();
-                const data = await lastValueFrom(this.authService.getAccessToken(code, verifier));
+                const data = await lastValueFrom(this.authService.getAccessToken(this.code, verifier));
                 this.tokenStorage.saveToken(data.access_token);
             } catch (e: any) {
                 console.error(e);
@@ -37,11 +38,6 @@ export class HomeComponent implements OnInit {
 
         if (this.tokenStorage.isLoggedIn()) {
             this.user = this.tokenStorage.getUser();
-            if (!this.tokenStorage.isSuperAdmin()) {
-                await this.router.navigateByUrl(`/tenant/${this.user.tenant.id}`);
-            }
-        } else {
-            await this.router.navigateByUrl(`/login`);
         }
         this.loading = false;
     }

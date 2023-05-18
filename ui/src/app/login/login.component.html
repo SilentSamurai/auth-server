@@ -1,9 +1,15 @@
-<div class="col-md-12 ">
-    <div class="d-flex  align-items-center justify-content-center">
-        <div class="m-5 align-middle" style="width: 30%">
-            <div class="card-body">
+<div class="container">
+    <div class="row align-items-center">
+        <div class="col-md-12 vh-100">
+            <div *ngIf="loading" class="align-middle text-center" style="padding-top:25%">
+                <div class="spinner-border m-5" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+            </div>
+            <div *ngIf="!loading" class="card card-container">
                 <img
-                    class="profile-img-card my-4"
+                    alt=""
+                    class="profile-img-card"
                     id="profile-img"
                     src="/assets/logo-img.jpg"/>
                 <form
@@ -59,6 +65,7 @@
                         <input
                             #domain="ngModel"
                             [(ngModel)]="form.domain"
+                            [disabled]="freezeDomain"
                             class="form-control"
                             id="domain"
                             minlength="6"
@@ -96,9 +103,12 @@
                 <div *ngIf="isLoggedIn" class="alert alert-success">
                     Logged in as {{ scopes }}.
                 </div>
-                <div class="text-center">
+                <div class="d-flex justify-content-evenly">
                     <a class="mt-1 " href="https://silentsamurai.github.io/auth-server">
                         Api Docs
+                    </a>
+                    <a class=" mt-1" href="javascript:void(0)" routerLink="/register">
+                        Sign Up
                     </a>
                 </div>
 
@@ -106,3 +116,4 @@
         </div>
     </div>
 </div>
+

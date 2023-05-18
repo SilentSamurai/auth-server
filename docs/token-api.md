@@ -1,10 +1,12 @@
 ### Verify Access Token
 
-**POST `/api/oauth/verify`**
+```http
+[POST] /api/oauth/verify
+```
 
 `public`  `application/json`
 
-**Request Body**
+**Request**
 
 ```json
 {
@@ -14,7 +16,7 @@
 }
 ```
 
-**Response Body**
+**Response**
 
 ```json
 {
@@ -31,13 +33,17 @@
 }
 ```
 
+<hr>
+
 ### Access Token Exchange
 
-**POST `/api/oauth/exchange`**
+```http
+[POST] /api/oauth/exchange
+```
 
 `public`  `application/json`
 
-**Request Body**
+**Request**
 
 ```json
 {
@@ -47,7 +53,7 @@
 }
 ```
 
-**Response Body**
+**Response**
 
 ```json
 {

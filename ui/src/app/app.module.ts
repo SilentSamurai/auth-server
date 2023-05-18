@@ -11,7 +11,7 @@ import {HomeComponent} from './home/home.component';
 import {ProfileComponent} from './profile/profile.component';
 
 import {authInterceptorProviders} from './_helpers/auth.interceptor';
-import {NgbDropdown, NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {NgbCollapseModule, NgbDropdown, NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {TableModule} from 'primeng/table';
 import {TenantModule} from "./board-tenants/tenant.module";
 import {UserModule} from "./board-user/user.module";
@@ -20,6 +20,7 @@ import {ToastModule} from "primeng/toast";
 import {MessageService} from "primeng/api";
 import {NavBarModule} from "./nav-bar/nav-bar.module";
 import {RouterModule} from "@angular/router";
+import {OtpDisplayComponent} from "./opt-page/otp-display.component";
 
 @NgModule({
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -29,6 +30,7 @@ import {RouterModule} from "@angular/router";
         RegisterComponent,
         HomeComponent,
         ProfileComponent,
+        OtpDisplayComponent,
     ],
     imports: [
         BrowserModule,
@@ -37,6 +39,7 @@ import {RouterModule} from "@angular/router";
         FormsModule,
         HttpClientModule,
         NgbModule,
+        NgbCollapseModule,
         TableModule,
         TenantModule,
         UserModule,

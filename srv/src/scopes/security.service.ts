@@ -12,7 +12,8 @@ import {AnyAbility} from "@casl/ability/dist/types/PureAbility";
 export enum GRANT_TYPES {
     PASSWORD = "password",
     CLIENT_CREDENTIAL = "client_credential",
-    REFRESH_TOKEN = "refresh_token"
+    REFRESH_TOKEN = "refresh_token",
+    CODE = "authorization_code"
 }
 
 export class SecurityContext {

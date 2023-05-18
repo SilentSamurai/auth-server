@@ -33,7 +33,7 @@ describe('e2e users', () => {
 
         expect(response.body.access_token).toBeDefined();
         expect(response.body.expires_in).toBeDefined();
-        expect(response.body.token_type).toEqual('bearer');
+        expect(response.body.token_type).toEqual('Bearer');
         expect(response.body.refresh_token).toBeDefined();
         refreshToken = response.body.refresh_token;
         accessToken = response.body.access_token;

@@ -10,9 +10,11 @@ import {BoardTenantComponent} from './board-tenants/board-tenant.component';
 import {UserAuthGuard} from "./shared/user-auth-guard.service";
 import {TenantDetailsComponent} from "./board-tenants/tenant-details/tenant-details.component";
 import {UserDetailsComponent} from "./board-user/user-details/user-details.component";
+import {OtpDisplayComponent} from "./opt-page/otp-display.component";
 
 const routes: Routes = [
-    {path: 'home', component: HomeComponent, canActivate: [UserAuthGuard]},
+    {path: 'home', component: HomeComponent, canActivate: []},
+    {path: 'opt-page', component: OtpDisplayComponent, canActivate: []},
     {path: 'login', component: LoginComponent},
     {path: 'register', component: RegisterComponent},
     {path: 'profile', component: ProfileComponent, canActivate: [UserAuthGuard]},
@@ -20,7 +22,7 @@ const routes: Routes = [
     {path: 'tenants', component: BoardTenantComponent, canActivate: [UserAuthGuard]},
     {path: 'tenant/:tenantId', component: TenantDetailsComponent, canActivate: [UserAuthGuard]},
     {path: 'user/:email', component: UserDetailsComponent, canActivate: [UserAuthGuard]},
-    {path: '', redirectTo: 'login', pathMatch: 'full'}
+    {path: '', redirectTo: 'home', pathMatch: 'full'}
 ];
 
 @NgModule({

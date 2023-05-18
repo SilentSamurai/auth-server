@@ -12,6 +12,7 @@ export class NavBarComponent implements OnInit {
     isLoggedIn = false;
     email?: string;
     _isSuperAdmin = false;
+    public isCollapsed = true;
 
     constructor(private userService: UserService,
                 private router: Router,
@@ -38,6 +39,6 @@ export class NavBarComponent implements OnInit {
 
     logout(): void {
         this.tokenStorageService.signOut();
-        window.location.reload();
+        this.router.navigateByUrl(`/login`);
     }
 }

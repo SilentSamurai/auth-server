@@ -24,6 +24,7 @@ import {Tenant} from "../tenants/tenant.entity";
 import {GRANT_TYPES} from "../scopes/security.service";
 import {ForbiddenException} from "../exceptions/forbidden.exception";
 import {InvalidTokenException} from "../exceptions/invalid-token.exception";
+import {AuthCodeService} from "../auth/auth-code.service";
 
 @Controller('api/oauth')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -33,8 +34,25 @@ export class AuthController {
         private readonly authService: AuthService,
         private readonly usersService: UsersService,
         private readonly tenantService: TenantService,
-        private readonly mailService: MailService
+        private readonly mailService: MailService,
+        private readonly authCodeService: AuthCodeService
     ) {
+    }
+
+    @Post('/login')
+    async login(
+        @Body(new ValidationPipe(ValidationSchema.LoginSchema)) body: {
+            domain: string,
+            password: string,
+            email: string,
+            code_challenge: string
+        }) {
+        const user: User = await this.authService.validate(body.email, body.password);
+        const tenant = await this.tenantService.findByDomain(body.domain);
+        const auth_code = await this.authCodeService.createAuthToken(user, tenant, body.code_challenge);
+        return {
+            authentication_code: auth_code
+        };
     }
 
     @Post('/token')
@@ -46,12 +64,26 @@ export class AuthController {
             password: string,
             email: string,
             refresh_token: string,
+            code: string,
+            code_verifier: string,
             grant_type: GRANT_TYPES,
             scopes: string[]
         }
     ): Promise<any> {
 
         switch (body.grant_type) {
+            case GRANT_TYPES.CODE: {
+                let validationPipe = new ValidationPipe(ValidationSchema.CodeGrantSchema);
+                await validationPipe.transform(body, null);
+                const {user, tenant} = await this.authCodeService.validateAuthCode(body.code, body.code_verifier);
+                const {accessToken, refreshToken} = await this.authService.createUserAccessToken(user, tenant);
+                return {
+                    access_token: accessToken,
+                    expires_in: this.configService.get('TOKEN_EXPIRATION_TIME'),
+                    token_type: "Bearer",
+                    refresh_token: refreshToken
+                };
+            }
             case GRANT_TYPES.PASSWORD: {
                 let validationPipe = new ValidationPipe(ValidationSchema.PasswordGrantSchema);
                 await validationPipe.transform(body, null);
@@ -61,7 +93,7 @@ export class AuthController {
                 return {
                     access_token: accessToken,
                     expires_in: this.configService.get('TOKEN_EXPIRATION_TIME'),
-                    token_type: "bearer",
+                    token_type: "Bearer",
                     refresh_token: refreshToken
                 };
             }
@@ -73,7 +105,7 @@ export class AuthController {
                 return {
                     access_token: token,
                     expires_in: this.configService.get('TOKEN_EXPIRATION_TIME'),
-                    token_type: "bearer"
+                    token_type: "Bearer"
                 };
             }
             case GRANT_TYPES.REFRESH_TOKEN: {
@@ -84,13 +116,28 @@ export class AuthController {
                 return {
                     access_token: accessToken,
                     expires_in: this.configService.get('TOKEN_EXPIRATION_TIME'),
-                    token_type: "bearer",
+                    token_type: "Bearer",
                     refresh_token: refreshToken
                 };
             }
             default:
                 throw new BadRequestException("grant type not recognised.");
         }
+    }
+
+    @Post('/gen-auth-code')
+    async authCode(
+        @Body() body: {
+            access_token: string,
+            code_challenge: string
+        }) {
+        let securityContext = await this.authService.validateAccessToken(body.access_token);
+        const user: User = await this.usersService.findByEmail(securityContext.email);
+        const tenant = await this.tenantService.findById(securityContext.tenant.id);
+        const auth_code = await this.authCodeService.createAuthToken(user, tenant, body.code_challenge);
+        return {
+            authentication_code: auth_code
+        };
     }
 
     @Post('/verify')
@@ -120,7 +167,7 @@ export class AuthController {
         return {
             access_token: accessToken,
             expires_in: this.configService.get('TOKEN_EXPIRATION_TIME'),
-            token_type: "bearer",
+            token_type: "Bearer",
             refresh_token: refreshToken
         };
     }
