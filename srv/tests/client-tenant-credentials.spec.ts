@@ -78,7 +78,7 @@ describe('e2e tenant technical credential', () => {
         expect(response.status).toEqual(201);
         expect(response.body.access_token).toBeDefined();
         expect(response.body.expires_in).toBeDefined();
-        expect(response.body.token_type).toEqual('bearer');
+        expect(response.body.token_type).toEqual('Bearer');
         techinalAccessToken = response.body.access_token;
     });
 

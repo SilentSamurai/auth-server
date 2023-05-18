@@ -167,7 +167,7 @@ export class AuthController {
         return {
             access_token: accessToken,
             expires_in: this.configService.get('TOKEN_EXPIRATION_TIME'),
-            token_type: "bearer",
+            token_type: "Bearer",
             refresh_token: refreshToken
         };
     }

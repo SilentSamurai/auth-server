@@ -36,9 +36,9 @@ export class CaslAbilityFactory {
 
             // User Permissions
             cannot(Action.Manage, SubjectEnum.USER);
-            // can(Action.Manage, SubjectEnum.USER, {
-            //     id: {$eq: user.id}
-            // });
+            can(Action.Manage, SubjectEnum.USER, {
+                id: {$eq: user.id}
+            });
 
 
             if (scopes.includes(ScopeEnum.TENANT_VIEWER)) {
@@ -63,7 +63,6 @@ export class CaslAbilityFactory {
 
 
         }
-
 
         return build();
     }

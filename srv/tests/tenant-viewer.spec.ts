@@ -33,7 +33,7 @@ describe('e2e tenant', () => {
 
         expect(response.body.access_token).toBeDefined();
         expect(response.body.expires_in).toBeDefined();
-        expect(response.body.token_type).toEqual('bearer');
+        expect(response.body.token_type).toEqual('Bearer');
         expect(response.body.refresh_token).toBeDefined();
         superAdminToken = response.body.access_token;
     });
@@ -99,7 +99,7 @@ describe('e2e tenant', () => {
 
         expect(response.body.access_token).toBeDefined();
         expect(response.body.expires_in).toBeDefined();
-        expect(response.body.token_type).toEqual('bearer');
+        expect(response.body.token_type).toEqual('Bearer');
         expect(response.body.refresh_token).toBeDefined();
         tenantViewerAccessToken = response.body.access_token;
     });

@@ -22,7 +22,7 @@ export class TokenFixture {
         expect(response.status).toEqual(201);
         expect(response.body.access_token).toBeDefined();
         expect(response.body.expires_in).toBeDefined();
-        expect(response.body.token_type).toEqual('bearer');
+        expect(response.body.token_type).toEqual('Bearer');
         expect(response.body.refresh_token).toBeDefined();
 
         let decode = this.app.jwtService().decode(response.body.access_token, {json: true}) as any;

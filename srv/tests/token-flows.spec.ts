@@ -39,7 +39,7 @@ describe('e2e positive token flow', () => {
         expect(response.status).toEqual(201);
         expect(response.body.access_token).toBeDefined();
         expect(response.body.expires_in).toBeDefined();
-        expect(response.body.token_type).toEqual('bearer');
+        expect(response.body.token_type).toEqual('Bearer');
         expect(response.body.refresh_token).toBeDefined();
     });
 
@@ -70,7 +70,7 @@ describe('e2e positive token flow', () => {
         expect(response.status).toEqual(201);
         expect(response.body.access_token).toBeDefined();
         expect(response.body.expires_in).toBeDefined();
-        expect(response.body.token_type).toEqual('bearer');
+        expect(response.body.token_type).toEqual('Bearer');
     });
 
     it(`/POST Verify Token`, async () => {
