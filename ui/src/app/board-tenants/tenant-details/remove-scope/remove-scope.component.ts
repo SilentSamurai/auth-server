@@ -1,5 +1,4 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
 import {MessageService} from "primeng/api";
 import {TenantService} from "../../../_services/tenant.service";
 
@@ -14,8 +13,7 @@ export class RemoveScopeComponent implements OnInit {
     @Output() passEntry: EventEmitter<any> = new EventEmitter();
 
     constructor(private tenantService: TenantService,
-                private messageService: MessageService,
-                public activeModal: NgbActiveModal) {
+                private messageService: MessageService) {
     }
 
     ngOnInit() {
@@ -27,7 +25,7 @@ export class RemoveScopeComponent implements OnInit {
             let deletedScope = await this.tenantService.removeScope(this.scope.name, this.tenant.id);
             this.messageService.add({severity: 'success', summary: 'Success', detail: 'Scope Deleted'});
             this.passEntry.emit(deletedScope);
-            this.activeModal.close(deletedScope);
+            // this.activeModal.close(deletedScope);
         } catch (e) {
             this.messageService.add({severity: 'error', summary: 'Error', detail: 'Scope Deletion Failed'});
         }

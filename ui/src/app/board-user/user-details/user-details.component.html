@@ -1,68 +1,77 @@
 <nav-bar></nav-bar>
-<div class="container">
-    <div class="row justify-content-center my-2">
-        <div class="col-md-8">
-            <div class="card text-black">
-                <p-table [value]="tenants" responsiveLayout="scroll">
-                    <ng-template pTemplate="caption">
-                        <div class="d-flex justify-content-between">
-                            <h5>Tenant List</h5>
-                        </div>
-
-                    </ng-template>
-                    <ng-template let-columns pTemplate="header">
-                        <tr>
-                            <th>Tenant Id</th>
-                            <th>Name</th>
-                            <th>Domain</th>
-                            <th>Scopes</th>
-                        </tr>
-                    </ng-template>
-                    <ng-template let-columns="columns" let-tenant pTemplate="body">
-                        <tr>
-                            <td><span class="p-column-title">Tenant Id</span>
-                                <a [routerLink]="['/tenant/', tenant.id]" href="javascript:void(0)">{{tenant.id}}</a>
-                            </td>
-                            <td><span class="p-column-title">Name</span>{{tenant.name}}</td>
-                            <td><span class="p-column-title">Domain</span>{{tenant.domain }}</td>
-                            <td><span class="p-column-title">Scopes</span>
-                                <ul>
-                                    <li *ngFor="let scope of tenant.scopes">
-                                        <code>{{tenant.name}}::{{scope.name}}</code>
-                                    </li>
-                                </ul>
-                            </td>
-                        </tr>
-                    </ng-template>
-                </p-table>
-            </div>
+<div class="container-fluid">
+    <div class="row ">
+        <div class="col-md-6">
+            <h1>{{ user_email }}</h1>
         </div>
-        <div class="col-md-4">
-            <div class="card text-black">
-                <div class="card-body">
-                    <div>
-                        <div class="my-2">
-                            <div class="p-disabled">Email</div>
-                            <h3>{{ user_email }}</h3>
-                        </div>
-                        <br>
-                        <div class="my-2">
-                            <div class="p-disabled">Name</div>
-                            <div>{{ user.name }}</div>
-                        </div>
-                        <div class="my-2">
-                            <div class="p-disabled">Created At</div>
-                            <div>{{ user.createdAt | date }}</div>
-                        </div>
+        <div class="col-md-6 d-flex justify-content-end">
+            <p-confirmPopup></p-confirmPopup>
+            <p-button (click)="confirmDelete($event)" class="p-button-danger p-button-text mt-2"
+                      label="Delete" severity="danger"></p-button>
+        </div>
+    </div>
+    <div class="row justify-content-center ">
+        <div class="col-md-4 mt-md-2">
+            <p-card>
+                <div>
+                    <div class="my-2">
+                        <div class="p-disabled">Email</div>
+                        <strong>{{ user_email }}</strong>
                     </div>
-                    <div class="d-flex justify-content-between total font-weight-bold mt-4">
-                        <button (click)="openUpdateModal()" class="btn btn-primary">
-                            Update
-                        </button>
+                    <div class="my-2">
+                        <div class="p-disabled">Name</div>
+                        <div>{{ user.name }}</div>
+                    </div>
+                    <div class="my-2">
+                        <div class="p-disabled">Created At</div>
+                        <div>{{ user.createdAt | date }}</div>
                     </div>
                 </div>
-            </div>
+                <div class="d-flex justify-content-between total font-weight-bold mt-4">
+                    <button (click)="openUpdateModal()" label="Update" pButton type="button">
+                    </button>
+                </div>
+                <p-dialog *ngIf="!loading"
+                          [(visible)]="updateDialog" [modal]="true" [style]="{width: '50vw'}" header="Update User">
+                    <edit-user-modal (completeUpdate)="completeUpdate($event)" [user]="user"></edit-user-modal>
+                </p-dialog>
+            </p-card>
         </div>
+        <div class="col-md-8 mt-2">
+            <p-table [value]="tenants" responsiveLayout="scroll">
+                <ng-template pTemplate="caption">
+                    <div class="d-flex justify-content-between">
+                        <h5>Tenant List</h5>
+                    </div>
+
+                </ng-template>
+                <ng-template let-columns pTemplate="header">
+                    <tr>
+                        <th>Tenant Id</th>
+                        <th>Name</th>
+                        <th>Domain</th>
+                        <th>Scopes</th>
+                    </tr>
+                </ng-template>
+                <ng-template let-columns="columns" let-tenant pTemplate="body">
+                    <tr>
+                        <td><span class="p-column-title">Tenant Id</span>
+                            <a [routerLink]="['/tenant/', tenant.id]" href="javascript:void(0)">{{tenant.id}}</a>
+                        </td>
+                        <td><span class="p-column-title">Name</span>{{tenant.name}}</td>
+                        <td><span class="p-column-title">Domain</span>{{tenant.domain }}</td>
+                        <td><span class="p-column-title">Scopes</span>
+                            <ul>
+                                <li *ngFor="let scope of tenant.scopes">
+                                    <code>{{tenant.name}}::{{scope.name}}</code>
+                                </li>
+                            </ul>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+
     </div>
 </div>
 

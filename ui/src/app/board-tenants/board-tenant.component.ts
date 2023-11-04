@@ -1,8 +1,4 @@
 import {Component, OnInit} from '@angular/core';
-import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
-import {CreateTenantComponent} from "./create-tenant/create-tenant.component";
-import {UpdateTenantComponent} from "./update-tenant/update-tenant.component";
-import {DeleteTenantComponent} from "./delete-tenant/delete-tenant.component";
 import {lastValueFrom} from "rxjs";
 import {TenantService} from "../_services/tenant.service";
 import {TokenStorageService} from "../_services/token-storage.service";
@@ -10,7 +6,7 @@ import {TokenStorageService} from "../_services/token-storage.service";
 @Component({
     selector: 'app-board-tenants',
     templateUrl: './board-tenant.component.html',
-    styleUrls: ['./board-tenant.component.css']
+    styleUrls: ['./board-tenant.component.scss']
 })
 export class BoardTenantComponent implements OnInit {
 
@@ -19,8 +15,7 @@ export class BoardTenantComponent implements OnInit {
     isTenantAdmin = false;
 
     constructor(private tokenStorageService: TokenStorageService,
-                private tenantService: TenantService,
-                private modalService: NgbModal) {
+                private tenantService: TenantService) {
     }
 
     async ngOnInit(): Promise<void> {
@@ -34,25 +29,25 @@ export class BoardTenantComponent implements OnInit {
     }
 
     async openCreateModal() {
-        const modalRef = this.modalService.open(CreateTenantComponent);
-        const tenant = await modalRef.result;
-        console.log(tenant);
+        // const modalRef = this.modalService.open(CreateTenantComponent);
+        // const tenant = await modalRef.result;
+        // console.log(tenant);
         await this.ngOnInit();
     }
 
     async openUpdateModal(tenant: any) {
-        const modalRef = this.modalService.open(UpdateTenantComponent);
-        modalRef.componentInstance.tenant = tenant;
-        const editedTenant = await modalRef.result;
-        console.log(editedTenant);
+        // const modalRef = this.modalService.open(UpdateTenantComponent);
+        // modalRef.componentInstance.tenant = tenant;
+        // const editedTenant = await modalRef.result;
+        // console.log(editedTenant);
         await this.ngOnInit();
     }
 
     async openDeleteModal(tenant: any) {
-        const modalRef = this.modalService.open(DeleteTenantComponent);
-        modalRef.componentInstance.tenant = tenant;
-        const deletedTenant = await modalRef.result;
-        console.log(deletedTenant);
+        // const modalRef = this.modalService.open(DeleteTenantComponent);
+        // modalRef.componentInstance.tenant = tenant;
+        // const deletedTenant = await modalRef.result;
+        // console.log(deletedTenant);
         await this.ngOnInit();
     }
 }

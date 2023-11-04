@@ -16,6 +16,8 @@ import {RemoveMemberComponent} from "./tenant-details/remove-member/remove-membe
 import {ChipModule} from "primeng/chip";
 import {RemoveScopeComponent} from "./tenant-details/remove-scope/remove-scope.component";
 import {NavBarModule} from "../nav-bar/nav-bar.module";
+import {ButtonModule} from "primeng/button";
+import {CardModule} from "primeng/card";
 
 @NgModule({
     declarations: [
@@ -37,7 +39,9 @@ import {NavBarModule} from "../nav-bar/nav-bar.module";
         FormsModule,
         MultiSelectModule,
         ChipModule,
-        NavBarModule
+        NavBarModule,
+        ButtonModule,
+        CardModule
     ],
     providers: [],
 })

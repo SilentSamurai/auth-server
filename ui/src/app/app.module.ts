@@ -11,7 +11,6 @@ import {HomeComponent} from './home/home.component';
 import {ProfileComponent} from './profile/profile.component';
 
 import {authInterceptorProviders} from './_helpers/auth.interceptor';
-import {NgbCollapseModule, NgbDropdown, NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {TableModule} from 'primeng/table';
 import {TenantModule} from "./board-tenants/tenant.module";
 import {UserModule} from "./board-user/user.module";
@@ -21,6 +20,10 @@ import {MessageService} from "primeng/api";
 import {NavBarModule} from "./nav-bar/nav-bar.module";
 import {RouterModule} from "@angular/router";
 import {OtpDisplayComponent} from "./opt-page/otp-display.component";
+import {InputTextModule} from "primeng/inputtext";
+import {CardModule} from "primeng/card";
+import {DividerModule} from "primeng/divider";
+import {ButtonModule} from "primeng/button";
 
 @NgModule({
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -38,17 +41,19 @@ import {OtpDisplayComponent} from "./opt-page/otp-display.component";
         AppRoutingModule,
         FormsModule,
         HttpClientModule,
-        NgbModule,
-        NgbCollapseModule,
         TableModule,
         TenantModule,
         UserModule,
         BrowserAnimationsModule,
         ReactiveFormsModule,
         ToastModule,
-        NavBarModule
+        NavBarModule,
+        InputTextModule,
+        CardModule,
+        DividerModule,
+        ButtonModule
     ],
-    providers: [authInterceptorProviders, NgbDropdown, MessageService],
+    providers: [authInterceptorProviders, MessageService],
     exports: [],
     bootstrap: [AppComponent]
 })

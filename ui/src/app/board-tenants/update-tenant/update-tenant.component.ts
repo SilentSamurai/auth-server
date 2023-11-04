@@ -1,5 +1,4 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
 import {lastValueFrom} from "rxjs";
 import {MessageService} from "primeng/api";
 import {TenantService} from "../../_services/tenant.service";
@@ -19,8 +18,7 @@ export class UpdateTenantComponent implements OnInit {
     }
 
     constructor(private tenantService: TenantService,
-                private messageService: MessageService,
-                public activeModal: NgbActiveModal) {
+                private messageService: MessageService) {
     }
 
     ngOnInit(): void {
@@ -39,7 +37,7 @@ export class UpdateTenantComponent implements OnInit {
             ));
             this.messageService.add({severity: 'success', summary: 'Success', detail: 'Tenant Updated'});
             this.passEntry.emit(editedTenant);
-            this.activeModal.close(editedTenant);
+            // this.activeModal.close(editedTenant);
         } catch (e) {
             this.messageService.add({severity: 'error', summary: 'Error', detail: 'Tenant Update Failed'});
         }

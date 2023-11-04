@@ -1,68 +1,61 @@
-<div class="modal-header">
-    <h4 class="modal-title" id="modal-basic-title">Create User</h4>
-    <button (click)="activeModal.close('Cross click')"
-            aria-label="Close"
-            class="btn-sm btn "
-            type="button">
-        <span aria-hidden="true">
-            <i class="fa fa-icons fa-close"></i>
-        </span>
-    </button>
-</div>
-<div class="modal-body">
-    <form #createUserForm="ngForm"
-          (ngSubmit)="createUserForm.form.valid && onSubmit()"
-          name="createUserForm"
-          novalidate>
-        <div class="mb-3 form-group">
-            <label class="form-label" for="create.user.name">Name</label>
-            <input #name="ngModel"
-                   [(ngModel)]="form.name"
-                   class="form-control"
-                   id="create.user.name"
-                   name="name"
-                   required
-                   type="text">
-            <div
-                *ngIf="name.errors && createUserForm.submitted"
-                class="alert alert-danger"
-                role="alert">
-                Name is required!
-            </div>
+<form #createUserForm="ngForm"
+      (ngSubmit)="createUserForm.form.valid && onSubmit()"
+      class="p-fluid"
+      name="createUserForm"
+      novalidate>
+    <div class="mb-3 field">
+        <label class="form-label px-1" for="create.user.name">Name</label>
+        <input #name="ngModel"
+               [(ngModel)]="form.name"
+               class=""
+               id="create.user.name"
+               name="name"
+               pInputText
+               required
+               type="text">
+        <div
+            *ngIf="name.errors && createUserForm.submitted"
+            class="alert alert-danger"
+            role="alert">
+            Name is required!
         </div>
-        <div class="mb-3 form-group">
-            <label class="form-label" for="create.user.email">Email address</label>
-            <input #email="ngModel"
-                   [(ngModel)]="form.email"
-                   aria-describedby="emailHelp"
-                   class="form-control"
-                   id="create.user.email"
-                   name="email"
-                   required type="email">
-            <div
-                *ngIf="email.errors && createUserForm.submitted"
-                class="alert alert-danger"
-                role="alert">
-                Email is required!
-            </div>
+    </div>
+    <div class="mb-3 field">
+        <label class="form-label px-1" for="create.user.email">Email address</label>
+        <input #email="ngModel"
+               [(ngModel)]="form.email"
+               aria-describedby="emailHelp"
+               class=""
+               id="create.user.email"
+               name="email"
+               pInputText
+               required type="email">
+        <div
+            *ngIf="email.errors && createUserForm.submitted"
+            class="alert alert-danger"
+            role="alert">
+            Email is required!
         </div>
+    </div>
 
-        <div class="mb-3 form-group">
-            <label class="form-label" for="create.user.password">Default Password</label>
-            <input #password="ngModel"
-                   [(ngModel)]="form.password"
-                   class="form-control"
-                   id="create.user.password"
-                   name="password"
-                   required type="password">
-            <div
-                *ngIf="password.errors && createUserForm.submitted"
-                class="alert alert-danger"
-                role="alert">
-                Password is required!
-            </div>
+    <div class="mb-3 field">
+        <label class="form-label px-1" for="create.user.password">Default Password</label>
+        <input #password="ngModel"
+               [(ngModel)]="form.password"
+               class=""
+               id="create.user.password"
+               name="password"
+               pInputText
+               required type="password">
+        <div
+            *ngIf="password.errors && createUserForm.submitted"
+            class="alert alert-danger"
+            role="alert">
+            Password is required!
         </div>
+    </div>
 
-        <button class="btn btn-primary" type="submit">Create</button>
-    </form>
-</div>
+    <div class="field mt-4 col-4">
+        <button label="Create" pButton type="submit"></button>
+    </div>
+</form>

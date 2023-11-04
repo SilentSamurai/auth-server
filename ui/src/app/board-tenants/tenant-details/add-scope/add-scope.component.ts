@@ -1,5 +1,4 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
 import {TenantService} from "../../../_services/tenant.service";
 import {MessageService} from "primeng/api";
 
@@ -18,8 +17,7 @@ export class AddScopeComponent implements OnInit {
     }
 
     constructor(private tenantService: TenantService,
-                private messageService: MessageService,
-                public activeModal: NgbActiveModal) {
+                private messageService: MessageService) {
     }
 
     ngOnInit(): void {
@@ -30,7 +28,7 @@ export class AddScopeComponent implements OnInit {
             const addedScope = await this.tenantService.addScope(this.form.name, this.tenant.id);
             this.messageService.add({severity: 'success', summary: 'Success', detail: 'Scope Added'});
             this.passEntry.emit(addedScope);
-            this.activeModal.close(addedScope);
+            // this.activeModal.close(addedScope);
         } catch (e) {
             console.error(e)
             this.messageService.add({severity: 'error', summary: 'Error', detail: 'Failed to add scope'});

@@ -1,5 +1,4 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
 import {MessageService} from "primeng/api";
 import {TenantService} from "../../_services/tenant.service";
 
@@ -13,8 +12,7 @@ export class DeleteTenantComponent implements OnInit {
     @Output() passEntry: EventEmitter<any> = new EventEmitter();
 
     constructor(private tenantService: TenantService,
-                private messageService: MessageService,
-                public activeModal: NgbActiveModal) {
+                private messageService: MessageService) {
     }
 
     ngOnInit() {
@@ -26,7 +24,7 @@ export class DeleteTenantComponent implements OnInit {
             let deletedTenant = await this.tenantService.deleteTenant(this.tenant.id);
             this.messageService.add({severity: 'success', summary: 'Success', detail: 'Tenant Deleted'});
             this.passEntry.emit(deletedTenant);
-            this.activeModal.close(deletedTenant);
+            // this.activeModal.close(deletedTenant);
         } catch (e) {
             this.messageService.add({severity: 'error', summary: 'Error', detail: 'Tenant Deletion Failed'});
         }

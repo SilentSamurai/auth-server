@@ -1,5 +1,4 @@
 import {Component, EventEmitter, OnInit, Output} from '@angular/core';
-import {NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
 import {lastValueFrom} from "rxjs";
 import {TenantService} from "../../_services/tenant.service";
 import {MessageService} from "primeng/api";
@@ -18,8 +17,7 @@ export class CreateTenantComponent implements OnInit {
     }
 
     constructor(private tenantService: TenantService,
-                private messageService: MessageService,
-                public activeModal: NgbActiveModal) {
+                private messageService: MessageService) {
     }
 
     ngOnInit(): void {
@@ -30,7 +28,7 @@ export class CreateTenantComponent implements OnInit {
             const createdTenant = await lastValueFrom(this.tenantService.createTenant(this.form.name, this.form.domain));
             this.messageService.add({severity: 'success', summary: 'Success', detail: 'Tenant Created'});
             this.passEntry.emit(createdTenant);
-            this.activeModal.close(createdTenant);
+            // this.activeModal.close(createdTenant);
         } catch (e) {
             this.messageService.add({severity: 'error', summary: 'Error', detail: 'Tenant Creation Failed'});
         }

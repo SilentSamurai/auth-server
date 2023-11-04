@@ -1,5 +1,4 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
 import {TenantService} from "../../../_services/tenant.service";
 import {MessageService} from "primeng/api";
 
@@ -14,8 +13,7 @@ export class RemoveMemberComponent implements OnInit {
     @Output() passEntry: EventEmitter<any> = new EventEmitter();
 
     constructor(private tenantService: TenantService,
-                private messageService: MessageService,
-                public activeModal: NgbActiveModal) {
+                private messageService: MessageService) {
     }
 
     ngOnInit() {
@@ -27,7 +25,7 @@ export class RemoveMemberComponent implements OnInit {
             const removedMember = await this.tenantService.removeMember(this.member.email, this.tenant.id);
             this.messageService.add({severity: 'success', summary: 'Success', detail: 'Member Removed'});
             this.passEntry.emit(removedMember);
-            this.activeModal.close(removedMember);
+            // this.activeModal.close(removedMember);
         } catch (e) {
             this.messageService.add({severity: 'error', summary: 'Error', detail: 'Failed to remove member'});
         }
