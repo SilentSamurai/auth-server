@@ -5,6 +5,8 @@
     </ng-template>
     <ng-template pTemplate="end">
         <p-menu #menu [model]="userMenu" [popup]="true"></p-menu>
-        <button (click)="menu.toggle($event)" icon="pi pi-bars" label="{{email}}" pButton type="button"></button>
+        <button (click)="menu.toggle($event)" class="p-button-text p-button-plain" icon="pi pi-angle-down"
+                iconPos="right"
+                label="{{email}}" pButton type="button"></button>
     </ng-template>
 </p-menubar>

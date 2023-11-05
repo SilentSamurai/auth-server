@@ -1,7 +1,8 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {lastValueFrom} from "rxjs";
+import {Component, OnInit} from '@angular/core';
+import {firstValueFrom} from "rxjs";
 import {MessageService} from "primeng/api";
 import {TenantService} from "../../_services/tenant.service";
+import {DynamicDialogConfig, DynamicDialogRef} from "primeng/dynamicdialog";
 
 @Component({
     selector: 'app-update-tenant',
@@ -9,8 +10,8 @@ import {TenantService} from "../../_services/tenant.service";
     styleUrls: ['./update-tenant.component.css']
 })
 export class UpdateTenantComponent implements OnInit {
-    @Input() tenant: any;
-    @Output() passEntry: EventEmitter<any> = new EventEmitter();
+
+    tenant: any;
 
     form = {
         name: "",
@@ -18,10 +19,13 @@ export class UpdateTenantComponent implements OnInit {
     }
 
     constructor(private tenantService: TenantService,
+                public ref: DynamicDialogRef,
+                public config: DynamicDialogConfig,
                 private messageService: MessageService) {
     }
 
     ngOnInit(): void {
+        this.tenant = this.config.data.tenant;
         this.form = {
             name: this.tenant.name,
             domain: this.tenant.domain
@@ -30,14 +34,13 @@ export class UpdateTenantComponent implements OnInit {
 
     async onSubmit() {
         try {
-            let editedTenant = await lastValueFrom(this.tenantService.editTenant(
+            let editedTenant = await firstValueFrom(this.tenantService.editTenant(
                 this.tenant.id,
                 this.tenant.name === this.form.name ? null : this.form.name,
                 this.tenant.domain === this.form.domain ? null : this.form.domain
             ));
             this.messageService.add({severity: 'success', summary: 'Success', detail: 'Tenant Updated'});
-            this.passEntry.emit(editedTenant);
-            // this.activeModal.close(editedTenant);
+            this.ref.close(editedTenant);
         } catch (e) {
             this.messageService.add({severity: 'error', summary: 'Error', detail: 'Tenant Update Failed'});
         }

@@ -1,7 +1,8 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {UserService} from '../../_services/user.service';
 import {lastValueFrom} from "rxjs";
 import {MessageService} from "primeng/api";
+import {DynamicDialogConfig, DynamicDialogRef} from "primeng/dynamicdialog";
 
 @Component({
     selector: 'edit-user-modal',
@@ -9,15 +10,17 @@ import {MessageService} from "primeng/api";
     styleUrls: ['./edit-user-modal.component.css'],
 })
 export class EditUserModalComponent implements OnInit {
-    @Input() user: any;
-    @Output() completeUpdate: EventEmitter<any> = new EventEmitter();
+    user: any;
     form: any;
 
     constructor(private userService: UserService,
+                public ref: DynamicDialogRef,
+                public config: DynamicDialogConfig,
                 private messageService: MessageService) {
     }
 
     ngOnInit() {
+        this.user = this.config.data.user;
         this.form = {
             name: this.user.name,
             email: this.user.email,
@@ -36,8 +39,9 @@ export class EditUserModalComponent implements OnInit {
             );
             editedUser = await lastValueFrom(editedUser);
             this.messageService.add({severity: 'success', summary: 'Success', detail: 'User Updated'});
-            this.completeUpdate.emit(editedUser);
+            // this.completeUpdate.emit(editedUser);
             // this.activeModal.close(editedUser);
+            this.ref.close(editedUser);
         } catch (e: any) {
             console.error(e);
             this.messageService.add({severity: 'error', summary: 'Error', detail: e.error.message});

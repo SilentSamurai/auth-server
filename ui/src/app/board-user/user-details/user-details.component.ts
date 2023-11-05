@@ -1,14 +1,16 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from "@angular/router";
 import {UserService} from "../../_services/user.service";
-import {lastValueFrom} from "rxjs";
+import {firstValueFrom, lastValueFrom} from "rxjs";
 import {ConfirmationService, MessageService} from "primeng/api";
+import {DialogService} from "primeng/dynamicdialog";
+import {EditUserModalComponent} from "../edit-user-modal/edit-user-modal.component";
 
 @Component({
     selector: 'tenant-details',
     templateUrl: './user-details.component.html',
     styleUrls: [],
-    providers: [ConfirmationService, MessageService]
+    providers: [ConfirmationService, MessageService, DialogService]
 })
 export class UserDetailsComponent implements OnInit {
 
@@ -24,6 +26,7 @@ export class UserDetailsComponent implements OnInit {
     constructor(private userService: UserService,
                 private router: Router,
                 private messageService: MessageService,
+                private dialogService: DialogService,
                 private confirmationService: ConfirmationService,
                 private actRoute: ActivatedRoute) {
     }
@@ -67,7 +70,19 @@ export class UserDetailsComponent implements OnInit {
 
     }
 
-    openUpdateModal() {
+    async openUpdateModal() {
+        let modalRef = this.dialogService.open(EditUserModalComponent, {
+            data: {
+                user: this.user
+            },
+            header: "Update User",
+            width: "50vh",
+            modal: true
+        });
+        const user = await firstValueFrom(modalRef.onClose);
+        modalRef.destroy();
+        console.log(user);
+        await this.ngOnInit();
         this.updateDialog = true;
         // const modalRef = this.modalService.open(EditUserModalComponent);
         // modalRef.componentInstance.user = this.user;

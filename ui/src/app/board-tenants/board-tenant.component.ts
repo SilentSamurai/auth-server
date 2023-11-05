@@ -1,12 +1,15 @@
 import {Component, OnInit} from '@angular/core';
-import {lastValueFrom} from "rxjs";
+import {firstValueFrom, lastValueFrom} from "rxjs";
 import {TenantService} from "../_services/tenant.service";
 import {TokenStorageService} from "../_services/token-storage.service";
+import {DialogService} from "primeng/dynamicdialog";
+import {CreateTenantComponent} from "./create-tenant/create-tenant.component";
 
 @Component({
     selector: 'app-board-tenants',
     templateUrl: './board-tenant.component.html',
-    styleUrls: ['./board-tenant.component.scss']
+    styleUrls: ['./board-tenant.component.scss'],
+    providers: [DialogService]
 })
 export class BoardTenantComponent implements OnInit {
 
@@ -15,6 +18,7 @@ export class BoardTenantComponent implements OnInit {
     isTenantAdmin = false;
 
     constructor(private tokenStorageService: TokenStorageService,
+                private dialogService: DialogService,
                 private tenantService: TenantService) {
     }
 
@@ -29,25 +33,14 @@ export class BoardTenantComponent implements OnInit {
     }
 
     async openCreateModal() {
-        // const modalRef = this.modalService.open(CreateTenantComponent);
-        // const tenant = await modalRef.result;
-        // console.log(tenant);
-        await this.ngOnInit();
-    }
-
-    async openUpdateModal(tenant: any) {
-        // const modalRef = this.modalService.open(UpdateTenantComponent);
-        // modalRef.componentInstance.tenant = tenant;
-        // const editedTenant = await modalRef.result;
-        // console.log(editedTenant);
-        await this.ngOnInit();
-    }
-
-    async openDeleteModal(tenant: any) {
-        // const modalRef = this.modalService.open(DeleteTenantComponent);
-        // modalRef.componentInstance.tenant = tenant;
-        // const deletedTenant = await modalRef.result;
-        // console.log(deletedTenant);
+        let modalRef = this.dialogService.open(CreateTenantComponent, {
+            header: "Create Tenant",
+            width: "50vh",
+            modal: true
+        });
+        const tenant = await firstValueFrom(modalRef.onClose);
+        modalRef.destroy();
+        console.log(tenant);
         await this.ngOnInit();
     }
 }

@@ -2,12 +2,12 @@
 <div class="container-fluid">
     <div class="row ">
         <div class="col-md-6">
-            <h1>{{ user_email }}</h1>
+            <h3>{{ user_email }}</h3>
         </div>
         <div class="col-md-6 d-flex justify-content-end">
             <p-confirmPopup></p-confirmPopup>
-            <p-button (click)="confirmDelete($event)" class="p-button-danger p-button-text mt-2"
-                      label="Delete" severity="danger"></p-button>
+            <button (click)="confirmDelete($event)" class="p-button-danger"
+                    label="Delete" pButton type="button"></button>
         </div>
     </div>
     <div class="row justify-content-center ">
@@ -31,10 +31,6 @@
                     <button (click)="openUpdateModal()" label="Update" pButton type="button">
                     </button>
                 </div>
-                <p-dialog *ngIf="!loading"
-                          [(visible)]="updateDialog" [modal]="true" [style]="{width: '50vw'}" header="Update User">
-                    <edit-user-modal (completeUpdate)="completeUpdate($event)" [user]="user"></edit-user-modal>
-                </p-dialog>
             </p-card>
         </div>
         <div class="col-md-8 mt-2">

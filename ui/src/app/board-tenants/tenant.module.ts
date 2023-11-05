@@ -7,17 +7,17 @@ import {CommonModule} from "@angular/common";
 import {CreateTenantComponent} from './create-tenant/create-tenant.component';
 import {FormsModule} from "@angular/forms";
 import {UpdateTenantComponent} from "./update-tenant/update-tenant.component";
-import {DeleteTenantComponent} from "./delete-tenant/delete-tenant.component";
 import {AddMemberComponent} from "./tenant-details/add-member/add-member.component";
 import {AddScopeComponent} from "./tenant-details/add-scope/add-scope.component";
 import {AssignScopeComponent} from "./tenant-details/assign-scope/assign-scope.component";
 import {MultiSelectModule} from "primeng/multiselect";
-import {RemoveMemberComponent} from "./tenant-details/remove-member/remove-member.component";
 import {ChipModule} from "primeng/chip";
-import {RemoveScopeComponent} from "./tenant-details/remove-scope/remove-scope.component";
 import {NavBarModule} from "../nav-bar/nav-bar.module";
 import {ButtonModule} from "primeng/button";
 import {CardModule} from "primeng/card";
+import {DynamicDialogModule} from "primeng/dynamicdialog";
+import {InputTextModule} from "primeng/inputtext";
+import {ConfirmPopupModule} from "primeng/confirmpopup";
 
 @NgModule({
     declarations: [
@@ -25,12 +25,9 @@ import {CardModule} from "primeng/card";
         TenantDetailsComponent,
         CreateTenantComponent,
         UpdateTenantComponent,
-        DeleteTenantComponent,
         AddMemberComponent,
         AddScopeComponent,
-        AssignScopeComponent,
-        RemoveMemberComponent,
-        RemoveScopeComponent
+        AssignScopeComponent
     ],
     imports: [
         TableModule,
@@ -41,7 +38,10 @@ import {CardModule} from "primeng/card";
         ChipModule,
         NavBarModule,
         ButtonModule,
-        CardModule
+        CardModule,
+        DynamicDialogModule,
+        InputTextModule,
+        ConfirmPopupModule
     ],
     providers: [],
 })

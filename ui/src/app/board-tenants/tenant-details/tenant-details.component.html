@@ -1,10 +1,18 @@
 <nav-bar></nav-bar>
-<div class="container">
-
-
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-6">
+            <h3>{{ tenant.domain }}</h3>
+        </div>
+        <div class="col-md-6 d-flex justify-content-end">
+            <p-confirmPopup></p-confirmPopup>
+            <button (click)="confirmDelete($event)" class="p-button-danger"
+                    label="Delete" pButton type="button"></button>
+        </div>
+    </div>
     <div class="row justify-content-center my-2">
         <div class="col-lg-8">
-            <p-card header="{{ tenant.domain }}">
+            <p-card>
                 <div class=" row">
                     <div class="col-lg-5">
                         <div class=" my-2 mb-4">
@@ -62,13 +70,12 @@
                         <div *ngFor="let scope of tenant.scopes" class="my-2">
                             <p-chip>
                                 <code>{{tenant.name}}::{{scope.name}}</code>
-                                <button (click)="onRemoveScope(scope)" *ngIf="scope.removable"
+                                <button (click)="onRemoveScope($event, scope)" *ngIf="scope.removable"
                                         [disabled]="!isTenantAdmin"
-                                        aria-label="Close"
-                                        class="btn-sm btn"
-                                        style="height:100%"
+                                        class="p-button-rounded p-button-text p-button-plain"
+                                        icon="pi pi-times-circle"
+                                        pButton
                                         type="button">
-                                    <i class="fa fa-close"></i>
                                 </button>
                             </p-chip>
                         </div>
@@ -90,7 +97,7 @@
                     <div class="d-flex justify-content-between">
                         <h5>Member List</h5>
                         <button (click)="onAddMember()" [disabled]="!isTenantAdmin"
-                                label="Create"
+                                label="Add"
                                 pButton>
                         </button>
                     </div>
@@ -116,14 +123,15 @@
                             </ul>
                         </td>
                         <td class="">
-                            <button (click)="onAssignRole(user)" [disabled]="!isTenantAdmin" class="btn"
-                                    type="button">
-                                <i class="fa fa-solid fa-user"></i>
-                            </button>
-                            <button (click)="removeMember(user)" [disabled]="!isTenantAdmin" class="btn"
-                                    type="button">
-                                <i class="fa fa-solid fa-trash"></i>
-                            </button>
+
+                            <button (click)="onAssignRole(user)" [disabled]="!isTenantAdmin"
+                                    class="p-button-rounded p-button-text p-button-plain" icon="pi pi-user-edit"
+                                    pButton pRipple
+                                    type="button"></button>
+                            <button (click)="removeMember($event, user)" [disabled]="!isTenantAdmin"
+                                    class="p-button-rounded p-button-danger p-button-text" icon="pi pi-times"
+                                    pButton pRipple
+                                    type="button"></button>
                         </td>
                     </tr>
                 </ng-template>

@@ -2,16 +2,16 @@
 //@import "~bootstrap/dist/css/bootstrap.css";
 
 /* Importing Bootstrap SCSS file. */
+@import "~primeng/resources/themes/bootstrap4-dark-blue/theme.css";
 
 @import '~bootstrap/scss/bootstrap';
+
 @import "~primeng/resources/primeng.css";
 @import "~primeicons/primeicons.css";
 
 $gutter: 1rem; //for primeflex grid system
 @import "assets/layout/styles/layout/layout.scss";
 
-
-@import "~primeng/resources/themes/bootstrap4-dark-blue/theme.css";
 
 /* Demos */
 //@import "assets/demo/styles/flags/flags.css";

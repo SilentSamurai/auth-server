@@ -1,15 +1,16 @@
-import {Component, EventEmitter, OnInit, Output} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {lastValueFrom} from "rxjs";
 import {TenantService} from "../../_services/tenant.service";
 import {MessageService} from "primeng/api";
+import {DynamicDialogRef} from "primeng/dynamicdialog";
 
 @Component({
     selector: 'app-create-tenant',
     templateUrl: './create-tenant.component.html',
-    styleUrls: ['./create-tenant.component.css']
+    styleUrls: ['./create-tenant.component.scss']
 })
 export class CreateTenantComponent implements OnInit {
-    @Output() passEntry: EventEmitter<any> = new EventEmitter();
+    // @Output() passEntry: EventEmitter<any> = new EventEmitter();
 
     form = {
         name: "",
@@ -17,6 +18,7 @@ export class CreateTenantComponent implements OnInit {
     }
 
     constructor(private tenantService: TenantService,
+                public ref: DynamicDialogRef,
                 private messageService: MessageService) {
     }
 
@@ -27,8 +29,9 @@ export class CreateTenantComponent implements OnInit {
         try {
             const createdTenant = await lastValueFrom(this.tenantService.createTenant(this.form.name, this.form.domain));
             this.messageService.add({severity: 'success', summary: 'Success', detail: 'Tenant Created'});
-            this.passEntry.emit(createdTenant);
+            // this.passEntry.emit(createdTenant);
             // this.activeModal.close(createdTenant);
+            this.ref.close(createdTenant);
         } catch (e) {
             this.messageService.add({severity: 'error', summary: 'Error', detail: 'Tenant Creation Failed'});
         }
