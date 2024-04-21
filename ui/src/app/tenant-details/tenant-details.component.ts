@@ -2,14 +2,14 @@ import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from "@angular/router";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {AddMemberComponent} from "./add-member/add-member.component";
-import {UpdateTenantComponent} from "../update-tenant/update-tenant.component";
 import {AddScopeComponent} from "./add-scope/add-scope.component";
 import {AssignScopeComponent} from "./assign-scope/assign-scope.component";
 import {RemoveMemberComponent} from "./remove-member/remove-member.component";
-import {TenantService} from "../../_services/tenant.service";
 import {MessageService} from "primeng/api";
 import {RemoveScopeComponent} from "./remove-scope/remove-scope.component";
-import {TokenStorageService} from "../../_services/token-storage.service";
+import {TenantService} from "../_services/tenant.service";
+import {TokenStorageService} from "../_services/token-storage.service";
+import {UpdateTenantComponent} from "../board-tenants/update-tenant/update-tenant.component";
 
 @Component({
     selector: 'tenant-details',
@@ -17,6 +17,34 @@ import {TokenStorageService} from "../../_services/token-storage.service";
     styleUrls: ['./tenant-details.component.css']
 })
 export class TenantDetailsComponent implements OnInit {
+
+    selectedMenu = "OVR";
+    menu = [
+        {
+            id: "OVR",
+            label: 'Overview',
+            icon: 'pi pi-fw pi-sitemap',
+            command: () => {
+                this.selectedMenu = "OVR";
+            }
+        },
+        {
+            id: "MEM",
+            label: 'Members',
+            icon: 'pi pi-fw pi-users',
+            command: () => {
+                this.selectedMenu = "MEM";
+            }
+        },
+        {
+            id: "ROLE",
+            label: 'Roles',
+            icon: 'pi pi-fw pi-palette',
+            command: () => {
+                this.selectedMenu = "ROLE";
+            }
+        }
+    ];
 
     tenant_id: string = "";
     tenant: any = {};

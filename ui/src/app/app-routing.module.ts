@@ -8,9 +8,9 @@ import {ProfileComponent} from './profile/profile.component';
 import {BoardUserComponent} from './board-user/board-user.component';
 import {BoardTenantComponent} from './board-tenants/board-tenant.component';
 import {UserAuthGuard} from "./shared/user-auth-guard.service";
-import {TenantDetailsComponent} from "./board-tenants/tenant-details/tenant-details.component";
 import {UserDetailsComponent} from "./board-user/user-details/user-details.component";
 import {OtpDisplayComponent} from "./opt-page/otp-display.component";
+import {TenantDetailsComponent} from "./tenant-details/tenant-details.component";
 
 const routes: Routes = [
     {path: 'home', component: HomeComponent, canActivate: []},

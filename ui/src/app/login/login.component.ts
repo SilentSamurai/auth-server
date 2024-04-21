@@ -20,7 +20,7 @@ export class LoginComponent implements OnInit {
     isLoginFailed = false;
     errorMessage = '';
     scopes: string[] = [];
-    freezeDomain = true;
+    freezeDomain = false;
     redirectUri = "/home";
     code_challenge = "";
 

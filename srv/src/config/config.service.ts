@@ -10,7 +10,7 @@ export class ConfigService {
 
     static config(): any {
         if (!this.isProduction()) {
-            let envPath = path.resolve(process.cwd(), '.env.dev');
+            let envPath = path.resolve(process.cwd(), '.env.development');
             console.log("Environment path :", envPath);
             config({
                 path: envPath

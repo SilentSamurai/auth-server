@@ -1,0 +1,164 @@
+<nav-bar></nav-bar>
+<div class="container-fluid">
+
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-2 my-2">
+            <p-panelMenu  [model]="menu" class="w-100">
+            </p-panelMenu >
+        </div>
+        <div class="col-10">
+            <div class="row justify-content-center my-2" *ngIf="selectedMenu == 'OVR' ">
+                <div class="col-md-12">
+                    <div class="card text-black">
+                        <div class=" row card-body">
+                            <div class="col-lg-5">
+                                <div class=" my-2 mb-4">
+                                    <div class="p-disabled">Tenant Domain</div>
+                                    <h4>{{ tenant.domain }}</h4>
+                                </div>
+                                <div class="my-2">
+                                    <div class="p-disabled">Tenant Id</div>
+                                    <div>{{ tenant_id }}</div>
+                                </div>
+                                <div class="my-2">
+                                    <div class="p-disabled">Tenant Name</div>
+                                    <div>{{ tenant.name }}</div>
+                                </div>
+                                <div class="d-flex justify-content-between total font-weight-bold mt-4">
+                                    <button (click)="onUpdateTenant()" [disabled]="!isTenantAdmin"
+                                            class="btn btn-primary btn-sm">
+                                        Update
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-lg-7">
+                                <div class="my-2">
+                                    <div class="p-disabled">Client Id</div>
+                                    <div>
+                                        <code>
+                                            <pre class="text-wrap text-break">{{ credentials.clientId }}</pre>
+                                        </code>
+                                    </div>
+                                </div>
+                                <div class="my-2">
+                                    <div class="p-disabled">Client Secret</div>
+                                    <div>
+                                        <code>
+                                            <pre class="text-wrap text-break">{{ credentials.clientSecret }}</pre>
+                                        </code>
+                                    </div>
+                                </div>
+                                <div class="my-2">
+                                    <div class="p-disabled">Public Key</div>
+                                    <div>
+                                        <code>
+                                            <pre class="text-wrap text-break">{{ credentials.publicKey }}</pre>
+                                        </code>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="row justify-content-center my-2" *ngIf="selectedMenu == 'MEM' ">
+                <div class="col-md-12">
+                    <div class="card text-black">
+                        <p-table [value]="members" responsiveLayout="scroll">
+                            <ng-template pTemplate="caption">
+                                <div class="d-flex justify-content-between">
+                                    <h5>Member List</h5>
+                                    <button (click)="onAddMember()" [disabled]="!isTenantAdmin"
+                                            class="btn btn-primary btn-sm">
+                                        Add Member
+                                    </button>
+                                </div>
+
+                            </ng-template>
+                            <ng-template let-columns pTemplate="header">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Assigned Scopes</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </ng-template>
+                            <ng-template let-columns="columns" let-user pTemplate="body">
+                                <tr>
+                                    <td><span class="p-column-title">Name</span>{{ user.name }}</td>
+                                    <td><span class="p-column-title">Email</span>{{ user.email }}</td>
+                                    <td><span class="p-column-title">Scopes</span>
+                                        <ul>
+                                            <li *ngFor="let scope of user.scopes">
+                                                <code>{{ tenant.name }}::{{ scope.name }}</code>
+                                            </li>
+                                        </ul>
+                                    </td>
+                                    <td class="">
+                                        <button (click)="onAssignRole(user)" [disabled]="!isTenantAdmin" class="btn"
+                                                type="button">
+                                            <i class="fa fa-solid fa-user"></i>
+                                        </button>
+                                        <button (click)="removeMember(user)" [disabled]="!isTenantAdmin" class="btn"
+                                                type="button">
+                                            <i class="fa fa-solid fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </ng-template>
+                        </p-table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row justify-content-center my-2" *ngIf="selectedMenu == 'ROLE' ">
+                <div class="col-md-12">
+                    <div class="card text-black">
+                        <div class="card text-black">
+                            <p-table [value]="tenant.scopes" responsiveLayout="scroll">
+                                <ng-template pTemplate="caption">
+                                    <div class="d-flex justify-content-between">
+                                        <h5>Role List</h5>
+                                        <button (click)="onAddScope()" [disabled]="!isTenantAdmin"
+                                                class="btn btn-primary btn-sm">
+                                            Add Role
+                                        </button>
+                                    </div>
+
+                                </ng-template>
+                                <ng-template let-columns pTemplate="header">
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </ng-template>
+                                <ng-template let-columns="columns" let-scope pTemplate="body">
+                                    <tr>
+                                        <td><span class="p-column-title">Name</span>{{ scope.name }}</td>
+                                        <td>
+                                            <button (click)="onRemoveScope(scope)"
+                                                    *ngIf="scope.removable"
+                                                    [disabled]="!isTenantAdmin"
+                                                    class="btn btn-sm"
+                                                    type="button">
+                                                <i class="fa fa-solid fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </ng-template>
+                            </p-table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+
+</div>

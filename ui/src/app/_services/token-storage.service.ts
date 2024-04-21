@@ -1,5 +1,6 @@
 import {Injectable} from '@angular/core';
 import jwt_decode from "jwt-decode";
+import {Router} from "@angular/router";
 
 const TOKEN_KEY = 'auth-token';
 const USER_KEY = 'auth-user';
@@ -9,7 +10,7 @@ const CODE_VERIFIER = 'code-verifier';
     providedIn: 'root'
 })
 export class TokenStorageService {
-    constructor() {
+    constructor(private router: Router,) {
     }
 
     signOut(): void {
@@ -24,7 +25,12 @@ export class TokenStorageService {
     }
 
     public getToken(): string | null {
-        return window.localStorage.getItem(TOKEN_KEY);
+        const token = window.localStorage.getItem(TOKEN_KEY);
+        if (token == null || tokenExpired(token)) {
+            this.router.navigateByUrl("/login");
+            return null;
+        }
+        return token;
     }
 
     public getUser(): any {
@@ -105,4 +111,9 @@ function base64urlencode(a: ArrayBuffer): string {
 async function generateCodeChallengeFromVerifier(v: string): Promise<string> {
     const hashed: ArrayBuffer = await sha256(v);
     return base64urlencode(hashed);
+}
+
+function tokenExpired(token: string) {
+    const expiry = (JSON.parse(atob(token.split('.')[1]))).exp;
+    return (Math.floor((new Date).getTime() / 1000)) >= expiry;
 }
