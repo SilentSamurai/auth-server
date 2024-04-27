@@ -128,21 +128,24 @@ export class AuthController {
     @Post('/gen-auth-code')
     async authCode(
         @Body() body: {
-            access_token: string,
-            code_challenge: string
+            auth_code: string
         }) {
-        let securityContext = await this.authService.validateAccessToken(body.access_token);
-        const user: User = await this.usersService.findByEmail(securityContext.email);
-        const tenant = await this.tenantService.findById(securityContext.tenant.id);
-        const auth_code = await this.authCodeService.createAuthToken(user, tenant, body.code_challenge);
+        const authCodeObj = await this.authCodeService.findByCode(body.auth_code);
+        const user = await this.usersService.findById(authCodeObj.userId);
         return {
-            authentication_code: auth_code
+            authentication_code: body.auth_code,
+            status: true,
+            email: user.email
         };
     }
 
     @Post('/verify')
     async verifyAccessToken(
-        @Body(new ValidationPipe(ValidationSchema.VerifyTokenSchema)) body: { access_token: string, client_id: string, client_secret: string }
+        @Body(new ValidationPipe(ValidationSchema.VerifyTokenSchema)) body: {
+            access_token: string,
+            client_id: string,
+            client_secret: string
+        }
     ): Promise<object> {
         const tenant = await this.authService.validateClientCredentials(body.client_id, body.client_secret);
         let securityContext = await this.authService.validateAccessToken(body.access_token);
@@ -154,7 +157,11 @@ export class AuthController {
 
     @Post('/exchange')
     async exchangeAccessToken(
-        @Body(new ValidationPipe(ValidationSchema.ExchangeTokenSchema)) body: { access_token: string, client_id: string, client_secret: string }
+        @Body(new ValidationPipe(ValidationSchema.ExchangeTokenSchema)) body: {
+            access_token: string,
+            client_id: string,
+            client_secret: string
+        }
     ): Promise<object> {
         let securityContext = await this.authService.validateAccessToken(body.access_token);
         if (securityContext.grant_type !== GRANT_TYPES.PASSWORD) {

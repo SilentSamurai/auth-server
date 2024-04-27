@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {Observable} from 'rxjs';
+import {lastValueFrom, Observable} from 'rxjs';
 
 const AUTH_API = '/api/oauth';
 
@@ -32,11 +32,10 @@ export class AuthService {
         }, httpOptions);
     }
 
-    getAuthCode(accessToken: string, challenge: string): Observable<any> {
-        return this.http.post(`${AUTH_API}/gen-auth-code`, {
-            access_token: accessToken,
-            code_challenge: challenge
-        }, httpOptions);
+    validateAuthCode(authCode: string): Promise<any> {
+        return lastValueFrom(this.http.post(`${AUTH_API}/gen-auth-code`, {
+            auth_code: authCode
+        }, httpOptions));
     }
 
     register(name: string, email: string, password: string): Observable<any> {

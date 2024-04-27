@@ -22,7 +22,11 @@ export class HomeComponent implements OnInit {
                 private tokenStorage: TokenStorageService) {
     }
 
-    async ngOnInit(): Promise<void> {
+    ngOnInit(): void {
+        this.startUp();
+    }
+
+    async startUp(): Promise<void> {
         let params = this.route.snapshot.queryParamMap;
         if (params.has("code")) {
             try {

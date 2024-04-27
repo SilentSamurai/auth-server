@@ -19,8 +19,11 @@
                     name="form"
                     novalidate
                 >
-                    <div class="form-group">
-                        <label for="email">Email</label>
+                    <label for="email">Email</label>
+                    <div class="form-group input-group">
+                        <span class="input-group-text">
+                            @
+                        </span>
                         <input
                             #username="ngModel"
                             [(ngModel)]="form.email"
@@ -29,16 +32,17 @@
                             name="email"
                             required
                             type="text"/>
-                        <div
-                            *ngIf="username.errors && f.submitted"
-                            class="alert alert-danger"
-                            role="alert"
-                        >
-                            Email is required!
-                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="password">Password</label>
+                    <div
+                        *ngIf="username.errors && f.submitted"
+                        class="alert alert-danger"
+                        role="alert"
+                    >
+                        Email is required!
+                    </div>
+
+                    <label for="password">Password</label>
+                    <div class="input-group form-group">
                         <input
                             #password="ngModel"
                             [(ngModel)]="form.password"
@@ -47,16 +51,22 @@
                             minlength="6"
                             name="password"
                             required
-                            type="password"/>
-                        <div
-                            *ngIf="password.errors && f.submitted"
-                            class="alert alert-danger"
-                            role="alert"
-                        >
-                            <div *ngIf="password.errors['required']">Password is required</div>
-                            <div *ngIf="password.errors['minlength']">
-                                Password must be at least 6 characters
-                            </div>
+                            placeholder="password"
+                            type="{{ isPasswordVisible ? 'text' :'password' }}"/>
+                        <button class="input-group-text"
+                                (click)="isPasswordVisible = !isPasswordVisible"
+                                type="button">
+                            <i class="fa fas {{ !isPasswordVisible ? 'fa-eye' : 'fa-eye-slash' }}"></i>
+                        </button>
+                    </div>
+                    <div
+                        *ngIf="password.errors && f.submitted"
+                        class="alert alert-danger"
+                        role="alert"
+                    >
+                        <div *ngIf="password.errors['required']">Password is required</div>
+                        <div *ngIf="password.errors['minlength']">
+                            Password must be at least 6 characters
                         </div>
                     </div>
 
@@ -72,15 +82,15 @@
                             name="domain"
                             required
                             type="text"/>
-                        <div
-                            *ngIf="domain.errors && f.submitted"
-                            class="alert alert-danger"
-                            role="alert"
-                        >
-                            <div *ngIf="domain.errors['required']">Domain is required</div>
-                            <div *ngIf="domain.errors['minlength']">
-                                Password must be at least 6 characters
-                            </div>
+                    </div>
+                    <div
+                        *ngIf="domain.errors && f.submitted"
+                        class="alert alert-danger"
+                        role="alert"
+                    >
+                        <div *ngIf="domain.errors['required']">Domain is required</div>
+                        <div *ngIf="domain.errors['minlength']">
+                            Password must be at least 6 characters
                         </div>
                     </div>
 

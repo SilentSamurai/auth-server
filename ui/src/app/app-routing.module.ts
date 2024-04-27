@@ -14,7 +14,7 @@ import {TenantDetailsComponent} from "./tenant-details/tenant-details.component"
 
 const routes: Routes = [
     {path: 'home', component: HomeComponent, canActivate: []},
-    {path: 'opt-page', component: OtpDisplayComponent, canActivate: []},
+    {path: 'opt-page', component: OtpDisplayComponent},
     {path: 'login', component: LoginComponent},
     {path: 'register', component: RegisterComponent},
     {path: 'profile', component: ProfileComponent, canActivate: [UserAuthGuard]},

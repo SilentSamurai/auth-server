@@ -20,9 +20,11 @@ export class LoginComponent implements OnInit {
     isLoginFailed = false;
     errorMessage = '';
     scopes: string[] = [];
-    freezeDomain = false;
+    freezeDomain = true;
     redirectUri = "/home";
     code_challenge = "";
+
+    isPasswordVisible = false;
 
     constructor(private authService: AuthService,
                 private router: Router,
@@ -41,33 +43,47 @@ export class LoginComponent implements OnInit {
             this.form.domain = params.get("domain");
             this.redirectUri = params.get("redirect")!;
             this.code_challenge = params.get("code_challenge")!;
-            if (this.redirectUri === "otp") {
-                this.redirectUri = "/opt-page"
-                this.code_challenge = await this.tokenStorage.getCodeChallenge();
-            }
         }
-
-
-        if (this.tokenStorage.isLoggedIn()) {
-            if (!externalLogin) {
-                await this.router.navigateByUrl("/home");
-                return;
-            } else {
-                let user = this.tokenStorage.getUser();
-                if (user.tenant.domain === this.form.domain) {
-                    try {
-                        let codeChallenge = this.code_challenge;
-                        let token = this.tokenStorage.getToken()!;
-                        const code = await lastValueFrom(this.authService.getAuthCode(token, codeChallenge));
-                        await this.redirect(code.authentication_code);
-                        return;
-                    } catch (e: any) {
-                    }
+        // if auth code is present, then redirect
+        // verify auth-code
+        const authCode = this.tokenStorage.getAuthCode();
+        if (authCode) {
+            try {
+                const data = await this.authService.validateAuthCode(authCode);
+                if (data.status) {
+                    await this.router.navigate(['opt-page'], {
+                        queryParams: {
+                            redirect: this.redirectUri
+                        }
+                    });
                 }
-                this.tokenStorage.signOut();
+            } catch (e: any) {
+                console.error(e);
             }
         }
+        // else if (this.tokenStorage.isLoggedIn() && !externalLogin) {
+        //     await this.router.navigateByUrl("/home");
+        // }
         this.loading = false;
+    }
+
+    // redirection to home page might not work sometime,
+    // check if internally anything is nav-ing to login page again
+    async onSubmit(): Promise<void> {
+        const {email, password, domain} = this.form;
+        try {
+            const data = await lastValueFrom(this.authService.login(email, password, domain, this.code_challenge));
+            let authenticationCode = data.authentication_code;
+            this.isLoginFailed = false;
+            this.isLoggedIn = true;
+            this.tokenStorage.saveAuthCode(authenticationCode);
+            await this.redirect(authenticationCode);
+        } catch (err: any) {
+            console.error(err);
+            this.errorMessage = err.error.message;
+            this.isLoginFailed = true;
+        }
+
     }
 
     async redirect(code: string) {
@@ -82,25 +98,9 @@ export class LoginComponent implements OnInit {
         }
     }
 
-    async onSubmit(): Promise<void> {
-        const {email, password, domain} = this.form;
-        try {
-            const data = await lastValueFrom(this.authService.login(email, password, domain, this.code_challenge));
-            let authenticationCode = data.authentication_code;
-            this.isLoginFailed = false;
-            this.isLoggedIn = true;
-            await this.redirect(authenticationCode);
-        } catch (err: any) {
-            console.error(err);
-            this.errorMessage = err.error.message;
-            this.isLoginFailed = true;
-        }
-
-    }
-
     protected isAbsoluteUrl(url: string): boolean {
         try {
-            const absoluteUrl = new URL(url);
+            new URL(url);
             return true;
         } catch (error) {
             return false;

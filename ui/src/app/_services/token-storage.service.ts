@@ -4,6 +4,7 @@ import {Router} from "@angular/router";
 
 const TOKEN_KEY = 'auth-token';
 const USER_KEY = 'auth-user';
+const CODE_KEY = 'auth-code';
 const CODE_VERIFIER = 'code-verifier';
 
 @Injectable({
@@ -13,8 +14,24 @@ export class TokenStorageService {
     constructor(private router: Router,) {
     }
 
-    signOut(): void {
-        window.localStorage.clear();
+    public clearSession(): void {
+        window.localStorage.removeItem(TOKEN_KEY);
+        window.localStorage.removeItem(USER_KEY);
+        window.sessionStorage.removeItem(CODE_KEY);
+    }
+
+    async signOut(): Promise<void> {
+        this.clearSession();
+        await this.router.navigateByUrl(`/login`);
+    }
+
+    public getAuthCode(): string | null {
+        return window.sessionStorage.getItem(CODE_KEY);
+    }
+
+    public saveAuthCode(code: string): void {
+        window.sessionStorage.removeItem(CODE_KEY);
+        window.sessionStorage.setItem(CODE_KEY, code);
     }
 
     public saveToken(token: string): void {
@@ -27,18 +44,31 @@ export class TokenStorageService {
     public getToken(): string | null {
         const token = window.localStorage.getItem(TOKEN_KEY);
         if (token == null || tokenExpired(token)) {
-            this.router.navigateByUrl("/login");
             return null;
         }
         return token;
     }
+
+    public isTokenExpired(): boolean {
+        const token = window.localStorage.getItem(TOKEN_KEY);
+        return token != null && tokenExpired(token);
+
+    }
+
+    // public async getToken(): Promise<string | null> {
+    //     const token = window.localStorage.getItem(TOKEN_KEY);
+    //     if (token == null || tokenExpired(token)) {
+    //         await this.router.navigateByUrl("/login");
+    //         return null;
+    //     }
+    //     return token;
+    // }
 
     public getUser(): any {
         const user = window.localStorage.getItem(USER_KEY);
         if (user) {
             return JSON.parse(user);
         }
-
         return null;
     }
 
