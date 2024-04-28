@@ -13,15 +13,15 @@ export class LoginComponent implements OnInit {
     form: any = {
         email: null,
         password: null,
-        domain: "auth.server.com"
+        domain: null
     };
     loading = true;
     isLoggedIn = false;
     isLoginFailed = false;
     errorMessage = '';
     scopes: string[] = [];
-    freezeDomain = true;
-    redirectUri = "/home";
+    freezeDomain = false;
+    redirectUri = "";
     code_challenge = "";
 
     isPasswordVisible = false;
@@ -35,15 +35,19 @@ export class LoginComponent implements OnInit {
     async ngOnInit(): Promise<void> {
 
         let params = this.route.snapshot.queryParamMap;
-        console.log(params, this.freezeDomain);
-        this.code_challenge = await this.tokenStorage.getCodeChallenge();
 
-        const externalLogin = params.has("redirect") && params.has("code_challenge") && params.has("domain");
-        if (externalLogin) {
-            this.form.domain = params.get("domain");
-            this.redirectUri = params.get("redirect")!;
-            this.code_challenge = params.get("code_challenge")!;
+        if (!params.has("code_challenge")) {
+            alert("Invalid challenge");
+            return;
         }
+        if (params.has("domain")) {
+            this.freezeDomain = true;
+        }
+
+        this.form.domain = params.get("domain");
+        this.redirectUri = params.get("redirect")!;
+        this.code_challenge = params.get("code_challenge")!;
+
         // if auth code is present, then redirect
         // verify auth-code
         const authCode = this.tokenStorage.getAuthCode();
@@ -51,9 +55,11 @@ export class LoginComponent implements OnInit {
             try {
                 const data = await this.authService.validateAuthCode(authCode);
                 if (data.status) {
-                    await this.router.navigate(['opt-page'], {
+                    await this.router.navigate(['session-confirm'], {
                         queryParams: {
-                            redirect: this.redirectUri
+                            redirect: this.redirectUri,
+                            domain: this.form.domain,
+                            code_challenge: this.code_challenge
                         }
                     });
                 }
@@ -87,6 +93,9 @@ export class LoginComponent implements OnInit {
     }
 
     async redirect(code: string) {
+        if (this.redirectUri.length <= 0) {
+            return
+        }
         if (this.isAbsoluteUrl(this.redirectUri)) {
             window.location.href = `${this.redirectUri}?code=${code}`;
         } else {

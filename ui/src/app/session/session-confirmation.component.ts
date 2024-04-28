@@ -3,30 +3,37 @@ import {UserService} from '../_services/user.service';
 import {TokenStorageService} from "../_services/token-storage.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {AuthService} from "../_services/auth.service";
+import {AuthDefaultService} from "../_services/auth.default.service";
 
 @Component({
-    selector: 'app-home',
-    templateUrl: './otp-display.component.html',
-    styleUrls: ['./otp-display.component.css']
+    selector: 'session-confirm',
+    templateUrl: './session-confirmation.component.html',
+    styleUrls: ['./session-confirmation.component.css']
 })
-export class OtpDisplayComponent implements OnInit {
+export class SessionConfirmationComponent implements OnInit {
     content?: string;
     user: any;
     loading = true;
     authCode = "";
     redirectUri = "";
     username = "";
+    code_challenge = "";
+    domain = "";
 
     constructor(private userService: UserService,
                 private router: Router,
                 private route: ActivatedRoute,
                 private authService: AuthService,
+                private authDefaultService: AuthDefaultService,
                 private tokenStorage: TokenStorageService) {
     }
 
     async ngOnInit(): Promise<void> {
         let params = this.route.snapshot.queryParamMap;
         this.redirectUri = params.get("redirect")!;
+        this.domain = params.get("domain")!;
+        this.code_challenge = params.get("code_challenge")!;
+
 
         const authCode = this.tokenStorage.getAuthCode();
         if (authCode) {
@@ -49,7 +56,15 @@ export class OtpDisplayComponent implements OnInit {
     }
 
     async onLogout() {
-        await this.tokenStorage.signOut();
+        this.tokenStorage.clearSession();
+        await this.router.navigate(['login'], {
+            queryParams: {
+                redirect: this.redirectUri,
+                domain: this.domain,
+                code_challenge: this.code_challenge
+            }
+        });
+
     }
 
     async redirect(code: string) {

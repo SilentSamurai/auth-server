@@ -4,6 +4,7 @@ import {TokenStorageService} from "../_services/token-storage.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {lastValueFrom} from "rxjs";
 import {AuthService} from "../_services/auth.service";
+import {AuthDefaultService} from "../_services/auth.default.service";
 
 @Component({
     selector: 'app-home',
@@ -19,6 +20,7 @@ export class HomeComponent implements OnInit {
                 private router: Router,
                 private route: ActivatedRoute,
                 private authService: AuthService,
+                private authDefaultService: AuthDefaultService,
                 private tokenStorage: TokenStorageService) {
     }
 
@@ -45,7 +47,7 @@ export class HomeComponent implements OnInit {
                 await this.router.navigateByUrl(`/tenant/${this.user.tenant.id}`);
             }
         } else {
-            await this.router.navigateByUrl(`/login`);
+            await this.authDefaultService.signOut('/home');
         }
         this.loading = false;
     }

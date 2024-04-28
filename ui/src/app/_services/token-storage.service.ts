@@ -11,18 +11,13 @@ const CODE_VERIFIER = 'code-verifier';
     providedIn: 'root'
 })
 export class TokenStorageService {
-    constructor(private router: Router,) {
+    constructor(private router: Router) {
     }
 
     public clearSession(): void {
         window.localStorage.removeItem(TOKEN_KEY);
         window.localStorage.removeItem(USER_KEY);
         window.sessionStorage.removeItem(CODE_KEY);
-    }
-
-    async signOut(): Promise<void> {
-        this.clearSession();
-        await this.router.navigateByUrl(`/login`);
     }
 
     public getAuthCode(): string | null {

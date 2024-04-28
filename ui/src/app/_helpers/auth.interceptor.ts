@@ -3,13 +3,15 @@ import {Injectable} from '@angular/core';
 
 import {TokenStorageService} from '../_services/token-storage.service';
 import {Observable} from 'rxjs';
+import {AuthDefaultService} from "../_services/auth.default.service";
 
 // const TOKEN_HEADER_KEY = 'Authorization';       // for Spring Boot back-end
 const TOKEN_HEADER_KEY = 'Authorization';   // for Node.js Express back-end
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
-    constructor(private tokenService: TokenStorageService) {
+    constructor(private tokenService: TokenStorageService,
+                private authDefaultService: AuthDefaultService) {
     }
 
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
@@ -25,7 +27,7 @@ export class AuthInterceptor implements HttpInterceptor {
 
         if (this.tokenService.isTokenExpired()) {
             console.log("signing out as token is null");
-            this.tokenService.signOut();
+            this.authDefaultService.signOut('/home');
         }
         return next.handle(authReq);
     }

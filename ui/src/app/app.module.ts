@@ -20,7 +20,7 @@ import {ToastModule} from "primeng/toast";
 import {MessageService} from "primeng/api";
 import {NavBarModule} from "./nav-bar/nav-bar.module";
 import {RouterModule} from "@angular/router";
-import {OtpDisplayComponent} from "./opt-page/otp-display.component";
+import {SessionConfirmationComponent} from "./session/session-confirmation.component";
 import {TenantDetailsModule} from "./tenant-details/tenant-details.module";
 
 @NgModule({
@@ -31,7 +31,7 @@ import {TenantDetailsModule} from "./tenant-details/tenant-details.module";
         RegisterComponent,
         HomeComponent,
         ProfileComponent,
-        OtpDisplayComponent,
+        SessionConfirmationComponent,
     ],
     imports: [
         BrowserModule,

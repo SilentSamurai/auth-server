@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {UserService} from '../_services/user.service';
 import {TokenStorageService} from "../_services/token-storage.service";
 import {Router} from "@angular/router";
+import {AuthDefaultService} from "../_services/auth.default.service";
 
 @Component({
     selector: 'nav-bar',
@@ -16,6 +17,7 @@ export class NavBarComponent implements OnInit {
 
     constructor(private userService: UserService,
                 private router: Router,
+                private authDefaultService: AuthDefaultService,
                 private tokenStorageService: TokenStorageService) {
 
     }
@@ -38,6 +40,6 @@ export class NavBarComponent implements OnInit {
     }
 
     logout(): void {
-        this.tokenStorageService.signOut();
+        this.authDefaultService.signOut("/home");
     }
 }
