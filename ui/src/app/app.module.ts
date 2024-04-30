@@ -22,6 +22,7 @@ import {NavBarModule} from "./nav-bar/nav-bar.module";
 import {RouterModule} from "@angular/router";
 import {SessionConfirmationComponent} from "./session/session-confirmation.component";
 import {TenantDetailsModule} from "./tenant-details/tenant-details.module";
+import {AdminModule} from "./admin/admin.module";
 
 @NgModule({
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -45,6 +46,7 @@ import {TenantDetailsModule} from "./tenant-details/tenant-details.module";
         TenantModule,
         UserModule,
         TenantDetailsModule,
+        AdminModule,
         BrowserAnimationsModule,
         ReactiveFormsModule,
         ToastModule,

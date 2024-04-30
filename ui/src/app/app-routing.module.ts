@@ -11,6 +11,7 @@ import {UserAuthGuard} from "./shared/user-auth-guard.service";
 import {UserDetailsComponent} from "./board-user/user-details/user-details.component";
 import {SessionConfirmationComponent} from "./session/session-confirmation.component";
 import {TenantDetailsComponent} from "./tenant-details/tenant-details.component";
+import { AdminHomeComponent } from './admin/home/admin-home.component';
 
 const routes: Routes = [
     {path: 'home', component: HomeComponent, canActivate: []},
@@ -22,6 +23,14 @@ const routes: Routes = [
     {path: 'tenants', component: BoardTenantComponent, canActivate: [UserAuthGuard]},
     {path: 'tenant/:tenantId', component: TenantDetailsComponent, canActivate: [UserAuthGuard]},
     {path: 'user/:email', component: UserDetailsComponent, canActivate: [UserAuthGuard]},
+    {
+        path: 'admin', 
+        component: AdminHomeComponent, 
+        canActivate: [],
+        children: [
+            {path: '', component: AdminHomeComponent, canActivate: []},
+        ]
+    },
     {path: '', redirectTo: 'home', pathMatch: 'full'}
 ];
 
