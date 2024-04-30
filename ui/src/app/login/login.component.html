@@ -15,7 +15,7 @@
                 <form
                     #f="ngForm"
                     (ngSubmit)="f.form.valid && onSubmit()"
-                    *ngIf="!isLoggedIn"
+                    *ngIf="!isLoggedIn && freezeDomain"
                     name="form"
                     novalidate
                 >
@@ -107,6 +107,28 @@
                         >
                             Login failed: {{ errorMessage }}
                         </div>
+                    </div>
+                </form>
+
+                <form *ngIf="!freezeDomain">
+                    <div class="form-group">
+                        <label for="domain">Domain</label>
+                        <input
+                            #domain_pre="ngModel"
+                            [(ngModel)]="form.domain"
+                            [disabled]="freezeDomain"
+                            class="form-control"
+                            id="domain-pre"
+                            minlength="6"
+                            name="domain"
+                            required
+                            type="text"/>
+                    </div>
+
+                    <div class="form-group d-grid gap-2 py-3 ">
+                        <button class="btn btn-primary btn-block btn-lg" (click)="onContinue()">
+                            Continue
+                        </button>
                     </div>
                 </form>
 

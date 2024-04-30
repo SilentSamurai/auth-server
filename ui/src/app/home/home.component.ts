@@ -29,17 +29,7 @@ export class HomeComponent implements OnInit {
     }
 
     async startUp(): Promise<void> {
-        let params = this.route.snapshot.queryParamMap;
-        if (params.has("code")) {
-            try {
-                let code = params.get("code")!;
-                let verifier = this.tokenStorage.getCodeVerifier();
-                const data = await lastValueFrom(this.authService.getAccessToken(code, verifier));
-                this.tokenStorage.saveToken(data.access_token);
-            } catch (e: any) {
-                console.error(e);
-            }
-        }
+        // let params = this.route.snapshot.queryParamMap;
 
         if (this.tokenStorage.isLoggedIn()) {
             this.user = this.tokenStorage.getUser();

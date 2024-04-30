@@ -59,7 +59,7 @@ export class TokenStorageService {
     //     return token;
     // }
 
-    public getUser(): any {
+    public getUser(): any| null {
         const user = window.localStorage.getItem(USER_KEY);
         if (user) {
             return JSON.parse(user);

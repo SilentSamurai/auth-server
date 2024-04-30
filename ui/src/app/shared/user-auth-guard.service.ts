@@ -21,7 +21,7 @@ export class UserAuthGuard implements CanActivate {
         if (this.tokenStorageService.isLoggedIn()) {
             return true;
         }
-        this.authDefaultService.signOut(route.url.toString());
+        this.authDefaultService.signOut("/" + route.url.join("/"));
         return false;
     }
 

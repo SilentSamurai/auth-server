@@ -41,10 +41,12 @@ export class LoginComponent implements OnInit {
             return;
         }
         if (params.has("domain")) {
-            this.freezeDomain = true;
+            this.form.domain = params.get("domain");
+            if (this.form.domain && this.form.domain.length > 0) {
+                this.freezeDomain = true;
+            }
         }
 
-        this.form.domain = params.get("domain");
         this.redirectUri = params.get("redirect")!;
         this.code_challenge = params.get("code_challenge")!;
 
@@ -73,6 +75,10 @@ export class LoginComponent implements OnInit {
         this.loading = false;
     }
 
+    onContinue() {
+        this.freezeDomain = true;
+    }
+
     // redirection to home page might not work sometime,
     // check if internally anything is nav-ing to login page again
     async onSubmit(): Promise<void> {
@@ -96,14 +102,24 @@ export class LoginComponent implements OnInit {
         if (this.redirectUri.length <= 0) {
             return
         }
+
         if (this.isAbsoluteUrl(this.redirectUri)) {
+            // redirecting else where
             window.location.href = `${this.redirectUri}?code=${code}`;
         } else {
-            await this.router.navigate([this.redirectUri], {
-                queryParams: {
-                    code: code
-                }
-            });
+            // redirecting internally
+            await this.setAccessToken(code);
+            await this.router.navigateByUrl(this.redirectUri);
+        }
+    }
+
+    private async setAccessToken(code: string) {
+        try {
+            let verifier = this.tokenStorage.getCodeVerifier();
+            const data = await lastValueFrom(this.authService.getAccessToken(code, verifier));
+            this.tokenStorage.saveToken(data.access_token);
+        } catch (e: any) {
+            console.error(e);
         }
     }
 

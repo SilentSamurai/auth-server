@@ -11,19 +11,34 @@ export class AuthDefaultService {
     }
 
     async signOut(redirect: string): Promise<void> {
+        const userInfo = this.tokenStorageService.getUser();
         this.tokenStorageService.clearSession();
-        await this.navToLogin(redirect);
+        if (userInfo) {
+            await this.navToLogin(redirect, userInfo.tenant.domain);
+        } else {
+            await this.navToLogin(redirect, null);
+        }
     }
 
-    public async navToLogin(redirect: string): Promise<void> {
+    public async navToLogin(redirect: string, domain: string | null): Promise<void> {
         let code_challenge = await this.tokenStorageService.getCodeChallenge();
-        await this.router.navigate(['login'], {
-            queryParams: {
-                redirect: redirect,
-                domain: 'auth.server.com',
-                code_challenge: code_challenge
-            }
-        });
+        if (domain) {
+            await this.router.navigate(['login'], {
+                queryParams: {
+                    redirect: redirect,
+                    domain: domain,
+                    code_challenge: code_challenge
+                }
+            });
+        } else {
+            await this.router.navigate(['login'], {
+                queryParams: {
+                    redirect: redirect,
+                    code_challenge: code_challenge
+                }
+            });
+        }
+
     }
 
 
