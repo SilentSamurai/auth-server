@@ -6,14 +6,36 @@ import {AuthService} from "../../_services/auth.service";
 import {AuthDefaultService} from "../../_services/auth.default.service";
 
 @Component({
-    selector: 'app-admin-home',
-    templateUrl: './admin-home.component.html',
-    styleUrls: ['./admin-home.component.css']
+    selector: 'app-home',
+    templateUrl: './home.component.html',
+    styleUrls: ['./home.component.css']
 })
-export class AdminHomeComponent implements OnInit {
+export class HomeComponent implements OnInit {
     content?: string;
     user: any;
     loading = true;
+
+    tiles = [
+        {
+            title: "Tenant overview",
+            subtitle: "Tenant overview",
+            icon: "fa-building",
+            link: [],
+            size: 'lg'
+        },
+        {
+            title: "Members",
+            subtitle: "manage members",
+            icon: "fa-users",
+            link: ['/tenant/']
+        },
+        {
+            title: "Role",
+            subtitle: "manage roles",
+            icon: "fa-magic",
+            link: ['/tenant/']
+        }
+    ]
 
     constructor(private userService: UserService,
                 private router: Router,
@@ -30,8 +52,12 @@ export class AdminHomeComponent implements OnInit {
     async startUp(): Promise<void> {
         // let params = this.route.snapshot.queryParamMap;
 
-        this.user = this.tokenStorage.getUser();
-
+        if (this.tokenStorage.isLoggedIn()) {
+            this.user = this.tokenStorage.getUser();
+            this.tiles[0].link = ['/tenant/', this.user.tenant.id]
+        } else {
+            await this.authDefaultService.signOut('/home');
+        }
         this.loading = false;
     }
 

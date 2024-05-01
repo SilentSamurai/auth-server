@@ -1,20 +1,20 @@
 import {Component, OnInit} from '@angular/core';
-import {Router} from "@angular/router";
-import {UserService} from "../../_services/user.service";
-import {AuthDefaultService} from "../../_services/auth.default.service";
+import {UserService} from '../../_services/user.service';
 import {TokenStorageService} from "../../_services/token-storage.service";
-import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
+import {Router} from "@angular/router";
+import {AuthDefaultService} from "../../_services/auth.default.service";
 import {ProfileComponent} from "../../profile/profile.component";
+import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 
 @Component({
-    selector: 'admin-nav-bar',
+    selector: 'nav-bar',
     templateUrl: './nav-bar.component.html',
     styleUrls: ['./nav-bar.component.css']
 })
-export class AdminNavBarComponent implements OnInit {
+export class NavBarComponent implements OnInit {
     isLoggedIn = false;
     email?: string;
-    _isSuperAdmin = true;
+    _isSuperAdmin = false;
     public isCollapsed = true;
 
     constructor(private userService: UserService,
@@ -31,15 +31,17 @@ export class AdminNavBarComponent implements OnInit {
 
     async ngOnInit(): Promise<void> {
         this.isLoggedIn = !!this.tokenStorageService.getToken();
-
         if (this.isLoggedIn) {
             const user = this.tokenStorageService.getUser();
+            if (this.tokenStorageService.isSuperAdmin()) {
+                this._isSuperAdmin = true;
+            }
             this.email = user.email;
         }
     }
 
     logout(): void {
-        this.authDefaultService.signOut("/admin");
+        this.authDefaultService.signOut("/home");
     }
 
     async openProfileModal() {

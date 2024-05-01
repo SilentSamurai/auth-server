@@ -1,0 +1,36 @@
+<div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Add Member</h4>
+    <button (click)="activeModal.close('Cross click')"
+            aria-label="Close"
+            class="btn-sm btn "
+            type="button">
+        <span aria-hidden="true">
+            <i class="fa fa-icons fa-close"></i>
+        </span>
+    </button>
+</div>
+<div class="modal-body">
+    <form #addMemberForm="ngForm"
+          (ngSubmit)="addMemberForm.form.valid && onSubmit()"
+          name="addMemberForm"
+          novalidate>
+        <div class="mb-3 form-group">
+            <label class="form-label" for="add.member.name">Email</label>
+            <input #email="ngModel"
+                   [(ngModel)]="form.email"
+                   class="form-control"
+                   id="add.member.name"
+                   name="email"
+                   required type="email">
+            <div
+                *ngIf="email.errors && addMemberForm.submitted"
+                class="alert alert-danger"
+                role="alert">
+                Email is required!
+            </div>
+        </div>
+
+
+        <button class="btn btn-primary" type="submit">Add Member</button>
+    </form>
+</div>

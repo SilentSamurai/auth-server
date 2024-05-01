@@ -1,5 +1,5 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark " ngbNav>
-    <a class="navbar-brand" href="javascript:void(0)" routerLink="/admin">
+    <a class="navbar-brand" href="javascript:void(0)" routerLink="/home">
         <img alt="" class="rounded-circle mx-2" height="30" src="/assets/logo-img.jpg" width="30">
         My Identity
     </a>
@@ -15,16 +15,6 @@
     </button>
     <div [ngbCollapse]="isCollapsed" class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav px-2 w-100">
-            <li [ngbNavItem]="1">
-                <a class="text-white mt-1" href="javascript:void(0)" ngbNavLink routerLink="/admin/users">
-                    Users
-                </a>
-            </li>
-            <li [ngbNavItem]="2" class="flex-grow-1">
-                <a class="text-white mt-1" href="javascript:void(0)" ngbNavLink routerLink="/admin/tenants">
-                    Tenants
-                </a>
-            </li>
             <li [ngbNavItem]="3" class="nav-item" class="ms-auto" ngbDropdown placement="bottom-left">
                 <a class="text-white nav-link mt-1"
                    id="dropdownUser1"

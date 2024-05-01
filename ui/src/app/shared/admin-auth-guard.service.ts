@@ -7,7 +7,7 @@ import {AuthDefaultService} from "../_services/auth.default.service";
 @Injectable({
     providedIn: 'root'
 })
-export class UserAuthGuard implements CanActivate {
+export class AdminAuthGuard implements CanActivate {
 
 
     constructor(private tokenStorageService: TokenStorageService,
@@ -15,13 +15,15 @@ export class UserAuthGuard implements CanActivate {
                 private router: Router) {
     }
 
-    canActivate(
-        route: ActivatedRouteSnapshot,
-        state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
-        if (this.tokenStorageService.isLoggedIn()) {
+    canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot):
+        Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
+        if (this.tokenStorageService.isLoggedIn() && this.tokenStorageService.isSuperAdmin()) {
             return true;
         }
-        this.authDefaultService.signOut(state.url);
+        if (!this.tokenStorageService.isLoggedIn()) {
+            this.authDefaultService.signOut("/admin");
+        }
+        this.authDefaultService.signOut("/home");
         return false;
     }
 

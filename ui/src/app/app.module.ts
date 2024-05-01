@@ -7,22 +7,21 @@ import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
 import {LoginComponent} from './login/login.component';
 import {RegisterComponent} from './register/register.component';
-import {HomeComponent} from './home/home.component';
+import {HomeComponent} from './non-admin/home/home.component';
 import {ProfileComponent} from './profile/profile.component';
 
 import {authInterceptorProviders} from './_helpers/auth.interceptor';
 import {NgbCollapseModule, NgbDropdown, NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {TableModule} from 'primeng/table';
-import {TenantModule} from "./board-tenants/tenant.module";
-import {UserModule} from "./board-user/user.module";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {ToastModule} from "primeng/toast";
 import {MessageService} from "primeng/api";
-import {NavBarModule} from "./nav-bar/nav-bar.module";
 import {RouterModule} from "@angular/router";
 import {SessionConfirmationComponent} from "./session/session-confirmation.component";
-import {TenantDetailsModule} from "./tenant-details/tenant-details.module";
 import {AdminModule} from "./admin/admin.module";
+import {NonAdminModule} from "./non-admin/non-admin.module";
+import {CardModule} from "primeng/card";
+import {TileComponent} from "./component/tile/tile.component";
 
 @NgModule({
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -33,6 +32,7 @@ import {AdminModule} from "./admin/admin.module";
         HomeComponent,
         ProfileComponent,
         SessionConfirmationComponent,
+        TileComponent
     ],
     imports: [
         BrowserModule,
@@ -43,14 +43,12 @@ import {AdminModule} from "./admin/admin.module";
         NgbModule,
         NgbCollapseModule,
         TableModule,
-        TenantModule,
-        UserModule,
-        TenantDetailsModule,
+        NonAdminModule,
         AdminModule,
         BrowserAnimationsModule,
         ReactiveFormsModule,
         ToastModule,
-        NavBarModule
+        CardModule
     ],
     providers: [authInterceptorProviders, NgbDropdown, MessageService],
     exports: [],
