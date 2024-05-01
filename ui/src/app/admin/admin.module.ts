@@ -25,6 +25,8 @@ import {AddScopeComponent} from "./tenants/view-tenant/add-scope/add-scope.compo
 import {AssignScopeComponent} from "./tenants/view-tenant/assign-scope/assign-scope.component";
 import {RemoveMemberComponent} from "./tenants/view-tenant/remove-member/remove-member.component";
 import {RemoveScopeComponent} from "./tenants/view-tenant/remove-scope/remove-scope.component";
+import {ComponentModule} from "../component/component.module";
+import {RoleListComponent} from "./roles/role-list.component";
 
 @NgModule({
     declarations: [
@@ -44,7 +46,8 @@ import {RemoveScopeComponent} from "./tenants/view-tenant/remove-scope/remove-sc
         AddScopeComponent,
         AssignScopeComponent,
         RemoveMemberComponent,
-        RemoveScopeComponent
+        RemoveScopeComponent,
+        RoleListComponent
     ],
     imports: [
         TableModule,
@@ -57,7 +60,8 @@ import {RemoveScopeComponent} from "./tenants/view-tenant/remove-scope/remove-sc
         PanelMenuModule,
         NgbCollapseModule,
         NgbNavModule,
-        NgbDropdownModule
+        NgbDropdownModule,
+        ComponentModule
     ],
     providers: [],
     exports: [

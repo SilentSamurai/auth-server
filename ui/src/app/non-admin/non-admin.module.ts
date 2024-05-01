@@ -16,6 +16,7 @@ import {PanelMenuModule} from "primeng/panelmenu";
 import {UpdateTenantComponent} from "./tenant/update-tenant/update-tenant.component";
 import {NavBarComponent} from "./nav-bar/nav-bar.component";
 import {NgbCollapseModule, NgbDropdownModule, NgbNavModule} from "@ng-bootstrap/ng-bootstrap";
+import {ComponentModule} from "../component/component.module";
 
 @NgModule({
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -40,7 +41,8 @@ import {NgbCollapseModule, NgbDropdownModule, NgbNavModule} from "@ng-bootstrap/
         PanelMenuModule,
         NgbNavModule,
         NgbCollapseModule,
-        NgbDropdownModule
+        NgbDropdownModule,
+        ComponentModule
     ],
     providers: [],
     exports: [

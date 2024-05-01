@@ -21,7 +21,7 @@ import {SessionConfirmationComponent} from "./session/session-confirmation.compo
 import {AdminModule} from "./admin/admin.module";
 import {NonAdminModule} from "./non-admin/non-admin.module";
 import {CardModule} from "primeng/card";
-import {TileComponent} from "./component/tile/tile.component";
+import {ComponentModule} from "./component/component.module";
 
 @NgModule({
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -31,8 +31,7 @@ import {TileComponent} from "./component/tile/tile.component";
         RegisterComponent,
         HomeComponent,
         ProfileComponent,
-        SessionConfirmationComponent,
-        TileComponent
+        SessionConfirmationComponent
     ],
     imports: [
         BrowserModule,
@@ -48,7 +47,8 @@ import {TileComponent} from "./component/tile/tile.component";
         BrowserAnimationsModule,
         ReactiveFormsModule,
         ToastModule,
-        CardModule
+        CardModule,
+        ComponentModule
     ],
     providers: [authInterceptorProviders, NgbDropdown, MessageService],
     exports: [],

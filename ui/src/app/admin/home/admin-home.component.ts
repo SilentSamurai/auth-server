@@ -14,6 +14,26 @@ export class AdminHomeComponent implements OnInit {
     content?: string;
     user: any;
     loading = true;
+    tiles: any = [
+        {
+            title: "Tenants",
+            subtitle: "manage tenants",
+            icon: "fa-bars",
+            link: ['/admin', 'tenants']
+        },
+        {
+            title: "Users",
+            subtitle: "manage users",
+            icon: "fa-users",
+            link: ['/admin', 'users']
+        },
+        {
+            title: "Roles",
+            subtitle: "manage role",
+            icon: "fa-magic",
+            link: ['/admin', 'roles']
+        },
+    ];
 
     constructor(private userService: UserService,
                 private router: Router,

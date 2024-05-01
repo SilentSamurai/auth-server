@@ -23,13 +23,13 @@
                     </ng-template>
                     <ng-template let-columns="columns" let-user pTemplate="body">
                         <tr>
-                            <td><span class="p-column-title">Name</span>{{user.name}} {{user.surname}}</td>
+                            <td><span class="p-column-title">Name</span>{{ user.name }} {{ user.surname }}</td>
                             <td>
                                 <span class="p-column-title">Price</span>
                                 <a [routerLink]="['/admin/user/', user.email]"
                                    href="javascript:void(0)">{{ user.email }}</a>
                             </td>
-                            <td><span class="p-column-title">Created At</span>{{user.createdAt | date }}</td>
+                            <td><span class="p-column-title">Created At</span>{{ user.createdAt | date }}</td>
                             <td class="d-flex ">
                                 <button (click)="openUpdateModal(user)" class="btn " type="button">
                                     <i class="fa fa-edit"></i>
