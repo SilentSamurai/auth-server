@@ -1,0 +1,56 @@
+<div class="container-fluid">
+    <div class="row">
+        <div class="">
+            <p-table
+                [(selection)]="selectedItem"
+                [scrollable]="true"
+                [value]="data"
+                responsiveLayout="scroll"
+                selectionMode="{{multi?'multiple' : 'single'}}"
+            >
+                <ng-template pTemplate="caption">
+                    <div class="d-flex justify-content-between">
+                        <h5>User List</h5>
+                        <button (click)="closeValueHelp()" aria-label="Close" class="btn-close text-bg-secondary"
+                                type="button"></button>
+                    </div>
+                </ng-template>
+                <ng-template let-columns pTemplate="header">
+                    <tr>
+                        <th style="width: 2rem">
+                            <p-tableHeaderCheckbox *ngIf="multi"></p-tableHeaderCheckbox>
+                        </th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Created At</th>
+                        <th>Actions</th>
+                    </tr>
+                </ng-template>
+                <ng-template let-columns="columns" let-rowIndex="rowIndex" let-user pTemplate="body">
+                    <tr [pSelectableRow]="user">
+                        <td style="width: 2rem">
+                            <p-tableCheckbox [value]="user"></p-tableCheckbox>
+                        </td>
+                        <td>{{ user.name }} {{ user.surname }}</td>
+                        <td>
+                            <a [routerLink]="['/admin/user/', user.email]"
+                               href="javascript:void(0)">{{ user.email }}</a>
+                        </td>
+                        <td>
+                            {{ user.createdAt | date }}
+                        </td>
+                    </tr>
+                </ng-template>
+                <ng-template let-columns pTemplate="footer">
+                    <div class="gap-2 py-3 justify-content-end d-flex">
+                        <button (click)="Confirm()" class="btn btn-primary btn-block btn-sm" id="confirm">
+                            Select
+                        </button>
+                    </div>
+                </ng-template>
+            </p-table>
+        </div>
+
+    </div>
+</div>
+

@@ -1,39 +1,31 @@
 import {Component, OnInit} from '@angular/core';
-import {UserService} from '../../_services/user.service';
-import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
+
+import {NgbActiveModal, NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {ActivatedRoute} from "@angular/router";
-import {ValueHelpComponent} from "../../component/value-help/value-help.component";
+import {UserService} from "../../_services/user.service";
+import {lastValueFrom} from "rxjs";
 
 @Component({
-    selector: 'app-role-list',
-    templateUrl: './role-list.component.html',
-    styleUrls: ['./role-list.component.css']
+    selector: 'app-value-help',
+    templateUrl: './value-help.component.html',
+    styleUrls: ['./value-help.component.css']
 })
-export class RoleListComponent implements OnInit {
-    email: any | null = null;
-    tenantId: any | null = null;
+export class ValueHelpComponent implements OnInit {
 
-    roles = [];
+    data = [];
+    multi: boolean = true;
+    selectedItem: any = [];
+
 
     constructor(private userService: UserService,
                 private route: ActivatedRoute,
+                private activeModal: NgbActiveModal,
                 private modalService: NgbModal) {
     }
 
-    ngOnInit(): void {
-        let params = this.route.snapshot.queryParamMap;
-        if (params.has('email')) {
-            this.email = params.get('email')
-        }
-        if (params.has('tenantId')) {
-            this.tenantId = params.get('tenantId')
-        }
-    }
-
-    async openUserValueHelp() {
-        const modalRef = this.modalService.open(ValueHelpComponent, {size: 'lg', backdrop: 'static'});
-        const user = await modalRef.result;
-        console.log(user);
+    async ngOnInit(): Promise<void> {
+        this.data = await lastValueFrom(this.userService.getAllUsers())
+        console.log("multi", this.multi)
     }
 
     async openCreateModal() {
@@ -57,5 +49,13 @@ export class RoleListComponent implements OnInit {
         // const deletedUser = await modalRef.result;
         // console.log(deletedUser);
         // this.ngOnInit();
+    }
+
+    Confirm() {
+        this.activeModal.close(this.selectedItem);
+    }
+
+    closeValueHelp() {
+        this.activeModal.dismiss('user dismissed');
     }
 }

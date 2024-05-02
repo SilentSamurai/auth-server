@@ -10,11 +10,15 @@ import {PanelMenuModule} from "primeng/panelmenu";
 import {NgbCollapseModule, NgbDropdownModule, NgbNavModule} from "@ng-bootstrap/ng-bootstrap";
 import {TileComponent} from "./tile/tile.component";
 import {CardModule} from "primeng/card";
+import {ValueHelpComponent} from "./value-help/value-help.component";
+import {ValueHelpInputComponent} from "./value-help-input/value-help-input.component";
 
 @NgModule({
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
     declarations: [
-        TileComponent
+        TileComponent,
+        ValueHelpComponent,
+        ValueHelpInputComponent
     ],
     imports: [
         TableModule,
@@ -32,7 +36,8 @@ import {CardModule} from "primeng/card";
     ],
     providers: [],
     exports: [
-        TileComponent
+        TileComponent,
+        ValueHelpInputComponent
     ]
 })
 export class ComponentModule {

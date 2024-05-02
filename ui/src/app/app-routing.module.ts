@@ -4,7 +4,6 @@ import {RouterModule, Routes} from '@angular/router';
 import {RegisterComponent} from './register/register.component';
 import {LoginComponent} from './login/login.component';
 import {HomeComponent} from './non-admin/home/home.component';
-import {ProfileComponent} from './profile/profile.component';
 import {UserListComponent} from './admin/users/user-list.component';
 import {TenantListComponent} from './admin/tenants/tenant-list.component';
 import {UserAuthGuard} from "./shared/user-auth-guard.service";
@@ -14,6 +13,7 @@ import {ViewTenantComponent} from "./admin/tenants/view-tenant/view-tenant.compo
 import {AdminHomeComponent} from './admin/home/admin-home.component';
 import {AdminAuthGuard} from "./shared/admin-auth-guard.service";
 import {TenantDetailsComponent} from "./non-admin/tenant/tenant-details.component";
+import {RoleListComponent} from "./admin/roles/role-list.component";
 
 const routes: Routes = [
     {path: 'session-confirm', component: SessionConfirmationComponent},
@@ -32,9 +32,9 @@ const routes: Routes = [
         canActivate: [AdminAuthGuard],
         children: [
             {path: '', component: AdminHomeComponent, canActivate: []},
-            {path: 'profile', component: ProfileComponent, canActivate: []},
             {path: 'users', component: UserListComponent, canActivate: []},
             {path: 'tenants', component: TenantListComponent, canActivate: []},
+            {path: 'roles', component: RoleListComponent, canActivate: []},
             {path: 'tenant/:tenantId', component: ViewTenantComponent, canActivate: []},
             {path: 'user/:email', component: UserDetailsComponent, canActivate: []},
         ]

@@ -1,0 +1,16 @@
+<label class="col-3 col-form-label" for="{{name}}">
+    {{ name }}
+</label>
+<div class="col-3 input-group ">
+    <input
+        class="form-control"
+        id="{{name}}"
+        name="{{name}}"
+        required
+        type="text"/>
+
+    <button (click)="openValueHelp()" class="input-group-text"
+            type="button">
+        <i class="fa fas fa-clone"></i>
+    </button>
+</div>
