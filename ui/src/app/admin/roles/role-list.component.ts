@@ -2,7 +2,9 @@ import {Component, OnInit} from '@angular/core';
 import {UserService} from '../../_services/user.service';
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {ActivatedRoute} from "@angular/router";
-import {ValueHelpComponent} from "../../component/value-help/value-help.component";
+import {lastValueFrom} from "rxjs";
+import {TenantService} from "../../_services/tenant.service";
+import {Filter} from "../../component/value-help-input/value-help-input.component";
 
 @Component({
     selector: 'app-role-list',
@@ -10,17 +12,22 @@ import {ValueHelpComponent} from "../../component/value-help/value-help.componen
     styleUrls: ['./role-list.component.css']
 })
 export class RoleListComponent implements OnInit {
-    email: any | null = null;
-    tenantId: any | null = null;
 
+    tenantId: any | null = null;
+    email: string | null = '';
     roles = [];
+    users = [];
+    tenants: [] = [];
+    selectedTenant: any[] = [];
+    selectedUser: any[] = [];
 
     constructor(private userService: UserService,
+                private tenantService: TenantService,
                 private route: ActivatedRoute,
                 private modalService: NgbModal) {
     }
 
-    ngOnInit(): void {
+    async ngOnInit(): Promise<void> {
         let params = this.route.snapshot.queryParamMap;
         if (params.has('email')) {
             this.email = params.get('email')
@@ -30,32 +37,34 @@ export class RoleListComponent implements OnInit {
         }
     }
 
-    async openUserValueHelp() {
-        const modalRef = this.modalService.open(ValueHelpComponent, {size: 'lg', backdrop: 'static'});
-        const user = await modalRef.result;
-        console.log(user);
+    continue() {
+        console.log({
+            'users': this.selectedUser,
+            'tenant': this.selectedTenant
+        });
     }
 
-    async openCreateModal() {
-        // const modalRef = this.modalService.open(CreateUserModalComponent);
-        // const user = await modalRef.result;
-        // console.log(user);
-        // this.ngOnInit();
+    onTenantSelection(rows: any[]) {
+        this.selectedTenant = rows;
     }
 
-    async openUpdateModal(user: any) {
-        // const modalRef = this.modalService.open(EditUserModalComponent);
-        // modalRef.componentInstance.user = user;
-        // const editedUser = await modalRef.result;
-        // console.log(editedUser);
-        // this.ngOnInit();
+    onUserSelection(rows: any[]) {
+        this.selectedUser = rows;
     }
 
-    async openDeleteModal(user: any) {
-        // const modalRef = this.modalService.open(DeleteUserModalComponent);
-        // modalRef.componentInstance.user = user;
-        // const deletedUser = await modalRef.result;
-        // console.log(deletedUser);
-        // this.ngOnInit();
+    filterUser(filter: Filter) {
+        console.log(filter)
+    }
+
+    async onUserLoad(filter: Filter) {
+        this.users = await lastValueFrom(this.userService.getAllUsers())
+    }
+
+    async onTenantLoad(filter: Filter) {
+        this.tenants = await lastValueFrom(this.tenantService.getAllTenants())
+    }
+
+    filterTenant(filter: Filter) {
+        console.log(filter)
     }
 }

@@ -12,6 +12,7 @@ import {TileComponent} from "./tile/tile.component";
 import {CardModule} from "primeng/card";
 import {ValueHelpComponent} from "./value-help/value-help.component";
 import {ValueHelpInputComponent} from "./value-help-input/value-help-input.component";
+import {SkeletonModule} from "primeng/skeleton";
 
 @NgModule({
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -32,7 +33,8 @@ import {ValueHelpInputComponent} from "./value-help-input/value-help-input.compo
         NgbNavModule,
         NgbCollapseModule,
         NgbDropdownModule,
-        CardModule
+        CardModule,
+        SkeletonModule
     ],
     providers: [],
     exports: [

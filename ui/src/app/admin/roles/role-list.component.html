@@ -1,33 +1,62 @@
 <admin-nav-bar></admin-nav-bar>
 <div class="container-fluid">
 
-    <div *ngIf="!email || !tenantId" class="row">
+    <div *ngIf="!selectedUser || !tenantId" class="row">
         <div class="h4 py-2">
             Manage Roles
         </div>
         <div class="col-4">
             <form class="form-group input-group g-3">
-                <app-value-help-input [multi]="false" class="col-3 input-group" name="Email">
+                <app-value-help-input (onFilter)="filterUser($event)"
+                                      (onLoad)="onUserLoad($event)"
+                                      (onSelect)="onUserSelection($event)"
+                                      [data]="users"
+                                      class="col-3 input-group"
+                                      idField="email"
+                                      labelField="email"
+                                      multi="true"
+                                      name="Email">
+
+                    <ng-template #vh_header>
+                        <th>Name</th>
+                        <th>Email</th>
+                    </ng-template>
+
+                    <ng-template #vh_body let-row>
+                        <td>{{ row.name }} {{ row.surname }}</td>
+                        <td>
+                            {{ row.email }}
+                        </td>
+                    </ng-template>
 
                 </app-value-help-input>
-                <label class="col-3 col-form-label" for="tenant">Tenant</label>
-                <div class="col-3 input-group ">
-                    <input
-                        [(ngModel)]="tenantId"
-                        class="form-control"
-                        id="tenant"
-                        name="Tenant"
-                        required
-                        type="text"/>
 
-                    <button class="input-group-text"
-                            type="button">
-                        <i class="fa fas fa-clone"></i>
-                    </button>
-                </div>
+                <app-value-help-input
+                    (onFilter)="filterTenant($event)"
+                    (onLoad)="onTenantLoad($event)"
+                    (onSelect)="onTenantSelection($event)"
+                    [data]="tenants"
+                    class="col-3 input-group"
+                    idField="id"
+                    labelField="name"
+                    name="Tenant">
+
+                    <ng-template #vh_header>
+                        <th>Name</th>
+                        <th>Domain</th>
+                    </ng-template>
+
+                    <ng-template #vh_body let-row>
+                        <td>{{ row.name }}</td>
+                        <td>
+                            {{ row.domain }}
+                        </td>
+                    </ng-template>
+
+                </app-value-help-input>
 
                 <div class="form-group d-grid gap-2 py-3 ">
-                    <button class="btn btn-primary btn-block btn-sm" id="login-btn">
+                    <button (click)="continue()" class="btn btn-primary btn-block btn-sm" id="login-btn">
                         Continue
                     </button>
                 </div>
@@ -37,46 +66,46 @@
 
     </div>
 
-    <div *ngIf="email && tenantId" class="row">
+    <div *ngIf="selectedUser && tenantId" class="row">
         <div class="col-xl-12">
             <div class="card my-2">
-                <p-table [scrollable]="true" [value]="roles" responsiveLayout="scroll" scrollHeight="80vh">
-                    <ng-template pTemplate="caption">
-                        <div class="d-flex justify-content-between">
-                            <h5>User List</h5>
-                            <button (click)="openCreateModal()" class="btn btn-primary" type="button">
-                                <i class="fa fa-solid fa-plus me-2"></i> Add User
-                            </button>
-                        </div>
-                    </ng-template>
-                    <ng-template let-columns pTemplate="header">
-                        <tr>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Created At</th>
-                            <th>Actions</th>
-                        </tr>
-                    </ng-template>
-                    <ng-template let-columns="columns" let-user pTemplate="body">
-                        <tr>
-                            <td><span class="p-column-title">Name</span>{{ user.name }} {{ user.surname }}</td>
-                            <td>
-                                <span class="p-column-title">Price</span>
-                                <a [routerLink]="['/admin/user/', user.email]"
-                                   href="javascript:void(0)">{{ user.email }}</a>
-                            </td>
-                            <td><span class="p-column-title">Created At</span>{{ user.createdAt | date }}</td>
-                            <td class="d-flex ">
-                                <button (click)="openUpdateModal(user)" class="btn " type="button">
-                                    <i class="fa fa-edit"></i>
-                                </button>
-                                <button (click)="openDeleteModal(user)" class="btn " type="button">
-                                    <i class="fa fa-solid fa-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    </ng-template>
-                </p-table>
+                <!--                <p-table [scrollable]="true" [value]="roles" responsiveLayout="scroll" scrollHeight="80vh">-->
+                <!--                    <ng-template pTemplate="caption">-->
+                <!--                        <div class="d-flex justify-content-between">-->
+                <!--                            <h5>User List</h5>-->
+                <!--                            <button (click)="openCreateModal()" class="btn btn-primary" type="button">-->
+                <!--                                <i class="fa fa-solid fa-plus me-2"></i> Add User-->
+                <!--                            </button>-->
+                <!--                        </div>-->
+                <!--                    </ng-template>-->
+                <!--                    <ng-template let-columns pTemplate="header">-->
+                <!--                        <tr>-->
+                <!--                            <th>Name</th>-->
+                <!--                            <th>Email</th>-->
+                <!--                            <th>Created At</th>-->
+                <!--                            <th>Actions</th>-->
+                <!--                        </tr>-->
+                <!--                    </ng-template>-->
+                <!--                    <ng-template let-columns="columns" let-user pTemplate="body">-->
+                <!--                        <tr>-->
+                <!--                            <td><span class="p-column-title">Name</span>{{ user.name }} {{ user.surname }}</td>-->
+                <!--                            <td>-->
+                <!--                                <span class="p-column-title">Price</span>-->
+                <!--                                <a [routerLink]="['/admin/user/', user.email]"-->
+                <!--                                   href="javascript:void(0)">{{ user.email }}</a>-->
+                <!--                            </td>-->
+                <!--                            <td><span class="p-column-title">Created At</span>{{ user.createdAt | date }}</td>-->
+                <!--                            <td class="d-flex ">-->
+                <!--                                <button (click)="openUpdateModal(user)" class="btn " type="button">-->
+                <!--                                    <i class="fa fa-edit"></i>-->
+                <!--                                </button>-->
+                <!--                                <button (click)="openDeleteModal(user)" class="btn " type="button">-->
+                <!--                                    <i class="fa fa-solid fa-trash"></i>-->
+                <!--                                </button>-->
+                <!--                            </td>-->
+                <!--                        </tr>-->
+                <!--                    </ng-template>-->
+                <!--                </p-table>-->
             </div>
         </div>
         <div class="">

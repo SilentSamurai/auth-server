@@ -1,56 +1,95 @@
-<div class="container-fluid">
+<div>
+    <div class="row p-2 pb-0">
+        <div class="col">
+            <div class="d-flex justify-content-between">
+                <div class="h4 mb-0">{{ name }}</div>
+                <button (click)="cancel()"
+                        aria-label="Close"
+                        class="btn-close text-bg-secondary"
+                        type="button"></button>
+            </div>
+        </div>
+    </div>
+    <div class="row p-2 pt-0">
+        <div class="col">
+            <div class="col align-content-end d-flex justify-content-end">
+                <button (click)="filter()" class="btn btn-primary btn-block btn-sm">
+                    Go
+                </button>
+                <button (click)="filterVisible = !filterVisible" class="btn btn-sm px-3">
+                    {{ filterVisible ? 'Hide' : 'Show' }} Filters
+                </button>
+            </div>
+        </div>
+    </div>
+    <div *ngIf="filterVisible" class="row p-2 pt-0 row-cols-auto">
+        <div *ngFor="let col of columns; " class="col">
+            <label class="col-sm-4 col-form-label pt-0">{{ col }}</label>
+            <input [(ngModel)]="filters[col]"
+                   class="col-sm-8 form-control form-control-sm"
+                   type="text">
+        </div>
+    </div>
     <div class="row">
-        <div class="">
+        <div class="col">
             <p-table
                 [(selection)]="selectedItem"
                 [scrollable]="true"
-                [value]="data"
-                responsiveLayout="scroll"
+                (onLazyLoad)="lazyLoad($event)"
+                [dataKey]="idField"
+                [lazy]="true"
+                [rowHover]="true"
                 selectionMode="{{multi?'multiple' : 'single'}}"
+                [value]="virtualData"
+                [virtualRowHeight]="40"
+                [virtualScroll]="true"
+                scrollHeight="65vh"
+                styleClass="p-datatable-gridlines p-datatable-sm"
             >
-                <ng-template pTemplate="caption">
-                    <div class="d-flex justify-content-between">
-                        <h5>User List</h5>
-                        <button (click)="closeValueHelp()" aria-label="Close" class="btn-close text-bg-secondary"
-                                type="button"></button>
-                    </div>
-                </ng-template>
+                <!--                <ng-template pTemplate="caption">-->
+
+                <!--                </ng-template>-->
                 <ng-template let-columns pTemplate="header">
-                    <tr>
-                        <th style="width: 2rem">
+                    <tr style="height:40px">
+                        <th style="max-width:40px">
                             <p-tableHeaderCheckbox *ngIf="multi"></p-tableHeaderCheckbox>
                         </th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Created At</th>
-                        <th>Actions</th>
+                        <ng-container *ngTemplateOutlet="header"></ng-container>
                     </tr>
                 </ng-template>
-                <ng-template let-columns="columns" let-rowIndex="rowIndex" let-user pTemplate="body">
-                    <tr [pSelectableRow]="user">
-                        <td style="width: 2rem">
-                            <p-tableCheckbox [value]="user"></p-tableCheckbox>
+                <ng-template let-columns="columns" let-row let-rowIndex="rowIndex" pTemplate="body">
+                    <tr [pSelectableRow]="row">
+                        <td style="max-width:40px">
+                            <p-tableCheckbox [value]="row"></p-tableCheckbox>
                         </td>
-                        <td>{{ user.name }} {{ user.surname }}</td>
-                        <td>
-                            <a [routerLink]="['/admin/user/', user.email]"
-                               href="javascript:void(0)">{{ user.email }}</a>
-                        </td>
-                        <td>
-                            {{ user.createdAt | date }}
+                        <ng-container *ngTemplateOutlet="body; context: {$implicit: row}"></ng-container>
+                    </tr>
+                </ng-template>
+                <ng-template let-columns="columns" pTemplate="loadingbody">
+                    <tr style="height:40px">
+                        <td *ngFor="let col of columns">
+                            <div class="loading-text"></div>
+                            <p-skeleton [ngStyle]="{'width': '100%'}"></p-skeleton>
                         </td>
                     </tr>
                 </ng-template>
                 <ng-template let-columns pTemplate="footer">
-                    <div class="gap-2 py-3 justify-content-end d-flex">
-                        <button (click)="Confirm()" class="btn btn-primary btn-block btn-sm" id="confirm">
-                            Select
-                        </button>
-                    </div>
+
                 </ng-template>
             </p-table>
         </div>
-
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="gap-2 p-2 justify-content-end d-flex">
+                <button (click)="clear()" class="btn btn-outline-secondary btn-block btn-sm">
+                    Clear
+                </button>
+                <button (click)="confirm()" class="btn btn-primary btn-block btn-sm">
+                    Select
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 
