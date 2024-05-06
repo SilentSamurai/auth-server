@@ -24,10 +24,28 @@
     </div>
     <div *ngIf="filterVisible" class="row p-2 pt-0 row-cols-auto">
         <div *ngFor="let col of columns; " class="col">
-            <label class="col-sm-4 col-form-label pt-0">{{ col }}</label>
-            <input [(ngModel)]="filters[col]"
-                   class="col-sm-8 form-control form-control-sm"
-                   type="text">
+            <label class="col-sm-4 col-form-label pt-0">{{ col.label }}</label>
+            <div class="input-group-sm input-group">
+                <input [(ngModel)]="filters[col.name]"
+                       class="col-sm-8 form-control form-control-sm"
+                       type="text">
+                <button aria-expanded="false"
+                        class="btn btn-outline-secondary dropdown-toggle"
+                        data-bs-toggle="dropdown" id="{{col.label}}_ddtgl"
+                        ngbDropdown ngbDropdownToggle type="button">
+                    [=]
+                </button>
+                <ul [attr.aria-labelledby]="col.label + '_ddtgl'" class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="#">[=]</a></li>
+                    <li><a class="dropdown-item" href="#">[>]</a></li>
+                    <li><a class="dropdown-item" href="#">Something else here</a></li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li><a class="dropdown-item" href="#">Separated link</a></li>
+                </ul>
+            </div>
+
         </div>
     </div>
     <div class="row">
@@ -39,8 +57,8 @@
                 [dataKey]="idField"
                 [lazy]="true"
                 [rowHover]="true"
-                selectionMode="{{multi?'multiple' : 'single'}}"
-                [value]="virtualData"
+                [value]="filteredRow"
+                selectionMode="{{ multi ? 'multiple' : 'single' }}"
                 [virtualRowHeight]="40"
                 [virtualScroll]="true"
                 scrollHeight="65vh"
@@ -49,15 +67,17 @@
                 <!--                <ng-template pTemplate="caption">-->
 
                 <!--                </ng-template>-->
-                <ng-template let-columns pTemplate="header">
+                <ng-template pTemplate="header">
                     <tr style="height:40px">
                         <th style="max-width:40px">
                             <p-tableHeaderCheckbox *ngIf="multi"></p-tableHeaderCheckbox>
                         </th>
-                        <ng-container *ngTemplateOutlet="header"></ng-container>
+                        <th *ngFor="let col of columns">
+                            {{ col.label }}
+                        </th>
                     </tr>
                 </ng-template>
-                <ng-template let-columns="columns" let-row let-rowIndex="rowIndex" pTemplate="body">
+                <ng-template let-row let-rowIndex="rowIndex" pTemplate="body">
                     <tr [pSelectableRow]="row">
                         <td style="max-width:40px">
                             <p-tableCheckbox [value]="row"></p-tableCheckbox>
@@ -65,7 +85,7 @@
                         <ng-container *ngTemplateOutlet="body; context: {$implicit: row}"></ng-container>
                     </tr>
                 </ng-template>
-                <ng-template let-columns="columns" pTemplate="loadingbody">
+                <ng-template pTemplate="loadingbody">
                     <tr style="height:40px">
                         <td *ngFor="let col of columns">
                             <div class="loading-text"></div>
@@ -73,7 +93,7 @@
                         </td>
                     </tr>
                 </ng-template>
-                <ng-template let-columns pTemplate="footer">
+                <ng-template pTemplate="footer">
 
                 </ng-template>
             </p-table>

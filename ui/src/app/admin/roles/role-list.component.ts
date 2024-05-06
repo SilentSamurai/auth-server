@@ -2,9 +2,8 @@ import {Component, OnInit} from '@angular/core';
 import {UserService} from '../../_services/user.service';
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {ActivatedRoute} from "@angular/router";
-import {lastValueFrom} from "rxjs";
 import {TenantService} from "../../_services/tenant.service";
-import {Filter} from "../../component/value-help-input/value-help-input.component";
+
 
 @Component({
     selector: 'app-role-list',
@@ -15,11 +14,9 @@ export class RoleListComponent implements OnInit {
 
     tenantId: any | null = null;
     email: string | null = '';
-    roles = [];
-    users = [];
-    tenants: [] = [];
-    selectedTenant: any[] = [];
-    selectedUser: any[] = [];
+    member: any;
+    user: any;
+    tenant: any;
 
     constructor(private userService: UserService,
                 private tenantService: TenantService,
@@ -35,36 +32,30 @@ export class RoleListComponent implements OnInit {
         if (params.has('tenantId')) {
             this.tenantId = params.get('tenantId')
         }
+
+        if (this.tenantId && this.email) {
+            this.member = await this.tenantService.getMemberDetails(this.tenantId, this.email);
+        }
+
     }
 
-    continue() {
-        console.log({
-            'users': this.selectedUser,
-            'tenant': this.selectedTenant
-        });
+    openCreateModal() {
+
     }
 
-    onTenantSelection(rows: any[]) {
-        this.selectedTenant = rows;
+    openUpdateModal(user: any) {
+
     }
 
-    onUserSelection(rows: any[]) {
-        this.selectedUser = rows;
+    openDeleteModal(user: any) {
+
     }
 
-    filterUser(filter: Filter) {
-        console.log(filter)
+    onAddScope() {
+
     }
 
-    async onUserLoad(filter: Filter) {
-        this.users = await lastValueFrom(this.userService.getAllUsers())
-    }
+    onRemoveScope(scope: any) {
 
-    async onTenantLoad(filter: Filter) {
-        this.tenants = await lastValueFrom(this.tenantService.getAllTenants())
-    }
-
-    filterTenant(filter: Filter) {
-        console.log(filter)
     }
 }

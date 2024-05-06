@@ -14,6 +14,7 @@ import {AdminHomeComponent} from './admin/home/admin-home.component';
 import {AdminAuthGuard} from "./shared/admin-auth-guard.service";
 import {TenantDetailsComponent} from "./non-admin/tenant/tenant-details.component";
 import {RoleListComponent} from "./admin/roles/role-list.component";
+import {RoleSelectionComponent} from "./admin/roles/role-selection.component";
 
 const routes: Routes = [
     {path: 'session-confirm', component: SessionConfirmationComponent},
@@ -34,6 +35,7 @@ const routes: Routes = [
             {path: '', component: AdminHomeComponent, canActivate: []},
             {path: 'users', component: UserListComponent, canActivate: []},
             {path: 'tenants', component: TenantListComponent, canActivate: []},
+            {path: 'roles-sel', component: RoleSelectionComponent, canActivate: []},
             {path: 'roles', component: RoleListComponent, canActivate: []},
             {path: 'tenant/:tenantId', component: ViewTenantComponent, canActivate: []},
             {path: 'user/:email', component: UserDetailsComponent, canActivate: []},

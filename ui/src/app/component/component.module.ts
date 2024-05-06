@@ -13,13 +13,15 @@ import {CardModule} from "primeng/card";
 import {ValueHelpComponent} from "./value-help/value-help.component";
 import {ValueHelpInputComponent} from "./value-help-input/value-help-input.component";
 import {SkeletonModule} from "primeng/skeleton";
+import {ValueHelpColumnComponent} from "./value-help-input/value-help-column.component";
 
 @NgModule({
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
     declarations: [
         TileComponent,
         ValueHelpComponent,
-        ValueHelpInputComponent
+        ValueHelpInputComponent,
+        ValueHelpColumnComponent
     ],
     imports: [
         TableModule,
@@ -39,7 +41,8 @@ import {SkeletonModule} from "primeng/skeleton";
     providers: [],
     exports: [
         TileComponent,
-        ValueHelpInputComponent
+        ValueHelpInputComponent,
+        ValueHelpColumnComponent
     ]
 })
 export class ComponentModule {

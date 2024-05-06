@@ -31,7 +31,7 @@ export class AdminHomeComponent implements OnInit {
             title: "Roles",
             subtitle: "manage role",
             icon: "fa-magic",
-            link: ['/admin', 'roles']
+            link: ['/admin', 'roles-sel']
         },
     ];
 

@@ -78,4 +78,8 @@ export class TenantService {
     async removeScope(name: string, tenantId: string) {
         return lastValueFrom(this.http.delete(`${API_URL}/tenant/${tenantId}/scope/${name}`, this.getHttpOptions()))
     }
+
+    async getMemberDetails(tenantId: string, email: string) {
+        return lastValueFrom(this.http.get(`${API_URL}/tenant/${tenantId}/member/${email}`, this.getHttpOptions()))
+    }
 }

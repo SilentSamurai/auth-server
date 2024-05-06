@@ -27,6 +27,7 @@ import {RemoveMemberComponent} from "./tenants/view-tenant/remove-member/remove-
 import {RemoveScopeComponent} from "./tenants/view-tenant/remove-scope/remove-scope.component";
 import {ComponentModule} from "../component/component.module";
 import {RoleListComponent} from "./roles/role-list.component";
+import {RoleSelectionComponent} from "./roles/role-selection.component";
 
 @NgModule({
     declarations: [
@@ -47,7 +48,8 @@ import {RoleListComponent} from "./roles/role-list.component";
         AssignScopeComponent,
         RemoveMemberComponent,
         RemoveScopeComponent,
-        RoleListComponent
+        RoleListComponent,
+        RoleSelectionComponent
     ],
     imports: [
         TableModule,
