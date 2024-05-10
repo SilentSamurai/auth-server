@@ -4,7 +4,7 @@ import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {ActivatedRoute, Router} from "@angular/router";
 import {lastValueFrom} from "rxjs";
 import {TenantService} from "../../_services/tenant.service";
-import {VHAsyncLoadEvent} from "../../component/value-help-input/value-help-input.component";
+import {TableAsyncLoadEvent} from "../../component/table/table.component";
 
 
 @Component({
@@ -18,13 +18,17 @@ import {VHAsyncLoadEvent} from "../../component/value-help-input/value-help-inpu
                 </div>
                 <div class="col-4">
                     <form class="form-group g-3">
+
+                        <label class="col-3 col-form-label" for="Email">
+                            Email
+                        </label>
                         <app-value-help-input
                             (dataProvider)="userDataProvider($event)"
-                            (onSelect)="onUserSelection($event)"
+                            [(selection)]="selectedUser"
                             class="col-3"
                             idField="email"
                             labelField="email"
-                            multi="false"
+                            multi="true"
                             name="Email">
 
                             <app-vh-col name="name" label="Name"></app-vh-col>
@@ -39,9 +43,14 @@ import {VHAsyncLoadEvent} from "../../component/value-help-input/value-help-inpu
 
                         </app-value-help-input>
 
+
+                        <label class="col-3 col-form-label" for="Tenant">
+                            Tenant
+                        </label>
+
                         <app-value-help-input
                             (dataProvider)="onTenantLoad($event)"
-                            (onSelect)="onTenantSelection($event)"
+                            [(selection)]="selectedTenant"
                             class="col-3"
                             idField="id"
                             labelField="name"
@@ -111,20 +120,12 @@ export class RoleSelectionComponent implements OnInit {
         }
     }
 
-    onTenantSelection(rows: any[]) {
-        this.selectedTenant = rows;
-    }
-
-    onUserSelection(rows: any[]) {
-        this.selectedUser = rows;
-    }
-
-    async userDataProvider($event: VHAsyncLoadEvent) {
+    async userDataProvider($event: TableAsyncLoadEvent) {
         this.users = await lastValueFrom(this.userService.getAllUsers());
         $event.update(this.users);
     }
 
-    async onTenantLoad(event: VHAsyncLoadEvent) {
+    async onTenantLoad(event: TableAsyncLoadEvent) {
         this.tenants = await lastValueFrom(this.tenantService.getAllTenants());
         event.update(this.tenants);
     }

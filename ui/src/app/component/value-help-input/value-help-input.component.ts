@@ -16,6 +16,7 @@ import {ActivatedRoute} from "@angular/router";
 import {UserService} from "../../_services/user.service";
 import {ValueHelpComponent} from "../value-help/value-help.component";
 import {ValueHelpColumnComponent} from "./value-help-column.component";
+import {TableAsyncLoadEvent} from "../table/table.component";
 
 
 function parseBoolean(value: string): boolean {
@@ -25,41 +26,34 @@ function parseBoolean(value: string): boolean {
 
 export class VHAsyncLoadEvent {
     filters: any;
-    update: any;
+    update!: (data: any[], selected: any[]) => void;
 }
 
 
 @Component({
     selector: 'app-value-help-input',
     template: `
-        <div class="input-group">
-            <label class="col-3 col-form-label" for="{{name}}">
-                {{ name }}
-            </label>
-
-            <div class="col-3 input-group">
-                <div *ngIf="multi" class="form-control text-truncate">
-                    <ng-container *ngFor="let row of selectedRows; index as i; first as isFirst">
-                        <p-chip [removable]="false" label="{{getLabel(i)}}">
-                        </p-chip>
-                    </ng-container>
-                </div>
-
-                <input *ngIf="!multi"
-                       class="form-control text-truncate"
-                       id="{{name}}"
-                       name="{{name}}"
-                       readonly
-                       required
-                       type="text"
-                       value="{{getLabel(0)}}"
-                />
-
-                <button (click)="openValueHelp()" class="input-group-text btn btn-outline-secondary"
-                        type="button">
-                    <i class="fa fas fa-clone"></i>
-                </button>
+        <div class="col-3 input-group">
+            <div *ngIf="multi" class="form-control text-truncate">
+                <ng-container *ngFor="let row of selection; index as i; first as isFirst">
+                    <p-chip [removable]="false" label="{{getLabel(i)}}">
+                    </p-chip>
+                </ng-container>
             </div>
+            <input *ngIf="!multi"
+                   class="form-control text-truncate"
+                   id="{{name}}"
+                   name="{{name}}"
+                   readonly
+                   placeholder="{{placeholder}}"
+                   required
+                   type="text"
+                   value="{{getLabel(0)}}"
+            />
+            <button (click)="openValueHelp()" class="input-group-text btn btn-outline-secondary"
+                    type="button">
+                <i class="fa fas fa-clone"></i>
+            </button>
         </div>
 
     `,
@@ -76,13 +70,14 @@ export class ValueHelpInputComponent implements OnInit, AfterViewInit {
     @Input() labelField!: string;
     @Input() idField!: string;
     @Input() isFilterAsync: string | boolean = false;
-    @Output() onSelect = new EventEmitter<any[]>();
-    @Output() dataProvider = new EventEmitter<VHAsyncLoadEvent>();
+    @Input() placeholder: string = '';
+    @Input() selection: any[] = [];
+    @Output() selectionChange = new EventEmitter<any[]>();
+    @Output() dataProvider = new EventEmitter<TableAsyncLoadEvent>();
 
     @ContentChild('vh_body')
     body: TemplateRef<any> | null = null;
 
-    selectedRows: any[] = [];
     modalInstance!: ValueHelpComponent;
 
     @ContentChildren(ValueHelpColumnComponent)
@@ -111,11 +106,11 @@ export class ValueHelpInputComponent implements OnInit, AfterViewInit {
             return;
         }
         if (Array.isArray(value)) {
-            this.selectedRows = value;
-            this.onSelect.emit(this.selectedRows);
+            this.selection = value;
+            this.selectionChange.emit(this.selection);
         } else {
-            this.selectedRows = [value];
-            this.onSelect.emit(this.selectedRows);
+            this.selection = [value];
+            this.selectionChange.emit(this.selection);
         }
     }
 
@@ -128,7 +123,7 @@ export class ValueHelpInputComponent implements OnInit, AfterViewInit {
         this.modalInstance.isFilterAsync = this.isFilterAsync as boolean;
         await this.modalInstance.startUp({
             name: this.name,
-            selectedItem: this.selectedRows,
+            selectedItem: this.selection,
             multi: this.multi as boolean,
             idField: this.idField
         })
@@ -139,8 +134,8 @@ export class ValueHelpInputComponent implements OnInit, AfterViewInit {
     }
 
     getLabel(index: number) {
-        if (this.selectedRows && index >= 0 && index < this.selectedRows.length) {
-            const row = this.selectedRows[index] as any;
+        if (this.selection && index >= 0 && index < this.selection.length) {
+            const row = this.selection[index] as any;
             return row[this.labelField];
         }
         return "";

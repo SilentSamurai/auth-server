@@ -100,4 +100,22 @@ export class MemberController {
         return this.tenantService.updateScopeOfMember(body.scopes, tenantId, user);
     }
 
+    @Get('/:tenantId/member/:email')
+    @UseGuards(JwtAuthGuard)
+    async getMember(
+        @Request() request,
+        @Param('tenantId') tenantId: string,
+        @Param('email') email: string
+    ): Promise<any> {
+        const user = await this.usersService.findByEmail(email);
+        const tenant = await this.tenantService.findById(tenantId);
+        this.securityService.check(request, Action.Read, subject(SubjectEnum.TENANT, tenant));
+        let roles = await this.tenantService.getMemberScope(tenantId, user);
+        return {
+            tenantId: tenant.id,
+            userId: user.id,
+            roles: roles
+        };
+    }
+
 }

@@ -1,4 +1,4 @@
-import {NgModule} from '@angular/core';
+import {CUSTOM_ELEMENTS_SCHEMA, NgModule} from '@angular/core';
 import {TableModule} from "primeng/table";
 import {RouterModule} from "@angular/router";
 import {CommonModule} from "@angular/common";
@@ -28,8 +28,11 @@ import {RemoveScopeComponent} from "./tenants/view-tenant/remove-scope/remove-sc
 import {ComponentModule} from "../component/component.module";
 import {RoleListComponent} from "./roles/role-list.component";
 import {RoleSelectionComponent} from "./roles/role-selection.component";
+import {InputTextModule} from "primeng/inputtext";
+import {MessagesModule} from "primeng/messages";
 
 @NgModule({
+    schemas: [CUSTOM_ELEMENTS_SCHEMA],
     declarations: [
         AdminHomeComponent,
         AdminNavBarComponent,
@@ -63,7 +66,9 @@ import {RoleSelectionComponent} from "./roles/role-selection.component";
         NgbCollapseModule,
         NgbNavModule,
         NgbDropdownModule,
-        ComponentModule
+        ComponentModule,
+        InputTextModule,
+        MessagesModule
     ],
     providers: [],
     exports: [

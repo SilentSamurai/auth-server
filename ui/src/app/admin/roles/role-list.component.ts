@@ -1,8 +1,11 @@
 import {Component, OnInit} from '@angular/core';
 import {UserService} from '../../_services/user.service';
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
-import {ActivatedRoute} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {TenantService} from "../../_services/tenant.service";
+import {lastValueFrom} from "rxjs";
+import {VHAsyncLoadEvent} from "../../component/value-help-input/value-help-input.component";
+import {MessageService} from "primeng/api";
 
 
 @Component({
@@ -12,31 +15,53 @@ import {TenantService} from "../../_services/tenant.service";
 })
 export class RoleListComponent implements OnInit {
 
-    tenantId: any | null = null;
-    email: string | null = '';
-    member: any;
+    tenantId: string = '';
+    email: string = '';
+    member: any = {
+        roles: []
+    };
     user: any;
     tenant: any;
+    loading = true;
+    tenantRoles: any;
+    selectedRoles: any[] = [];
 
     constructor(private userService: UserService,
                 private tenantService: TenantService,
                 private route: ActivatedRoute,
+                private router: Router,
+                private messageService: MessageService,
                 private modalService: NgbModal) {
     }
 
     async ngOnInit(): Promise<void> {
         let params = this.route.snapshot.queryParamMap;
-        if (params.has('email')) {
-            this.email = params.get('email')
-        }
-        if (params.has('tenantId')) {
-            this.tenantId = params.get('tenantId')
+        if (!params.has('email') || !params.has('tenantId')) {
+            await this.router.navigate(['/role-sel']);
         }
 
+        this.email = params.get('email') as string;
+        this.tenantId = params.get('tenantId') as string;
+
+        this.tenant = await this.tenantService.getTenantDetails(this.tenantId);
+        this.user = await lastValueFrom(this.userService.getUser(this.email));
+        try {
+
+            await this.loadTable();
+            this.tenantRoles = this.tenant.scopes;
+            this.loading = false;
+
+        } catch (exception: any) {
+            console.log(exception);
+            this.messageService.add({severity: 'error', summary: 'Failed', detail: exception.error.message});
+        }
+
+    }
+
+    async loadTable() {
         if (this.tenantId && this.email) {
             this.member = await this.tenantService.getMemberDetails(this.tenantId, this.email);
         }
-
     }
 
     openCreateModal() {
@@ -51,11 +76,21 @@ export class RoleListComponent implements OnInit {
 
     }
 
-    onAddScope() {
-
+    async onAddRole() {
+        await this.tenantService.assignScope(this.selectedRoles, this.tenantId, this.email);
+        await this.loadTable();
+        this.selectedRoles = [];
     }
 
     onRemoveScope(scope: any) {
+
+    }
+
+    provideRoles($event: VHAsyncLoadEvent) {
+        $event.update(this.tenantRoles, []);
+    }
+
+    onAddRoleSelection(selected: any[]) {
 
     }
 }

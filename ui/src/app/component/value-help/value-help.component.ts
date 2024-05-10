@@ -2,40 +2,80 @@ import {Component, EventEmitter, OnInit, QueryList, TemplateRef} from '@angular/
 
 import {NgbActiveModal, NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {ActivatedRoute} from "@angular/router";
-import {UserService} from "../../_services/user.service";
-import {LazyLoadEvent} from "primeng/api";
-import {VHAsyncLoadEvent} from "../value-help-input/value-help-input.component";
 import {ValueHelpColumnComponent} from "../value-help-input/value-help-column.component";
+import {TableAsyncLoadEvent} from "../table/table.component";
 
 @Component({
     selector: 'app-value-help',
-    templateUrl: './value-help.component.html',
-    styleUrls: ['./value-help.component.css']
+    template: `
+        <div>
+            <div class="row p-2 pb-0">
+                <div class="col">
+                    <div class="d-flex justify-content-between">
+                        <div class="h4 mb-0">{{ name }}</div>
+                        <button (click)="cancel()"
+                                aria-label="Close"
+                                class="btn-close text-bg-secondary"
+                                type="button"></button>
+                    </div>
+                </div>
+            </div>
+            <app-table
+                [idField]="idField"
+                [multi]="multi"
+                [isFilterAsync]="isFilterAsync"
+                (onLoad)="lazyLoad($event)"
+                [(selection)]="selectedItem">
+                <app-table-col *ngFor="let col of columns"
+                               label="{{col.label}}"
+                               name="{{col.name}}"
+                               isId="{{col.isId}}"
+                >
+                    <ng-template #table_body let-row>
+                        <ng-container *ngTemplateOutlet="body; context: {$implicit: row}"></ng-container>
+                    </ng-template>
+                </app-table-col>
+            </app-table>
+            <div class="row">
+                <div class="col">
+                    <div class="gap-2 p-2 justify-content-end d-flex">
+                        <button (click)="clear()"
+                                class="btn btn-outline-secondary btn-block btn-sm">
+                            Clear
+                        </button>
+                        <button (click)="confirm()"
+                                class="btn btn-primary btn-block btn-sm">
+                            Select
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `,
+    styles: [
+        ``
+    ]
 })
 export class ValueHelpComponent implements OnInit {
 
     name: string = "";
     multi: boolean = true;
-    selectedItem: any = [];
-    body: TemplateRef<any> | null = null;
-    actualRows: any[] = [];
-    filteredRow: any[] = [];
 
+    body: TemplateRef<any> | null = null;
+
+    selectedItem: any[] = [];
     previousSelectedRows: any[] = [];
+
     columns!: QueryList<ValueHelpColumnComponent>;
-    filterVisible: boolean = true;
-    filters: any = {};
     idField!: string;
-    onLoad!: EventEmitter<VHAsyncLoadEvent>;
+    onLoad!: EventEmitter<TableAsyncLoadEvent>;
     isFilterAsync: boolean = false;
 
 
-    constructor(private userService: UserService,
-                private route: ActivatedRoute,
+    constructor(private route: ActivatedRoute,
                 private activeModal: NgbActiveModal,
                 private modalService: NgbModal) {
     }
-
 
     async ngOnInit(): Promise<void> {
         // this.data = await lastValueFrom(this.userService.getAllUsers())
@@ -67,41 +107,8 @@ export class ValueHelpComponent implements OnInit {
         this.activeModal.close([]);
     }
 
-    lazyLoad($event: LazyLoadEvent) {
+    lazyLoad($event: TableAsyncLoadEvent) {
         console.log("lazy", $event);
-        this.onLoad.emit({
-            filters: this.filters,
-            update: this.updateVirtualData.bind(this)
-        })
-    }
-
-    updateVirtualData(data: any[]) {
-        this.actualRows = data;
-        this.filteredRow = this.actualRows;
-    }
-
-    filter() {
-        if (this.isFilterAsync) {
-            this.onLoad.emit({
-                filters: this.filters,
-                update: this.updateVirtualData.bind(this)
-            })
-        } else {
-            if (Object.keys(this.filters).length > 0) {
-                console.log(this.filters);
-                const filtered = this.actualRows.filter((row, index) => {
-                    for (let field in this.filters) {
-                        let value = this.filters[field];
-                        let pattern = new RegExp(value, 'iug');
-                        if (row.hasOwnProperty(field) && pattern.test(row[field])) {
-                            return true;
-                        }
-                    }
-                    return false;
-                });
-                this.filteredRow = filtered;
-            }
-        }
-
+        this.onLoad.emit($event)
     }
 }
