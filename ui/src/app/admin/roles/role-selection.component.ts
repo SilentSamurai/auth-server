@@ -5,6 +5,7 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {lastValueFrom} from "rxjs";
 import {TenantService} from "../../_services/tenant.service";
 import {TableAsyncLoadEvent} from "../../component/table/table.component";
+import {MessageService} from "primeng/api";
 
 
 @Component({
@@ -18,31 +19,6 @@ import {TableAsyncLoadEvent} from "../../component/table/table.component";
                 </div>
                 <div class="col-4">
                     <form class="form-group g-3">
-
-                        <label class="col-3 col-form-label" for="Email">
-                            Email
-                        </label>
-                        <app-value-help-input
-                            (dataProvider)="userDataProvider($event)"
-                            [(selection)]="selectedUser"
-                            class="col-3"
-                            idField="email"
-                            labelField="email"
-                            multi="true"
-                            name="Email">
-
-                            <app-vh-col name="name" label="Name"></app-vh-col>
-                            <app-vh-col name="email" label="Email"></app-vh-col>
-
-                            <ng-template #vh_body let-row>
-                                <td>{{ row.name }} {{ row.surname }}</td>
-                                <td>
-                                    {{ row.email }}
-                                </td>
-                            </ng-template>
-
-                        </app-value-help-input>
-
 
                         <label class="col-3 col-form-label" for="Tenant">
                             Tenant
@@ -68,6 +44,31 @@ import {TableAsyncLoadEvent} from "../../component/table/table.component";
                             </ng-template>
 
                         </app-value-help-input>
+
+                        <label class="col-3 col-form-label" for="Email">
+                            Email
+                        </label>
+                        <app-value-help-input
+                            (dataProvider)="userDataProvider($event)"
+                            [(selection)]="selectedUser"
+                            class="col-3"
+                            idField="email"
+                            labelField="email"
+                            multi="false"
+                            name="Email">
+
+                            <app-vh-col name="name" label="Name"></app-vh-col>
+                            <app-vh-col name="email" label="Email"></app-vh-col>
+
+                            <ng-template #vh_body let-row>
+                                <td>{{ row.name }} {{ row.surname }}</td>
+                                <td>
+                                    {{ row.email }}
+                                </td>
+                            </ng-template>
+
+                        </app-value-help-input>
+
 
                         <div class=" d-grid gap-2 py-3 d-flex justify-content-end ">
                             <button (click)="continue()" class="btn btn-primary btn-block btn-sm" id="login-btn">
@@ -98,6 +99,7 @@ export class RoleSelectionComponent implements OnInit {
                 private tenantService: TenantService,
                 private route: ActivatedRoute,
                 private router: Router,
+                private messageService: MessageService,
                 private modalService: NgbModal) {
     }
 
@@ -111,13 +113,29 @@ export class RoleSelectionComponent implements OnInit {
             'tenant': this.selectedTenant
         });
         if (this.selectedTenant.length > 0 && this.selectedUser.length > 0) {
-            await this.router.navigate(['/admin', 'roles'], {
-                queryParams: {
-                    email: this.selectedUser[0].email,
-                    tenantId: this.selectedTenant[0].id
-                }
-            })
+
+            const isMem = await this.isMember();
+            if (isMem) {
+                await this.router.navigate(['/admin', 'roles'], {
+                    queryParams: {
+                        email: this.selectedUser[0].email,
+                        tenantId: this.selectedTenant[0].id
+                    }
+                })
+            }
         }
+    }
+
+    async isMember() {
+        const email = this.selectedUser[0].email;
+        const tenantId = this.selectedTenant[0].id;
+        try {
+            await this.tenantService.getMemberDetails(tenantId, email);
+        } catch (exception: any) {
+            this.messageService.add({severity: 'error', summary: 'Failed', detail: exception.error.message});
+            return false;
+        }
+        return true;
     }
 
     async userDataProvider($event: TableAsyncLoadEvent) {
