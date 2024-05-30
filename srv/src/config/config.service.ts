@@ -2,6 +2,7 @@ import {Injectable} from '@nestjs/common';
 import {config} from 'dotenv';
 import * as path from 'path';
 import {join} from 'path';
+import * as process from "node:process";
 
 @Injectable()
 export class ConfigService {
@@ -9,35 +10,34 @@ export class ConfigService {
     }
 
     static config(): any {
-        if (!this.isProduction()) {
-            let envPath = path.resolve(process.cwd(), '.env.development');
-            console.log("Environment path :", envPath);
-            config({
-                path: envPath
-            })
-
-            console.log("Environment variables:");
-            Object.keys(process.env).forEach(function (key) {
-                console.log(key + '=' + process.env[key]);
-            });
-        }
-    }
-
-    static configTest(print = false): any {
-        let envPath = path.resolve(process.cwd(), '.env.testing');
+        const envFile = process.env.ENV_FILE || './envs/.env.development';
+        let envPath = path.resolve(process.cwd(), envFile);
         console.log("Environment path :", envPath);
         config({
             path: envPath
         })
 
-
-        if (print) {
-            console.log("Environment variables:");
-            Object.keys(process.env).forEach(function (key) {
-                console.log(key + '=' + process.env[key]);
-            });
-        }
+        console.log("Environment variables:");
+        Object.keys(process.env).forEach(function (key) {
+            console.log(key + '=' + process.env[key]);
+        });
     }
+
+    // static configTest(print = false): any {
+    //     let envPath = path.resolve(process.cwd(), '.env.testing');
+    //     console.log("Environment path :", envPath);
+    //     config({
+    //         path: envPath
+    //     })
+    //
+    //
+    //     if (print) {
+    //         console.log("Environment variables:");
+    //         Object.keys(process.env).forEach(function (key) {
+    //             console.log(key + '=' + process.env[key]);
+    //         });
+    //     }
+    // }
 
     /**
      * Get a configuration value.

@@ -1,4 +1,4 @@
-import {createHash, generateKeyPairSync, randomBytes, scryptSync, timingSafeEqual} from "crypto";
+import {generateKeyPairSync, randomBytes, scryptSync, timingSafeEqual} from "crypto";
 import {generate} from 'otp-generator';
 
 function base64UrlEncode(input: Buffer | string): string {
@@ -58,8 +58,26 @@ export class CryptUtil {
     }
 
     public static generateCodeChallenge(verifier: string): string {
-        const hash = createHash('sha256').update(verifier).digest();
-        return base64UrlEncode(hash).replace(/=+$/, '');
+        // commenting as cannot use in http context only https allowed.
+
+        // const hash = createHash('sha256').update(verifier).digest();
+        // return base64UrlEncode(hash).replace(/=+$/, '');
+
+
+        return this.oneWayHash(verifier);
+    }
+
+    public static oneWayHash(plain: string) {
+        const FNV_PRIME = 16777619;
+        const OFFSET_BASIS = 2166136261;
+        let hash = OFFSET_BASIS;
+
+        for (let i = 0; i < plain.length; i++) {
+            hash ^= plain.charCodeAt(i);
+            hash = (hash * FNV_PRIME) >>> 0; // Force to 32-bit integer
+        }
+        const finalHash = hash >>> 0;
+        return `${finalHash}`; // Convert to unsigned 32-bit integer
     }
 
     public static generateRandomString(length: number): string {
