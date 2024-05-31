@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg " ngbNav>
+<nav class="navbar navbar-expand-lg bg-secondary" ngbNav>
     <a class="navbar-brand" href="javascript:void(0)" routerLink="/admin">
         <img alt="" class="rounded-circle mx-2" height="30" src="/assets/logo-img.jpg" width="30">
         My Identity
@@ -16,17 +16,17 @@
     <div [ngbCollapse]="isCollapsed" class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav px-2 w-100">
             <li [ngbNavItem]="1">
-                <a class="text-white mt-1" href="javascript:void(0)" ngbNavLink routerLink="/admin/users">
+                <a class=" mt-1" href="javascript:void(0)" ngbNavLink routerLink="/admin/users">
                     Users
                 </a>
             </li>
             <li [ngbNavItem]="2" class="flex-grow-1">
-                <a class="text-white mt-1" href="javascript:void(0)" ngbNavLink routerLink="/admin/tenants">
+                <a class=" mt-1" href="javascript:void(0)" ngbNavLink routerLink="/admin/tenants">
                     Tenants
                 </a>
             </li>
             <li [ngbNavItem]="3" class="nav-item" class="ms-auto" ngbDropdown placement="bottom-left">
-                <a class="text-white nav-link mt-1"
+                <a class="nav-link mt-1"
                    id="dropdownUser1"
                    ngbDropdownToggle>
                     <span class="mt-1">{{ email }}</span>

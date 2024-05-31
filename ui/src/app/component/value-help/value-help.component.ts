@@ -8,34 +8,41 @@ import {TableAsyncLoadEvent} from "../table/table.component";
 @Component({
     selector: 'app-value-help',
     template: `
-        <div>
+        <div class="bg-body-secondary">
             <div class="row p-2 pb-0">
                 <div class="col">
                     <div class="d-flex justify-content-between">
-                        <div class="h4 mb-0">{{ name }}</div>
+                        <div class="h5 mb-0">{{ name }}</div>
                         <button (click)="cancel()"
                                 aria-label="Close"
-                                class="btn-close text-bg-secondary"
-                                type="button"></button>
+                                class="btn btn-sm "
+                                type="button">
+                            <i class="fa fa-close"></i>
+                        </button>
                     </div>
                 </div>
             </div>
-            <app-table
-                [idField]="idField"
-                [multi]="multi"
-                [isFilterAsync]="isFilterAsync"
-                (onLoad)="lazyLoad($event)"
-                [(selection)]="selectedItem">
-                <app-table-col *ngFor="let col of columns"
-                               label="{{col.label}}"
-                               name="{{col.name}}"
-                               isId="{{col.isId}}"
-                >
-                    <ng-template #table_body let-row>
-                        <ng-container *ngTemplateOutlet="body; context: {$implicit: row}"></ng-container>
-                    </ng-template>
-                </app-table-col>
-            </app-table>
+            <div class="row ">
+                <div class="col">
+                    <app-table
+                        [idField]="idField"
+                        [multi]="multi"
+                        [isFilterAsync]="isFilterAsync"
+                        (onLoad)="lazyLoad($event)"
+                        [(selection)]="selectedItem">
+                        <app-table-col *ngFor="let col of columns"
+                                       label="{{col.label}}"
+                                       name="{{col.name}}"
+                                       isId="{{col.isId}}"
+                        >
+                            <ng-template #table_body let-row>
+                                <ng-container *ngTemplateOutlet="body; context: {$implicit: row}"></ng-container>
+                            </ng-template>
+                        </app-table-col>
+                    </app-table>
+                </div>
+            </div>
+
             <div class="row">
                 <div class="col">
                     <div class="gap-2 p-2 justify-content-end d-flex">

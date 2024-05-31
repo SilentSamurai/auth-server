@@ -48,11 +48,8 @@ export class FilterBarColumnComponent implements OnInit {
                     <button *ngIf="filterVisible" (click)="onGo()" class="btn btn-primary btn-block btn-sm">
                         Go
                     </button>
-                    <button (click)="addFilter()" *ngIf="filterVisible"
-                            class="btn btn-sm text-success ">
-                        <i class="fa fa-plus-circle"></i>
-                    </button>
-                    <button (click)="filterVisible = !filterVisible" class="btn btn-sm ">
+
+                    <button (click)="filterVisible = !filterVisible" class="btn btn-sm px-3">
                         <i class="fa {{ filterVisible ? 'fa-eye-slash' : 'fa-eye' }}"></i>
                     </button>
                 </div>
@@ -63,13 +60,17 @@ export class FilterBarColumnComponent implements OnInit {
                 <!--                <label class="col-sm-4 col-form-label pt-0">{{ filter.label }}</label>-->
                 <div class="input-group-sm input-group">
 
+                    <button class="btn btn-sm " (click)="removeFilter(i)">
+                        <i class="fa fa-close"></i>
+                    </button>
+
                     <button aria-expanded="false"
-                            class="btn btn-outline-secondary dropdown-toggle"
+                            class="btn btn-outline-secondary dropdown-toggle text-start"
                             data-bs-toggle="dropdown" ngbDropdown ngbDropdownToggle
                             style="min-width: 6rem"
                             type="button">
 
-                        <b class="px-2">
+                        <b class="">
                             {{ filter.label }}
                         </b>
                         <ul class="dropdown-menu " ngbDropdownMenu>
@@ -83,12 +84,11 @@ export class FilterBarColumnComponent implements OnInit {
                     </button>
 
                     <button aria-expanded="false"
-                            class="btn btn-outline-secondary dropdown-toggle"
+                            class="btn btn-outline-secondary dropdown-toggle text-start"
                             data-bs-toggle="dropdown" ngbDropdown ngbDropdownToggle
-                            style="min-width: 5rem"
                             type="button">
 
-                        <b class="px-2">
+                        <b class="">
                             {{ Operators.symbolFromOperator(filter.operator) }}
                         </b>
                         <ul class="dropdown-menu " ngbDropdownMenu>
@@ -105,10 +105,14 @@ export class FilterBarColumnComponent implements OnInit {
                            class="col-sm-8 form-control form-control-sm"
                            type="text">
 
-                    <button class="btn btn-sm " (click)="removeFilter(i)">
-                        <i class="fa fa-close"></i>
-                    </button>
+
                 </div>
+            </div>
+            <div class="col pt-1">
+                <button (click)="addFilter()" *ngIf="filterVisible"
+                        class="btn btn-sm text-success ">
+                    <i class="fa fa-plus-circle"></i>
+                </button>
             </div>
         </div>
     `,

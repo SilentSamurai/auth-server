@@ -7,8 +7,28 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
 
 @Component({
     selector: 'app-tile',
-    templateUrl: './tile.component.html',
-    styleUrls: ['./tile.component.css']
+    template: `
+        <div class="row row-cols-auto my-2">
+            <div *ngFor="let tile of internalTile; index as i;" class="col py-1">
+                <a [routerLink]="tile.link"
+                   class="text-decoration-none">
+                    <p-card [style]="tile.size" [styleClass]="'shadow-sm'">
+                        <ng-template pTemplate="title">
+                            <span class="text-truncate">{{ tile.title }}</span>
+                        </ng-template>
+                        <ng-template pTemplate="subtitle">
+                            {{ tile.subtitle }}
+                        </ng-template>
+                        <ng-template pTemplate="footer">
+                            <i aria-hidden="true" class="fa {{ tile.icon }} fa-2x"></i>
+                        </ng-template>
+                    </p-card>
+                </a>
+
+            </div>
+        </div>
+    `,
+    styles: ['']
 })
 export class TileComponent implements OnInit {
 
