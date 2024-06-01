@@ -157,7 +157,7 @@ const PasswordGrantSchema = yup.object().shape({
 });
 
 const ClientCredentialGrantSchema = yup.object().shape({
-    grant_type: yup.string().required().matches(/^client_credential$/g, {message: "grant type not recognised"}),
+    grant_type: yup.string().required().matches(/^client_credentials?$/g, {message: "grant type not recognised"}),
     client_id: yup.string().required('client_id is required'),
     client_secret: yup.string().required('client_secret is required'),
     scopes: yup.array().of(

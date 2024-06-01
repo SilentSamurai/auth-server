@@ -62,6 +62,10 @@ export class MemberController {
         @Param('tenantId') tenantId: string,
         @Param('email') email: string
     ): Promise<Tenant> {
+        const isPresent = await this.usersService.existByEmail(email);
+        if (!isPresent) {
+            await this.usersService.createShadowUser(email, email);
+        }
         const user = await this.usersService.findByEmail(email);
         const tenant = await this.tenantService.findById(tenantId);
         this.securityService.check(request, Action.Update, subject(SubjectEnum.TENANT, tenant));

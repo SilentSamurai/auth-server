@@ -30,8 +30,8 @@ export class Operators {
             operator: "contains"
         },
         {
-            label: ".*",
-            operator: "Regex"
+            label: "=*",
+            operator: "regex"
         }
     ]
 

@@ -160,7 +160,7 @@ export class FilterBarComponent implements OnInit, AfterViewInit {
         for (const col of this.columns) {
             let filter = new Filter(col.name, col.label,
                 "",
-                Operators.operatorFromSymbol("=")
+                Operators.operatorFromSymbol("=*")
             );
             this.filters.push(filter);
         }

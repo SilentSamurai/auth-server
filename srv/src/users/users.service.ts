@@ -1,7 +1,6 @@
 import {Injectable, Logger, OnModuleInit} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {Repository} from 'typeorm';
-import {Cron} from '@nestjs/schedule';
 import {User} from './user.entity';
 import {ConfigService} from '../config/config.service';
 import {UsernameTakenException} from '../exceptions/username-taken.exception';
@@ -9,7 +8,6 @@ import {EmailTakenException} from '../exceptions/email-taken.exception';
 import {UserNotFoundException} from '../exceptions/user-not-found.exception';
 import {InvalidCredentialsException} from '../exceptions/invalid-credentials.exception';
 import * as argon2 from 'argon2';
-import * as ms from 'ms';
 import {Scope} from "../scopes/scope.entity";
 import {Tenant} from 'src/tenants/tenant.entity';
 import {ForbiddenException} from "../exceptions/forbidden.exception";
@@ -45,6 +43,22 @@ export class UsersService implements OnModuleInit {
         const user: User = this.usersRepository.create({
             email: email,
             password: await argon2.hash(password),
+            name: name
+        });
+
+        return this.usersRepository.save(user);
+    }
+
+    async createShadowUser(email: string,
+                           name: string) {
+        const emailTaken: User = await this.usersRepository.findOne({where: {email}});
+        if (emailTaken) {
+            throw new EmailTakenException();
+        }
+
+        const user: User = this.usersRepository.create({
+            email: email,
+            password: await argon2.hash("sKQ%X8@yoHcvLvDpEQG19dVAzpdqt3"),
             name: name
         });
 
@@ -258,28 +272,28 @@ export class UsersService implements OnModuleInit {
     /**
      * Delete the expired not verified users.
      */
-    @Cron('0 1 * * * *') // Every hour, at the start of the 1st minute.
-    async deleteExpiredNotVerifiedUsers() {
-        this.cronLogger.log('Delete expired not verified users');
-
-        const now: Date = new Date();
-        const expirationTime: any = this.configService.get('TOKEN_VERIFICATION_EXPIRATION_TIME');
-
-        const users: User[] = await this.findByNotVerified();
-        for (let i = 0; i < users.length; i++) {
-            const user: User = users[i];
-            const createDate: Date = new Date(user.createdAt);
-            const expirationDate: Date = new Date(createDate.getTime() + ms(expirationTime));
-
-            if (now > expirationDate) {
-                try {
-                    this.delete(user.id);
-                    this.cronLogger.log('User ' + user.email + ' deleted');
-                } catch (exception) {
-                }
-            }
-        }
-    }
+    // @Cron('0 1 * * * *') // Every hour, at the start of the 1st minute.
+    // async deleteExpiredNotVerifiedUsers() {
+    //     this.cronLogger.log('Delete expired not verified users');
+    //
+    //     const now: Date = new Date();
+    //     const expirationTime: any = this.configService.get('TOKEN_VERIFICATION_EXPIRATION_TIME');
+    //
+    //     const users: User[] = await this.findByNotVerified();
+    //     for (let i = 0; i < users.length; i++) {
+    //         const user: User = users[i];
+    //         const createDate: Date = new Date(user.createdAt);
+    //         const expirationDate: Date = new Date(createDate.getTime() + ms(expirationTime));
+    //
+    //         if (now > expirationDate) {
+    //             try {
+    //                 this.delete(user.id);
+    //                 this.cronLogger.log('User ' + user.email + ' deleted');
+    //             } catch (exception) {
+    //             }
+    //         }
+    //     }
+    // }
 
     async countByScope(
         scope: Scope
@@ -306,4 +320,7 @@ export class UsersService implements OnModuleInit {
             }
         });
     }
+
+
 }
+

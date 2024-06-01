@@ -97,6 +97,7 @@ export class AuthController {
                     refresh_token: refreshToken
                 };
             }
+            case GRANT_TYPES.CLIENT_CREDENTIALS:
             case GRANT_TYPES.CLIENT_CREDENTIAL: {
                 let validationPipe = new ValidationPipe(ValidationSchema.ClientCredentialGrantSchema);
                 await validationPipe.transform(body, null);

@@ -11,6 +11,12 @@ import {UsersModule} from "../users/users.module";
 import {ScopesModule} from "../scopes/scopes.module";
 import {ScopeController} from "./scope.controller";
 import {MainController} from "./main.controller";
+import {GenericSearchController} from "./generic-serach.controller";
+import {TypeOrmModule} from "@nestjs/typeorm";
+import {User} from "../users/user.entity";
+import {Tenant} from "../tenants/tenant.entity";
+import {Scope} from "../scopes/scope.entity";
+import {TenantMember} from "../tenants/tenant.members.entity";
 
 @Module(
     {
@@ -22,6 +28,7 @@ import {MainController} from "./main.controller";
                 TenantModule,
                 UsersModule,
                 ScopesModule,
+                TypeOrmModule.forFeature([User, Tenant, Scope, TenantMember])
             ],
         controllers: [
             UsersController,
@@ -29,7 +36,8 @@ import {MainController} from "./main.controller";
             TenantController,
             MemberController,
             ScopeController,
-            MainController
+            MainController,
+            GenericSearchController
         ],
         providers: [],
         exports: []

@@ -82,4 +82,8 @@ export class TenantService {
     async getMemberDetails(tenantId: string, email: string) {
         return lastValueFrom(this.http.get(`${API_URL}/tenant/${tenantId}/member/${email}`, this.getHttpOptions()))
     }
+
+    async queryTenant(query: any): Promise<any> {
+        return lastValueFrom(this.http.post(`${API_URL}/search/Tenants`, query, this.getHttpOptions()));
+    }
 }

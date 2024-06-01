@@ -184,6 +184,7 @@ export class AppTableComponent implements OnInit {
     }
 
     filter(filters: Filter[]) {
+        this.filters = filters;
         if (this.isFilterAsync) {
             this.onLoad.emit({
                 pageNo: this.pageNo,

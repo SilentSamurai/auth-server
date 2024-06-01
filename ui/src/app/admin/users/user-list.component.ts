@@ -17,20 +17,13 @@ export class UserListComponent implements OnInit {
     @ViewChild(AppTableComponent)
     table!: AppTableComponent;
 
-    users: any[] = [];
+    users: any = [];
 
     constructor(private userService: UserService, private modalService: NgbModal) {
     }
 
-    ngOnInit(): void {
-        this.userService.getAllUsers().subscribe({
-            next: data => {
-                this.users = data;
-            },
-            error: err => {
-                this.users = [];
-            }
-        });
+    async ngOnInit(): Promise<void> {
+        // this.users = await this.userService.queryUser({});
     }
 
     async openCreateModal() {
@@ -56,10 +49,13 @@ export class UserListComponent implements OnInit {
         this.ngOnInit();
     }
 
-    lazyLoad($event: TableAsyncLoadEvent) {
-        if ($event.pageNo == 0) {
-            $event.update(this.users);
-        }
+    async lazyLoad($event: TableAsyncLoadEvent) {
+
+        this.users = await this.userService.queryUser({
+            pageNo: $event.pageNo,
+            where: $event.filters.filter(item => item.value != null && item.value.length > 0),
+        });
+        $event.update(this.users.data);
     }
 
     onFilter(filters: Filter[]) {

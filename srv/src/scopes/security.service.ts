@@ -1,4 +1,4 @@
-import {Injectable, OnModuleInit} from '@nestjs/common';
+import {Injectable, OnModuleInit, UnauthorizedException} from '@nestjs/common';
 import {AuthService} from "../auth/auth.service";
 import {ExtractJwt} from 'passport-jwt';
 import {ScopeEnum} from "./scope.enum";
@@ -11,6 +11,7 @@ import {AnyAbility} from "@casl/ability/dist/types/PureAbility";
 
 export enum GRANT_TYPES {
     PASSWORD = "password",
+    CLIENT_CREDENTIALS = "client_credentials",
     CLIENT_CREDENTIAL = "client_credential",
     REFRESH_TOKEN = "refresh_token",
     CODE = "authorization_code"
@@ -50,6 +51,9 @@ export class SecurityService implements OnModuleInit {
 
     async setSecurityContextFromRequest(request: any) {
         const token = extractTokenFromHeader(request);
+        if (!token) {
+            throw new UnauthorizedException("No token provided");
+        }
         const payload: SecurityContext = await this.authService.validateAccessToken(token);
         if (payload.grant_type === GRANT_TYPES.PASSWORD) {
             request['user'] = payload;

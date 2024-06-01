@@ -54,4 +54,8 @@ export class UserService {
     getUserTenants(email: string) {
         return this.http.get(`${API_URL}/users/${email}/tenants`, this.getHttpOptions());
     }
+
+    async queryUser(query: any): Promise<any> {
+        return lastValueFrom(this.http.post(`${API_URL}/search/Users`, query, this.getHttpOptions()));
+    }
 }
