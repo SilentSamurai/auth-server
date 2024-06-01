@@ -16,7 +16,8 @@ import {ActivatedRoute} from "@angular/router";
 import {UserService} from "../../_services/user.service";
 import {ValueHelpComponent} from "../value-help/value-help.component";
 import {ValueHelpColumnComponent} from "./value-help-column.component";
-import {TableAsyncLoadEvent} from "../table/table.component";
+import {TableAsyncLoadEvent} from "../table/app-table.component";
+import {FilterBarColumnComponent} from "../filter-bar/filter-bar.component";
 
 
 function parseBoolean(value: string): boolean {
@@ -83,6 +84,9 @@ export class ValueHelpInputComponent implements OnInit, AfterViewInit {
     @ContentChildren(ValueHelpColumnComponent)
     columns!: QueryList<ValueHelpColumnComponent>;
 
+    @ContentChildren(FilterBarColumnComponent)
+    filters!: QueryList<FilterBarColumnComponent>;
+
     constructor(private userService: UserService,
                 private route: ActivatedRoute,
                 private modalService: NgbModal) {
@@ -120,6 +124,7 @@ export class ValueHelpInputComponent implements OnInit, AfterViewInit {
         this.modalInstance.body = this.body;
         this.modalInstance.onLoad = this.dataProvider;
         this.modalInstance.columns = this.columns;
+        this.modalInstance.filters = this.filters;
         this.modalInstance.isFilterAsync = this.isFilterAsync as boolean;
         await this.modalInstance.startUp({
             name: this.name,

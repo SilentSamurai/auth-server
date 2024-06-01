@@ -4,7 +4,7 @@ import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {ActivatedRoute, Router} from "@angular/router";
 import {lastValueFrom} from "rxjs";
 import {TenantService} from "../../_services/tenant.service";
-import {TableAsyncLoadEvent} from "../../component/table/table.component";
+import {TableAsyncLoadEvent} from "../../component/table/app-table.component";
 import {MessageService} from "primeng/api";
 
 
@@ -32,6 +32,9 @@ import {MessageService} from "primeng/api";
                             labelField="name"
                             name="Tenant">
 
+                            <app-fb-col name="name" label="Name"></app-fb-col>
+                            <app-fb-col name="domain" label="Domain"></app-fb-col>
+
                             <app-vh-col name="name" label="Name"></app-vh-col>
                             <app-vh-col name="domain" label="Domain"></app-vh-col>
 
@@ -56,6 +59,10 @@ import {MessageService} from "primeng/api";
                             labelField="email"
                             multi="false"
                             name="Email">
+
+                            <app-fb-col name="email" label="Email"></app-fb-col>
+                            <app-fb-col name="name" label="Name"></app-fb-col>
+                            <app-fb-col name="domain" label="Domain"></app-fb-col>
 
                             <app-vh-col name="name" label="Name"></app-vh-col>
                             <app-vh-col name="email" label="Email"></app-vh-col>
@@ -138,14 +145,18 @@ export class RoleSelectionComponent implements OnInit {
         return true;
     }
 
-    async userDataProvider($event: TableAsyncLoadEvent) {
-        this.users = await lastValueFrom(this.userService.getAllUsers());
-        $event.update(this.users);
+    async userDataProvider(event: TableAsyncLoadEvent) {
+        if (event.pageNo == 0) {
+            this.users = await lastValueFrom(this.userService.getAllUsers());
+            event.update(this.users);
+        }
     }
 
     async onTenantLoad(event: TableAsyncLoadEvent) {
-        this.tenants = await lastValueFrom(this.tenantService.getAllTenants());
-        event.update(this.tenants);
+        if (event.pageNo == 0) {
+            this.tenants = await lastValueFrom(this.tenantService.getAllTenants());
+            event.update(this.tenants);
+        }
     }
 
 }

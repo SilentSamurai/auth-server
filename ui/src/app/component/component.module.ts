@@ -15,7 +15,7 @@ import {ValueHelpInputComponent} from "./value-help-input/value-help-input.compo
 import {SkeletonModule} from "primeng/skeleton";
 import {ValueHelpColumnComponent} from "./value-help-input/value-help-column.component";
 import {FilterBarColumnComponent, FilterBarComponent} from "./filter-bar/filter-bar.component";
-import {TableColumnComponent, TableComponent} from "./table/table.component";
+import {AppTableComponent, TableColumnComponent} from "./table/app-table.component";
 
 @NgModule({
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -26,8 +26,8 @@ import {TableColumnComponent, TableComponent} from "./table/table.component";
         ValueHelpColumnComponent,
         FilterBarComponent,
         FilterBarColumnComponent,
-        TableComponent,
-        TableColumnComponent
+        AppTableComponent,
+        TableColumnComponent,
     ],
     imports: [
         TableModule,
@@ -48,7 +48,11 @@ import {TableColumnComponent, TableComponent} from "./table/table.component";
     exports: [
         TileComponent,
         ValueHelpInputComponent,
-        ValueHelpColumnComponent
+        ValueHelpColumnComponent,
+        FilterBarColumnComponent,
+        AppTableComponent,
+        TableColumnComponent,
+        FilterBarComponent
     ]
 })
 export class ComponentModule {

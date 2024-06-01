@@ -1,9 +1,11 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {UserService} from '../../_services/user.service';
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {CreateUserModalComponent} from "./create-user-modal/create-user-modal.component";
 import {EditUserModalComponent} from "./edit-user-modal/edit-user-modal.component";
 import {DeleteUserModalComponent} from "./delete-user-modal/delete-user-modal.component";
+import {AppTableComponent, TableAsyncLoadEvent} from "../../component/table/app-table.component";
+import {Filter} from "../../component/filter-bar/filter-bar.component";
 
 @Component({
     selector: 'app-board-user',
@@ -11,6 +13,10 @@ import {DeleteUserModalComponent} from "./delete-user-modal/delete-user-modal.co
     styleUrls: ['./user-list.component.css']
 })
 export class UserListComponent implements OnInit {
+
+    @ViewChild(AppTableComponent)
+    table!: AppTableComponent;
+
     users: any[] = [];
 
     constructor(private userService: UserService, private modalService: NgbModal) {
@@ -48,5 +54,15 @@ export class UserListComponent implements OnInit {
         const deletedUser = await modalRef.result;
         console.log(deletedUser);
         this.ngOnInit();
+    }
+
+    lazyLoad($event: TableAsyncLoadEvent) {
+        if ($event.pageNo == 0) {
+            $event.update(this.users);
+        }
+    }
+
+    onFilter(filters: Filter[]) {
+        this.table.filter(filters);
     }
 }

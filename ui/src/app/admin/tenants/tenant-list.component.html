@@ -4,35 +4,42 @@
 
         <div class="col-md-12">
             <div class="card my-2">
-                <p-table [value]="tenants" responsiveLayout="scroll">
-                    <ng-template pTemplate="caption">
-                        <div class="d-flex justify-content-between">
-                            <h5>Tenant List</h5>
-                            <button (click)="openCreateModal()" [disabled]="!this.creationAllowed"
-                                    class="btn btn-primary"
-                                    type="button">
-                                <i class="fa fa-solid fa-plus me-2"></i> Add Tenant
-                            </button>
-                        </div>
+                <div class="card-header">
+                    <div class="d-flex justify-content-between py-2">
+                        <h5>Tenant List</h5>
+                        <button (click)="openCreateModal()" [disabled]="!this.creationAllowed"
+                                class="btn btn-success"
+                                type="button">
+                            <i class="fa fa-solid fa-plus me-2"></i> Add Tenant
+                        </button>
+                    </div>
+                    <app-fb (onFilter)="onFilter($event)">
+                        <app-fb-col label="Tenant Id" name="id"></app-fb-col>
+                        <app-fb-col label="Name" name="name"></app-fb-col>
+                        <app-fb-col label="Domain" name="domain"></app-fb-col>
+                    </app-fb>
+                </div>
+                <div class="card-body p-0">
+                    <app-table
+                        (onLoad)="lazyLoad($event)"
+                        idField="id"
+                        isFilterAsync="true"
+                        multi="true"
+                        scrollHeight="75vh">
 
-                    </ng-template>
-                    <ng-template let-columns pTemplate="header">
-                        <tr>
-                            <th>Tenant Id</th>
-                            <th>Name</th>
-                            <th>Domain</th>
-                            <th>Action</th>
-                        </tr>
-                    </ng-template>
-                    <ng-template let-columns="columns" let-tenant pTemplate="body">
-                        <tr>
+                        <app-table-col label="Tenant Id" name="id"></app-table-col>
+                        <app-table-col label="Name" name="name"></app-table-col>
+                        <app-table-col label="Domain" name="domain"></app-table-col>
+                        <app-table-col label="Action" name="action"></app-table-col>
+
+                        <ng-template #table_body let-tenant>
                             <td>
                                 <span class="p-column-title">Name</span>
                                 <a [routerLink]="['/admin/tenant/', tenant.id]"
                                    href="javascript:void(0)">{{ tenant.id }}</a>
                             </td>
-                            <td><span class="p-column-title">Name</span>{{tenant.name}}</td>
-                            <td><span class="p-column-title">Domain</span>{{tenant.domain}}</td>
+                            <td><span class="p-column-title">Name</span>{{ tenant.name }}</td>
+                            <td><span class="p-column-title">Domain</span>{{ tenant.domain }}</td>
                             <td class="d-flex ">
                                 <button (click)="openUpdateModal(tenant)" [disabled]="!this.isTenantAdmin" class="btn"
                                         type="button">
@@ -43,17 +50,11 @@
                                     <i class="fa fa-solid fa-trash"></i>
                                 </button>
                             </td>
-                        </tr>
-                    </ng-template>
-                </p-table>
+                        </ng-template>
+                    </app-table>
+                </div>
             </div>
         </div>
-
-
-        <div class="">
-
-        </div>
-
     </div>
 </div>
 

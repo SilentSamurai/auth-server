@@ -1,9 +1,10 @@
-import {Component, EventEmitter, OnInit, QueryList, TemplateRef} from '@angular/core';
+import {Component, EventEmitter, OnInit, QueryList, TemplateRef, ViewChild} from '@angular/core';
 
 import {NgbActiveModal, NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {ActivatedRoute} from "@angular/router";
 import {ValueHelpColumnComponent} from "../value-help-input/value-help-column.component";
-import {TableAsyncLoadEvent} from "../table/table.component";
+import {AppTableComponent, TableAsyncLoadEvent} from "../table/app-table.component";
+import {Filter, FilterBarColumnComponent} from "../filter-bar/filter-bar.component";
 
 @Component({
     selector: 'app-value-help',
@@ -24,6 +25,16 @@ import {TableAsyncLoadEvent} from "../table/table.component";
             </div>
             <div class="row ">
                 <div class="col">
+                    <app-fb (onFilter)="onFilter($event)" editable="false">
+                        <app-fb-col *ngFor="let filter of filters"
+                                    name="{{filter.name}}"
+                                    label="{{filter.label}}">
+                        </app-fb-col>
+                    </app-fb>
+                </div>
+            </div>
+            <div class="row ">
+                <div class="col">
                     <app-table
                         [idField]="idField"
                         [multi]="multi"
@@ -35,10 +46,10 @@ import {TableAsyncLoadEvent} from "../table/table.component";
                                        name="{{col.name}}"
                                        isId="{{col.isId}}"
                         >
-                            <ng-template #table_body let-row>
-                                <ng-container *ngTemplateOutlet="body; context: {$implicit: row}"></ng-container>
-                            </ng-template>
                         </app-table-col>
+                        <ng-template #table_body let-row>
+                            <ng-container *ngTemplateOutlet="body; context: {$implicit: row}"></ng-container>
+                        </ng-template>
                     </app-table>
                 </div>
             </div>
@@ -65,6 +76,7 @@ import {TableAsyncLoadEvent} from "../table/table.component";
 })
 export class ValueHelpComponent implements OnInit {
 
+    idField!: string;
     name: string = "";
     multi: boolean = true;
 
@@ -74,9 +86,14 @@ export class ValueHelpComponent implements OnInit {
     previousSelectedRows: any[] = [];
 
     columns!: QueryList<ValueHelpColumnComponent>;
-    idField!: string;
+    filters!: QueryList<FilterBarColumnComponent>;
+
+
     onLoad!: EventEmitter<TableAsyncLoadEvent>;
     isFilterAsync: boolean = false;
+
+    @ViewChild(AppTableComponent)
+    table!: AppTableComponent;
 
 
     constructor(private route: ActivatedRoute,
@@ -117,5 +134,9 @@ export class ValueHelpComponent implements OnInit {
     lazyLoad($event: TableAsyncLoadEvent) {
         console.log("lazy", $event);
         this.onLoad.emit($event)
+    }
+
+    onFilter(filters: Filter[]) {
+
     }
 }

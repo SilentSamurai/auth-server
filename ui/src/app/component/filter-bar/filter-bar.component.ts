@@ -45,43 +45,53 @@ export class FilterBarColumnComponent implements OnInit {
         <div class="row">
             <div class="col">
                 <div class="col align-content-end d-flex justify-content-end">
-                    <button *ngIf="filterVisible" (click)="onGo()" class="btn btn-primary btn-block btn-sm">
+                    <button *ngIf="visibility" (click)="onGo()" class="btn btn-primary btn-block btn-sm">
                         Go
                     </button>
 
-                    <button (click)="filterVisible = !filterVisible" class="btn btn-sm px-3">
-                        <i class="fa {{ filterVisible ? 'fa-eye-slash' : 'fa-eye' }}"></i>
+                    <button (click)="visibility = !visibility" class="btn btn-sm px-3">
+                        <i class=" fa {{ visibility ? 'fa-share' : 'fa-filter' }}"></i>
                     </button>
                 </div>
             </div>
         </div>
-        <div *ngIf="filterVisible" class="row px-2 pt-0 pb-1 row-cols-auto">
+        <div *ngIf="visibility" class="row px-2 pt-0 pb-1 row-cols-auto">
             <div *ngFor="let filter of filters; index as i" class="col pt-1">
                 <!--                <label class="col-sm-4 col-form-label pt-0">{{ filter.label }}</label>-->
                 <div class="input-group-sm input-group">
 
-                    <button class="btn btn-sm " (click)="removeFilter(i)">
+                    <button class="btn btn-sm " (click)="removeFilter(i)" *ngIf="editable">
                         <i class="fa fa-close"></i>
                     </button>
 
-                    <button aria-expanded="false"
-                            class="btn btn-outline-secondary dropdown-toggle text-start"
-                            data-bs-toggle="dropdown" ngbDropdown ngbDropdownToggle
-                            style="min-width: 6rem"
-                            type="button">
+                    <ng-container *ngIf="editable">
+                        <button aria-expanded="false"
+                                class="btn btn-outline-secondary dropdown-toggle text-start"
+                                data-bs-toggle="dropdown" ngbDropdown ngbDropdownToggle
+                                style="min-width: 6rem"
+                                type="button">
 
-                        <b class="">
+                            <b class="">
+                                {{ filter.label }}
+                            </b>
+                            <ul class="dropdown-menu " ngbDropdownMenu>
+                                <li *ngFor="let col of columns"
+                                    (click)="filter.name = col.name; filter.label = col.label">
+                                    <a class="dropdown-item ">
+                                        {{ col.label }}
+                                    </a>
+                                </li>
+                            </ul>
+                        </button>
+                    </ng-container>
+
+                    <ng-container *ngIf="!editable">
+                        <span class="input-group-text border-dark-subtle "
+                              style="min-width: 6rem">
                             {{ filter.label }}
-                        </b>
-                        <ul class="dropdown-menu " ngbDropdownMenu>
-                            <li *ngFor="let col of columns"
-                                (click)="filter.name = col.name; filter.label = col.label">
-                                <a class="dropdown-item ">
-                                    {{ col.label }}
-                                </a>
-                            </li>
-                        </ul>
-                    </button>
+                        </span>
+                    </ng-container>
+
 
                     <button aria-expanded="false"
                             class="btn btn-outline-secondary dropdown-toggle text-start"
@@ -104,12 +114,10 @@ export class FilterBarColumnComponent implements OnInit {
                     <input [(ngModel)]="filter.value"
                            class="col-sm-8 form-control form-control-sm"
                            type="text">
-
-
                 </div>
             </div>
-            <div class="col pt-1">
-                <button (click)="addFilter()" *ngIf="filterVisible"
+            <div class="col pt-1" *ngIf="editable">
+                <button (click)="addFilter()" *ngIf="visibility"
                         class="btn btn-sm text-success ">
                     <i class="fa fa-plus-circle"></i>
                 </button>
@@ -129,10 +137,12 @@ export class FilterBarComponent implements OnInit, AfterViewInit {
 
     Operators = Operators;
 
+    @Input() editable: boolean | string = true;
+    @Input() visibility: boolean = true;
     @Output() onFilter = new EventEmitter<Filter[]>();
 
     filters: Filter[] = [];
-    filterVisible: boolean = true;
+
 
     @ContentChildren(FilterBarColumnComponent)
     columns!: QueryList<FilterBarColumnComponent>;
@@ -141,7 +151,9 @@ export class FilterBarComponent implements OnInit, AfterViewInit {
     }
 
     async ngOnInit(): Promise<void> {
-
+        if (typeof this.editable === 'string') {
+            this.editable = parseBoolean(this.editable);
+        }
     }
 
     ngAfterViewInit(): void {

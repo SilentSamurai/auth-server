@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {CreateTenantComponent} from "./create-tenant/create-tenant.component";
 import {UpdateTenantComponent} from "./update-tenant/update-tenant.component";
@@ -6,6 +6,8 @@ import {DeleteTenantComponent} from "./delete-tenant/delete-tenant.component";
 import {lastValueFrom} from "rxjs";
 import {TenantService} from "../../_services/tenant.service";
 import {TokenStorageService} from "../../_services/token-storage.service";
+import {AppTableComponent, TableAsyncLoadEvent} from "../../component/table/app-table.component";
+import {Filter} from "../../component/filter-bar/filter-bar.component";
 
 @Component({
     selector: 'app-board-tenants',
@@ -13,6 +15,9 @@ import {TokenStorageService} from "../../_services/token-storage.service";
     styleUrls: ['./tenant-list.component.css']
 })
 export class TenantListComponent implements OnInit {
+
+    @ViewChild(AppTableComponent)
+    table!: AppTableComponent;
 
     tenants: any[] = [];
     creationAllowed = false;
@@ -54,5 +59,15 @@ export class TenantListComponent implements OnInit {
         const deletedTenant = await modalRef.result;
         console.log(deletedTenant);
         await this.ngOnInit();
+    }
+
+    lazyLoad($event: TableAsyncLoadEvent) {
+        if ($event.pageNo == 0) {
+            $event.update(this.tenants);
+        }
+    }
+
+    onFilter(event: Filter[]) {
+        this.table.filter(event);
     }
 }
