@@ -6,6 +6,9 @@ import {TokenStorageService} from "./token-storage.service";
     providedIn: 'root'
 })
 export class AuthDefaultService {
+
+    public title: string = "Home";
+
     constructor(private router: Router,
                 private tokenStorageService: TokenStorageService) {
     }
@@ -38,10 +41,16 @@ export class AuthDefaultService {
                 }
             });
         }
-
     }
 
 
+    resetTitle() {
+        this.title = "Home"
+    }
+
+    setTitle(title: string) {
+        this.title = title;
+    }
 }
 
 

@@ -6,6 +6,7 @@ import {lastValueFrom} from "rxjs";
 import {TenantService} from "../../_services/tenant.service";
 import {TableAsyncLoadEvent} from "../../component/table/app-table.component";
 import {MessageService} from "primeng/api";
+import {AuthDefaultService} from "../../_services/auth.default.service";
 
 
 @Component({
@@ -106,12 +107,13 @@ export class RoleSelectionComponent implements OnInit {
                 private tenantService: TenantService,
                 private route: ActivatedRoute,
                 private router: Router,
+                private authDefaultService: AuthDefaultService,
                 private messageService: MessageService,
                 private modalService: NgbModal) {
     }
 
     async ngOnInit(): Promise<void> {
-
+        this.authDefaultService.setTitle("Manage Role Assignments");
     }
 
     async continue() {

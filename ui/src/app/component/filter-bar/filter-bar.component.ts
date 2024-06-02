@@ -180,7 +180,7 @@ export class FilterBarComponent implements OnInit, AfterViewInit {
                 this.columns.first.name,
                 this.columns.first.label,
                 "",
-                Operators.operatorFromSymbol("=")
+                Operators.operatorFromSymbol("=*")
             );
             this.filters.push(filter)
         }

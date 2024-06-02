@@ -8,7 +8,7 @@ import {MessageService} from "primeng/api";
     selector: 'app-create-tenant',
     template: `
         <div class="modal-header d-flex justify-content-between bg-primary-subtle">
-            <h4 class="modal-title" id="modal-basic-title">Create Tenant</h4>
+            <h4 class="modal-title">Create Tenant</h4>
             <button (click)="activeModal.close('Cross click')"
                     aria-label="Close"
                     class="btn-sm btn "

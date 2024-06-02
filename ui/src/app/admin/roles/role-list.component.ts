@@ -6,6 +6,7 @@ import {TenantService} from "../../_services/tenant.service";
 import {lastValueFrom} from "rxjs";
 import {VHAsyncLoadEvent} from "../../component/value-help-input/value-help-input.component";
 import {MessageService} from "primeng/api";
+import {AuthDefaultService} from "../../_services/auth.default.service";
 
 
 @Component({
@@ -31,10 +32,13 @@ export class RoleListComponent implements OnInit {
                 private route: ActivatedRoute,
                 private router: Router,
                 private messageService: MessageService,
+                private authDefaultService: AuthDefaultService,
                 private modalService: NgbModal) {
     }
 
     async ngOnInit(): Promise<void> {
+        this.authDefaultService.setTitle("Manage Role Assignments");
+
         this.tenantId = this.route.snapshot.params['tenantId'];
         this.email = this.route.snapshot.params['email'];
 
