@@ -35,8 +35,8 @@ const routes: Routes = [
             {path: '', component: AdminHomeComponent, canActivate: []},
             {path: 'users', component: UserListComponent, canActivate: []},
             {path: 'tenants', component: TenantListComponent, canActivate: []},
-            {path: 'roles-sel', component: RoleSelectionComponent, canActivate: []},
-            {path: 'roles', component: RoleListComponent, canActivate: []},
+            {path: 'RL02-SEL', component: RoleSelectionComponent, canActivate: []},
+            {path: 'RL02/:tenantId/:email', component: RoleListComponent, canActivate: []},
             {path: 'tenant/:tenantId', component: ViewTenantComponent, canActivate: []},
             {path: 'user/:email', component: UserDetailsComponent, canActivate: []},
         ]

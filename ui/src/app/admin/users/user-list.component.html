@@ -4,8 +4,15 @@
     <div class="row">
         <div class="col-xl-12">
             <div class="card my-2">
-                <div class="card-header">
-                    <span class="h4"> Users</span>
+                <div class="card-header bg-dark-subtle">
+                    <div class="d-flex justify-content-between">
+                        <span class="h4">Users</span>
+                        <button (click)="openCreateModal()"
+                                class="btn btn-success btn-sm"
+                                type="button">
+                            <i class="fa fa-solid fa-plus me-2"></i> User
+                        </button>
+                    </div>
                     <app-fb (onFilter)="onFilter($event)">
                         <app-fb-col label="Name" name="name"></app-fb-col>
                         <app-fb-col label="Email" name="email"></app-fb-col>
@@ -27,7 +34,7 @@
                         <ng-template #table_body let-user>
                             <td><span class="p-column-title">Name</span>{{ user.name }} {{ user.surname }}</td>
                             <td>
-                                <span class="p-column-title">Price</span>
+                                <span class="p-column-title">Email</span>
                                 <a [routerLink]="['/admin/user/', user.email]"
                                    href="javascript:void(0)">{{ user.email }}</a>
                             </td>

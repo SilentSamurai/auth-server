@@ -9,18 +9,18 @@ import {Filter, FilterBarColumnComponent} from "../filter-bar/filter-bar.compone
 @Component({
     selector: 'app-value-help',
     template: `
-        <div class="bg-body-secondary">
-            <div class="row p-2 pb-0">
-                <div class="col">
-                    <div class="d-flex justify-content-between">
-                        <div class="h5 mb-0">{{ name }}</div>
-                        <button (click)="cancel()"
-                                aria-label="Close"
-                                class="btn btn-sm "
-                                type="button">
-                            <i class="fa fa-close"></i>
-                        </button>
-                    </div>
+        <div class="modal-header p-2 bg-primary-subtle" style="display:block">
+            <div class="row ">
+                <div class="col d-flex justify-content-between">
+                    <div class="h5 mb-0 modal-title">{{ name }}</div>
+                    <button (click)="cancel()"
+                            aria-label="Close"
+                            class="btn btn-sm "
+                            type="button">
+                    <span aria-hidden="true">
+                        <i class="fa fa-icons fa-close"></i>
+                    </span>
+                    </button>
                 </div>
             </div>
             <div class="row ">
@@ -33,41 +33,34 @@ import {Filter, FilterBarColumnComponent} from "../filter-bar/filter-bar.compone
                     </app-fb>
                 </div>
             </div>
-            <div class="row ">
-                <div class="col">
-                    <app-table
-                        [idField]="idField"
-                        [multi]="multi"
-                        [isFilterAsync]="isFilterAsync"
-                        (onLoad)="lazyLoad($event)"
-                        [(selection)]="selectedItem">
-                        <app-table-col *ngFor="let col of columns"
-                                       label="{{col.label}}"
-                                       name="{{col.name}}"
-                                       isId="{{col.isId}}"
-                        >
-                        </app-table-col>
-                        <ng-template #table_body let-row>
-                            <ng-container *ngTemplateOutlet="body; context: {$implicit: row}"></ng-container>
-                        </ng-template>
-                    </app-table>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col">
-                    <div class="gap-2 p-2 justify-content-end d-flex">
-                        <button (click)="clear()"
-                                class="btn btn-outline-secondary btn-block btn-sm">
-                            Clear
-                        </button>
-                        <button (click)="confirm()"
-                                class="btn btn-primary btn-block btn-sm">
-                            Select
-                        </button>
-                    </div>
-                </div>
-            </div>
+        </div>
+        <div class="modal-body p-0 w-100">
+            <app-table
+                [idField]="idField"
+                [multi]="multi"
+                [isFilterAsync]="isFilterAsync"
+                (onLoad)="lazyLoad($event)"
+                [(selection)]="selectedItem">
+                <app-table-col *ngFor="let col of columns"
+                               label="{{col.label}}"
+                               name="{{col.name}}"
+                               isId="{{col.isId}}"
+                >
+                </app-table-col>
+                <ng-template #table_body let-row>
+                    <ng-container *ngTemplateOutlet="body; context: {$implicit: row}"></ng-container>
+                </ng-template>
+            </app-table>
+        </div>
+        <div class="modal-footer p-0">
+            <button (click)="clear()"
+                    class="btn btn-outline-secondary btn-block btn-sm">
+                Clear
+            </button>
+            <button (click)="confirm()"
+                    class="btn btn-primary btn-block btn-sm">
+                Select
+            </button>
         </div>
     `,
     styles: [

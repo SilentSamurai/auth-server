@@ -42,17 +42,15 @@ export class FilterBarColumnComponent implements OnInit {
 @Component({
     selector: 'app-fb',
     template: `
-        <div class="row">
-            <div class="col">
-                <div class="col align-content-end d-flex justify-content-end">
-                    <button *ngIf="visibility" (click)="onGo()" class="btn btn-primary btn-block btn-sm">
-                        Go
-                    </button>
+        <div class="row pt-1">
+            <div class="col align-content-end d-flex justify-content-end">
+                <button *ngIf="visibility" (click)="onGo()" class="btn btn-primary btn-block btn-sm">
+                    Go
+                </button>
 
-                    <button (click)="visibility = !visibility" class="btn btn-sm px-3">
-                        <i class=" fa {{ visibility ? 'fa-share' : 'fa-filter' }}"></i>
-                    </button>
-                </div>
+                <button (click)="visibility = !visibility" class="btn btn-sm px-3">
+                    <i class=" fa {{ visibility ? 'fa-share' : 'fa-filter' }}"></i>
+                </button>
             </div>
         </div>
         <div *ngIf="visibility" class="row px-2 pt-0 pb-1 row-cols-auto">

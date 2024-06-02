@@ -83,7 +83,7 @@
                                 <tr>
                                     <th>Name</th>
                                     <th>Email</th>
-                                    <th>Assigned Scopes</th>
+                                    <th>Assigned Roles</th>
                                     <th>Actions</th>
                                 </tr>
                             </ng-template>
@@ -91,18 +91,12 @@
                                 <tr>
                                     <td><span class="p-column-title">Name</span>{{ user.name }}</td>
                                     <td><span class="p-column-title">Email</span>{{ user.email }}</td>
-                                    <td><span class="p-column-title">Scopes</span>
-                                        <ul>
-                                            <li *ngFor="let scope of user.scopes">
-                                                <code>{{ tenant.name }}::{{ scope.name }}</code>
-                                            </li>
-                                        </ul>
+                                    <td><span class="p-column-title">Roles</span>
+                                        <a [routerLink]="['/admin/RL02/', tenant_id, user.email]"
+                                           href="javascript:void(0)">View Role Assignments
+                                        </a>
                                     </td>
                                     <td class="">
-                                        <button (click)="onAssignRole(user)" [disabled]="!isTenantAdmin" class="btn"
-                                                type="button">
-                                            <i class="fa fa-solid fa-user"></i>
-                                        </button>
                                         <button (click)="removeMember(user)" [disabled]="!isTenantAdmin" class="btn"
                                                 type="button">
                                             <i class="fa fa-solid fa-trash"></i>

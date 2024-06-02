@@ -23,15 +23,15 @@ export class AdminHomeComponent implements OnInit {
         },
         {
             title: "Users",
-            subtitle: "manage users",
+            subtitle: "Manage Users",
             icon: "fa-users",
             link: ['/admin', 'users']
         },
         {
-            title: "Roles",
-            subtitle: "manage role",
+            title: "RL02",
+            subtitle: "Manage Role Assignments",
             icon: "fa-magic",
-            link: ['/admin', 'roles-sel']
+            link: ['/admin', 'RL02-SEL']
         },
     ];
 

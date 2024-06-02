@@ -8,48 +8,29 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
 @Component({
     selector: 'app-tile',
     template: `
-        <div class="row row-cols-auto my-2">
-            <div *ngFor="let tile of internalTile; index as i;" class="col py-1">
-                <a [routerLink]="tile.link"
-                   class="text-decoration-none">
-                    <p-card [style]="tile.size" [styleClass]="'shadow-sm'">
-                        <ng-template pTemplate="title">
-                            <span class="text-truncate">{{ tile.title }}</span>
-                        </ng-template>
-                        <ng-template pTemplate="subtitle">
-                            {{ tile.subtitle }}
-                        </ng-template>
-                        <ng-template pTemplate="footer">
-                            <i aria-hidden="true" class="fa {{ tile.icon }} fa-2x"></i>
-                        </ng-template>
-                    </p-card>
-                </a>
+        <div class="card tile tile-{{tile.size}} shadow-sm">
+            <div class="card-body">
+                <div class="card-title h4">
+                    {{ tile.title }}
+                </div>
+                <div class="tile-body-{{tile.size}} card-text">
+                    {{ tile.subtitle }}
+                </div>
 
+                <div class="card-text">
+                    <i aria-hidden="true" class="fa fa-icons {{ tile.icon }} fa-2x"></i>
+                </div>
             </div>
         </div>
     `,
-    styles: ['']
+    styles: [`
+
+    `]
 })
 export class TileComponent implements OnInit {
 
     @Input()
-    tiles: any;
-
-    internalTile: any[] = [];
-    sizeMap = {
-        'sm': {
-            width: '100px',
-            height: '100px'
-        },
-        'md': {
-            width: '200px',
-            height: '200px'
-        },
-        'lg': {
-            width: '425px',
-            height: '200px'
-        }
-    }
+    tile: any;
 
     constructor(private userService: UserService,
                 private router: Router,
@@ -59,27 +40,8 @@ export class TileComponent implements OnInit {
                 private tokenStorage: TokenStorageService) {
     }
 
-    findSize(size: string) {
-        if (size === 'sm') {
-            return this.sizeMap.sm;
-        }
-        if (size === 'lg') {
-            return this.sizeMap.lg;
-        }
-        return this.sizeMap.md;
-    }
-
 
     ngOnInit(): void {
-        for (let tile of this.tiles) {
-            this.internalTile.push({
-                title: tile.title,
-                link: tile.link,
-                subtitle: tile.subtitle,
-                icon: tile.icon,
-                size: this.findSize(tile.size),
-            })
-        }
-        console.log(this.tiles);
+        console.log(this.tile);
     }
 }

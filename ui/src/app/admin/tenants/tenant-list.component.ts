@@ -1,7 +1,7 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
-import {CreateTenantComponent} from "./create-tenant/create-tenant.component";
-import {UpdateTenantComponent} from "./update-tenant/update-tenant.component";
+import {CreateTenantComponent} from "./create-tenant.component";
+import {UpdateTenantComponent} from "./update-tenant.component";
 import {DeleteTenantComponent} from "./delete-tenant/delete-tenant.component";
 import {TenantService} from "../../_services/tenant.service";
 import {TokenStorageService} from "../../_services/token-storage.service";

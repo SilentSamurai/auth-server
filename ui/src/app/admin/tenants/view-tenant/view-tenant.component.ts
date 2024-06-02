@@ -4,11 +4,10 @@ import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {MessageService} from "primeng/api";
 import {TenantService} from "../../../_services/tenant.service";
 import {TokenStorageService} from "../../../_services/token-storage.service";
-import {UpdateTenantComponent} from "../update-tenant/update-tenant.component";
+import {UpdateTenantComponent} from "../update-tenant.component";
 import {AddMemberComponent} from "./add-member/add-member.component";
 import {AddScopeComponent} from "./add-scope/add-scope.component";
 import {RemoveScopeComponent} from "./remove-scope/remove-scope.component";
-import {AssignScopeComponent} from "./assign-scope/assign-scope.component";
 import {RemoveMemberComponent} from "./remove-member/remove-member.component";
 
 @Component({
@@ -104,15 +103,6 @@ export class ViewTenantComponent implements OnInit {
         modalRef.componentInstance.tenant = this.tenant;
         const deletedScope = await modalRef.result;
         console.log(deletedScope);
-        await this.ngOnInit();
-    }
-
-    async onAssignRole(user: any) {
-        const modalRef = this.modalService.open(AssignScopeComponent);
-        modalRef.componentInstance.tenant = this.tenant;
-        modalRef.componentInstance.user = user;
-        const addedScopes = await modalRef.result;
-        console.log(addedScopes);
         await this.ngOnInit();
     }
 

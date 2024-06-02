@@ -1,7 +1,7 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {UserService} from '../../_services/user.service';
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
-import {CreateUserModalComponent} from "./create-user-modal/create-user-modal.component";
+import {CreateUserModalComponent} from "./create-user-modal.component";
 import {EditUserModalComponent} from "./edit-user-modal/edit-user-modal.component";
 import {DeleteUserModalComponent} from "./delete-user-modal/delete-user-modal.component";
 import {AppTableComponent, TableAsyncLoadEvent} from "../../component/table/app-table.component";

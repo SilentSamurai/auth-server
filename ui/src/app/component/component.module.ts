@@ -16,6 +16,7 @@ import {SkeletonModule} from "primeng/skeleton";
 import {ValueHelpColumnComponent} from "./value-help-input/value-help-column.component";
 import {FilterBarColumnComponent, FilterBarComponent} from "./filter-bar/filter-bar.component";
 import {AppTableComponent, TableColumnComponent} from "./table/app-table.component";
+import {TileGroupsComponent} from "./tile/tile-groups.component";
 
 @NgModule({
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -28,6 +29,7 @@ import {AppTableComponent, TableColumnComponent} from "./table/app-table.compone
         FilterBarColumnComponent,
         AppTableComponent,
         TableColumnComponent,
+        TileGroupsComponent
     ],
     imports: [
         TableModule,
@@ -52,7 +54,8 @@ import {AppTableComponent, TableColumnComponent} from "./table/app-table.compone
         FilterBarColumnComponent,
         AppTableComponent,
         TableColumnComponent,
-        FilterBarComponent
+        FilterBarComponent,
+        TileGroupsComponent
     ]
 })
 export class ComponentModule {

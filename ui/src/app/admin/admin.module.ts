@@ -11,18 +11,17 @@ import {AdminHomeComponent} from './home/admin-home.component';
 import {AdminNavBarComponent} from "./nav-bar/nav-bar.component";
 import {NgbCollapseModule, NgbDropdownModule, NgbNavModule} from "@ng-bootstrap/ng-bootstrap";
 import {TenantListComponent} from "./tenants/tenant-list.component";
-import {UpdateTenantComponent} from "./tenants/update-tenant/update-tenant.component";
+import {UpdateTenantComponent} from "./tenants/update-tenant.component";
 import {DeleteTenantComponent} from "./tenants/delete-tenant/delete-tenant.component";
-import {CreateTenantComponent} from "./tenants/create-tenant/create-tenant.component";
+import {CreateTenantComponent} from "./tenants/create-tenant.component";
 import {UserDetailsComponent} from "./users/user-details/user-details.component";
 import {UserListComponent} from "./users/user-list.component";
-import {CreateUserModalComponent} from "./users/create-user-modal/create-user-modal.component";
+import {CreateUserModalComponent} from "./users/create-user-modal.component";
 import {EditUserModalComponent} from "./users/edit-user-modal/edit-user-modal.component";
 import {DeleteUserModalComponent} from "./users/delete-user-modal/delete-user-modal.component";
 import {ViewTenantComponent} from "./tenants/view-tenant/view-tenant.component";
 import {AddMemberComponent} from "./tenants/view-tenant/add-member/add-member.component";
 import {AddScopeComponent} from "./tenants/view-tenant/add-scope/add-scope.component";
-import {AssignScopeComponent} from "./tenants/view-tenant/assign-scope/assign-scope.component";
 import {RemoveMemberComponent} from "./tenants/view-tenant/remove-member/remove-member.component";
 import {RemoveScopeComponent} from "./tenants/view-tenant/remove-scope/remove-scope.component";
 import {ComponentModule} from "../component/component.module";
@@ -48,7 +47,6 @@ import {MessagesModule} from "primeng/messages";
         ViewTenantComponent,
         AddMemberComponent,
         AddScopeComponent,
-        AssignScopeComponent,
         RemoveMemberComponent,
         RemoveScopeComponent,
         RoleListComponent,

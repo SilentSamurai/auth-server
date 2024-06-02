@@ -120,15 +120,11 @@ export class RoleSelectionComponent implements OnInit {
             'tenant': this.selectedTenant
         });
         if (this.selectedTenant.length > 0 && this.selectedUser.length > 0) {
-
             const isMem = await this.isMember();
             if (isMem) {
-                await this.router.navigate(['/admin', 'roles'], {
-                    queryParams: {
-                        email: this.selectedUser[0].email,
-                        tenantId: this.selectedTenant[0].id
-                    }
-                })
+                await this.router.navigate([
+                    '/admin', 'RL02',
+                    this.selectedTenant[0].id, this.selectedUser[0].email])
             }
         }
     }

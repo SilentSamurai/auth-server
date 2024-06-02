@@ -35,13 +35,18 @@ export class RoleListComponent implements OnInit {
     }
 
     async ngOnInit(): Promise<void> {
-        let params = this.route.snapshot.queryParamMap;
-        if (!params.has('email') || !params.has('tenantId')) {
-            await this.router.navigate(['/role-sel']);
-        }
+        this.tenantId = this.route.snapshot.params['tenantId'];
+        this.email = this.route.snapshot.params['email'];
 
-        this.email = params.get('email') as string;
-        this.tenantId = params.get('tenantId') as string;
+        // let params = this.route.snapshot.queryParamMap;
+        // if (!params.has('email') || !params.has('tenantId')) {
+        //     await this.router.navigate(['/role-sel']);
+        // }
+        // this.email = params.get('email') as string;
+        // this.tenantId = params.get('tenantId') as string;
+        if (!this.email || !this.tenantId) {
+            await this.router.navigate(['/RL02-SEL']);
+        }
 
         this.tenant = await this.tenantService.getTenantDetails(this.tenantId);
         this.user = await lastValueFrom(this.userService.getUser(this.email));
