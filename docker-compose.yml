@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+    auth_node:
+        build: .
+        environment:
+            ENV_FILE: dist/envs/.env.aws
+            PORT: 8080
+        #        entrypoint: ["tail", "-f","/dev/null"]
+        ports:
+            - '8080:8080'
+
