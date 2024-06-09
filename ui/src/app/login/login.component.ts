@@ -19,7 +19,7 @@ export class LoginComponent implements OnInit {
     isLoggedIn = false;
     isLoginFailed = false;
     errorMessage = '';
-    scopes: string[] = [];
+    roles: string[] = [];
     freezeDomain = false;
     redirectUri = "";
     code_challenge = "";

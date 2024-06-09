@@ -7,7 +7,6 @@ import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
 import {LoginComponent} from './login/login.component';
 import {RegisterComponent} from './register/register.component';
-import {HomeComponent} from './non-admin/home/home.component';
 import {ProfileComponent} from './profile/profile.component';
 
 import {authInterceptorProviders} from './_helpers/auth.interceptor';
@@ -18,8 +17,7 @@ import {ToastModule} from "primeng/toast";
 import {MessageService} from "primeng/api";
 import {RouterModule} from "@angular/router";
 import {SessionConfirmationComponent} from "./session/session-confirmation.component";
-import {AdminModule} from "./admin/admin.module";
-import {NonAdminModule} from "./non-admin/non-admin.module";
+import {AdminModule} from "./secure/admin.module";
 import {CardModule} from "primeng/card";
 import {ComponentModule} from "./component/component.module";
 
@@ -29,7 +27,6 @@ import {ComponentModule} from "./component/component.module";
         AppComponent,
         LoginComponent,
         RegisterComponent,
-        HomeComponent,
         ProfileComponent,
         SessionConfirmationComponent
     ],
@@ -42,7 +39,6 @@ import {ComponentModule} from "./component/component.module";
         NgbModule,
         NgbCollapseModule,
         TableModule,
-        NonAdminModule,
         AdminModule,
         BrowserAnimationsModule,
         ReactiveFormsModule,

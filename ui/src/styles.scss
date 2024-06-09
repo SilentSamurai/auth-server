@@ -30,6 +30,7 @@
 .tile:hover {
     box-shadow: var(--bs-box-shadow-lg) !important;
     transition: 0.5s;
+    cursor: pointer;
 }
 
 .tile-sm {

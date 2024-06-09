@@ -60,14 +60,14 @@ export class TenantService {
         return lastValueFrom(this.http.post(`${API_URL}/tenant/${tenantId}/member/${email}`, {}, this.getHttpOptions()))
     }
 
-    async addScope(name: string, tenantId: string) {
-        return lastValueFrom(this.http.post(`${API_URL}/tenant/${tenantId}/scope/${name}`, {}, this.getHttpOptions()))
+    async addRole(name: string, tenantId: string) {
+        return lastValueFrom(this.http.post(`${API_URL}/tenant/${tenantId}/role/${name}`, {}, this.getHttpOptions()))
     }
 
-    async assignScope(selectedScopes: any[], tenantId: string, email: string) {
-        const scopes = selectedScopes.map(scope => scope.name);
-        return lastValueFrom(this.http.put(`${API_URL}/tenant/${tenantId}/member/${email}/scope`, {
-            scopes,
+    async assignRole(selectedRoles: any[], tenantId: string, email: string) {
+        const roles = selectedRoles.map(role => role.name);
+        return lastValueFrom(this.http.put(`${API_URL}/tenant/${tenantId}/member/${email}/roles`, {
+            roles: roles,
         }, this.getHttpOptions()))
     }
 
@@ -75,8 +75,8 @@ export class TenantService {
         return lastValueFrom(this.http.delete(`${API_URL}/tenant/${tenantId}/member/${email}`, this.getHttpOptions()))
     }
 
-    async removeScope(name: string, tenantId: string) {
-        return lastValueFrom(this.http.delete(`${API_URL}/tenant/${tenantId}/scope/${name}`, this.getHttpOptions()))
+    async removeRole(name: string, tenantId: string) {
+        return lastValueFrom(this.http.delete(`${API_URL}/tenant/${tenantId}/role/${name}`, this.getHttpOptions()))
     }
 
     async getMemberDetails(tenantId: string, email: string) {

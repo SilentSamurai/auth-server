@@ -19,9 +19,9 @@ import {ValidationSchema} from "../validation/validation.schema";
 import {Tenant} from "../tenants/tenant.entity";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
 import {User} from "../users/user.entity";
-import {Scope} from "../scopes/scope.entity";
+import {Role} from "../scopes/role.entity";
 import {SecurityService} from "../scopes/security.service";
-import {ScopeService} from "../scopes/scope.service";
+import {RoleService} from "../scopes/role.service";
 import {Action} from "../scopes/actions.enum";
 import {ForbiddenException} from "../exceptions/forbidden.exception";
 import {subject} from "@casl/ability";
@@ -35,7 +35,7 @@ export class MemberController {
         private readonly configService: ConfigService,
         private readonly tenantService: TenantService,
         private readonly usersService: UsersService,
-        private readonly scopeService: ScopeService,
+        private readonly roleService: RoleService,
         private readonly securityService: SecurityService
     ) {
     }
@@ -50,7 +50,7 @@ export class MemberController {
         this.securityService.check(request, Action.Read, subject(SubjectEnum.TENANT, tenant));
         let members = await this.usersService.findByTenant(tenant);
         for (const member of members) {
-            member.scopes = await this.scopeService.getMemberScopes(tenant, member);
+            member.roles = await this.roleService.getMemberRoles(tenant, member);
         }
         return members;
     }
@@ -90,18 +90,18 @@ export class MemberController {
         return this.tenantService.removeMember(tenantId, user);
     }
 
-    @Put('/:tenantId/member/:email/scope')
+    @Put('/:tenantId/member/:email/roles')
     @UseGuards(JwtAuthGuard)
-    async updateScope(
+    async updateRole(
         @Request() request,
         @Param('tenantId') tenantId: string,
         @Param('email') email: string,
-        @Body(new ValidationPipe(ValidationSchema.OperatingScopeSchema)) body: { scopes: string[] }
-    ): Promise<Scope[]> {
+        @Body(new ValidationPipe(ValidationSchema.OperatingRoleSchema)) body: { roles: string[] }
+    ): Promise<Role[]> {
         const user = await this.usersService.findByEmail(email);
         let tenant = await this.tenantService.findById(tenantId);
         this.securityService.check(request, Action.Update, subject(SubjectEnum.TENANT, tenant));
-        return this.tenantService.updateScopeOfMember(body.scopes, tenantId, user);
+        return this.tenantService.updateRolesOfMember(body.roles, tenantId, user);
     }
 
     @Get('/:tenantId/member/:email')
@@ -114,7 +114,7 @@ export class MemberController {
         const user = await this.usersService.findByEmail(email);
         const tenant = await this.tenantService.findById(tenantId);
         this.securityService.check(request, Action.Read, subject(SubjectEnum.TENANT, tenant));
-        let roles = await this.tenantService.getMemberScope(tenantId, user);
+        let roles = await this.tenantService.getMemberRoles(tenantId, user);
         return {
             tenantId: tenant.id,
             userId: user.id,

@@ -1,0 +1,60 @@
+<nav-bar></nav-bar>
+<div class="container-fluid">
+    <div class="row">
+
+        <div class="col-md-12">
+            <div class="card my-2">
+                <div class="card-header bg-dark-subtle">
+                    <div class="d-flex justify-content-between">
+                        <h5>Tenant List</h5>
+                        <button (click)="openCreateModal()" [disabled]="!this.creationAllowed"
+                                class="btn btn-success btn-sm"
+                                type="button">
+                            <i class="fa fa-solid fa-plus me-2"></i> Add Tenant
+                        </button>
+                    </div>
+                    <app-fb (onFilter)="onFilter($event)">
+                        <app-fb-col label="Tenant Id" name="id"></app-fb-col>
+                        <app-fb-col label="Name" name="name"></app-fb-col>
+                        <app-fb-col label="Domain" name="domain"></app-fb-col>
+                    </app-fb>
+                </div>
+                <div class="card-body p-0">
+                    <app-table
+                        (onLoad)="lazyLoad($event)"
+                        idField="id"
+                        isFilterAsync="true"
+                        multi="true"
+                        scrollHeight="75vh">
+
+                        <app-table-col label="Tenant Id" name="id"></app-table-col>
+                        <app-table-col label="Name" name="name"></app-table-col>
+                        <app-table-col label="Domain" name="domain"></app-table-col>
+                        <app-table-col label="Action" name="action"></app-table-col>
+
+                        <ng-template #table_body let-tenant>
+                            <td>
+                                <span class="p-column-title">Name</span>
+                                <a [routerLink]="['/tenant/', tenant.id]"
+                                   href="javascript:void(0)">{{ tenant.id }}</a>
+                            </td>
+                            <td><span class="p-column-title">Name</span>{{ tenant.name }}</td>
+                            <td><span class="p-column-title">Domain</span>{{ tenant.domain }}</td>
+                            <td class="d-flex ">
+                                <button (click)="openUpdateModal(tenant)" [disabled]="!this.isTenantAdmin" class="btn"
+                                        type="button">
+                                    <i class="fa fa-edit"></i>
+                                </button>
+                                <button (click)="openDeleteModal(tenant)" [disabled]="!this.creationAllowed" class="btn"
+                                        type="button">
+                                    <i class="fa fa-solid fa-trash"></i>
+                                </button>
+                            </td>
+                        </ng-template>
+                    </app-table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

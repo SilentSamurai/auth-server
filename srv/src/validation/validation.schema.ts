@@ -105,13 +105,13 @@ const UpdateTenantSchema = yup.object().shape(
         domain: yup.string().max(100).nullable(),
     });
 
-const CreateScopeSchema = yup.object().shape(
+const CreateRoleSchema = yup.object().shape(
     {
         name: yup.string().required('Name is required').max(20),
         tenantId: yup.string().required('TenantId is required'),
     });
 
-const OperatingScopeSchema = yup.object().shape({
+const OperatingRoleSchema = yup.object().shape({
         scopes: yup.array().of(
             yup.string().max(20)
         )
@@ -243,8 +243,8 @@ export const ValidationSchema =
         DeleteUserSchema,
         CreateTenantSchema,
         UpdateTenantSchema,
-        CreateScopeSchema,
-        OperatingScopeSchema,
+        CreateRoleSchema: CreateRoleSchema,
+        OperatingRoleSchema: OperatingRoleSchema,
         MemberOperationsSchema,
         CreateUserSchema,
         UpdateUserSchema,

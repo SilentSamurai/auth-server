@@ -11,7 +11,7 @@ export class MainController {
     }
 
     @Get('/health-check')
-    async createScope(
+    async healthCheck(
         @Request() request
     ): Promise<any> {
         return {

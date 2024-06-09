@@ -22,7 +22,7 @@ describe('e2e users', () => {
             .post('/api/oauth/token')
             .send({
                 "grant_type": "password",
-                "email": "admin@auth.server.com",
+                "email": "secure@auth.server.com",
                 "password": "admin9000",
                 "domain": "auth.server.com"
             })

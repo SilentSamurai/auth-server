@@ -10,29 +10,24 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
     template: `
         <div class="row row-cols-auto my-2">
             <div *ngFor="let tile of internalTile; index as i;" class="col py-1">
-                <a [routerLink]="tile.link"
-                   class="text-decoration-none">
-                    <app-tile [tile]="tile">
-
-                    </app-tile>
-                    <!--                    <p-card [style]="tile.size" [styleClass]="'shadow-sm'">-->
-                    <!--                        <ng-template pTemplate="title">-->
-                    <!--                            <span class="text-truncate text-wrap">{{ tile.title }}</span>-->
-                    <!--                        </ng-template>-->
-                    <!--                        <ng-template pTemplate="subtitle">-->
-                    <!--                                {{ tile.subtitle }}-->
-                    <!--                        </ng-template>-->
-                    <!--                        <ng-template pTemplate="footer">-->
-                    <!--                            <i aria-hidden="true" class="fa {{ tile.icon }} fa-2x"></i>-->
-                    <!--                        </ng-template>-->
-                    <!--                    </p-card>-->
-                </a>
-
+                <ng-container *ngIf="tile.isCallbackThere">
+                    <a (click)="tile.command()"
+                       class="text-decoration-none">
+                        <app-tile [tile]="tile">
+                        </app-tile>
+                    </a>
+                </ng-container>
+                <ng-container *ngIf="!tile.isCallbackThere">
+                    <a [routerLink]="tile.link"
+                       class="text-decoration-none">
+                        <app-tile [tile]="tile">
+                        </app-tile>
+                    </a>
+                </ng-container>
             </div>
         </div>
     `,
     styles: [`
-
     `]
 })
 export class TileGroupsComponent implements OnInit {
@@ -81,6 +76,8 @@ export class TileGroupsComponent implements OnInit {
                 title: tile.title,
                 link: tile.link,
                 subtitle: tile.subtitle,
+                isCallbackThere: tile.hasOwnProperty("command") && typeof tile.command === 'function',
+                command: tile.command,
                 icon: tile.icon,
                 size: tile.size || 'md',
             })

@@ -1,7 +1,7 @@
 import {Injectable, OnModuleInit, UnauthorizedException} from '@nestjs/common';
 import {AuthService} from "../auth/auth.service";
 import {ExtractJwt} from 'passport-jwt';
-import {ScopeEnum} from "./scope.enum";
+import {RoleEnum} from "./roleEnum";
 import {ConfigService} from "../config/config.service";
 import {ForbiddenException} from "../exceptions/forbidden.exception";
 import {TenantService} from "../tenants/tenant.service";
@@ -106,7 +106,7 @@ export class SecurityService implements OnModuleInit {
     }
 
     isSuperAdmin(securityContext: SecurityContext) {
-        return securityContext.scopes.some(scope => scope === ScopeEnum.SUPER_ADMIN)
+        return securityContext.scopes.some(scope => scope === RoleEnum.SUPER_ADMIN)
             && securityContext.tenant.domain === this.configService.get("SUPER_TENANT_DOMAIN");
     }
 

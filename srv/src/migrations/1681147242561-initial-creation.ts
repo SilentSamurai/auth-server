@@ -113,7 +113,7 @@ export class CreateInitialTables1681147242561 implements MigrationInterface {
 
         await queryRunner.createTable(
             new Table({
-                name: "scope",
+                name: "role",
                 columns: [
                     {
                         name: "id",
@@ -147,7 +147,7 @@ export class CreateInitialTables1681147242561 implements MigrationInterface {
                 ],
                 uniques: [
                     {
-                        name: "tenant_scope_constrain",
+                        name: "tenant_role_constrain",
                         columnNames: [
                             "tenant_id",
                             "name"
@@ -206,7 +206,7 @@ export class CreateInitialTables1681147242561 implements MigrationInterface {
 
         await queryRunner.createTable(
             new Table({
-                name: "user_scopes",
+                name: "user_roles",
                 columns: [
                     {
                         name: "tenant_id",
@@ -221,7 +221,7 @@ export class CreateInitialTables1681147242561 implements MigrationInterface {
                         isNullable: false
                     },
                     {
-                        name: "scope_id",
+                        name: "role_id",
                         type: DB_STRING_TYPE,
                         length: "36",
                         isNullable: false
@@ -229,7 +229,7 @@ export class CreateInitialTables1681147242561 implements MigrationInterface {
                 ],
                 uniques: [
                     {
-                        name: "user_scopes_constrain",
+                        name: "user_roles_constrain",
                         columnNames: [
                             "tenant_id",
                             "user_id",
@@ -251,9 +251,9 @@ export class CreateInitialTables1681147242561 implements MigrationInterface {
                         onDelete: "CASCADE",
                     },
                     {
-                        columnNames: ["scope_id"],
+                        columnNames: ["role_id"],
                         referencedColumnNames: ["id"],
-                        referencedTableName: "scope",
+                        referencedTableName: "role",
                     }
                 ]
             }),
@@ -264,8 +264,8 @@ export class CreateInitialTables1681147242561 implements MigrationInterface {
     public async down(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.dropTable("user");
         await queryRunner.dropTable("tenant");
-        await queryRunner.dropTable("scope");
-        await queryRunner.dropTable("user_scopes");
+        await queryRunner.dropTable("roles");
+        await queryRunner.dropTable("user_roles");
         await queryRunner.dropTable("tenant_members");
     }
 

@@ -3,7 +3,7 @@ import {ConfigModule} from './config/config.module';
 import {ServeStaticModule} from '@nestjs/serve-static';
 import {ScheduleModule} from '@nestjs/schedule';
 import {TypeOrmModule} from '@nestjs/typeorm';
-import {ScopesModule} from './scopes/scopes.module';
+import {RolesModule} from './scopes/roles.module';
 import {UsersModule} from './users/users.module';
 import {AuthModule} from './auth/auth.module';
 import {ConfigService} from './config/config.service';
@@ -14,8 +14,8 @@ import {ControllersModule} from "./controllers/controller.module";
 import {User} from "./users/user.entity";
 import {Tenant} from "./tenants/tenant.entity";
 import {TenantMember} from "./tenants/tenant.members.entity";
-import {UserScope} from "./scopes/user.scopes.entity";
-import {Scope} from "./scopes/scope.entity";
+import {UserRole} from "./scopes/user.roles.entity";
+import {Role} from "./scopes/role.entity";
 import {CreateInitialTables1681147242561} from "./migrations/1681147242561-initial-creation";
 import {SessionMigration1684308185392} from "./migrations/1684308185392-session-migration";
 import {AuthCode} from "./auth/auth_code.entity";
@@ -42,7 +42,7 @@ import {AuthCode} from "./auth/auth_code.entity";
                         username: configService.get('DATABASE_USERNAME'),
                         password: configService.get('DATABASE_PASSWORD'),
                         database: configService.get('DATABASE_NAME'),
-                        entities: [Tenant, User, TenantMember, Scope, UserScope, AuthCode],
+                        entities: [Tenant, User, TenantMember, Role, UserRole, AuthCode],
                         migrations: [CreateInitialTables1681147242561, SessionMigration1684308185392],
                         synchronize: false,
                         ssl: configService.get('DATABASE_SSL'),
@@ -52,7 +52,7 @@ import {AuthCode} from "./auth/auth_code.entity";
             }),
         UsersModule,
         TenantModule,
-        ScopesModule,
+        RolesModule,
         AuthModule,
         ControllersModule,
     ],

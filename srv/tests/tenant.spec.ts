@@ -21,7 +21,7 @@ describe('e2e tenant', () => {
     it(`/POST Fetch Access Token`, async () => {
         let tokenFixture = new TokenFixture(app);
         let response = await tokenFixture.fetchAccessToken(
-            "admin@auth.server.com",
+            "secure@auth.server.com",
             "admin9000",
             "auth.server.com"
         );

@@ -8,7 +8,7 @@ import {EmailTakenException} from '../exceptions/email-taken.exception';
 import {UserNotFoundException} from '../exceptions/user-not-found.exception';
 import {InvalidCredentialsException} from '../exceptions/invalid-credentials.exception';
 import * as argon2 from 'argon2';
-import {Scope} from "../scopes/scope.entity";
+import {Role} from "../scopes/role.entity";
 import {Tenant} from 'src/tenants/tenant.entity';
 import {ForbiddenException} from "../exceptions/forbidden.exception";
 
@@ -249,7 +249,7 @@ export class UsersService implements OnModuleInit {
     ): Promise<User> {
         const user: User = await this.findById(id);
         if (user.email === this.configService.get("SUPER_ADMIN_EMAIL")) {
-            throw new ForbiddenException("cannot delete super admin");
+            throw new ForbiddenException("cannot delete super secure");
         }
         return await this.usersRepository.remove(user);
     }
@@ -295,21 +295,21 @@ export class UsersService implements OnModuleInit {
     //     }
     // }
 
-    async countByScope(
-        scope: Scope
+    async countByRole(
+        role: Role
     ): Promise<number> {
         const count: number = await this.usersRepository.count({
             where: {
-                scopes: {id: scope.id}
+                roles: {id: role.id}
             }, relations: {
-                scopes: true
+                roles: true
             }
         });
         return count;
     }
 
-    async isUserAssignedToScope(scope: Scope) {
-        let count = await this.countByScope(scope);
+    async isUserAssignedToRole(role: Role) {
+        let count = await this.countByRole(role);
         return count > 0;
     }
 

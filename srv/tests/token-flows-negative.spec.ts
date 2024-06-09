@@ -20,7 +20,7 @@ describe('e2e negative token flow', () => {
             .post('/api/oauth/token')
             .send({
                 "grant_type": "password",
-                "email": "admin@auth.server.com",
+                "email": "secure@auth.server.com",
                 "password": "wrong-password",
                 "domain": "auth.server.com"
             })
@@ -34,7 +34,7 @@ describe('e2e negative token flow', () => {
             .post('/api/oauth/token')
             .send({
                 // "grant_type": "password",
-                "email": "admin@auth.server.com",
+                "email": "secure@auth.server.com",
                 "password": "wrong-password",
                 "domain": "auth.server.com"
             })
@@ -48,7 +48,7 @@ describe('e2e negative token flow', () => {
             .post('/api/oauth/token')
             .send({
                 "grant_type": "missing-Grant",
-                "email": "admin@auth.server.com",
+                "email": "secure@auth.server.com",
                 "password": "wrong-password",
                 "domain": "auth.server.com"
             })
@@ -76,7 +76,7 @@ describe('e2e negative token flow', () => {
             .post('/api/oauth/token')
             .send({
                 "grant_type": "password",
-                "email": "admin@auth.server.com",
+                "email": "secure@auth.server.com",
                 "password": "admin9000",
                 "domain": "auth.server.comasda"
             })

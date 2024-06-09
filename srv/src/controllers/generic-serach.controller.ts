@@ -13,7 +13,7 @@ import {InjectRepository} from "@nestjs/typeorm";
 import {User} from "../users/user.entity";
 import {Tenant} from "../tenants/tenant.entity";
 import {TenantMember} from "../tenants/tenant.members.entity";
-import {Scope} from "../scopes/scope.entity";
+import {Role} from "../scopes/role.entity";
 import {NotFoundError} from "rxjs";
 import {Action} from "../scopes/actions.enum";
 import {subject} from "@casl/ability";
@@ -31,14 +31,14 @@ export class GenericSearchController {
         @InjectRepository(User) private usersRepo: Repository<User>,
         @InjectRepository(Tenant) private tenantRepo: Repository<Tenant>,
         @InjectRepository(TenantMember) private memberRepo: Repository<TenantMember>,
-        @InjectRepository(Scope) private scopeRepo: Repository<Scope>,
+        @InjectRepository(Role) private roleRepository: Repository<Role>,
         private readonly securityService: SecurityService,
     ) {
         this.repos = {
             "Users": usersRepo,
             "Tenants": tenantRepo,
             "TenantMembers": tenantRepo,
-            "Roles": scopeRepo
+            "Roles": roleRepository
         };
     }
 

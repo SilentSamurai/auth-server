@@ -22,7 +22,7 @@ describe('e2e positive auth code flow', () => {
             .post('/api/oauth/login')
             .send({
                 "code_challenge": challenge,
-                "email": "admin@auth.server.com",
+                "email": "secure@auth.server.com",
                 "password": "admin9000",
                 "domain": "auth.server.com"
             })

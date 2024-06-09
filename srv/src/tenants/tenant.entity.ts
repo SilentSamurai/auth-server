@@ -1,5 +1,5 @@
 import {Column, CreateDateColumn, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn} from "typeorm";
-import {Scope} from "../scopes/scope.entity";
+import {Role} from "../scopes/role.entity";
 import {Exclude} from "class-transformer";
 import {User} from "../users/user.entity"; // Used with ClassSerializerInterceptor to exclude from responses.
 
@@ -33,11 +33,11 @@ export class Tenant {
     @Exclude()
     publicKey: string;
 
-    @OneToMany(type => Scope, scope => scope.tenant, {
+    @OneToMany(type => Role, role => role.tenant, {
         cascade: true,
         onDelete: "CASCADE"
     })
-    scopes: Scope[];
+    roles: Role[];
 
     @ManyToMany(() => User, (user) => user.tenants)
     @JoinTable({
