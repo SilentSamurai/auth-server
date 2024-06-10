@@ -1,7 +1,7 @@
 import {Column, CreateDateColumn, Entity, ManyToMany, PrimaryGeneratedColumn} from 'typeorm';
 import {Exclude} from 'class-transformer'; // Used with ClassSerializerInterceptor to exclude from responses.
 import {Tenant} from "../tenants/tenant.entity";
-import {Role} from "../scopes/role.entity";
+import {Role} from "../roles/role.entity";
 
 @Entity({name: "user"})
 export class User {

@@ -13,11 +13,11 @@ import {InjectRepository} from "@nestjs/typeorm";
 import {User} from "../users/user.entity";
 import {Tenant} from "../tenants/tenant.entity";
 import {TenantMember} from "../tenants/tenant.members.entity";
-import {Role} from "../scopes/role.entity";
+import {Role} from "../roles/role.entity";
 import {NotFoundError} from "rxjs";
-import {Action} from "../scopes/actions.enum";
+import {Action} from "../roles/actions.enum";
 import {subject} from "@casl/ability";
-import {SecurityService} from "../scopes/security.service";
+import {SecurityService} from "../roles/security.service";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
 import {escapeRegExp} from "typeorm/util/escapeRegExp";
 

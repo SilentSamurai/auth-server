@@ -8,7 +8,7 @@ import {EmailTakenException} from '../exceptions/email-taken.exception';
 import {UserNotFoundException} from '../exceptions/user-not-found.exception';
 import {InvalidCredentialsException} from '../exceptions/invalid-credentials.exception';
 import * as argon2 from 'argon2';
-import {Role} from "../scopes/role.entity";
+import {Role} from "../roles/role.entity";
 import {Tenant} from 'src/tenants/tenant.entity';
 import {ForbiddenException} from "../exceptions/forbidden.exception";
 

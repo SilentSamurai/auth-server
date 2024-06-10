@@ -1,12 +1,12 @@
 import {Injectable, OnModuleInit} from "@nestjs/common";
 import {ConfigService} from "./config/config.service";
 import {UsersService} from "./users/users.service";
-import {RoleService} from "./scopes/role.service";
+import {RoleService} from "./roles/role.service";
 import {TenantService} from "./tenants/tenant.service";
 import {User} from "./users/user.entity";
 import {readFile} from "fs";
 import {Tenant} from "./tenants/tenant.entity";
-import {RoleEnum} from "./scopes/roleEnum";
+import {RoleEnum} from "./roles/roleEnum";
 import {DataSource} from "typeorm/data-source/DataSource";
 
 @Injectable()

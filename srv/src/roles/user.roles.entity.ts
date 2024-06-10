@@ -1,4 +1,4 @@
-import {Entity, PrimaryColumn} from "typeorm";
+import {Column, Entity, PrimaryColumn} from "typeorm";
 
 
 @Entity({name: "user_roles"})
@@ -13,5 +13,8 @@ export class UserRole {
 
     @PrimaryColumn({name: "role_id"})
     roleId: string;
+
+    @Column({nullable: false, default: false})
+    from_group: boolean;
 
 }

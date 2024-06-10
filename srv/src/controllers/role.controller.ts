@@ -12,12 +12,12 @@ import {
 import {ConfigService} from "../config/config.service";
 import {TenantService} from "../tenants/tenant.service";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
-import {RoleService} from "../scopes/role.service";
-import {Role} from "../scopes/role.entity";
-import {SecurityService} from "../scopes/security.service";
-import {Action} from "../scopes/actions.enum";
+import {RoleService} from "../roles/role.service";
+import {Role} from "../roles/role.entity";
+import {SecurityService} from "../roles/security.service";
+import {Action} from "../roles/actions.enum";
 import {subject} from "@casl/ability";
-import {SubjectEnum} from "../scopes/subjectEnum";
+import {SubjectEnum} from "../roles/subjectEnum";
 
 @Controller('api/tenant')
 @UseInterceptors(ClassSerializerInterceptor)

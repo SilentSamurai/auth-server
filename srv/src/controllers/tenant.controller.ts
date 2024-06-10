@@ -18,11 +18,11 @@ import {ValidationPipe} from "../validation/validation.pipe";
 import {ValidationSchema} from "../validation/validation.schema";
 import {Tenant} from "../tenants/tenant.entity";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
-import {RoleGuard} from "../scopes/role.guard";
-import {RoleRule, Rules} from "../scopes/roles.decorator";
-import {SecurityService} from "../scopes/security.service";
-import {SubjectEnum} from "../scopes/subjectEnum";
-import {Action} from "../scopes/actions.enum";
+import {RoleGuard} from "../roles/role.guard";
+import {RoleRule, Rules} from "../roles/roles.decorator";
+import {SecurityService} from "../roles/security.service";
+import {SubjectEnum} from "../roles/subjectEnum";
+import {Action} from "../roles/actions.enum";
 import {subject} from "@casl/ability";
 
 @Controller('api/tenant')

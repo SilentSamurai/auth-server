@@ -8,7 +8,7 @@ import {ConfigService} from '../config/config.service';
 import {AuthService} from './auth.service';
 import {TenantModule} from "../tenants/tenant.module";
 import {JwtAuthGuard} from "./jwt-auth.guard";
-import {RolesModule} from "../scopes/roles.module";
+import {RolesModule} from "../roles/roles.module";
 import {AuthCodeService} from "./auth-code.service";
 import {TypeOrmModule} from "@nestjs/typeorm";
 import {AuthCode} from "./auth_code.entity";

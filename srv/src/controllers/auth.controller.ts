@@ -21,7 +21,7 @@ import {ValidationSchema} from '../validation/validation.schema';
 import {MailServiceErrorException} from '../exceptions/mail-service-error.exception';
 import {TenantService} from "../tenants/tenant.service";
 import {Tenant} from "../tenants/tenant.entity";
-import {GRANT_TYPES} from "../scopes/security.service";
+import {GRANT_TYPES} from "../roles/security.service";
 import {ForbiddenException} from "../exceptions/forbidden.exception";
 import {InvalidTokenException} from "../exceptions/invalid-token.exception";
 import {AuthCodeService} from "../auth/auth-code.service";

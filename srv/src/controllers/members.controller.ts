@@ -19,13 +19,13 @@ import {ValidationSchema} from "../validation/validation.schema";
 import {Tenant} from "../tenants/tenant.entity";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
 import {User} from "../users/user.entity";
-import {Role} from "../scopes/role.entity";
-import {SecurityService} from "../scopes/security.service";
-import {RoleService} from "../scopes/role.service";
-import {Action} from "../scopes/actions.enum";
+import {Role} from "../roles/role.entity";
+import {SecurityService} from "../roles/security.service";
+import {RoleService} from "../roles/role.service";
+import {Action} from "../roles/actions.enum";
 import {ForbiddenException} from "../exceptions/forbidden.exception";
 import {subject} from "@casl/ability";
-import {SubjectEnum} from "../scopes/subjectEnum";
+import {SubjectEnum} from "../roles/subjectEnum";
 
 @Controller('api/tenant')
 @UseInterceptors(ClassSerializerInterceptor)

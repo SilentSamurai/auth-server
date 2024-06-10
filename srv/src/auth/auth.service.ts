@@ -11,9 +11,9 @@ import * as argon2 from 'argon2';
 import {Tenant} from "../tenants/tenant.entity";
 import {TenantService} from "../tenants/tenant.service";
 import {CryptUtil} from "../util/crypt.util";
-import {GRANT_TYPES, SecurityContext} from "../scopes/security.service";
+import {GRANT_TYPES, SecurityContext} from "../roles/security.service";
 import {UnauthorizedException} from "../exceptions/unauthorized.exception";
-import {RoleEnum} from "../scopes/roleEnum";
+import {RoleEnum} from "../roles/roleEnum";
 import {ValidationPipe} from "../validation/validation.pipe";
 import {ValidationSchema} from "../validation/validation.schema";
 

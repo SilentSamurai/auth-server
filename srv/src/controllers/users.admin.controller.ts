@@ -16,14 +16,14 @@ import {UsersService} from '../users/users.service';
 import {AuthService} from '../auth/auth.service';
 import {MailService} from '../mail/mail.service';
 import {JwtAuthGuard} from '../auth/jwt-auth.guard';
-import {RoleRule, Rules} from '../scopes/roles.decorator';
-import {RoleGuard} from '../scopes/role.guard';
+import {RoleRule, Rules} from '../roles/roles.decorator';
+import {RoleGuard} from '../roles/role.guard';
 import {ValidationPipe} from '../validation/validation.pipe';
 import {ValidationSchema} from '../validation/validation.schema';
 import {TenantService} from "../tenants/tenant.service";
 import {Tenant} from "../tenants/tenant.entity";
-import {Action} from "../scopes/actions.enum";
-import {SubjectEnum} from "../scopes/subjectEnum";
+import {Action} from "../roles/actions.enum";
+import {SubjectEnum} from "../roles/subjectEnum";
 
 @Controller('api/users')
 @UseInterceptors(ClassSerializerInterceptor)
