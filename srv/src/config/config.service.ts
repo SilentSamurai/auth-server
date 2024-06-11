@@ -3,6 +3,7 @@ import {config} from 'dotenv';
 import * as path from 'path';
 import {join} from 'path';
 import * as process from "node:process";
+import * as fs from "node:fs";
 
 @Injectable()
 export class ConfigService {
@@ -10,8 +11,12 @@ export class ConfigService {
     }
 
     static config(): any {
-        const envFile = process.env.ENV_FILE || './envs/.env.development';
+        const envFile = process.env.ENV_FILE;
         let envPath = path.resolve(process.cwd(), envFile);
+        if (!fs.existsSync(envPath)) {
+            console.log("Environment does not exist", envPath);
+            throw new Error("Missing environment");
+        }
         console.log("Environment path :", envPath);
         config({
             path: envPath

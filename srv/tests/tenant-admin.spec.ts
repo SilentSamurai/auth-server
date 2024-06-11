@@ -1,6 +1,6 @@
 import {TestAppFixture} from "./test-app.fixture";
 
-describe('e2e tenant', () => {
+describe('e2e tenant admin', () => {
     let app: TestAppFixture;
     let tenant = {
         id: "",
@@ -22,7 +22,7 @@ describe('e2e tenant', () => {
             .post('/api/oauth/token')
             .send({
                 "grant_type": "password",
-                "email": "secure@auth.server.com",
+                "email": "admin@auth.server.com",
                 "password": "admin9000",
                 "domain": "auth.server.com"
             })
@@ -69,13 +69,13 @@ describe('e2e tenant', () => {
         expect(response.status).toEqual(201);
     });
 
-    it(`/PUT Update Member Scope`, async () => {
+    it(`/PUT Update Member Role`, async () => {
         const email = "legolas@mail.com";
         const response = await app.getHttpServer()
-            .put(`/api/tenant/${tenant.id}/member/${email}/scope`)
+            .put(`/api/tenant/${tenant.id}/member/${email}/roles`)
             .set('Authorization', `Bearer ${superAdminToken}`)
             .send({
-                "scopes": ["TENANT_ADMIN"]
+                "roles": ["TENANT_ADMIN"]
             })
             .set('Accept', 'application/json');
 
@@ -110,8 +110,9 @@ describe('e2e tenant', () => {
             .set('Authorization', `Bearer ${tenantAdminAccessToken}`)
             .set('Accept', 'application/json');
 
-        expect(response.status).toEqual(200);
+
         console.log(response.body);
+        expect(response.status).toEqual(200);
 
         expect(response.body.id).toBeDefined();
         expect(response.body.name).toEqual("tenant-1");
@@ -125,8 +126,9 @@ describe('e2e tenant', () => {
             .set('Authorization', `Bearer ${tenantAdminAccessToken}`)
             .set('Accept', 'application/json');
 
-        expect(response.status).toEqual(200);
+
         console.log(response.body);
+        expect(response.status).toEqual(200);
 
         expect(response.body.id).toBeDefined();
         expect(response.body.clientId).toBeDefined();
@@ -135,19 +137,20 @@ describe('e2e tenant', () => {
 
     });
 
-    it(`/GET Tenant Scopes`, async () => {
+    it(`/GET Tenant Roles`, async () => {
         const response = await app.getHttpServer()
-            .get(`/api/tenant/${tenant.id}/scopes`)
+            .get(`/api/tenant/${tenant.id}/roles`)
             .set('Authorization', `Bearer ${tenantAdminAccessToken}`)
             .set('Accept', 'application/json');
 
-        expect(response.status).toEqual(200);
+
         console.log(response.body);
+        expect(response.status).toEqual(200);
 
         expect(response.body).toBeInstanceOf(Array);
         expect(response.body.length).toBeGreaterThanOrEqual(2);
-        for (let scope of response.body) {
-            expect(scope.name).toMatch(/TENANT_ADMIN|TENANT_VIEWER/);
+        for (let role of response.body) {
+            expect(role.name).toMatch(/TENANT_ADMIN|TENANT_VIEWER/);
         }
 
     });
@@ -162,8 +165,9 @@ describe('e2e tenant', () => {
             })
             .set('Accept', 'application/json');
 
-        expect(response.status).toEqual(200);
+
         console.log(response.body);
+        expect(response.status).toEqual(200);
 
         expect(response.body.id).toBeDefined();
         expect(response.body.clientId).toEqual(tenant.clientId);
@@ -172,10 +176,10 @@ describe('e2e tenant', () => {
 
     });
 
-    it(`/POST Create Scope`, async () => {
+    it(`/POST Create Role`, async () => {
         const name = "auditor";
         const response = await app.getHttpServer()
-            .post(`/api/tenant/${tenant.id}/scope/${name}`)
+            .post(`/api/tenant/${tenant.id}/role/${name}`)
             .set('Authorization', `Bearer ${tenantAdminAccessToken}`)
             .set('Accept', 'application/json');
 
@@ -211,10 +215,10 @@ describe('e2e tenant', () => {
 
     });
 
-    it(`/DELETE Remove Scope`, async () => {
+    it(`/DELETE Remove Role`, async () => {
         const name = "auditor";
         const response = await app.getHttpServer()
-            .delete(`/api/tenant/${tenant.id}/scope/${name}`)
+            .delete(`/api/tenant/${tenant.id}/role/${name}`)
             .set('Authorization', `Bearer ${tenantAdminAccessToken}`)
             .set('Accept', 'application/json');
 

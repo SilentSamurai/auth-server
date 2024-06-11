@@ -4,7 +4,7 @@ import {Exclude} from "class-transformer";
 import {User} from "../users/user.entity";
 import {Group} from "../groups/group.entity"; // Used with ClassSerializerInterceptor to exclude from responses.
 
-@Entity({name: "tenant"})
+@Entity({name: "tenants"})
 export class Tenant {
     @PrimaryGeneratedColumn("uuid")
     id: string;

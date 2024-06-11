@@ -14,7 +14,7 @@ export class UserRole {
     @PrimaryColumn({name: "role_id"})
     roleId: string;
 
-    @Column({nullable: false, default: false})
+    @Column({name: "from_group", nullable: false, default: false})
     from_group: boolean;
 
 }

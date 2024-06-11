@@ -218,6 +218,18 @@ const RefreshTokenSchema = yup.object().shape(
         domain: yup.string().required('token is invalid')
     });
 
+const CreateGroupSchema = yup.object().shape(
+    {
+        name: yup.string().required('Name is required').max(20),
+        tenantId: yup.string().required('tenantId is required').max(100),
+    });
+
+const UpdateGroupRole = yup.object().shape(
+    {
+        roles: yup.array().of(
+            yup.string().max(20)
+        )
+    });
 
 export const ValidationSchema =
     {
@@ -251,5 +263,7 @@ export const ValidationSchema =
         VerifyTokenSchema,
         ExchangeTokenSchema,
         SecurityContextSchema,
-        RefreshTokenSchema
+        RefreshTokenSchema,
+        CreateGroupSchema,
+        UpdateGroupRole
     };

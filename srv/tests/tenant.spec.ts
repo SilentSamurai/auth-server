@@ -21,7 +21,7 @@ describe('e2e tenant', () => {
     it(`/POST Fetch Access Token`, async () => {
         let tokenFixture = new TokenFixture(app);
         let response = await tokenFixture.fetchAccessToken(
-            "secure@auth.server.com",
+            "admin@auth.server.com",
             "admin9000",
             "auth.server.com"
         );
@@ -80,9 +80,9 @@ describe('e2e tenant', () => {
 
     });
 
-    it(`/GET Tenant Scopes`, async () => {
+    it(`/GET Tenant Roles`, async () => {
         const response = await app.getHttpServer()
-            .get(`/api/tenant/${tenant.id}/scopes`)
+            .get(`/api/tenant/${tenant.id}/roles`)
             .set('Authorization', `Bearer ${accessToken}`)
             .set('Accept', 'application/json');
 
@@ -91,8 +91,8 @@ describe('e2e tenant', () => {
 
         expect(response.body).toBeInstanceOf(Array);
         expect(response.body.length).toBeGreaterThanOrEqual(2);
-        for (let scope of response.body) {
-            expect(scope.name).toMatch(/TENANT_ADMIN|TENANT_VIEWER/);
+        for (let role of response.body) {
+            expect(role.name).toMatch(/TENANT_ADMIN|TENANT_VIEWER/);
         }
 
     });
@@ -117,10 +117,10 @@ describe('e2e tenant', () => {
 
     });
 
-    it(`/POST Create Scope`, async () => {
+    it(`/POST Create Role`, async () => {
         const name = "auditor";
         const response = await app.getHttpServer()
-            .post(`/api/tenant/${tenant.id}/scope/${name}`)
+            .post(`/api/tenant/${tenant.id}/role/${name}`)
             .set('Authorization', `Bearer ${accessToken}`)
             .set('Accept', 'application/json');
 
@@ -153,13 +153,13 @@ describe('e2e tenant', () => {
         expect(response.body[0].name).toBeDefined();
     });
 
-    it(`/PUT Update Member Scope`, async () => {
+    it(`/PUT Update Member Role`, async () => {
         const email = "legolas@mail.com";
         const response = await app.getHttpServer()
-            .put(`/api/tenant/${tenant.id}/member/${email}/scope`)
+            .put(`/api/tenant/${tenant.id}/member/${email}/roles`)
             .set('Authorization', `Bearer ${accessToken}`)
             .send({
-                "scopes": ["TENANT_VIEWER", "auditor"]
+                "roles": ["TENANT_VIEWER", "auditor"]
             })
             .set('Accept', 'application/json');
 
@@ -179,10 +179,10 @@ describe('e2e tenant', () => {
 
     });
 
-    it(`/DELETE Remove Scope`, async () => {
+    it(`/DELETE Remove Role`, async () => {
         const name = "auditor";
         const response = await app.getHttpServer()
-            .delete(`/api/tenant/${tenant.id}/scope/${name}`)
+            .delete(`/api/tenant/${tenant.id}/role/${name}`)
             .set('Authorization', `Bearer ${accessToken}`)
             .set('Accept', 'application/json');
 

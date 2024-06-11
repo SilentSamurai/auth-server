@@ -33,7 +33,7 @@ export class AuthService {
     }
 
     validateAuthCode(authCode: string): Promise<any> {
-        return lastValueFrom(this.http.post(`${AUTH_API}/gen-auth-code`, {
+        return lastValueFrom(this.http.post(`${AUTH_API}/verify-auth-code`, {
             auth_code: authCode
         }, httpOptions));
     }

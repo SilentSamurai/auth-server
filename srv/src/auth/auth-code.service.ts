@@ -74,7 +74,7 @@ export class AuthCodeService {
         let tenant = await this.tenantService.findById(session.tenantId);
         let user = await this.usersService.findById(session.userId);
         let genChallenge = CryptUtil.generateCodeChallenge(codeVerifier);
-        if (genChallenge !== session.codeChallenge) {
+        if (genChallenge !== session.codeChallenge && codeVerifier !== session.codeChallenge) {
             throw new InvalidCredentialsException();
         }
         return {tenant, user};

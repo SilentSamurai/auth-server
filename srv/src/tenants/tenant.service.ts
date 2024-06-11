@@ -60,7 +60,7 @@ export class TenantService implements OnModuleInit {
         let viewerRole = await this.roleService.create(RoleEnum.TENANT_VIEWER, tenant, false);
 
         await this.tenantRepository.createQueryBuilder()
-            .relation(Tenant, "scopes")
+            .relation(Tenant, "roles")
             .of(tenant.id)
             .add([adminRole.id, viewerRole.id]);
 

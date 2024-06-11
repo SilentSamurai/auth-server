@@ -126,7 +126,7 @@ export class AuthController {
         }
     }
 
-    @Post('/gen-auth-code')
+    @Post('/verify-auth-code')
     async authCode(
         @Body() body: {
             auth_code: string

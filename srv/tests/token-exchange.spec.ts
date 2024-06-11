@@ -21,7 +21,7 @@ describe('e2e token exchange flow', () => {
     it(`/POST Access Token`, async () => {
         let tokenFixture = new TokenFixture(app);
         let response = await tokenFixture.fetchAccessToken(
-            "secure@auth.server.com",
+            "admin@auth.server.com",
             "admin9000",
             "auth.server.com"
         );

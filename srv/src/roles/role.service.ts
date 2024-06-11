@@ -139,31 +139,16 @@ export class RoleService {
             if (!currentRoleMap.has(key)) {
                 removeRoles.push(value.name);
             }
-        })
+        });
 
-        await Promise.all(addRoles.map(
-            async (name) => {
-                let role: Role = await this.roleRepository.findOne({
-                    where: {
-                        name,
-                        tenant: {id: tenant.id}
-                    },
-                    relations: {
-                        users: true
-                    }
-                });
-                if (role !== null) {
-                    let userRole = this.userRoleRepository.create({
-                        userId: user.id,
-                        tenantId: tenant.id,
-                        roleId: role.id
-                    });
-                    await this.userRoleRepository.save(userRole);
-                }
-            }
-        ));
+        await this.addRoles(user, tenant, addRoles);
+        await this.removeRoles(user, tenant, removeRoles);
 
-        await Promise.all(removeRoles.map(
+        return this.getMemberRoles(tenant, user);
+    }
+
+    async removeRoles(user: User, tenant: Tenant, roles: string[]) {
+        return await Promise.all(roles.map(
             async (name) => {
                 let role: Role = await this.roleRepository.findOne({
                     where: {
@@ -186,10 +171,30 @@ export class RoleService {
                 }
             }
         ))
-
-
-        return this.getMemberRoles(tenant, user);
     }
 
 
+    async addRoles(user: User, tenant: Tenant, roles: string[]) {
+        return await Promise.all(roles.map(
+            async (name) => {
+                let role: Role = await this.roleRepository.findOne({
+                    where: {
+                        name,
+                        tenant: {id: tenant.id}
+                    },
+                    relations: {
+                        users: true
+                    }
+                });
+                if (role !== null) {
+                    let userRole = this.userRoleRepository.create({
+                        userId: user.id,
+                        tenantId: tenant.id,
+                        roleId: role.id
+                    });
+                    await this.userRoleRepository.save(userRole);
+                }
+            }
+        ));
+    }
 }

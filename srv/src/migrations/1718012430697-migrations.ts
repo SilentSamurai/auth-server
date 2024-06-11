@@ -69,7 +69,7 @@ export class Migrations1718012430697 implements MigrationInterface {
                     {
                         columnNames: ["tenant_id"],
                         referencedColumnNames: ["id"],
-                        referencedTableName: "tenant",
+                        referencedTableName: "tenants",
                         onDelete: "CASCADE",
                     },
                     {
@@ -119,7 +119,7 @@ export class Migrations1718012430697 implements MigrationInterface {
                     {
                         columnNames: ["tenant_id"],
                         referencedColumnNames: ["id"],
-                        referencedTableName: "tenant",
+                        referencedTableName: "tenants",
                         onDelete: "CASCADE",
                     },
                     {

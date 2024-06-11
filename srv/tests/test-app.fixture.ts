@@ -4,7 +4,9 @@ import {Test, TestingModule} from "@nestjs/testing";
 import {AppModule} from "../src/app.module";
 import {JwtService} from "@nestjs/jwt";
 import * as request from 'supertest';
+import * as process from "node:process";
 
+let console = require('console');
 
 export class TestAppFixture {
     private app: INestApplication;
@@ -19,7 +21,11 @@ export class TestAppFixture {
     }
 
     public async init(): Promise<TestAppFixture> {
-        ConfigService.configTest();
+
+        global.console = console;
+
+        process.env.ENV_FILE = './envs/.env.testing';
+        ConfigService.config();
         this.moduleRef = await Test.createTestingModule({
             imports: [AppModule],
         }).compile()

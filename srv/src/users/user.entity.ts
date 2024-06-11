@@ -3,7 +3,7 @@ import {Exclude} from 'class-transformer'; // Used with ClassSerializerIntercept
 import {Tenant} from "../tenants/tenant.entity";
 import {Role} from "../roles/role.entity";
 
-@Entity({name: "user"})
+@Entity({name: "users"})
 export class User {
     @PrimaryGeneratedColumn("uuid")
     id: string;

@@ -9,6 +9,8 @@ import {ValidationErrorException} from "../exceptions/validation-error.exception
 import {Group} from "./group.entity";
 import {GroupUser} from "./group.users.entity";
 import {GroupRole} from "./group.roles.entity";
+import {RoleService} from "../roles/role.service";
+import {User} from "../users/user.entity";
 
 @Injectable()
 export class GroupService {
@@ -16,6 +18,7 @@ export class GroupService {
     constructor(
         private readonly configService: ConfigService,
         private readonly usersService: UsersService,
+        private readonly roleService: RoleService,
         @InjectRepository(Group) private groupRepository: Repository<Group>,
         @InjectRepository(GroupUser) private groupUserRepository: Repository<GroupUser>,
         @InjectRepository(GroupRole) private groupRoleRepository: Repository<GroupRole>,
@@ -45,5 +48,47 @@ export class GroupService {
         return null;
     }
 
+    async findGroupUsers(group: Group): Promise<User[]> {
+        let groupUsers = await this.groupUserRepository.find({where: {groupId: group.id}});
+        let users = await Promise.all(groupUsers.map(async gu => await this.usersService.findById(gu.userId)));
+        return users;
+    }
 
+
+    async addRoles(group: Group, roles: string[]) {
+        for (let role_name of roles) {
+            let role = await this.roleService.findById(role_name);
+            this.groupRoleRepository.create({
+                group: group,
+                tenant: group.tenant,
+                role: role
+            });
+        }
+
+        let users = await this.findGroupUsers(group);
+
+        for (const user of users) {
+            await this.roleService.addRoles(user, group.tenant, roles);
+        }
+    }
+
+    async removeRoles(group: Group, roles: string[]) {
+        for (let role_name of roles) {
+            let role = await this.roleService.findById(role_name);
+            let gr = await this.groupRoleRepository.findOne({
+                where: {
+                    group: group,
+                    tenant: {id: group.tenant.id},
+                    role: role
+                },
+            })
+            await this.groupRoleRepository.remove(gr);
+        }
+
+        let users = await this.findGroupUsers(group);
+
+        for (const user of users) {
+            await this.roleService.addRoles(user, group.tenant, roles);
+        }
+    }
 }
