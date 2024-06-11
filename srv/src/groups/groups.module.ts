@@ -7,6 +7,8 @@ import {Group} from "./group.entity";
 import {GroupUser} from "./group.users.entity";
 import {GroupRole} from "./group.roles.entity";
 import {GroupService} from "./group.service";
+import {GroupController} from "./group.controller";
+import {RolesModule} from "../roles/roles.module";
 
 @Module(
     {
@@ -15,9 +17,10 @@ import {GroupService} from "./group.service";
                 TypeOrmModule.forFeature([Group, GroupUser, GroupRole]),
                 forwardRef(() => UsersModule),
                 forwardRef(() => TenantModule),
-                forwardRef(() => AuthModule)
+                    forwardRef(() => AuthModule),
+                    forwardRef(() => RolesModule)
             ],
-        controllers: [],
+            controllers: [GroupController],
         providers: [GroupService],
         exports: [GroupService]
     })

@@ -231,6 +231,14 @@ const UpdateGroupRole = yup.object().shape(
         )
     });
 
+const UpdateGroupUser = yup.object().shape(
+    {
+        users: yup.array().of(
+            yup.string().max(20)
+        )
+    });
+
+
 export const ValidationSchema =
     {
         SignUpSchema,
@@ -265,5 +273,6 @@ export const ValidationSchema =
         SecurityContextSchema,
         RefreshTokenSchema,
         CreateGroupSchema,
-        UpdateGroupRole
+        UpdateGroupRole,
+        UpdateGroupUser
     };

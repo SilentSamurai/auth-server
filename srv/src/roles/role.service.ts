@@ -173,19 +173,21 @@ export class RoleService {
         ))
     }
 
-
-    async addRoles(user: User, tenant: Tenant, roles: string[]) {
+    async addRoles(user: User, tenant: Tenant, roles: string[] | Role[]) {
         return await Promise.all(roles.map(
-            async (name) => {
-                let role: Role = await this.roleRepository.findOne({
-                    where: {
-                        name,
-                        tenant: {id: tenant.id}
-                    },
-                    relations: {
-                        users: true
-                    }
-                });
+            async (role: string | Role) => {
+                if (typeof role == 'string') {
+                    let name = role as string;
+                    role = await this.roleRepository.findOne({
+                        where: {
+                            name,
+                            tenant: {id: tenant.id}
+                        },
+                        relations: {
+                            users: true
+                        }
+                    });
+                }
                 if (role !== null) {
                     let userRole = this.userRoleRepository.create({
                         userId: user.id,

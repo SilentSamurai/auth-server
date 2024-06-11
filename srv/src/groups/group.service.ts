@@ -11,6 +11,7 @@ import {GroupUser} from "./group.users.entity";
 import {GroupRole} from "./group.roles.entity";
 import {RoleService} from "../roles/role.service";
 import {User} from "../users/user.entity";
+import {Role} from "../roles/role.entity";
 
 @Injectable()
 export class GroupService {
@@ -48,47 +49,133 @@ export class GroupService {
         return null;
     }
 
-    async findGroupUsers(group: Group): Promise<User[]> {
-        let groupUsers = await this.groupUserRepository.find({where: {groupId: group.id}});
-        let users = await Promise.all(groupUsers.map(async gu => await this.usersService.findById(gu.userId)));
-        return users;
-    }
-
-
-    async addRoles(group: Group, roles: string[]) {
-        for (let role_name of roles) {
-            let role = await this.roleService.findById(role_name);
-            this.groupRoleRepository.create({
+    async isRoleInGroup(group: Group, role: Role): Promise<boolean> {
+        return await this.groupRoleRepository.exists({
+            where: {
                 group: group,
                 tenant: group.tenant,
                 role: role
-            });
+            }
+        });
+    }
+
+    async findGroupRole(group: Group, role: Role): Promise<GroupRole> {
+        return await this.groupRoleRepository.findOne({
+            where: {
+                group: group,
+                tenant: group.tenant,
+                role: role
+            }
+        });
+    }
+
+    async isUserInGroup(group: Group, user: User): Promise<boolean> {
+        return await this.groupUserRepository.exists({
+            where: {
+                group: group,
+                tenant: group.tenant,
+                user: user
+            }
+        });
+    }
+
+    async findGroupUser(group: Group, user: User): Promise<GroupUser> {
+        return await this.groupUserRepository.findOne({
+            where: {
+                group: group,
+                tenant: group.tenant,
+                user: user
+            }
+        });
+    }
+
+    async findGroupUsers(group: Group): Promise<User[]> {
+        let groupUsers = await this.groupUserRepository.find({where: {groupId: group.id}});
+        let users = await Promise.all(groupUsers.map(
+            async gu => await this.usersService.findById(gu.userId)
+        ));
+        return users;
+    }
+
+    async addRoles(group: Group, roles: string[]) {
+        let oRole = [];
+        for (let role_name of roles) {
+            let role = await this.roleService.findById(role_name);
+            if (!await this.isRoleInGroup(group, role)) {
+                let groupRole = this.groupRoleRepository.create({
+                    group: group,
+                    tenant: group.tenant,
+                    role: role
+                });
+                await this.groupRoleRepository.save(groupRole);
+                oRole.push(role);
+            }
         }
-
         let users = await this.findGroupUsers(group);
-
         for (const user of users) {
-            await this.roleService.addRoles(user, group.tenant, roles);
+            await this.roleService.addRoles(user, group.tenant, oRole);
         }
     }
 
     async removeRoles(group: Group, roles: string[]) {
+        let oRole = [];
         for (let role_name of roles) {
             let role = await this.roleService.findById(role_name);
-            let gr = await this.groupRoleRepository.findOne({
-                where: {
-                    group: group,
-                    tenant: {id: group.tenant.id},
-                    role: role
-                },
-            })
-            await this.groupRoleRepository.remove(gr);
+            if (await this.isRoleInGroup(group, role)) {
+                let gr = await this.findGroupRole(group, role);
+                await this.groupRoleRepository.remove(gr);
+                oRole.push(role);
+            }
         }
-
         let users = await this.findGroupUsers(group);
-
         for (const user of users) {
+            await this.roleService.addRoles(user, group.tenant, oRole);
+        }
+    }
+
+    async addUser(group: Group, users: string[]) {
+        let oUser = []
+        for (let email of users) {
+            let user = await this.usersService.findByEmail(email);
+            if (!await this.isUserInGroup(group, user)) {
+                let gu = this.groupUserRepository.create({
+                    group: group,
+                    tenant: group.tenant,
+                    user: user
+                });
+                gu = await this.groupUserRepository.save(gu);
+                oUser.push(user);
+            }
+        }
+        let roles = await this.findGroupRoles(group);
+        for (let user of oUser) {
             await this.roleService.addRoles(user, group.tenant, roles);
         }
     }
+
+    async removeUser(group: Group, users: string[]) {
+        let oUser = [];
+        for (let email of users) {
+            let user = await this.usersService.findByEmail(email);
+            if (await this.isUserInGroup(group, user)) {
+                let gu = await this.findGroupUser(group, user);
+                await this.groupUserRepository.remove(gu);
+                oUser.push(user);
+            }
+        }
+        let roles = await this.findGroupRoles(group);
+        for (let user of oUser) {
+            await this.roleService.addRoles(user, group.tenant, roles);
+        }
+    }
+
+    private async findGroupRoles(group: Group) {
+        let groupRoles = await this.groupRoleRepository.find({where: {groupId: group.id}});
+        let roles = await Promise.all(groupRoles.map(
+            async gr => await this.roleService.findById(gr.roleId)
+        ));
+        return roles;
+    }
+
+
 }

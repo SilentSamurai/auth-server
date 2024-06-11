@@ -7,7 +7,7 @@ import {GroupService} from "./group.service";
 
 @Controller('api/group')
 @UseInterceptors(ClassSerializerInterceptor)
-export class MainController {
+export class GroupController {
 
     constructor(
         private readonly configService: ConfigService,
@@ -45,6 +45,28 @@ export class MainController {
     ): Promise<any> {
         let group = await this.groupService.findById(groupId);
         await this.groupService.removeRoles(group, body.roles);
+        return group;
+    }
+
+    @Post('/:groupId/add-users')
+    async addUsers(
+        @Request() request,
+        @Param('groupId') groupId: string,
+        @Body(new ValidationPipe(ValidationSchema.UpdateGroupUser)) body: { users: string[] }
+    ): Promise<any> {
+        let group = await this.groupService.findById(groupId);
+        await this.groupService.addUser(group, body.users);
+        return group;
+    }
+
+    @Post('/:groupId/remove-users')
+    async removeUsers(
+        @Request() request,
+        @Param('groupId') groupId: string,
+        @Body(new ValidationPipe(ValidationSchema.UpdateGroupUser)) body: { users: string[] }
+    ): Promise<any> {
+        let group = await this.groupService.findById(groupId);
+        await this.groupService.removeUser(group, body.users);
         return group;
     }
 
