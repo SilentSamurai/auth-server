@@ -1,4 +1,4 @@
-import {Injectable} from "@nestjs/common";
+import {BadRequestException, Injectable} from "@nestjs/common";
 import {ConfigService} from "../config/config.service";
 import {UsersService} from "../users/users.service";
 import {InjectRepository} from "@nestjs/typeorm";
@@ -12,6 +12,7 @@ import {GroupRole} from "./group.roles.entity";
 import {RoleService} from "../roles/role.service";
 import {User} from "../users/user.entity";
 import {Role} from "../roles/role.entity";
+import {TenantService} from "../tenants/tenant.service";
 
 @Injectable()
 export class GroupService {
@@ -20,6 +21,7 @@ export class GroupService {
         private readonly configService: ConfigService,
         private readonly usersService: UsersService,
         private readonly roleService: RoleService,
+        private readonly tenantService: TenantService,
         @InjectRepository(Group) private groupRepository: Repository<Group>,
         @InjectRepository(GroupUser) private groupUserRepository: Repository<GroupUser>,
         @InjectRepository(GroupRole) private groupRoleRepository: Repository<GroupRole>,
@@ -36,25 +38,53 @@ export class GroupService {
     }
 
     async findById(id: string): Promise<Group> {
-        let group: Group = await this.groupRepository.findOne({where: {id: id}});
+        let group: Group = await this.groupRepository.findOne({
+            where: {id: id},
+            relations: ['tenant']
+        });
         if (group === null) {
             throw new ValidationErrorException("group not found");
         }
         return group;
     }
 
+    async findByNameAndTenantId(name: string, tenantId: string): Promise<Group> {
+        let group: Group = await this.groupRepository.findOne({
+            where: {
+                name: name,
+                tenantId: tenantId
+            },
+            relations: ['tenant']
+        });
+        if (group === null) {
+            throw new ValidationErrorException("group not found");
+        }
+        return group;
+    }
+
+    async existsByNameAndTenantId(name: string, tenantId: string): Promise<boolean> {
+        return await this.groupRepository.exists({
+            where: {
+                name: name,
+                tenantId: tenantId
+            },
+            relations: ['tenant']
+        });
+    }
+
     async deleteById(id: string): Promise<Group> {
         let group: Group = await this.findById(id);
-        // implement
-        return null;
+        let roles = await this.findGroupRoles(group);
+        await this.removeRoles(group, roles.map(r => r.name));
+        return group;
     }
 
     async isRoleInGroup(group: Group, role: Role): Promise<boolean> {
         return await this.groupRoleRepository.exists({
             where: {
-                group: group,
-                tenant: group.tenant,
-                role: role
+                groupId: group.id,
+                tenantId: group.tenantId,
+                roleId: role.id
             }
         });
     }
@@ -62,9 +92,9 @@ export class GroupService {
     async findGroupRole(group: Group, role: Role): Promise<GroupRole> {
         return await this.groupRoleRepository.findOne({
             where: {
-                group: group,
-                tenant: group.tenant,
-                role: role
+                groupId: group.id,
+                tenantId: group.tenantId,
+                roleId: role.id
             }
         });
     }
@@ -72,9 +102,9 @@ export class GroupService {
     async isUserInGroup(group: Group, user: User): Promise<boolean> {
         return await this.groupUserRepository.exists({
             where: {
-                group: group,
-                tenant: group.tenant,
-                user: user
+                groupId: group.id,
+                tenantId: group.tenantId,
+                userId: user.id
             }
         });
     }
@@ -82,9 +112,9 @@ export class GroupService {
     async findGroupUser(group: Group, user: User): Promise<GroupUser> {
         return await this.groupUserRepository.findOne({
             where: {
-                group: group,
-                tenant: group.tenant,
-                user: user
+                groupId: group.id,
+                tenantId: group.tenantId,
+                userId: user.id
             }
         });
     }
@@ -97,15 +127,25 @@ export class GroupService {
         return users;
     }
 
+    public async findGroupRoles(group: Group): Promise<Role[]> {
+        let groupRoles = await this.groupRoleRepository.find({where: {groupId: group.id}});
+        let roles = await Promise.all(groupRoles.map(
+            async gr => await this.roleService.findById(gr.roleId)
+        ));
+        return roles;
+    }
+
+
     async addRoles(group: Group, roles: string[]) {
         let oRole = [];
+        let tenant = await this.tenantService.findById(group.tenantId);
         for (let role_name of roles) {
-            let role = await this.roleService.findById(role_name);
+            let role = await this.roleService.findByNameAndTenant(role_name, group.tenant);
             if (!await this.isRoleInGroup(group, role)) {
                 let groupRole = this.groupRoleRepository.create({
-                    group: group,
-                    tenant: group.tenant,
-                    role: role
+                    groupId: group.id,
+                    tenantId: group.tenantId,
+                    roleId: role.id
                 });
                 await this.groupRoleRepository.save(groupRole);
                 oRole.push(role);
@@ -113,14 +153,14 @@ export class GroupService {
         }
         let users = await this.findGroupUsers(group);
         for (const user of users) {
-            await this.roleService.addRoles(user, group.tenant, oRole);
+            await this.roleService.addRoles(user, group.tenant, oRole, true);
         }
     }
 
     async removeRoles(group: Group, roles: string[]) {
         let oRole = [];
         for (let role_name of roles) {
-            let role = await this.roleService.findById(role_name);
+            let role = await this.roleService.findByNameAndTenant(role_name, group.tenant);
             if (await this.isRoleInGroup(group, role)) {
                 let gr = await this.findGroupRole(group, role);
                 await this.groupRoleRepository.remove(gr);
@@ -129,7 +169,7 @@ export class GroupService {
         }
         let users = await this.findGroupUsers(group);
         for (const user of users) {
-            await this.roleService.addRoles(user, group.tenant, oRole);
+            await this.roleService.removeRoles(user, group.tenant, oRole, true);
         }
     }
 
@@ -139,9 +179,9 @@ export class GroupService {
             let user = await this.usersService.findByEmail(email);
             if (!await this.isUserInGroup(group, user)) {
                 let gu = this.groupUserRepository.create({
-                    group: group,
-                    tenant: group.tenant,
-                    user: user
+                    groupId: group.id,
+                    tenantId: group.tenantId,
+                    userId: user.id
                 });
                 gu = await this.groupUserRepository.save(gu);
                 oUser.push(user);
@@ -149,7 +189,7 @@ export class GroupService {
         }
         let roles = await this.findGroupRoles(group);
         for (let user of oUser) {
-            await this.roleService.addRoles(user, group.tenant, roles);
+            await this.roleService.addRoles(user, group.tenant, roles, true);
         }
     }
 
@@ -165,17 +205,17 @@ export class GroupService {
         }
         let roles = await this.findGroupRoles(group);
         for (let user of oUser) {
-            await this.roleService.addRoles(user, group.tenant, roles);
+            await this.roleService.removeRoles(user, group.tenant, roles, true);
         }
     }
 
-    private async findGroupRoles(group: Group) {
-        let groupRoles = await this.groupRoleRepository.find({where: {groupId: group.id}});
-        let roles = await Promise.all(groupRoles.map(
-            async gr => await this.roleService.findById(gr.roleId)
-        ));
-        return roles;
+
+    async updateGroup(group: Group, body: { name: string }) {
+        if (!await this.existsByNameAndTenantId(body.name, group.tenantId)) {
+            group.name = body.name;
+            await this.groupRepository.save(group);
+        } else {
+            throw new BadRequestException("group already exists!");
+        }
     }
-
-
 }

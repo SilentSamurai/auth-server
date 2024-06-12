@@ -147,24 +147,28 @@ export class RoleService {
         return this.getMemberRoles(tenant, user);
     }
 
-    async removeRoles(user: User, tenant: Tenant, roles: string[]) {
+    async removeRoles(user: User, tenant: Tenant, roles: string[] | Role[], from_group = false) {
         return await Promise.all(roles.map(
-            async (name) => {
-                let role: Role = await this.roleRepository.findOne({
-                    where: {
-                        name,
-                        tenant: {id: tenant.id}
-                    },
-                    relations: {
-                        users: true
-                    }
-                });
+            async (role: string | Role) => {
+                if(typeof role == 'string') {
+                    let name = role as string;
+                    role = await this.roleRepository.findOne({
+                        where: {
+                            name,
+                            tenant: {id: tenant.id}
+                        },
+                        relations: {
+                            users: true
+                        }
+                    });
+                }
                 if (role !== null) {
                     let userRole = await this.userRoleRepository.findOne({
                         where: {
                             tenantId: tenant.id,
                             userId: user.id,
-                            roleId: role.id
+                            roleId: role.id,
+                            from_group: from_group
                         }
                     });
                     await this.userRoleRepository.remove(userRole);
@@ -173,7 +177,7 @@ export class RoleService {
         ))
     }
 
-    async addRoles(user: User, tenant: Tenant, roles: string[] | Role[]) {
+    async addRoles(user: User, tenant: Tenant, roles: string[] | Role[], from_group = false) {
         return await Promise.all(roles.map(
             async (role: string | Role) => {
                 if (typeof role == 'string') {
@@ -192,7 +196,8 @@ export class RoleService {
                     let userRole = this.userRoleRepository.create({
                         userId: user.id,
                         tenantId: tenant.id,
-                        roleId: role.id
+                        roleId: role.id,
+                        from_group: from_group
                     });
                     await this.userRoleRepository.save(userRole);
                 }

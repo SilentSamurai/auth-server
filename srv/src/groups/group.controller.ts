@@ -1,4 +1,14 @@
-import {Body, ClassSerializerInterceptor, Controller, Param, Post, Request, UseInterceptors} from "@nestjs/common";
+import {
+    Body,
+    ClassSerializerInterceptor,
+    Controller,
+    Delete,
+    Get,
+    Param, Patch,
+    Post, Put,
+    Request,
+    UseInterceptors
+} from "@nestjs/common";
 import {ConfigService} from "../config/config.service";
 import {ValidationPipe} from "../validation/validation.pipe";
 import {ValidationSchema} from "../validation/validation.schema";
@@ -26,6 +36,44 @@ export class GroupController {
         return group;
     }
 
+    @Get('/:groupId')
+    async getGroup(
+        @Request() request,
+        @Param('groupId') groupId: string,
+    ): Promise<any> {
+        let group = await this.groupService.findById(groupId);
+        let roles = await this.groupService.findGroupRoles(group);
+        let users = await this.groupService.findGroupUsers(group);
+        return {
+            group: group,
+            roles: roles,
+            users: users
+        };
+    }
+
+
+    @Patch('/:groupId/update')
+    async updateGroup(
+        @Request() request,
+        @Param('groupId') groupId: string,
+        @Body(new ValidationPipe(ValidationSchema.UpdateGroupSchema)) body: { name: string }
+    ): Promise<any> {
+        let group = await this.groupService.findById(groupId);
+        await this.groupService.updateGroup(group, body);
+        return group;
+    }
+
+    @Delete('/:groupId/delete')
+    async deleteGroup(
+        @Request() request,
+        @Param('groupId') groupId: string
+    ): Promise<any> {
+        let group = await this.groupService.findById(groupId);
+        await this.groupService.deleteById(groupId);
+        return group;
+    }
+
+
     @Post('/:groupId/add-roles')
     async addRole(
         @Request() request,
@@ -34,7 +82,11 @@ export class GroupController {
     ): Promise<any> {
         let group = await this.groupService.findById(groupId);
         await this.groupService.addRoles(group, body.roles);
-        return group;
+        let roles = await this.groupService.findGroupRoles(group);
+        return {
+            group: group,
+            roles: roles,
+        };
     }
 
     @Post('/:groupId/remove-roles')
@@ -45,7 +97,11 @@ export class GroupController {
     ): Promise<any> {
         let group = await this.groupService.findById(groupId);
         await this.groupService.removeRoles(group, body.roles);
-        return group;
+        let roles = await this.groupService.findGroupRoles(group);
+        return {
+            group: group,
+            roles: roles,
+        };
     }
 
     @Post('/:groupId/add-users')
@@ -56,7 +112,11 @@ export class GroupController {
     ): Promise<any> {
         let group = await this.groupService.findById(groupId);
         await this.groupService.addUser(group, body.users);
-        return group;
+        let users = await this.groupService.findGroupUsers(group);
+        return {
+            group: group,
+            users: users,
+        };
     }
 
     @Post('/:groupId/remove-users')
@@ -67,7 +127,11 @@ export class GroupController {
     ): Promise<any> {
         let group = await this.groupService.findById(groupId);
         await this.groupService.removeUser(group, body.users);
-        return group;
+        let users = await this.groupService.findGroupUsers(group);
+        return {
+            group: group,
+            users: users,
+        };
     }
 
 

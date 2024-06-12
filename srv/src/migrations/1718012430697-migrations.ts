@@ -34,6 +34,15 @@ export class Migrations1718012430697 implements MigrationInterface {
                         default: "now()",
                     },
                 ],
+                uniques: [
+                    {
+                        name: "tenant_group_name_unq_constrain",
+                        columnNames: [
+                            "tenant_id",
+                            "name"
+                        ]
+                    }
+                ]
             }
         ), true);
 

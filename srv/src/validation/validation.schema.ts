@@ -224,6 +224,11 @@ const CreateGroupSchema = yup.object().shape(
         tenantId: yup.string().required('tenantId is required').max(100),
     });
 
+const UpdateGroupSchema = yup.object().shape(
+    {
+        name: yup.string().required('Name is required').max(20)
+    });
+
 const UpdateGroupRole = yup.object().shape(
     {
         roles: yup.array().of(
@@ -274,5 +279,6 @@ export const ValidationSchema =
         RefreshTokenSchema,
         CreateGroupSchema,
         UpdateGroupRole,
-        UpdateGroupUser
+        UpdateGroupUser,
+        UpdateGroupSchema
     };

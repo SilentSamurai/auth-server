@@ -122,4 +122,20 @@ export class MemberController {
         };
     }
 
+    @Get('/:tenantId/member/:email/roles')
+    @UseGuards(JwtAuthGuard)
+    async getMemberRoles(
+        @Request() request,
+        @Param('tenantId') tenantId: string,
+        @Param('email') email: string
+    ): Promise<any> {
+        const user = await this.usersService.findByEmail(email);
+        const tenant = await this.tenantService.findById(tenantId);
+        this.securityService.check(request, Action.Read, subject(SubjectEnum.TENANT, tenant));
+        let roles = await this.tenantService.getMemberRoles(tenantId, user);
+        return {
+            roles: roles
+        };
+    }
+
 }
