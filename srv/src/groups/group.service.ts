@@ -48,6 +48,12 @@ export class GroupService {
         return group;
     }
 
+    async findByTenantId(tenantId: string): Promise<Group[]> {
+        return await this.groupRepository.findBy({
+            tenantId: tenantId
+        });
+    }
+
     async findByNameAndTenantId(name: string, tenantId: string): Promise<Group> {
         let group: Group = await this.groupRepository.findOne({
             where: {
@@ -218,4 +224,6 @@ export class GroupService {
             throw new BadRequestException("group already exists!");
         }
     }
+
+
 }

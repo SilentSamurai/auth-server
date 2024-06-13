@@ -66,6 +66,7 @@ export class VHAsyncLoadEvent {
 })
 export class ValueHelpInputComponent implements OnInit, AfterViewInit {
 
+    @Input() required = false;
     @Input() name: string = '';
     @Input() multi: string | boolean = false;
     @Input() labelField!: string;

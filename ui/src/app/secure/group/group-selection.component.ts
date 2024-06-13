@@ -7,10 +7,11 @@ import {TenantService} from "../../_services/tenant.service";
 import {TableAsyncLoadEvent} from "../../component/table/app-table.component";
 import {MessageService} from "primeng/api";
 import {AuthDefaultService} from "../../_services/auth.default.service";
+import {GroupService} from "../../_services/group.service";
 
 
 @Component({
-    selector: 'app-role-list',
+    selector: 'app-group-sel',
     template: `
         <nav-bar></nav-bar>
         <div class="container-fluid">
@@ -21,11 +22,12 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
                 <div class="col-4">
                     <form class="form-group g-3">
 
-                        <label class="col-3 col-form-label" for="Tenant">
+                        <label class="col-3 col-form-label control-label-required" for="Tenant">
                             Tenant
                         </label>
 
                         <app-value-help-input
+                            [required]="true"
                             (dataProvider)="onTenantLoad($event)"
                             [(selection)]="selectedTenant"
                             class="col-3"
@@ -49,17 +51,17 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
 
                         </app-value-help-input>
 
-                        <label class="col-3 col-form-label" for="Email">
-                            Email
+                        <label class="col-3 col-form-label" for="Group">
+                            Group
                         </label>
                         <app-value-help-input
-                            (dataProvider)="userDataProvider($event)"
-                            [(selection)]="selectedUser"
+                            (dataProvider)="groupDataProvider($event)"
+                            [(selection)]="selectedGroup"
                             class="col-3"
-                            idField="email"
-                            labelField="email"
+                            idField="group"
+                            labelField="group"
                             multi="false"
-                            name="Email">
+                            name="Group">
 
                             <app-fb-col name="email" label="Email"></app-fb-col>
                             <app-fb-col name="name" label="Name"></app-fb-col>
@@ -93,18 +95,19 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
     styles: [`
     `]
 })
-export class RoleSelectionComponent implements OnInit {
+export class GroupSelectionComponent implements OnInit {
 
     tenantId: any | null = null;
     email: string | null = '';
     roles = [];
-    users: any[] = [];
+    groups: any[] = [];
     tenants: [] = [];
     selectedTenant: any[] = [];
-    selectedUser: any[] = [];
+    selectedGroup: any[] = [];
 
     constructor(private userService: UserService,
                 private tenantService: TenantService,
+                private groupService: GroupService,
                 private route: ActivatedRoute,
                 private router: Router,
                 private authDefaultService: AuthDefaultService,
@@ -113,40 +116,34 @@ export class RoleSelectionComponent implements OnInit {
     }
 
     async ngOnInit(): Promise<void> {
-        this.authDefaultService.setTitle("Manage Role Assignments");
+        this.authDefaultService.setTitle("Manage Groups");
     }
 
     async continue() {
         console.log({
-            'users': this.selectedUser,
+            'group': this.selectedGroup,
             'tenant': this.selectedTenant
         });
-        if (this.selectedTenant.length > 0 && this.selectedUser.length > 0) {
-            const isMem = await this.isMember();
-            if (isMem) {
-                await this.router.navigate([
-                    '/RL02',
-                    this.selectedTenant[0].id, this.selectedUser[0].email])
+        if (this.selectedTenant.length > 0) {
+            if (this.selectedGroup.length > 0) {
+                await this.router.navigate(['/GR01', this.selectedTenant[0].id, this.selectedGroup[0].id]
+                )
+            } else {
+                await this.router.navigate(['/GR01', this.selectedTenant[0].id])
             }
+        } else {
+            this.messageService.add({severity: 'error', summary: 'Error', detail: "Tenant is required"})
         }
+
     }
 
-    async isMember() {
-        const email = this.selectedUser[0].email;
-        const tenantId = this.selectedTenant[0].id;
-        try {
-            await this.tenantService.getMemberDetails(tenantId, email);
-        } catch (exception: any) {
-            this.messageService.add({severity: 'error', summary: 'Failed', detail: exception.error.message});
-            return false;
-        }
-        return true;
-    }
-
-    async userDataProvider(event: TableAsyncLoadEvent) {
+    async groupDataProvider(event: TableAsyncLoadEvent) {
         if (event.pageNo == 0) {
-            this.users = await lastValueFrom(this.userService.getAllUsers());
-            event.update(this.users);
+            if (this.selectedTenant.length > 0) {
+                this.tenantId = this.selectedTenant[0].id;
+            }
+            this.groups = await this.groupService.getAllTenantGroups(this.tenantId);
+            event.update(this.groups);
         }
     }
 

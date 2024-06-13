@@ -14,12 +14,13 @@ import {NgbCollapseModule, NgbDropdown, NgbModule} from '@ng-bootstrap/ng-bootst
 import {TableModule} from 'primeng/table';
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {ToastModule} from "primeng/toast";
-import {MessageService} from "primeng/api";
+import {ConfirmationService, MessageService} from "primeng/api";
 import {RouterModule} from "@angular/router";
 import {SessionConfirmationComponent} from "./session/session-confirmation.component";
-import {AdminModule} from "./secure/admin.module";
+import {SecureModule} from "./secure/secure.module";
 import {CardModule} from "primeng/card";
 import {ComponentModule} from "./component/component.module";
+import {ConfirmDialogModule} from "primeng/confirmdialog";
 
 @NgModule({
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -39,14 +40,15 @@ import {ComponentModule} from "./component/component.module";
         NgbModule,
         NgbCollapseModule,
         TableModule,
-        AdminModule,
+        SecureModule,
         BrowserAnimationsModule,
         ReactiveFormsModule,
         ToastModule,
         CardModule,
-        ComponentModule
+        ComponentModule,
+        ConfirmDialogModule
     ],
-    providers: [authInterceptorProviders, NgbDropdown, MessageService],
+    providers: [authInterceptorProviders, NgbDropdown, MessageService, ConfirmationService],
     exports: [],
     bootstrap: [AppComponent]
 })

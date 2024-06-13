@@ -4,8 +4,9 @@ import {
     Controller,
     Delete,
     Get,
-    Param, Patch,
-    Post, Put,
+    Param,
+    Patch,
+    Post,
     Request,
     UseInterceptors
 } from "@nestjs/common";
@@ -13,9 +14,9 @@ import {ConfigService} from "../config/config.service";
 import {ValidationPipe} from "../validation/validation.pipe";
 import {ValidationSchema} from "../validation/validation.schema";
 import {TenantService} from "../tenants/tenant.service";
-import {GroupService} from "./group.service";
+import {GroupService} from "../groups/group.service";
 
-@Controller('api/group')
+@Controller('/api')
 @UseInterceptors(ClassSerializerInterceptor)
 export class GroupController {
 
@@ -26,7 +27,16 @@ export class GroupController {
     ) {
     }
 
-    @Post('/create')
+    @Get('/tenant/:tenantId/groups')
+    async getGroupsInTenant(
+        @Request() request,
+        @Param('tenantId') tenantId: string,
+    ): Promise<any> {
+        let tenant = await this.tenantService.findById(tenantId);
+        return await this.groupService.findByTenantId(tenant.id);
+    }
+
+    @Post('/group/create')
     async createGroup(
         @Request() request,
         @Body(new ValidationPipe(ValidationSchema.CreateGroupSchema)) body: { name: string, tenantId: string }
@@ -36,7 +46,7 @@ export class GroupController {
         return group;
     }
 
-    @Get('/:groupId')
+    @Get('/group/:groupId')
     async getGroup(
         @Request() request,
         @Param('groupId') groupId: string,
@@ -52,7 +62,7 @@ export class GroupController {
     }
 
 
-    @Patch('/:groupId/update')
+    @Patch('/group/:groupId/update')
     async updateGroup(
         @Request() request,
         @Param('groupId') groupId: string,
@@ -63,7 +73,7 @@ export class GroupController {
         return group;
     }
 
-    @Delete('/:groupId/delete')
+    @Delete('/group/:groupId/delete')
     async deleteGroup(
         @Request() request,
         @Param('groupId') groupId: string
@@ -74,7 +84,7 @@ export class GroupController {
     }
 
 
-    @Post('/:groupId/add-roles')
+    @Post('/group/:groupId/add-roles')
     async addRole(
         @Request() request,
         @Param('groupId') groupId: string,
@@ -89,7 +99,7 @@ export class GroupController {
         };
     }
 
-    @Post('/:groupId/remove-roles')
+    @Post('/group/:groupId/remove-roles')
     async removeRole(
         @Request() request,
         @Param('groupId') groupId: string,
@@ -104,7 +114,7 @@ export class GroupController {
         };
     }
 
-    @Post('/:groupId/add-users')
+    @Post('/group/:groupId/add-users')
     async addUsers(
         @Request() request,
         @Param('groupId') groupId: string,
@@ -119,7 +129,7 @@ export class GroupController {
         };
     }
 
-    @Post('/:groupId/remove-users')
+    @Post('/group/:groupId/remove-users')
     async removeUsers(
         @Request() request,
         @Param('groupId') groupId: string,

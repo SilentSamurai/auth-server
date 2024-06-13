@@ -29,6 +29,12 @@ import {RoleListComponent} from "./roles/role-list.component";
 import {RoleSelectionComponent} from "./roles/role-selection.component";
 import {InputTextModule} from "primeng/inputtext";
 import {MessagesModule} from "primeng/messages";
+import {GroupSelectionComponent} from "./group/group-selection.component";
+import {GroupListComponent} from "./group/group-list.component";
+import {CreateGroupComponent} from "./group/create-group.component";
+import {GroupObjectComponent} from "./group/group-object.component";
+import {ConfirmDialogModule} from "primeng/confirmdialog";
+import {ConfirmationService, MessageService} from "primeng/api";
 
 @NgModule({
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -50,7 +56,11 @@ import {MessagesModule} from "primeng/messages";
         RemoveMemberComponent,
         RemoveRoleComponent,
         RoleListComponent,
-        RoleSelectionComponent
+        RoleSelectionComponent,
+        GroupSelectionComponent,
+        GroupListComponent,
+        CreateGroupComponent,
+        GroupObjectComponent
     ],
     imports: [
         TableModule,
@@ -66,12 +76,13 @@ import {MessagesModule} from "primeng/messages";
         NgbDropdownModule,
         ComponentModule,
         InputTextModule,
-        MessagesModule
+        MessagesModule,
+        ConfirmDialogModule
     ],
-    providers: [],
+    providers: [ConfirmationService, MessageService],
     exports: [
         AdminNavBarComponent
     ]
 })
-export class AdminModule {
+export class SecureModule {
 }

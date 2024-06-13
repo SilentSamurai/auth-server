@@ -78,6 +78,12 @@ export class HomeComponent implements OnInit {
             icon: "fa-magic",
             link: ['/RL02']
         },
+        {
+            title: "GP01",
+            subtitle: "Manage Groups",
+            icon: "fa-group",
+            link: ['/GP01']
+        },
     ];
 
     constructor(private userService: UserService,

@@ -9,7 +9,7 @@ const API_URL = '/api';
 @Injectable({
     providedIn: 'root'
 })
-export class UserService {
+export class RoleService {
     constructor(private http: HttpClient, private tokenService: TokenStorageService) {
     }
 

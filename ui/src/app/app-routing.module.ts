@@ -12,6 +12,9 @@ import {HomeComponent} from './secure/home.component';
 import {AdminAuthGuard} from "./shared/admin-auth-guard.service";
 import {RoleListComponent} from "./secure/roles/role-list.component";
 import {RoleSelectionComponent} from "./secure/roles/role-selection.component";
+import {GroupListComponent} from "./secure/group/group-list.component";
+import {GroupSelectionComponent} from "./secure/group/group-selection.component";
+import {GroupObjectComponent} from "./secure/group/group-object.component";
 
 const routes: Routes = [
     {path: 'session-confirm', component: SessionConfirmationComponent},
@@ -26,6 +29,9 @@ const routes: Routes = [
             {path: 'tenants', component: TenantListComponent, canActivate: []},
             {path: 'RL02', component: RoleSelectionComponent, canActivate: []},
             {path: 'RL02/:tenantId/:email', component: RoleListComponent, canActivate: []},
+            {path: 'GP01', component: GroupListComponent, canActivate: []},
+            {path: 'GP02', component: GroupSelectionComponent, canActivate: []},
+            {path: 'GP02/:groupId', component: GroupObjectComponent, canActivate: []},
             {path: 'tenant/:tenantId', component: ViewTenantComponent, canActivate: []},
             {path: 'user/:email', component: UserDetailsComponent, canActivate: []},
         ]

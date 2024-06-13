@@ -17,6 +17,7 @@ import {User} from "../users/user.entity";
 import {Tenant} from "../tenants/tenant.entity";
 import {Role} from "../roles/role.entity";
 import {TenantMember} from "../tenants/tenant.members.entity";
+import {Group} from "../groups/group.entity";
 
 @Module(
     {
@@ -28,7 +29,7 @@ import {TenantMember} from "../tenants/tenant.members.entity";
                 TenantModule,
                 UsersModule,
                 RolesModule,
-                TypeOrmModule.forFeature([User, Tenant, Role, TenantMember])
+                TypeOrmModule.forFeature([User, Tenant, Role, TenantMember, Group])
             ],
         controllers: [
             UsersController,

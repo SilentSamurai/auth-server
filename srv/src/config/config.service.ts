@@ -11,7 +11,7 @@ export class ConfigService {
     }
 
     static config(): any {
-        const envFile = process.env.ENV_FILE;
+        const envFile = process.env.ENV_FILE || './envs/.env.development';
         let envPath = path.resolve(process.cwd(), envFile);
         if (!fs.existsSync(envPath)) {
             console.log("Environment does not exist", envPath);

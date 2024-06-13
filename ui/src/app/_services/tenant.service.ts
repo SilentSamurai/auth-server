@@ -52,8 +52,8 @@ export class TenantService {
         return lastValueFrom(this.http.get(`${API_URL}/tenant/${tenantId}/credentials`, this.getHttpOptions()))
     }
 
-    async getMembers(tenantId: string) {
-        return lastValueFrom(this.http.get(`${API_URL}/tenant/${tenantId}/members`, this.getHttpOptions()))
+    async getMembers(tenantId: string): Promise<any[]> {
+        return await lastValueFrom(this.http.get(`${API_URL}/tenant/${tenantId}/members`, this.getHttpOptions())) as Promise<any[]>
     }
 
     async addMember(email: string, tenantId: string) {
@@ -83,7 +83,13 @@ export class TenantService {
         return lastValueFrom(this.http.get(`${API_URL}/tenant/${tenantId}/member/${email}`, this.getHttpOptions()))
     }
 
-    async queryTenant(query: any): Promise<any> {
-        return lastValueFrom(this.http.post(`${API_URL}/search/Tenants`, query, this.getHttpOptions()));
+    async getTenantRoles(tenantId: string): Promise<any> {
+        return lastValueFrom(this.http.get(`${API_URL}/tenant/${tenantId}/roles`, this.getHttpOptions()))
     }
+
+    async queryTenant(query: any): Promise<any[]> {
+        return await lastValueFrom(this.http.post(`${API_URL}/search/Tenants`, query, this.getHttpOptions())) as any;
+    }
+
+
 }

@@ -1,7 +1,6 @@
 import {TestAppFixture} from "./test-app.fixture";
 import {TokenFixture} from "./token.fixture";
 import {HelperFixture} from "./helper.fixture";
-import {he} from "date-fns/locale";
 
 describe('e2e Groups Check', () => {
     let app: TestAppFixture;
@@ -24,11 +23,11 @@ describe('e2e Groups Check', () => {
         refreshToken = response.refreshToken;
         accessToken = response.accessToken;
         helper = new HelperFixture(app, accessToken);
-        tenant = await helper.createTenant("tenant-1", "test-web.com");
-        role = await helper.createRole("ABC_ROLE", tenant.id);
-        role = await helper.createRole("DEF_ROLE", tenant.id);
-        await helper.addMembers("legolas@mail.com", tenant.id);
-        await helper.addMembers("frodo@mail.com", tenant.id);
+        tenant = await helper.tenant.createTenant("tenant-1", "test-web.com");
+        role = await helper.role.createRole("ABC_ROLE", tenant.id);
+        role = await helper.role.createRole("DEF_ROLE", tenant.id);
+        await helper.tenant.addMembers("legolas@mail.com", tenant.id);
+        await helper.tenant.addMembers("frodo@mail.com", tenant.id);
     });
 
     afterAll(async () => {
@@ -36,149 +35,73 @@ describe('e2e Groups Check', () => {
     });
 
     it(`/Create Group for tenant`, async () => {
-        const response = await app.getHttpServer()
-            .post('/api/group/create')
-            .send({
-                "name": "group-1",
-                "tenantId": tenant.id
-            })
-            .set('Authorization', `Bearer ${accessToken}`)
-            .set('Accept', 'application/json');
+        group = await helper.group.createGroup("group-1", tenant.id);
+    });
 
-        console.log("Response: ", response.body);
+    it(`/Get All Groups for tenant`, async () => {
+        let groups = await helper.group.getAllTenantGroups(tenant.id);
+        expect(groups).toHaveLength(1);
+        expect(groups[0].name).toEqual("group-1");
+        expect(groups[0].tenantId).toEqual(tenant.id);
+    });
 
-        expect(response.status).toEqual(201);
-        expect(response.body.id).toBeDefined();
-        expect(response.body.name).toEqual("group-1");
-        expect(response.body.tenantId).toEqual(tenant.id);
-        group = response.body;
+    it(`/Get only current tenant groups`, async () => {
+        let newTenant = await helper.tenant.createTenant("tenant-2", "dummy.tenant.com")
+        let newGroup = await helper.group.createGroup("group-2", newTenant.id);
+
+        let groups = await helper.group.getAllTenantGroups(tenant.id);
+        expect(groups).toHaveLength(1);
+        expect(groups[0].name).toEqual("group-1");
+        expect(groups[0].tenantId).toEqual(tenant.id);
     });
 
     it(`Add Roles to Group`, async () => {
-        const response = await app.getHttpServer()
-            .post(`/api/group/${group.id}/add-roles`)
-            .send({
-                "roles": ["ABC_ROLE", "DEF_ROLE"]
-            })
-            .set('Authorization', `Bearer ${accessToken}`)
-            .set('Accept', 'application/json');
+        let response = await helper.group.addRole(group.id, ["ABC_ROLE", "DEF_ROLE"]);
 
-        console.log("Response: ", response.body);
-
-        expect(response.status).toEqual(201);
-        expect(response.body.group).toBeDefined();
-        expect(response.body.group.name).toEqual("group-1");
-        expect(response.body.group.tenantId).toEqual(tenant.id);
-        expect(response.body.roles).toBeDefined();
-        expect(response.body.roles).toHaveLength(2);
-        for (let role of response.body.roles) {
+        expect(response.group.name).toEqual("group-1");
+        expect(response.group.tenantId).toEqual(tenant.id);
+        expect(response.roles).toBeDefined();
+        expect(response.roles).toHaveLength(2);
+        for (let role of response.roles) {
             expect(role.name).toMatch(/ABC_ROLE|DEF_ROLE/);
         }
-
     });
 
     it(`Add User to Group`, async () => {
-        const response = await app.getHttpServer()
-            .post(`/api/group/${group.id}/add-users`)
-            .send({
-                "users": ["legolas@mail.com"]
-            })
-            .set('Authorization', `Bearer ${accessToken}`)
-            .set('Accept', 'application/json');
-
-        console.log("Response: ", response.body);
-
-        expect(response.status).toEqual(201);
-        expect(response.body.group).toBeDefined();
-        expect(response.body.group.name).toEqual("group-1");
-        expect(response.body.group.tenantId).toEqual(tenant.id);
-        expect(response.body.users).toBeDefined();
-        expect(response.body.users).toHaveLength(1);
-        expect(response.body.users[0].email).toEqual("legolas@mail.com");
-
-        let roles = await helper.getMemberRoles("legolas@mail.com", tenant.id);
-
+        await helper.group.addUser(group.id, ["legolas@mail.com"])
+        let roles = await helper.tenant.getMemberRoles("legolas@mail.com", tenant.id);
         for (let role of roles) {
             expect(role.name).toMatch(/ABC_ROLE|DEF_ROLE/);
         }
-
     });
 
     it(`Remove User from Group`, async () => {
-        const response = await app.getHttpServer()
-            .post(`/api/group/${group.id}/remove-users`)
-            .send({
-                "users": ["legolas@mail.com"]
-            })
-            .set('Authorization', `Bearer ${accessToken}`)
-            .set('Accept', 'application/json');
-
-        console.log("Response: ", response.body);
-
-        expect(response.status).toEqual(201);
-        expect(response.body.group).toBeDefined();
-        expect(response.body.group.name).toEqual("group-1");
-        expect(response.body.group.tenantId).toEqual(tenant.id);
-        expect(response.body.users).toBeDefined();
-        expect(response.body.users).toHaveLength(0);
-
-        let roles = await helper.getMemberRoles("legolas@mail.com", tenant.id);
-
+        await helper.group.removeUser(group.id, ["legolas@mail.com"]);
+        let roles = await helper.tenant.getMemberRoles("legolas@mail.com", tenant.id);
         for (let role of roles) {
             expect(role.name).not.toMatch(/ABC_ROLE|DEF_ROLE/);
         }
-
     });
 
     it(`Add User to Group`, async () => {
-        const response = await app.getHttpServer()
-            .post(`/api/group/${group.id}/add-users`)
-            .send({
-                "users": ["frodo@mail.com"]
-            })
-            .set('Authorization', `Bearer ${accessToken}`)
-            .set('Accept', 'application/json');
-
-        console.log("Response: ", response.body);
-
-        expect(response.status).toEqual(201);
-        expect(response.body.group).toBeDefined();
-        expect(response.body.group.name).toEqual("group-1");
-        expect(response.body.group.tenantId).toEqual(tenant.id);
-        expect(response.body.users).toBeDefined();
-        expect(response.body.users).toHaveLength(1);
-        expect(response.body.users[0].email).toEqual("frodo@mail.com");
-
-        let roles = await helper.getMemberRoles("frodo@mail.com", tenant.id);
-
+        await helper.group.addUser(group.id, ["frodo@mail.com"])
+        let roles = await helper.tenant.getMemberRoles("frodo@mail.com", tenant.id);
         for (let role of roles) {
             expect(role.name).toMatch(/ABC_ROLE|DEF_ROLE/);
         }
-
     });
 
     it(`Remove Roles from Group`, async () => {
-        const response = await app.getHttpServer()
-            .post(`/api/group/${group.id}/remove-roles`)
-            .send({
-                "roles": ["ABC_ROLE"]
-            })
-            .set('Authorization', `Bearer ${accessToken}`)
-            .set('Accept', 'application/json');
-
-        console.log("Response: ", response.body);
-
-        expect(response.status).toEqual(201);
-        expect(response.body.group).toBeDefined();
-        expect(response.body.group.name).toEqual("group-1");
-        expect(response.body.group.tenantId).toEqual(tenant.id);
-        expect(response.body.roles).toBeDefined();
-        expect(response.body.roles).toHaveLength(1);
-        for (let role of response.body.roles) {
+        let response = await helper.group.removeRoles(group.id, ["ABC_ROLE"]);
+        expect(response.group.name).toEqual("group-1");
+        expect(response.group.tenantId).toEqual(tenant.id);
+        expect(response.roles).toBeDefined();
+        expect(response.roles).toHaveLength(1);
+        for (let role of response.roles) {
             expect(role.name).toMatch(/DEF_ROLE/);
         }
 
-        let roles = await helper.getMemberRoles("frodo@mail.com", tenant.id);
+        let roles = await helper.tenant.getMemberRoles("frodo@mail.com", tenant.id);
 
         for (let role of roles) {
             expect(role.name).toMatch(/DEF_ROLE/);
@@ -187,20 +110,10 @@ describe('e2e Groups Check', () => {
     });
 
     it(`/Get Group`, async () => {
-        const response = await app.getHttpServer()
-            .get(`/api/group/${group.id}`)
-            .set('Authorization', `Bearer ${accessToken}`)
-            .set('Accept', 'application/json');
+        let response = await helper.group.getGroup(group.id);
 
-        console.log("Response: ", response.body);
-
-        expect(response.status).toEqual(200);
-        expect(response.body.group).toBeDefined();
-        expect(response.body.group.id).toBeDefined();
-        expect(response.body.group.name).toEqual("group-1");
-        expect(response.body.group.tenantId).toEqual(tenant.id);
-        expect(response.body.users).toBeDefined();
-        expect(response.body.roles).toBeDefined();
+        expect(response.group.name).toEqual("group-1");
+        expect(response.group.tenantId).toEqual(tenant.id);
     });
 
     it(`/Update Group Name`, async () => {

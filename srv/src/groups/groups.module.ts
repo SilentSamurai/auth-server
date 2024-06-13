@@ -7,7 +7,7 @@ import {Group} from "./group.entity";
 import {GroupUser} from "./group.users.entity";
 import {GroupRole} from "./group.roles.entity";
 import {GroupService} from "./group.service";
-import {GroupController} from "./group.controller";
+import {GroupController} from "../controllers/group.controller";
 import {RolesModule} from "../roles/roles.module";
 
 @Module(

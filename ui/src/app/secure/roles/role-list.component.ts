@@ -49,7 +49,7 @@ export class RoleListComponent implements OnInit {
         // this.email = params.get('email') as string;
         // this.tenantId = params.get('tenantId') as string;
         if (!this.email || !this.tenantId) {
-            await this.router.navigate(['/RL02-SEL']);
+            await this.router.navigate(['/RL02']);
         }
 
         this.tenant = await this.tenantService.getTenantDetails(this.tenantId);

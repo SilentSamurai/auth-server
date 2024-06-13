@@ -20,6 +20,7 @@ import {subject} from "@casl/ability";
 import {SecurityService} from "../roles/security.service";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
 import {escapeRegExp} from "typeorm/util/escapeRegExp";
+import {Group} from "../groups/group.entity";
 
 @Controller('api/search')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -32,13 +33,15 @@ export class GenericSearchController {
         @InjectRepository(Tenant) private tenantRepo: Repository<Tenant>,
         @InjectRepository(TenantMember) private memberRepo: Repository<TenantMember>,
         @InjectRepository(Role) private roleRepository: Repository<Role>,
+        @InjectRepository(Group) private groupRepository: Repository<Group>,
         private readonly securityService: SecurityService,
     ) {
         this.repos = {
             "Users": usersRepo,
             "Tenants": tenantRepo,
             "TenantMembers": tenantRepo,
-            "Roles": roleRepository
+            "Roles": roleRepository,
+            "Groups": groupRepository
         };
     }
 
