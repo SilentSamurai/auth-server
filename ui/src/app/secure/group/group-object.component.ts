@@ -7,17 +7,19 @@ import {TokenStorageService} from "../../_services/token-storage.service";
 import {GroupService} from "../../_services/group.service";
 import {AuthDefaultService} from "../../_services/auth.default.service";
 import {TableAsyncLoadEvent} from "../../component/table/app-table.component";
+import {UpdateGroupComponent} from "./update-group.component";
 
 @Component({
     selector: 'app-group-object',
     template: `
         <nav-bar></nav-bar>
         <div class="container-fluid mb-5" *ngIf="!loading">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class=" my-2 mb-4">
+            <div class="row card">
+                <div class="col card-body">
+                    <div class="row">
+                        <div class="col">
+
+                        <div class=" my-2 mb-4">
                                 <div class="p-disabled">Name</div>
                                 <h4>{{ group.name }}</h4>
                             </div>
@@ -29,38 +31,38 @@ import {TableAsyncLoadEvent} from "../../component/table/app-table.component";
                                 <div class="p-disabled">Tenant Name</div>
                                 <div>{{ group.tenant.name }}</div>
                             </div>
+                        </div>
+                        <div class="col">
                             <div class="d-flex justify-content-between total font-weight-bold mt-4">
                                 <button (click)="onUpdateGroup()"
                                         class="btn btn-primary btn-sm">
                                     Update
                                 </button>
                             </div>
-
                         </div>
-
-                        <ul class="nav nav-tabs" id="myTab" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link active"
-                                        id="home-tab" data-bs-toggle="tab"
-                                        data-bs-target="#home"
-                                        type="button" role="tab"
-                                        aria-controls="home" aria-selected="true">
-                                    Roles
-                                </button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link"
-                                        id="profile-tab"
-                                        data-bs-toggle="tab"
-                                        data-bs-target="#profile" type="button" role="tab"
-                                        aria-controls="profile" aria-selected="false">
-                                    Users
-                                </button>
-                            </li>
-                        </ul>
                     </div>
-
                 </div>
+
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active"
+                                id="home-tab" data-bs-toggle="tab"
+                                data-bs-target="#home"
+                                type="button" role="tab"
+                                aria-controls="home" aria-selected="true">
+                            Roles
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link"
+                                id="profile-tab"
+                                data-bs-toggle="tab"
+                                data-bs-target="#profile" type="button" role="tab"
+                                aria-controls="profile" aria-selected="false">
+                            Users
+                        </button>
+                    </li>
+                </ul>
             </div>
             <div class="row">
                 <div class="col-md-12">
@@ -131,12 +133,12 @@ import {TableAsyncLoadEvent} from "../../component/table/app-table.component";
                                                 idField="id"
                                                 labelField="name"
                                                 multi="true"
-                                                name="Roles">
+                                                name="Users">
 
-                                                <app-vh-col label="Name" name="name"></app-vh-col>
+                                                <app-vh-col label="Email" name="email"></app-vh-col>
 
                                                 <ng-template #vh_body let-row>
-                                                    <td>{{ row.name }}</td>
+                                                    <td>{{ row.email }}</td>
                                                 </ng-template>
 
                                             </app-value-help-input>
@@ -229,8 +231,12 @@ export class GroupObjectComponent implements OnInit {
         this.loading = false;
     }
 
-    onUpdateGroup() {
-
+    async onUpdateGroup() {
+        const modalRef = this.modalService.open(UpdateGroupComponent);
+        modalRef.componentInstance.groupId = this.group_id;
+        const user = await modalRef.result;
+        console.log(user);
+        this.ngOnInit();
     }
 
 

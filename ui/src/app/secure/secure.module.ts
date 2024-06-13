@@ -35,6 +35,7 @@ import {CreateGroupComponent} from "./group/create-group.component";
 import {GroupObjectComponent} from "./group/group-object.component";
 import {ConfirmDialogModule} from "primeng/confirmdialog";
 import {ConfirmationService, MessageService} from "primeng/api";
+import {UpdateGroupComponent} from "./group/update-group.component";
 
 @NgModule({
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -60,7 +61,8 @@ import {ConfirmationService, MessageService} from "primeng/api";
         GroupSelectionComponent,
         GroupListComponent,
         CreateGroupComponent,
-        GroupObjectComponent
+        GroupObjectComponent,
+        UpdateGroupComponent
     ],
     imports: [
         TableModule,

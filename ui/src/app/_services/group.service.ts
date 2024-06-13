@@ -59,9 +59,15 @@ export class GroupService {
         }, this.getHttpOptions())) as any;
     }
 
-    async removeUser(groupId: any, emails: any[]) {
+    async removeUser(groupId: string, emails: any[]) {
         return await lastValueFrom(this.http.post(`${API_URL}/group/${groupId}/remove-users`, {
             users: emails
+        }, this.getHttpOptions())) as any;
+    }
+
+    async updateGroup(groupId: string, name: string) {
+        return await lastValueFrom(this.http.patch(`${API_URL}/group/${groupId}/update`, {
+            name: name
         }, this.getHttpOptions())) as any;
     }
 }

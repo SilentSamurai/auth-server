@@ -220,26 +220,26 @@ const RefreshTokenSchema = yup.object().shape(
 
 const CreateGroupSchema = yup.object().shape(
     {
-        name: yup.string().required('Name is required').max(20),
+        name: yup.string().required('Name is required').max(128),
         tenantId: yup.string().required('tenantId is required').max(100),
     });
 
 const UpdateGroupSchema = yup.object().shape(
     {
-        name: yup.string().required('Name is required').max(20)
+        name: yup.string().required('Name is required').max(128)
     });
 
 const UpdateGroupRole = yup.object().shape(
     {
         roles: yup.array().of(
-            yup.string().max(20)
+            yup.string().max(128)
         )
     });
 
 const UpdateGroupUser = yup.object().shape(
     {
         users: yup.array().of(
-            yup.string().max(20)
+            yup.string().max(128)
         )
     });
 
