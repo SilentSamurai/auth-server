@@ -82,6 +82,11 @@ export class GroupService {
         let group: Group = await this.findById(id);
         let roles = await this.findGroupRoles(group);
         await this.removeRoles(group, roles.map(r => r.name));
+        let users = await this.findGroupUsers(group);
+        await this.removeUser(group, users.map(u => u.email));
+
+        await this.groupRepository.remove(group);
+
         return group;
     }
 

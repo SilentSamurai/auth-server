@@ -70,4 +70,8 @@ export class GroupService {
             name: name
         }, this.getHttpOptions())) as any;
     }
+
+    async deleteGroup(groupId: any) {
+        return await lastValueFrom(this.http.delete(`${API_URL}/group/${groupId}/delete`, this.getHttpOptions())) as any;
+    }
 }

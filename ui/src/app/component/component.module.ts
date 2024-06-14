@@ -17,6 +17,9 @@ import {ValueHelpColumnComponent} from "./value-help-input/value-help-column.com
 import {FilterBarColumnComponent, FilterBarComponent} from "./filter-bar/filter-bar.component";
 import {AppTableComponent, TableColumnComponent} from "./table/app-table.component";
 import {TileGroupsComponent} from "./tile/tile-groups.component";
+import {ObjectPageComponent} from "./object-page/object-page.component";
+import {ObjectPageHeaderComponent} from "./object-page/object-page-header.component";
+import {ObjectPageSectionComponent} from "./object-page/object-page-section.component";
 
 @NgModule({
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -29,7 +32,10 @@ import {TileGroupsComponent} from "./tile/tile-groups.component";
         FilterBarColumnComponent,
         AppTableComponent,
         TableColumnComponent,
-        TileGroupsComponent
+        TileGroupsComponent,
+        ObjectPageComponent,
+        ObjectPageHeaderComponent,
+        ObjectPageSectionComponent
     ],
     imports: [
         TableModule,
@@ -55,7 +61,10 @@ import {TileGroupsComponent} from "./tile/tile-groups.component";
         AppTableComponent,
         TableColumnComponent,
         FilterBarComponent,
-        TileGroupsComponent
+        TileGroupsComponent,
+        ObjectPageComponent,
+        ObjectPageHeaderComponent,
+        ObjectPageSectionComponent
     ]
 })
 export class ComponentModule {

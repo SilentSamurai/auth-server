@@ -41,9 +41,7 @@ export class HomeComponent implements OnInit {
             command: async () => {
                 const tenant_id = this.user.tenant.id;
                 await this.router.navigate(["/tenant", tenant_id], {
-                    queryParams: {
-                        nav: "MEM"
-                    }
+                    fragment: "MEMBERS"
                 });
             }
         },
@@ -54,17 +52,15 @@ export class HomeComponent implements OnInit {
             command: async () => {
                 const tenant_id = this.user.tenant.id;
                 await this.router.navigate(["/tenant", tenant_id], {
-                    queryParams: {
-                        nav: "ROLE"
-                    }
+                    fragment: "ROLES"
                 });
             }
         },
         {
-            title: "Tenants",
+            title: "TN01",
             subtitle: "Manage All Tenants",
             icon: "fa-bars",
-            link: ['/tenants']
+            link: ['/TN01']
         },
         {
             title: "Users",

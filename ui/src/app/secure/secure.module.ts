@@ -10,7 +10,7 @@ import {PanelMenuModule} from "primeng/panelmenu";
 import {HomeComponent} from './home.component';
 import {AdminNavBarComponent} from "./nav-bar.component";
 import {NgbCollapseModule, NgbDropdownModule, NgbNavModule} from "@ng-bootstrap/ng-bootstrap";
-import {TenantListComponent} from "./tenants/tenant-list.component";
+import {TN01Component} from "./tenants/TN01.component";
 import {UpdateTenantComponent} from "./tenants/update-tenant.component";
 import {DeleteTenantComponent} from "./tenants/delete-tenant.component";
 import {CreateTenantComponent} from "./tenants/create-tenant.component";
@@ -36,13 +36,14 @@ import {GroupObjectComponent} from "./group/group-object.component";
 import {ConfirmDialogModule} from "primeng/confirmdialog";
 import {ConfirmationService, MessageService} from "primeng/api";
 import {UpdateGroupComponent} from "./group/update-group.component";
+import {RoleObjectComponent} from "./roles/role-object.component";
 
 @NgModule({
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
     declarations: [
         HomeComponent,
         AdminNavBarComponent,
-        TenantListComponent,
+        TN01Component,
         UpdateTenantComponent,
         DeleteTenantComponent,
         CreateTenantComponent,
@@ -62,7 +63,8 @@ import {UpdateGroupComponent} from "./group/update-group.component";
         GroupListComponent,
         CreateGroupComponent,
         GroupObjectComponent,
-        UpdateGroupComponent
+        UpdateGroupComponent,
+        RoleObjectComponent
     ],
     imports: [
         TableModule,

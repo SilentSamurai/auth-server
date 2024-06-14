@@ -25,4 +25,20 @@ export class RoleService {
     getAllRoles(): Observable<any> {
         return this.http.get(`${API_URL}/roles`, this.getHttpOptions());
     }
+
+    async getRoleDetails(tenantId: string, roleName: string): Promise<any> {
+
+    }
+
+    async deleteRole(tenantId: string, roleName: string): Promise<any> {
+
+    }
+
+    async removeUser(tenantId: string, roleName: string, users: any[]) {
+
+    }
+
+    async addUser(tenantId: string, roleName: string, users: any[]) {
+
+    }
 }
