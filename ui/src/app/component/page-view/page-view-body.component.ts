@@ -1,24 +1,22 @@
-import {Component, Input, OnInit, TemplateRef, ViewChild} from '@angular/core';
+import {Component, OnInit, TemplateRef, ViewChild} from '@angular/core';
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {ConfirmationService, MessageService} from "primeng/api";
 
 @Component({
-    selector: 'app-object-page-section',
+    selector: 'app-page-view-body',
     template: `
-        <ng-template #OPS>
+        <ng-template #PVB>
             <ng-content></ng-content>
         </ng-template>
     `,
     styles: [''],
     providers: []
 })
-export class ObjectPageSectionComponent implements OnInit {
-
-    @Input() name: string = "";
+export class PageViewBodyComponent implements OnInit {
 
     loading = true;
 
-    @ViewChild('OPS', {static: true}) template!: TemplateRef<any>;
+    @ViewChild('PVB', {static: true}) template!: TemplateRef<any>;
 
     constructor(
         private messageService: MessageService,

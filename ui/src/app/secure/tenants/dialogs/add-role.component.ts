@@ -40,7 +40,7 @@ import {TenantService} from "../../../_services/tenant.service";
                 </div>
 
 
-                <button class="btn btn-primary" type="submit">Add Role</button>
+                <button class="btn btn-primary" type="submit">Create</button>
             </form>
         </div>
     `,

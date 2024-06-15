@@ -17,9 +17,9 @@ import {Filter, FilterBarColumnComponent} from "../filter-bar/filter-bar.compone
                             aria-label="Close"
                             class="btn btn-sm "
                             type="button">
-                    <span aria-hidden="true">
-                        <i class="fa fa-icons fa-close"></i>
-                    </span>
+                        <span aria-hidden="true">
+                            <i class="fa fa-icons fa-close"></i>
+                        </span>
                     </button>
                 </div>
             </div>

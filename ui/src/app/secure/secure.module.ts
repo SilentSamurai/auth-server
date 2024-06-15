@@ -11,19 +11,19 @@ import {HomeComponent} from './home.component';
 import {AdminNavBarComponent} from "./nav-bar.component";
 import {NgbCollapseModule, NgbDropdownModule, NgbNavModule} from "@ng-bootstrap/ng-bootstrap";
 import {TN01Component} from "./tenants/TN01.component";
-import {UpdateTenantComponent} from "./tenants/update-tenant.component";
-import {DeleteTenantComponent} from "./tenants/delete-tenant.component";
-import {CreateTenantComponent} from "./tenants/create-tenant.component";
+import {UpdateTenantComponent} from "./tenants/dialogs/update-tenant.component";
+import {DeleteTenantComponent} from "./tenants/dialogs/delete-tenant.component";
+import {CreateTenantComponent} from "./tenants/dialogs/create-tenant.component";
 import {UserDetailsComponent} from "./users/user-details.component";
 import {UserListComponent} from "./users/user-list.component";
 import {CreateUserModalComponent} from "./users/create-user.modal.component";
 import {EditUserModalComponent} from "./users/edit-user.modal.component";
 import {DeleteUserModalComponent} from "./users/delete-user.modal.component";
-import {ViewTenantComponent} from "./tenants/view-tenant/view-tenant.component";
-import {AddMemberComponent} from "./tenants/view-tenant/add-member.component";
-import {AddRoleComponent} from "./tenants/view-tenant/add-role.component";
-import {RemoveMemberComponent} from "./tenants/view-tenant/remove-member.component";
-import {RemoveRoleComponent} from "./tenants/view-tenant/remove-role.component";
+import {TN02Component} from "./tenants/TN02.component";
+import {AddMemberComponent} from "./tenants/dialogs/add-member.component";
+import {AddRoleComponent} from "./tenants/dialogs/add-role.component";
+import {RemoveMemberComponent} from "./tenants/dialogs/remove-member.component";
+import {RemoveRoleComponent} from "./tenants/dialogs/remove-role.component";
 import {ComponentModule} from "../component/component.module";
 import {RoleListComponent} from "./roles/role-list.component";
 import {RoleSelectionComponent} from "./roles/role-selection.component";
@@ -37,6 +37,9 @@ import {ConfirmDialogModule} from "primeng/confirmdialog";
 import {ConfirmationService, MessageService} from "primeng/api";
 import {UpdateGroupComponent} from "./group/update-group.component";
 import {RoleObjectComponent} from "./roles/role-object.component";
+import {TN02SelectionComponent} from "./tenants/TN02-selection.component";
+import {TNRL01Component} from "./tenants/TNRL01.component";
+import {TNRL01SelectionComponent} from "./tenants/TNRL01-selection.component";
 
 @NgModule({
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -52,7 +55,10 @@ import {RoleObjectComponent} from "./roles/role-object.component";
         CreateUserModalComponent,
         EditUserModalComponent,
         DeleteUserModalComponent,
-        ViewTenantComponent,
+        TN02Component,
+        TN02SelectionComponent,
+        TNRL01SelectionComponent,
+        TNRL01Component,
         AddMemberComponent,
         AddRoleComponent,
         RemoveMemberComponent,

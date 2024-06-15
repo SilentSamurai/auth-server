@@ -73,3 +73,10 @@
     content: "*";
     color: red;
 }
+
+.p-datatable.p-datatable-sm .p-datatable-tbody > tr > td {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+

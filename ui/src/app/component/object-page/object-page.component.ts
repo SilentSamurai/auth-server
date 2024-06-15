@@ -10,8 +10,8 @@ import {firstValueFrom} from "rxjs";
     selector: 'app-object-page',
     template: `
         <div class="container-fluid mb-5 px-0" *ngIf="!loading">
-            <div class="card">
-                <div class="container">
+            <div class="card" style="border-radius: 0">
+                <div class="container mt-4">
                     <div class="row">
                         <div class="col">
                             <ng-container [ngTemplateOutlet]="header.template"></ng-container>

@@ -36,7 +36,7 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
                                 idField="email"
                                 isFilterAsync="true"
                                 multi="true"
-                                scrollHeight="75vh">
+                                scrollHeight="50vh">
 
                                 <app-table-col label="Name" name="name"></app-table-col>
                                 <app-table-col label="Email" name="email"></app-table-col>

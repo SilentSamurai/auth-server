@@ -13,6 +13,8 @@ import {
 import {Filter, FilterBarComponent} from "../filter-bar/filter-bar.component";
 import {FilterMatchMode, LazyLoadEvent} from "primeng/api";
 import {Table} from "primeng/table"
+import {TableColumnComponent} from "./app-table-column.component";
+import {Util} from "../utils";
 
 
 export class TableAsyncLoadEvent {
@@ -23,50 +25,23 @@ export class TableAsyncLoadEvent {
     update!: (data: any[]) => void;
 }
 
-function parseBoolean(value: string): boolean {
-    const lowerCaseStr = value.toLowerCase();
-    return lowerCaseStr === 'true';
-}
-
-
-@Component({
-    selector: 'app-table-col',
-    template: '',
-    styles: [],
-})
-export class TableColumnComponent implements OnInit {
-
-    @Input() label: string = '';
-    @Input() name: string = '';
-    @Input() isId: string | boolean = false;
-
-    constructor() {
-    }
-
-    async ngOnInit(): Promise<void> {
-        if (typeof this.isId === 'string') {
-            this.isId = parseBoolean(this.isId);
-        }
-    }
-
-}
 
 @Component({
     selector: 'app-table',
     template: `
         <p-table
-                [(selection)]="selectedItem"
-                [scrollable]="true"
-                scrollHeight="{{scrollHeight}}"
-                [lazy]="true"
-                (onLazyLoad)="lazyLoad($event)"
-                [dataKey]="idField"
-                [rowHover]="true"
-                [value]="actualRows"
-                selectionMode="{{ multi ? 'multiple' : 'single' }}"
-                [virtualRowHeight]="40"
-                [virtualScroll]="true"
-                styleClass="p-datatable-gridlines p-datatable-sm"
+            [(selection)]="selectedItem"
+            [scrollable]="true"
+            scrollHeight="{{scrollHeight}}"
+            [lazy]="true"
+            (onLazyLoad)="lazyLoad($event)"
+            [dataKey]="idField"
+            [rowHover]="true"
+            [value]="actualRows"
+            selectionMode="{{ multi ? 'multiple' : 'single' }}"
+            [virtualRowHeight]="20"
+            [virtualScroll]="true"
+            styleClass="p-datatable-gridlines p-datatable-sm"
         >
             <!--                <ng-template pTemplate="caption">-->
 
@@ -76,9 +51,15 @@ export class TableColumnComponent implements OnInit {
                     <th style="max-width:40px">
                         <p-tableHeaderCheckbox *ngIf="multi"></p-tableHeaderCheckbox>
                     </th>
-                    <th *ngFor="let col of columns">
-                        {{ col.label }}
-                    </th>
+                    <ng-container *ngFor="let col of columns">
+                        <ng-container *ngIf="col.isTemplateProvided" [ngTemplateOutlet]="col.template"></ng-container>
+                        <ng-container *ngIf="!col.isTemplateProvided">
+                            <th>
+                                {{ col.label }}
+                            </th>
+                        </ng-container>
+
+                    </ng-container>
                 </tr>
             </ng-template>
             <ng-template let-row let-rowIndex="rowIndex" pTemplate="body">
@@ -102,7 +83,7 @@ export class TableColumnComponent implements OnInit {
             </ng-template>
         </p-table>
     `,
-    styles: [],
+    styles: [''],
 })
 export class AppTableComponent implements OnInit {
 
@@ -134,7 +115,6 @@ export class AppTableComponent implements OnInit {
     pageNo: number = 0;
 
 
-
     constructor() {
     }
 
@@ -154,10 +134,10 @@ export class AppTableComponent implements OnInit {
 
     async ngOnInit(): Promise<void> {
         if (typeof this.isFilterAsync === 'string') {
-            this.isFilterAsync = parseBoolean(this.isFilterAsync);
+            this.isFilterAsync = Util.parseBoolean(this.isFilterAsync);
         }
         if (typeof this.multi === 'string') {
-            this.multi = parseBoolean(this.multi);
+            this.multi = Util.parseBoolean(this.multi);
         }
     }
 
@@ -188,7 +168,7 @@ export class AppTableComponent implements OnInit {
         if (this.isFilterAsync) {
             this.onLoad.emit({
                 pageNo: this.pageNo,
-                pageSize: 10,
+                pageSize: 100,
                 sortBy: [],
                 filters: filters,
                 update: this.setData.bind(this)

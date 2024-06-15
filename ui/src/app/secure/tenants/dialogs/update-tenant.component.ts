@@ -2,7 +2,7 @@ import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
 import {lastValueFrom} from "rxjs";
 import {MessageService} from "primeng/api";
-import {TenantService} from "../../_services/tenant.service";
+import {TenantService} from "../../../_services/tenant.service";
 
 @Component({
     selector: 'app-update-tenant',

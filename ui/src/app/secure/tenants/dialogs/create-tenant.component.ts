@@ -1,7 +1,7 @@
 import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
 import {lastValueFrom} from "rxjs";
-import {TenantService} from "../../_services/tenant.service";
+import {TenantService} from "../../../_services/tenant.service";
 import {MessageService} from "primeng/api";
 
 @Component({

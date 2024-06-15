@@ -15,11 +15,18 @@ import {ValueHelpInputComponent} from "./value-help-input/value-help-input.compo
 import {SkeletonModule} from "primeng/skeleton";
 import {ValueHelpColumnComponent} from "./value-help-input/value-help-column.component";
 import {FilterBarColumnComponent, FilterBarComponent} from "./filter-bar/filter-bar.component";
-import {AppTableComponent, TableColumnComponent} from "./table/app-table.component";
+import {AppTableComponent} from "./table/app-table.component";
 import {TileGroupsComponent} from "./tile/tile-groups.component";
 import {ObjectPageComponent} from "./object-page/object-page.component";
 import {ObjectPageHeaderComponent} from "./object-page/object-page-header.component";
 import {ObjectPageSectionComponent} from "./object-page/object-page-section.component";
+import {LaunchPadComponent} from "./tile/launchpad.component";
+import {PageViewComponent} from "./page-view/page-view.component";
+import {PageViewHeaderComponent} from "./page-view/page-view-header.component";
+import {TableColumnComponent} from "./table/app-table-column.component";
+import {PageViewBodyComponent} from "./page-view/page-view-body.component";
+import {FilterFieldComponent} from "./filter-bar/filter-field.component";
+import {FilterValueHelpComponent} from "./filter-bar/filter-value-help.component";
 
 @NgModule({
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -30,12 +37,18 @@ import {ObjectPageSectionComponent} from "./object-page/object-page-section.comp
         ValueHelpColumnComponent,
         FilterBarComponent,
         FilterBarColumnComponent,
+        FilterFieldComponent,
+        FilterValueHelpComponent,
         AppTableComponent,
         TableColumnComponent,
         TileGroupsComponent,
+        LaunchPadComponent,
         ObjectPageComponent,
         ObjectPageHeaderComponent,
-        ObjectPageSectionComponent
+        ObjectPageSectionComponent,
+        PageViewComponent,
+        PageViewBodyComponent,
+        PageViewHeaderComponent
     ],
     imports: [
         TableModule,
@@ -64,7 +77,11 @@ import {ObjectPageSectionComponent} from "./object-page/object-page-section.comp
         TileGroupsComponent,
         ObjectPageComponent,
         ObjectPageHeaderComponent,
-        ObjectPageSectionComponent
+        ObjectPageSectionComponent,
+        LaunchPadComponent,
+        PageViewComponent,
+        PageViewHeaderComponent,
+        PageViewBodyComponent
     ]
 })
 export class ComponentModule {
