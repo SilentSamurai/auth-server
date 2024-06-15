@@ -18,6 +18,7 @@ import {SecurityService} from "../roles/security.service";
 import {Action} from "../roles/actions.enum";
 import {subject} from "@casl/ability";
 import {SubjectEnum} from "../roles/subjectEnum";
+import {UsersService} from "../users/users.service";
 
 @Controller('api/tenant')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -26,6 +27,7 @@ export class RoleController {
     constructor(
         private readonly configService: ConfigService,
         private readonly tenantService: TenantService,
+        private readonly userService: UsersService,
         private readonly roleService: RoleService,
         private readonly securityService: SecurityService
     ) {
@@ -70,5 +72,21 @@ export class RoleController {
         return this.tenantService.getTenantRoles(tenant)
     }
 
+    @Get('/:tenantId/role/:name')
+    @UseGuards(JwtAuthGuard)
+    async getRole(
+        @Request() request,
+        @Param('tenantId') tenantId: string,
+        @Param('name') name: string,
+    ): Promise<any> {
+        const tenant = await this.tenantService.findById(tenantId);
+        this.securityService.check(request, Action.Read, subject(SubjectEnum.TENANT, tenant));
+        let role = await this.roleService.findByNameAndTenant(name, tenant);
+        let users = await this.userService.findByRole(role);
+        return {
+            role: role,
+            users: users
+        }
+    }
 
 }

@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {Observable} from 'rxjs';
+import {lastValueFrom, Observable} from 'rxjs';
 import {TokenStorageService} from "./token-storage.service";
 
 const API_URL = '/api';
@@ -27,7 +27,7 @@ export class RoleService {
     }
 
     async getRoleDetails(tenantId: string, roleName: string): Promise<any> {
-
+        return lastValueFrom(this.http.get(`${API_URL}/tenant/${tenantId}/role/${roleName}`, this.getHttpOptions()));
     }
 
     async deleteRole(tenantId: string, roleName: string): Promise<any> {
@@ -40,5 +40,9 @@ export class RoleService {
 
     async addUser(tenantId: string, roleName: string, users: any[]) {
 
+    }
+
+    async queryRoles(query: any): Promise<any> {
+        return await lastValueFrom(this.http.post(`${API_URL}/search/Roles`, query, this.getHttpOptions())) as any;
     }
 }

@@ -9,7 +9,7 @@ import {ProfileComponent} from "../profile/profile.component";
 @Component({
     selector: 'nav-bar',
     template: `
-        <nav class="navbar navbar-expand-lg bg-secondary" ngbNav>
+        <nav class="navbar navbar-expand-lg " ngbNav style="background-color: steelblue;">
             <a class="navbar-brand" href="javascript:void(0)" routerLink="/home">
                 <img alt="" class="rounded-circle mx-2" height="30" src="/assets/logo-img.jpg" width="30">
                 {{ this.getTitle() }}

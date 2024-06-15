@@ -10,7 +10,7 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
 
 
 @Component({
-    selector: 'app-role-list',
+    selector: 'app-UR02-SEL',
     template: `
         <nav-bar></nav-bar>
         <div class="container-fluid">
@@ -20,34 +20,6 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
                 </div>
                 <div class="col-4">
                     <form class="form-group g-3">
-
-                        <label class="col-3 col-form-label" for="Tenant">
-                            Tenant
-                        </label>
-
-                        <app-value-help-input
-                            (dataProvider)="onTenantLoad($event)"
-                            [(selection)]="selectedTenant"
-                            class="col-3"
-                            idField="id"
-                            labelField="name"
-                            name="Tenant">
-
-                            <app-fb-col name="name" label="Name"></app-fb-col>
-                            <app-fb-col name="domain" label="Domain"></app-fb-col>
-
-                            <app-vh-col name="name" label="Name"></app-vh-col>
-                            <app-vh-col name="domain" label="Domain"></app-vh-col>
-
-
-                            <ng-template #vh_body let-row>
-                                <td>{{ row.name }}</td>
-                                <td>
-                                    {{ row.domain }}
-                                </td>
-                            </ng-template>
-
-                        </app-value-help-input>
 
                         <label class="col-3 col-form-label" for="Email">
                             Email
@@ -93,14 +65,10 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
     styles: [`
     `]
 })
-export class RoleSelectionComponent implements OnInit {
+export class UR02SelectionComponent implements OnInit {
 
-    tenantId: any | null = null;
     email: string | null = '';
-    roles = [];
     users: any[] = [];
-    tenants: [] = [];
-    selectedTenant: any[] = [];
     selectedUser: any[] = [];
 
     constructor(private userService: UserService,
@@ -113,47 +81,22 @@ export class RoleSelectionComponent implements OnInit {
     }
 
     async ngOnInit(): Promise<void> {
-        this.authDefaultService.setTitle("Manage Role Assignments");
+        this.authDefaultService.setTitle("UR02: Select User");
     }
 
     async continue() {
         console.log({
-            'users': this.selectedUser,
-            'tenant': this.selectedTenant
+            'users': this.selectedUser
         });
-        if (this.selectedTenant.length > 0 && this.selectedUser.length > 0) {
-            const isMem = await this.isMember();
-            if (isMem) {
-                await this.router.navigate([
-                    '/RL02',
-                    this.selectedTenant[0].id, this.selectedUser[0].email])
-            }
+        if (this.selectedUser.length > 0) {
+            await this.router.navigate(['/UR02', this.selectedUser[0].email])
         }
-    }
-
-    async isMember() {
-        const email = this.selectedUser[0].email;
-        const tenantId = this.selectedTenant[0].id;
-        try {
-            await this.tenantService.getMemberDetails(tenantId, email);
-        } catch (exception: any) {
-            this.messageService.add({severity: 'error', summary: 'Failed', detail: exception.error.message});
-            return false;
-        }
-        return true;
     }
 
     async userDataProvider(event: TableAsyncLoadEvent) {
         if (event.pageNo == 0) {
             this.users = await lastValueFrom(this.userService.getAllUsers());
             event.update(this.users);
-        }
-    }
-
-    async onTenantLoad(event: TableAsyncLoadEvent) {
-        if (event.pageNo == 0) {
-            this.tenants = await lastValueFrom(this.tenantService.getAllTenants());
-            event.update(this.tenants);
         }
     }
 

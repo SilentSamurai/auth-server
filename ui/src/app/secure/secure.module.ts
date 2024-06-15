@@ -14,19 +14,19 @@ import {TN01Component} from "./tenants/TN01.component";
 import {UpdateTenantComponent} from "./tenants/dialogs/update-tenant.component";
 import {DeleteTenantComponent} from "./tenants/dialogs/delete-tenant.component";
 import {CreateTenantComponent} from "./tenants/dialogs/create-tenant.component";
-import {UserDetailsComponent} from "./users/user-details.component";
-import {UserListComponent} from "./users/user-list.component";
-import {CreateUserModalComponent} from "./users/create-user.modal.component";
-import {EditUserModalComponent} from "./users/edit-user.modal.component";
-import {DeleteUserModalComponent} from "./users/delete-user.modal.component";
+import {UR02Component} from "./users/UR02.component";
+import {UR01Component} from "./users/UR01.component";
+import {CreateUserModalComponent} from "./users/dialogs/create-user.modal.component";
+import {EditUserModalComponent} from "./users/dialogs/edit-user.modal.component";
+import {DeleteUserModalComponent} from "./users/dialogs/delete-user.modal.component";
 import {TN02Component} from "./tenants/TN02.component";
 import {AddMemberComponent} from "./tenants/dialogs/add-member.component";
 import {AddRoleComponent} from "./tenants/dialogs/add-role.component";
 import {RemoveMemberComponent} from "./tenants/dialogs/remove-member.component";
 import {RemoveRoleComponent} from "./tenants/dialogs/remove-role.component";
 import {ComponentModule} from "../component/component.module";
-import {RoleListComponent} from "./roles/role-list.component";
-import {RoleSelectionComponent} from "./roles/role-selection.component";
+import {RL01Component} from "./roles/RL01.component";
+import {RL02SelectionComponent} from "./roles/RL02-selection.component";
 import {InputTextModule} from "primeng/inputtext";
 import {MessagesModule} from "primeng/messages";
 import {GroupSelectionComponent} from "./group/group-selection.component";
@@ -36,10 +36,11 @@ import {GroupObjectComponent} from "./group/group-object.component";
 import {ConfirmDialogModule} from "primeng/confirmdialog";
 import {ConfirmationService, MessageService} from "primeng/api";
 import {UpdateGroupComponent} from "./group/update-group.component";
-import {RoleObjectComponent} from "./roles/role-object.component";
+import {RL02Component} from "./roles/RL02.component";
 import {TN02SelectionComponent} from "./tenants/TN02-selection.component";
 import {TNRL01Component} from "./tenants/TNRL01.component";
 import {TNRL01SelectionComponent} from "./tenants/TNRL01-selection.component";
+import {UR02SelectionComponent} from "./users/UR02-selection.component";
 
 @NgModule({
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -50,8 +51,9 @@ import {TNRL01SelectionComponent} from "./tenants/TNRL01-selection.component";
         UpdateTenantComponent,
         DeleteTenantComponent,
         CreateTenantComponent,
-        UserDetailsComponent,
-        UserListComponent,
+        UR02Component,
+        UR01Component,
+        UR02SelectionComponent,
         CreateUserModalComponent,
         EditUserModalComponent,
         DeleteUserModalComponent,
@@ -63,14 +65,14 @@ import {TNRL01SelectionComponent} from "./tenants/TNRL01-selection.component";
         AddRoleComponent,
         RemoveMemberComponent,
         RemoveRoleComponent,
-        RoleListComponent,
-        RoleSelectionComponent,
+        RL01Component,
+        RL02SelectionComponent,
         GroupSelectionComponent,
         GroupListComponent,
         CreateGroupComponent,
         GroupObjectComponent,
         UpdateGroupComponent,
-        RoleObjectComponent
+        RL02Component
     ],
     imports: [
         TableModule,

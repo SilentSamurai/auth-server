@@ -11,7 +11,7 @@ import {PageViewBodyComponent} from "./page-view-body.component";
     template: `
         <div class="container-fluid mb-5 px-0" *ngIf="!loading">
             <div class="card" style="border-radius: 0">
-                <div class="{{containerClass}} mt-4">
+                <div class="{{containerClass}} mt-4 px-4">
                     <div class="row">
                         <div class="col">
                             <ng-container [ngTemplateOutlet]="header.template"></ng-container>
@@ -20,7 +20,7 @@ import {PageViewBodyComponent} from "./page-view-body.component";
                 </div>
             </div>
 
-            <div class="{{containerClass}}">
+            <div class="{{containerClass}} px-4">
                 <div class="row my-2">
                     <div class="col-md-12 ">
                         <div class="card">

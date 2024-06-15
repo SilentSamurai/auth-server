@@ -16,7 +16,7 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
         <app-page-view>
             <app-page-view-header>
                 <div class="mb-4">
-                    <div class="d-flex justify-content-between ">
+                    <div class="d-flex justify-content-between">
                         <h5>Tenant List</h5>
                         <button (click)="openCreateModal()" [disabled]="!this.creationAllowed"
                                 class="btn btn-success btn-sm"
@@ -30,11 +30,9 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
                         <app-fb-col label="Domain" name="domain"></app-fb-col>
                     </app-fb>
                 </div>
-
             </app-page-view-header>
 
             <app-page-view-body>
-
                 <app-table
                     (onLoad)="lazyLoad($event)"
                     idField="id"
@@ -70,7 +68,6 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
                             </button>
                         </td>
                     </ng-template>
-
                 </app-table>
             </app-page-view-body>
         </app-page-view>

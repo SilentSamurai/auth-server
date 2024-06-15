@@ -27,6 +27,16 @@ import {Group} from "../groups/group.entity";
 export class GenericSearchController {
 
     private repos = {};
+    private relations = {
+        "Users": {},
+        "Tenants": {},
+        "TenantMembers": {},
+        "Roles": {
+            "Users": "users",
+            "Tenants": "tenant"
+        },
+        "Groups": {}
+    }
 
     constructor(
         @InjectRepository(User) private usersRepo: Repository<User>,
@@ -61,11 +71,12 @@ export class GenericSearchController {
         this.securityService.check(request, Action.Read, subject(entity, {}));
 
         let pageNo = query.pageNo || 0;
-        let pageSize = query.pageSize || 10;
+        let pageSize = query.pageSize || 30;
         let findOption: any = {
             skip: pageNo * pageSize,
             take: pageSize,
-            where: getWhere(query.where)
+            where: getWhere(query.where),
+            relations: this.getRelations(entity, query)
         };
         let users = await repo.find(findOption)
         return {
@@ -73,6 +84,19 @@ export class GenericSearchController {
             pageSize: pageSize,
             data: users
         };
+    }
+
+    getRelations(entity: string, query: any) {
+        let relations = this.relations[entity] || {};
+        let rel_qry = {}
+        let expands = query.expand || [];
+        for (let related_entity of expands) {
+            if (relations.hasOwnProperty(related_entity)) {
+                const table_entity = relations[related_entity]
+                rel_qry[table_entity] = true;
+            }
+        }
+        return rel_qry;
     }
 
     getRepo(entity: string) {

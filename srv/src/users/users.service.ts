@@ -120,6 +120,15 @@ export class UsersService implements OnModuleInit {
         return users;
     }
 
+    async findByRole(role: Role): Promise<User[]> {
+        const users: User[] = await this.usersRepository.find({
+            where: {
+                roles: {id: role.id}
+            }
+        });
+        return users;
+    }
+
     async existByEmail(email: string): Promise<boolean> {
         return this.usersRepository.exist({
             where: {email}

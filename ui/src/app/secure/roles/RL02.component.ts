@@ -12,7 +12,7 @@ import {RoleService} from "../../_services/role.service";
     selector: 'app-group-object',
     template: `
         <nav-bar></nav-bar>
-        <app-object-page>
+        <app-object-page *ngIf="!loading">
             <app-object-page-header>
                 <div class="row">
                     <div class="col">
@@ -100,7 +100,7 @@ import {RoleService} from "../../_services/role.service";
         </app-object-page>
 
 
-        <div class="text-center" *ngIf="loading">
+        <div class="text-center mt-5" *ngIf="loading">
             <div class="spinner-border" role="status">
                 <span class="sr-only">Loading...</span>
             </div>
@@ -112,7 +112,7 @@ import {RoleService} from "../../_services/role.service";
     styles: [''],
     providers: [ConfirmationService, MessageService]
 })
-export class RoleObjectComponent implements OnInit {
+export class RL02Component implements OnInit {
 
     loading = true;
     role: any = {

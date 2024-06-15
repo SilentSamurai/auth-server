@@ -82,10 +82,16 @@ export class HomeComponent implements OnInit {
             name: "Users",
             tiles: [
                 {
-                    title: "Users",
+                    title: "UR01",
                     subtitle: "Manage Users",
                     icon: "fa-users",
-                    link: ['/users']
+                    link: ['/UR01']
+                },
+                {
+                    title: "UR02",
+                    subtitle: "Display User",
+                    icon: "fa-users",
+                    link: ['/UR02']
                 }
             ]
         },
@@ -103,6 +109,23 @@ export class HomeComponent implements OnInit {
                     subtitle: "Display Group",
                     icon: "fa-group",
                     link: ['/GP02']
+                }
+            ]
+        },
+        {
+            name: "Roles",
+            tiles: [
+                {
+                    title: "RL01",
+                    subtitle: "Manage Roles",
+                    icon: "fa-roles",
+                    link: ['/RL01']
+                },
+                {
+                    title: "RL02",
+                    subtitle: "Display Role",
+                    icon: "fa-role",
+                    link: ['/RL02']
                 }
             ]
         }

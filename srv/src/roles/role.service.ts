@@ -64,6 +64,9 @@ export class RoleService {
             where: {
                 name,
                 tenant: {id: tenant.id}
+            },
+            relations: {
+                tenant: true
             }
         });
         if (role === null) {
