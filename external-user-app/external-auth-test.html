@@ -65,7 +65,7 @@
 
     async function refer() {
         const redirect = window.location.origin + window.location.pathname
-        const code_challenge = await generateCodeChallengeFromVerifier(code_verifier)
+        const code_challenge = code_verifier
         const domain = "dummy.com";
         window.location.href =
             `http://localhost:9001/login?redirect=${redirect}&code_challenge=${code_challenge}&domain=${domain}`;
