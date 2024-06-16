@@ -1,15 +1,12 @@
+FROM node:20
+MAINTAINER "Sourav Das"
 
-FROM node:16
+COPY srv/dist /home/app/dist
+COPY srv/package.json /home/app/package.json
 
-COPY ./srv/dist/   /app/srv/dist
-COPY ./srv/package.json   /app/srv/package.json
-COPY ./srv/static/   /app/srv/static
-COPY ./package.json  /app/package.json
-
-WORKDIR /app/srv
+WORKDIR /home/app
 
 RUN npm install
 
-WORKDIR /app
-
-ENTRYPOINT npm run start
+#ENTRYPOINT ["ls", "/home/app", "-lha"]
+ENTRYPOINT ["npm", "run", "start:prod"]
