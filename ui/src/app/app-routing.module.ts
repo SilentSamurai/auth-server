@@ -25,6 +25,7 @@ const routes: Routes = [
     {path: 'session-confirm', component: SessionConfirmationComponent},
     {path: 'login', component: LoginComponent},
     {path: 'register', component: RegisterComponent},
+    {path: '', redirectTo: 'home', pathMatch: 'full'},
     {
         path: '',
         canActivate: [AdminAuthGuard],
@@ -52,7 +53,7 @@ const routes: Routes = [
 
         ]
     },
-    {path: '', redirectTo: 'home', pathMatch: 'full'}
+
 ];
 
 @NgModule({

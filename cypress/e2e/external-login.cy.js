@@ -14,7 +14,7 @@ describe('login', () => {
         cy.get('#login-btn').click();
 
 
-        cy.get('#email').type("secure@auth.server.com")
+        cy.get('#email').type("admin@auth.server.com")
         cy.get('#password').type("admin9000")
 
         cy.intercept('POST', '**/api/oauth/login*').as('authCode')
