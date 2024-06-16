@@ -20,7 +20,7 @@ export class AdminAuthGuard implements CanActivate {
         if (this.tokenStorageService.isLoggedIn() && this.tokenStorageService.isSuperAdmin()) {
             return true;
         }
-        this.authDefaultService.signOut("/home");
+        this.router.navigate(['/error', '403 unauthorized']);
         return false;
     }
 

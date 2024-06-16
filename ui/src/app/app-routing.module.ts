@@ -20,17 +20,26 @@ import {TN02SelectionComponent} from "./secure/tenants/TN02-selection.component"
 import {TNRL01Component} from "./secure/tenants/TNRL01.component";
 import {TNRL01SelectionComponent} from "./secure/tenants/TNRL01-selection.component";
 import {UR02SelectionComponent} from "./secure/users/UR02-selection.component";
+import {UserAuthGuard} from "./shared/user-auth-guard.service";
+import {HttpErrorComponent} from "./error-pages/HttpError.component";
 
 const routes: Routes = [
     {path: 'session-confirm', component: SessionConfirmationComponent},
     {path: 'login', component: LoginComponent},
     {path: 'register', component: RegisterComponent},
+    {path: 'error/:msg', component: HttpErrorComponent},
     {path: '', redirectTo: 'home', pathMatch: 'full'},
+    {
+        path: '',
+        canActivate: [UserAuthGuard],
+        children: [
+            {path: 'home', component: HomeComponent, canActivate: []},
+        ]
+    },
     {
         path: '',
         canActivate: [AdminAuthGuard],
         children: [
-            {path: 'home', component: HomeComponent, canActivate: []},
             // tenants
             {path: 'TN01', component: TN01Component, canActivate: []},
             {path: 'TN02', component: TN02SelectionComponent, canActivate: []},
