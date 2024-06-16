@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {AuthService} from '../_services/auth.service';
 import {lastValueFrom} from "rxjs";
 import {Router} from "@angular/router";
+import {AuthDefaultService} from "../_services/auth.default.service";
 
 @Component({
     selector: 'app-register',
@@ -19,6 +20,7 @@ export class RegisterComponent implements OnInit {
     errorMessage = '';
 
     constructor(private authService: AuthService,
+                private authDefaultService: AuthDefaultService,
                 private router: Router,) {
     }
 
@@ -30,14 +32,16 @@ export class RegisterComponent implements OnInit {
         this.isSignUpFailed = false;
         try {
             const user = await lastValueFrom(this.authService.register(name, email, password));
-            await this.router.navigateByUrl("/login");
+            await this.authDefaultService.signOut("/home");
             this.isSuccessful = false;
         } catch (e: any) {
             console.error(e);
             this.isSignUpFailed = true;
             this.errorMessage = e.error.message;
         }
+    }
 
-
+    async onLoginClick() {
+        await this.authDefaultService.signOut("/home")
     }
 }

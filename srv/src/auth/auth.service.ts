@@ -11,9 +11,9 @@ import * as argon2 from 'argon2';
 import {Tenant} from "../tenants/tenant.entity";
 import {TenantService} from "../tenants/tenant.service";
 import {CryptUtil} from "../util/crypt.util";
-import {GRANT_TYPES, SecurityContext} from "../scopes/security.service";
+import {GRANT_TYPES, SecurityContext} from "../roles/security.service";
 import {UnauthorizedException} from "../exceptions/unauthorized.exception";
-import {ScopeEnum} from "../scopes/scope.enum";
+import {RoleEnum} from "../roles/roleEnum";
 import {ValidationPipe} from "../validation/validation.pipe";
 import {ValidationSchema} from "../validation/validation.schema";
 
@@ -92,8 +92,8 @@ export class AuthService {
         return tenant;
     }
 
-    async createTechnicalAccessToken(tenant: Tenant, scopes: string[]): Promise<string> {
-        scopes = scopes instanceof Array ? scopes : [];
+    async createTechnicalAccessToken(tenant: Tenant, roles: string[]): Promise<string> {
+        roles = roles instanceof Array ? roles : [];
         const payload: SecurityContext = {
             sub: "oauth",
             email: "oauth@" + tenant.domain,
@@ -103,7 +103,7 @@ export class AuthService {
                 name: tenant.name,
                 domain: tenant.domain,
             },
-            scopes: [ScopeEnum.TENANT_VIEWER, ...scopes],
+            scopes: [RoleEnum.TENANT_VIEWER, ...roles],
             grant_type: GRANT_TYPES.CLIENT_CREDENTIAL
         };
         return this.jwtService.sign(payload, {privateKey: tenant.privateKey,});
@@ -118,7 +118,7 @@ export class AuthService {
             throw new EmailNotVerifiedException();
         }
 
-        let scopes = await this.tenantService.getMemberScope(tenant.id, user);
+        let roles = await this.tenantService.getMemberRoles(tenant.id, user);
 
         const accessTokenPayload: SecurityContext = {
             sub: user.email,
@@ -129,7 +129,7 @@ export class AuthService {
                 name: tenant.name,
                 domain: tenant.domain,
             },
-            scopes: scopes.map(scope => scope.name),
+            scopes: roles.map(role => role.name),
             grant_type: GRANT_TYPES.PASSWORD
         };
 

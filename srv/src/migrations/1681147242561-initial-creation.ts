@@ -10,7 +10,7 @@ export class CreateInitialTables1681147242561 implements MigrationInterface {
         // User table
         await queryRunner.createTable(
             new Table({
-                name: "user",
+                name: "users",
                 columns: [
                     {
                         name: "id",
@@ -54,7 +54,7 @@ export class CreateInitialTables1681147242561 implements MigrationInterface {
 
         await queryRunner.createTable(
             new Table({
-                name: "tenant",
+                name: "tenants",
                 columns: [
                     {
                         name: "id",
@@ -113,7 +113,7 @@ export class CreateInitialTables1681147242561 implements MigrationInterface {
 
         await queryRunner.createTable(
             new Table({
-                name: "scope",
+                name: "roles",
                 columns: [
                     {
                         name: "id",
@@ -147,7 +147,7 @@ export class CreateInitialTables1681147242561 implements MigrationInterface {
                 ],
                 uniques: [
                     {
-                        name: "tenant_scope_constrain",
+                        name: "tenant_role_constrain",
                         columnNames: [
                             "tenant_id",
                             "name"
@@ -166,22 +166,15 @@ export class CreateInitialTables1681147242561 implements MigrationInterface {
                         name: "tenant_id",
                         type: DB_STRING_TYPE,
                         length: "36",
+                        isPrimary: true,
                         isNullable: false
                     },
                     {
                         name: "user_id",
                         type: DB_STRING_TYPE,
                         length: "36",
+                        isPrimary: true,
                         isNullable: false
-                    }
-                ],
-                uniques: [
-                    {
-                        name: "tenant_membership_constrain",
-                        columnNames: [
-                            "tenant_id",
-                            "user_id"
-                        ]
                     }
                 ],
                 foreignKeys: [
@@ -189,14 +182,14 @@ export class CreateInitialTables1681147242561 implements MigrationInterface {
                         name: "fk_tenant_membership_tenant_id",
                         columnNames: ["tenant_id"],
                         referencedColumnNames: ["id"],
-                        referencedTableName: "tenant",
+                        referencedTableName: "tenants",
                         onDelete: "CASCADE",
                     },
                     {
                         name: "fk_tenant_membership_user_id",
                         columnNames: ["user_id"],
                         referencedColumnNames: ["id"],
-                        referencedTableName: "user",
+                        referencedTableName: "users",
                         onDelete: "CASCADE",
                     }
                 ]
@@ -206,54 +199,53 @@ export class CreateInitialTables1681147242561 implements MigrationInterface {
 
         await queryRunner.createTable(
             new Table({
-                name: "user_scopes",
+                name: "user_roles",
                 columns: [
                     {
                         name: "tenant_id",
                         type: DB_STRING_TYPE,
                         length: "36",
+                        isPrimary: true,
                         isNullable: false
                     },
                     {
                         name: "user_id",
                         type: DB_STRING_TYPE,
                         length: "36",
+                        isPrimary: true,
                         isNullable: false
                     },
                     {
-                        name: "scope_id",
+                        name: "role_id",
                         type: DB_STRING_TYPE,
                         length: "36",
+                        isPrimary: true,
                         isNullable: false
                     },
-                ],
-                uniques: [
                     {
-                        name: "user_scopes_constrain",
-                        columnNames: [
-                            "tenant_id",
-                            "user_id",
-                            "scope_id"
-                        ]
-                    }
+                        name: "from_group",
+                        type: "BOOLEAN",
+                        isNullable: false,
+                        default: "FALSE"
+                    },
                 ],
                 foreignKeys: [
                     {
                         columnNames: ["tenant_id"],
                         referencedColumnNames: ["id"],
-                        referencedTableName: "tenant",
+                        referencedTableName: "tenants",
                         onDelete: "CASCADE",
                     },
                     {
                         columnNames: ["user_id"],
                         referencedColumnNames: ["id"],
-                        referencedTableName: "user",
+                        referencedTableName: "users",
                         onDelete: "CASCADE",
                     },
                     {
-                        columnNames: ["scope_id"],
+                        columnNames: ["role_id"],
                         referencedColumnNames: ["id"],
-                        referencedTableName: "scope",
+                        referencedTableName: "roles",
                     }
                 ]
             }),
@@ -262,10 +254,10 @@ export class CreateInitialTables1681147242561 implements MigrationInterface {
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.dropTable("user");
-        await queryRunner.dropTable("tenant");
-        await queryRunner.dropTable("scope");
-        await queryRunner.dropTable("user_scopes");
+        await queryRunner.dropTable("users");
+        await queryRunner.dropTable("tenants");
+        await queryRunner.dropTable("roles");
+        await queryRunner.dropTable("user_roles");
         await queryRunner.dropTable("tenant_members");
     }
 

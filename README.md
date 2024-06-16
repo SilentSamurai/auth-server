@@ -12,3 +12,5 @@ and [Nest.js](https://nestjs.com/).
 - Reset password via email.
 - Change email address via email.
 - API [documentation](https://silentsamurai.github.io/Speedy-API) available.
+
+

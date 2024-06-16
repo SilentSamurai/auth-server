@@ -13,16 +13,18 @@ export class LoginComponent implements OnInit {
     form: any = {
         email: null,
         password: null,
-        domain: "auth.server.com"
+        domain: null
     };
     loading = true;
     isLoggedIn = false;
     isLoginFailed = false;
     errorMessage = '';
-    scopes: string[] = [];
-    freezeDomain = true;
-    redirectUri = "/home";
+    roles: string[] = [];
+    freezeDomain = false;
+    redirectUri = "";
     code_challenge = "";
+
+    isPasswordVisible = false;
 
     constructor(private authService: AuthService,
                 private router: Router,
@@ -33,55 +35,52 @@ export class LoginComponent implements OnInit {
     async ngOnInit(): Promise<void> {
 
         let params = this.route.snapshot.queryParamMap;
-        console.log(params, this.freezeDomain);
-        this.code_challenge = await this.tokenStorage.getCodeChallenge();
 
-        const externalLogin = params.has("redirect") && params.has("code_challenge") && params.has("domain");
-        if (externalLogin) {
+        if (!params.has("code_challenge")) {
+            alert("Invalid challenge");
+            return;
+        }
+        if (params.has("domain")) {
             this.form.domain = params.get("domain");
-            this.redirectUri = params.get("redirect")!;
-            this.code_challenge = params.get("code_challenge")!;
-            if (this.redirectUri === "otp") {
-                this.redirectUri = "/opt-page"
-                this.code_challenge = await this.tokenStorage.getCodeChallenge();
+            if (this.form.domain && this.form.domain.length > 0) {
+                this.freezeDomain = true;
             }
         }
 
+        this.redirectUri = params.get("redirect")!;
+        this.code_challenge = params.get("code_challenge")!;
 
-        if (this.tokenStorage.isLoggedIn()) {
-            if (!externalLogin) {
-                await this.router.navigateByUrl("/home");
-                return;
-            } else {
-                let user = this.tokenStorage.getUser();
-                if (user.tenant.domain === this.form.domain) {
-                    try {
-                        let codeChallenge = this.code_challenge;
-                        let token = this.tokenStorage.getToken()!;
-                        const code = await lastValueFrom(this.authService.getAuthCode(token, codeChallenge));
-                        await this.redirect(code.authentication_code);
-                        return;
-                    } catch (e: any) {
-                    }
+        // if auth code is present, then redirect
+        // verify auth-code
+        const authCode = this.tokenStorage.getAuthCode();
+        if (authCode) {
+            try {
+                const data = await this.authService.validateAuthCode(authCode);
+                if (data.status) {
+                    await this.router.navigate(['session-confirm'], {
+                        queryParams: {
+                            redirect: this.redirectUri,
+                            domain: this.form.domain,
+                            code_challenge: this.code_challenge
+                        }
+                    });
                 }
-                this.tokenStorage.signOut();
+            } catch (e: any) {
+                console.error(e);
             }
         }
+        // else if (this.tokenStorage.isLoggedIn() && !externalLogin) {
+        //     await this.router.navigateByUrl("/home");
+        // }
         this.loading = false;
     }
 
-    async redirect(code: string) {
-        if (this.isAbsoluteUrl(this.redirectUri)) {
-            window.location.href = `${this.redirectUri}?code=${code}`;
-        } else {
-            await this.router.navigate([this.redirectUri], {
-                queryParams: {
-                    code: code
-                }
-            });
-        }
+    onContinue() {
+        this.freezeDomain = true;
     }
 
+    // redirection to home page might not work sometime,
+    // check if internally anything is nav-ing to login page again
     async onSubmit(): Promise<void> {
         const {email, password, domain} = this.form;
         try {
@@ -89,6 +88,7 @@ export class LoginComponent implements OnInit {
             let authenticationCode = data.authentication_code;
             this.isLoginFailed = false;
             this.isLoggedIn = true;
+            this.tokenStorage.saveAuthCode(authenticationCode);
             await this.redirect(authenticationCode);
         } catch (err: any) {
             console.error(err);
@@ -98,9 +98,34 @@ export class LoginComponent implements OnInit {
 
     }
 
+    async redirect(code: string) {
+        if (this.redirectUri.length <= 0) {
+            return
+        }
+
+        if (this.isAbsoluteUrl(this.redirectUri)) {
+            // redirecting else where
+            window.location.href = `${this.redirectUri}?code=${code}`;
+        } else {
+            // redirecting internally
+            await this.setAccessToken(code);
+            await this.router.navigateByUrl(this.redirectUri);
+        }
+    }
+
+    private async setAccessToken(code: string) {
+        try {
+            let verifier = this.tokenStorage.getCodeVerifier();
+            const data = await lastValueFrom(this.authService.getAccessToken(code, verifier));
+            this.tokenStorage.saveToken(data.access_token);
+        } catch (e: any) {
+            console.error(e);
+        }
+    }
+
     protected isAbsoluteUrl(url: string): boolean {
         try {
-            const absoluteUrl = new URL(url);
+            new URL(url);
             return true;
         } catch (error) {
             return false;

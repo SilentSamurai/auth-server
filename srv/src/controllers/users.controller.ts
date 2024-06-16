@@ -21,7 +21,7 @@ import {ValidationSchema} from '../validation/validation.schema';
 import {MailServiceErrorException} from '../exceptions/mail-service-error.exception';
 import {TenantService} from "../tenants/tenant.service";
 import {Tenant} from "../tenants/tenant.entity";
-import {SecurityService} from "../scopes/security.service";
+import {SecurityService} from "../roles/security.service";
 
 @Controller('api/users')
 @UseInterceptors(ClassSerializerInterceptor)

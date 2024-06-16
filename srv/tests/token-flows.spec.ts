@@ -83,7 +83,7 @@ describe('e2e positive token flow', () => {
             })
             .set('Accept', 'application/json');
 
-        console.log(response.body);
+        console.log("Response: ", response.body);
         expect(response.status).toEqual(201);
         expect(response.body.email).toBeDefined();
         expect(response.body.name).toBeDefined();

@@ -1,19 +1,32 @@
 import {Injectable} from '@angular/core';
 import jwt_decode from "jwt-decode";
+import {Router} from "@angular/router";
 
 const TOKEN_KEY = 'auth-token';
 const USER_KEY = 'auth-user';
+const CODE_KEY = 'auth-code';
 const CODE_VERIFIER = 'code-verifier';
 
 @Injectable({
     providedIn: 'root'
 })
 export class TokenStorageService {
-    constructor() {
+    constructor(private router: Router) {
     }
 
-    signOut(): void {
-        window.localStorage.clear();
+    public clearSession(): void {
+        window.localStorage.removeItem(TOKEN_KEY);
+        window.localStorage.removeItem(USER_KEY);
+        window.sessionStorage.removeItem(CODE_KEY);
+    }
+
+    public getAuthCode(): string | null {
+        return window.sessionStorage.getItem(CODE_KEY);
+    }
+
+    public saveAuthCode(code: string): void {
+        window.sessionStorage.removeItem(CODE_KEY);
+        window.sessionStorage.setItem(CODE_KEY, code);
     }
 
     public saveToken(token: string): void {
@@ -24,15 +37,33 @@ export class TokenStorageService {
     }
 
     public getToken(): string | null {
-        return window.localStorage.getItem(TOKEN_KEY);
+        const token = window.localStorage.getItem(TOKEN_KEY);
+        if (token == null || tokenExpired(token)) {
+            return null;
+        }
+        return token;
     }
 
-    public getUser(): any {
+    public isTokenExpired(): boolean {
+        const token = window.localStorage.getItem(TOKEN_KEY);
+        return token != null && tokenExpired(token);
+
+    }
+
+    // public async getToken(): Promise<string | null> {
+    //     const token = window.localStorage.getItem(TOKEN_KEY);
+    //     if (token == null || tokenExpired(token)) {
+    //         await this.router.navigateByUrl("/login");
+    //         return null;
+    //     }
+    //     return token;
+    // }
+
+    public getUser(): any | null {
         const user = window.localStorage.getItem(USER_KEY);
         if (user) {
             return JSON.parse(user);
         }
-
         return null;
     }
 
@@ -66,7 +97,7 @@ export class TokenStorageService {
 
     public async getCodeChallenge(): Promise<string> {
         let codeVerifier = this.getCodeVerifier();
-        return await generateCodeChallengeFromVerifier(codeVerifier);
+        return await generateCodeChallenge(codeVerifier);
     }
 
     private saveUser(user: any): void {
@@ -75,6 +106,9 @@ export class TokenStorageService {
     }
 }
 
+async function generateCodeChallenge(verifier: string): Promise<string> {
+    return oneWayHash(verifier);
+}
 
 function generateCodeVerifier(): string {
     var array = new Uint32Array(56 / 2);
@@ -82,11 +116,24 @@ function generateCodeVerifier(): string {
     return Array.from(array, (dec) => ("0" + dec.toString(16)).substr(-2)).join("");
 }
 
-function sha256(plain: string) {
-    // returns promise ArrayBuffer
-    const encoder = new TextEncoder();
-    const data = encoder.encode(plain);
-    return window.crypto.subtle.digest("SHA-256", data);
+function oneWayHash(plain: string) {
+    // commenting as cannot use in http context only https allowed.
+
+    // const encoder = new TextEncoder();
+    // const data = encoder.encode(plain);
+    // return window.crypto.subtle.digest("SHA-256", data);
+
+
+    const FNV_PRIME = 16777619;
+    const OFFSET_BASIS = 2166136261;
+    let hash = OFFSET_BASIS;
+
+    for (let i = 0; i < plain.length; i++) {
+        hash ^= plain.charCodeAt(i);
+        hash = (hash * FNV_PRIME) >>> 0; // Force to 32-bit integer
+    }
+    const finalHash = hash >>> 0;
+    return `${finalHash}`; // Convert to unsigned 32-bit integer
 }
 
 function base64urlencode(a: ArrayBuffer): string {
@@ -102,7 +149,8 @@ function base64urlencode(a: ArrayBuffer): string {
         .replace(/=+$/, "").toString();
 }
 
-async function generateCodeChallengeFromVerifier(v: string): Promise<string> {
-    const hashed: ArrayBuffer = await sha256(v);
-    return base64urlencode(hashed);
+
+function tokenExpired(token: string) {
+    const expiry = (JSON.parse(atob(token.split('.')[1]))).exp;
+    return (Math.floor((new Date).getTime() / 1000)) >= expiry;
 }

@@ -6,8 +6,8 @@ describe('e2e positive auth code flow', () => {
     let accessToken = "";
     let clientId = "";
     let clientSecret = "";
-    const verifier = "OrxPz3wFm0oRnjQvYI_lZiLz1KUdNGy2GreFNGCbiA0";
-    const challenge = "bJXNTelxbEYiDtO7MHN94-q9UOFM7wC-UtPRUjoUQ4k";
+    const verifier = "challenge-ABCD";
+    const challenge = "challenge-ABCD";
 
     beforeAll(async () => {
         app = await new TestAppFixture().init();
@@ -53,17 +53,20 @@ describe('e2e positive auth code flow', () => {
     });
 
 
-    it(`/POST Fetch auth gen code`, async () => {
+    it(`/POST Verify auth gen code`, async () => {
         const response = await app.getHttpServer()
-            .post('/api/oauth/gen-auth-code')
+            .post('/api/oauth/verify-auth-code')
             .send({
-                "access_token": accessToken,
-                "code_challenge": challenge,
+                "auth_code": authentication_code,
             })
             .set('Accept', 'application/json');
 
         expect(response.status).toEqual(201);
         expect(response.body.authentication_code).toBeDefined();
+        expect(response.body.status).toBeDefined();
+        expect(response.body.email).toBeDefined();
+        expect(response.body.status).toEqual(true);
+        expect(response.body.email).toEqual("admin@auth.server.com");
     });
 
 

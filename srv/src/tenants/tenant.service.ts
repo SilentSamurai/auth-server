@@ -6,10 +6,10 @@ import {Repository} from "typeorm";
 import {Tenant} from "./tenant.entity";
 import {ValidationErrorException} from "../exceptions/validation-error.exception";
 import {User} from "../users/user.entity";
-import {Scope} from "../scopes/scope.entity";
+import {Role} from "../roles/role.entity";
 import {ForbiddenException} from "../exceptions/forbidden.exception";
-import {ScopeService} from "../scopes/scope.service";
-import {ScopeEnum} from "../scopes/scope.enum";
+import {RoleService} from "../roles/role.service";
+import {RoleEnum} from "../roles/roleEnum";
 import {CryptUtil} from "../util/crypt.util";
 import {TenantMember} from "./tenant.members.entity";
 import {NotFoundException} from "../exceptions/not-found.exception";
@@ -20,7 +20,7 @@ export class TenantService implements OnModuleInit {
     constructor(
         private readonly configService: ConfigService,
         private readonly usersService: UsersService,
-        private readonly scopeService: ScopeService,
+        private readonly roleService: RoleService,
         @InjectRepository(Tenant) private tenantRepository: Repository<Tenant>,
         @InjectRepository(TenantMember) private tenantMemberRepository: Repository<TenantMember>,
     ) {
@@ -49,22 +49,22 @@ export class TenantService implements OnModuleInit {
             clientSecret: clientSecret,
             secretSalt: salt,
             members: [],
-            scopes: []
+            roles: []
         });
 
         tenant = await this.tenantRepository.save(tenant);
 
         await this.addMember(tenant.id, owner);
 
-        let adminScope = await this.scopeService.create(ScopeEnum.TENANT_ADMIN, tenant, false);
-        let viewerScope = await this.scopeService.create(ScopeEnum.TENANT_VIEWER, tenant, false);
+        let adminRole = await this.roleService.create(RoleEnum.TENANT_ADMIN, tenant, false);
+        let viewerRole = await this.roleService.create(RoleEnum.TENANT_VIEWER, tenant, false);
 
         await this.tenantRepository.createQueryBuilder()
-            .relation(Tenant, "scopes")
+            .relation(Tenant, "roles")
             .of(tenant.id)
-            .add([adminScope.id, viewerScope.id]);
+            .add([adminRole.id, viewerRole.id]);
 
-        await this.updateScopeOfMember([adminScope.name], tenant.id, owner);
+        await this.updateRolesOfMember([adminRole.name], tenant.id, owner);
 
         return tenant;
     }
@@ -93,7 +93,7 @@ export class TenantService implements OnModuleInit {
         let tenant = await this.tenantRepository.findOne({
             where: {id: id}, relations: {
                 members: true,
-                scopes: true
+                roles: true
             }
         });
         if (tenant === null) {
@@ -106,7 +106,7 @@ export class TenantService implements OnModuleInit {
         let tenant = await this.tenantRepository.findOne({
             where: {domain}, relations: {
                 members: true,
-                scopes: true
+                roles: true
             }
         });
         if (tenant === null) {
@@ -119,7 +119,7 @@ export class TenantService implements OnModuleInit {
         let tenant = await this.tenantRepository.findOne({
             where: {clientId}, relations: {
                 members: true,
-                scopes: true
+                roles: true
             }
         });
         if (tenant === null) {
@@ -134,7 +134,7 @@ export class TenantService implements OnModuleInit {
             tenantId: tenant.id,
             userId: user.id
         });
-        // await this.scopeService.updateUserScopes([ScopeEnum.TENANT_VIEWER], tenant, user);
+        // await this.roleService.updateUserScopes([ScopeEnum.TENANT_VIEWER], tenant, user);
         return this.tenantMemberRepository.save(tenantMember);
     }
 
@@ -155,13 +155,13 @@ export class TenantService implements OnModuleInit {
         return this.tenantRepository.save(tenant)
     }
 
-    async getMemberScope(tenantId: string, user: User): Promise<Scope[]> {
+    async getMemberRoles(tenantId: string, user: User): Promise<Role[]> {
         let tenant: Tenant = await this.findById(tenantId);
         let isMember = await this.isMember(tenant.id, user);
         if (!isMember) {
             throw new ForbiddenException("Not a Member.");
         }
-        return this.scopeService.getMemberScopes(tenant, user);
+        return this.roleService.getMemberRoles(tenant, user);
     }
 
     async isViewer(tenantId: string, user: User): Promise<boolean> {
@@ -169,14 +169,14 @@ export class TenantService implements OnModuleInit {
         if (!(await this.isMember(tenantId, user))) {
             return false;
         }
-        return this.scopeService.hasAnyOfScopes([ScopeEnum.TENANT_ADMIN, ScopeEnum.TENANT_VIEWER],
+        return this.roleService.hasAnyOfRoles([RoleEnum.TENANT_ADMIN, RoleEnum.TENANT_VIEWER],
             tenant, user);
     }
 
     async removeMember(tenantId: string, user: User): Promise<Tenant> {
         let tenant: Tenant = await this.findById(tenantId);
         let tenantMember = await this.findMembership(tenant, user);
-        await this.updateScopeOfMember([], tenantId, user);
+        await this.updateRolesOfMember([], tenantId, user);
         await this.tenantMemberRepository.remove(tenantMember);
         return tenant;
     }
@@ -208,20 +208,20 @@ export class TenantService implements OnModuleInit {
         if (!(await this.isMember(tenantId, user))) {
             return false;
         }
-        return this.scopeService.hasAllScopes([ScopeEnum.TENANT_ADMIN], tenant, user);
+        return this.roleService.hasAllRoles([RoleEnum.TENANT_ADMIN], tenant, user);
     }
 
     async findGlobalTenant(): Promise<Tenant> {
         return this.findByDomain(this.configService.get("SUPER_TENANT_DOMAIN"));
     }
 
-    async updateScopeOfMember(scopes: string[], tenantId: string, user: User): Promise<Scope[]> {
+    async updateRolesOfMember(roles: string[], tenantId: string, user: User): Promise<Role[]> {
         let tenant: Tenant = await this.findById(tenantId);
         const isMember: boolean = await this.isMember(tenantId, user);
         if (!isMember) {
             throw new NotFoundException("user is not a member of this tenant");
         }
-        return this.scopeService.updateUserScopes(scopes, tenant, user)
+        return this.roleService.updateUserRoles(roles, tenant, user)
     }
 
     async findByMembership(user: User): Promise<Tenant[]> {
@@ -229,7 +229,7 @@ export class TenantService implements OnModuleInit {
             where: {
                 members: {id: user.id}
             }, relations: {
-                scopes: true
+                roles: true
             }
         });
         return tenants;
@@ -240,7 +240,7 @@ export class TenantService implements OnModuleInit {
             where: {
                 members: {id: user.id}
             }, relations: {
-                scopes: true
+                roles: true
             }
         });
         return tenants.filter(tenant => this.isViewer(tenant.id, user));
@@ -248,7 +248,7 @@ export class TenantService implements OnModuleInit {
 
     async deleteTenant(tenantId: string) {
         let tenant: Tenant = await this.findById(tenantId);
-        await this.scopeService.deleteByTenant(tenant);
+        await this.roleService.deleteByTenant(tenant);
         return this.tenantRepository.remove(tenant);
     }
 
@@ -261,8 +261,8 @@ export class TenantService implements OnModuleInit {
         return this.tenantRepository.remove(tenant);
     }
 
-    async getTenantScopes(tenant: Tenant): Promise<Scope[]> {
-        return this.scopeService.getTenantScopes(tenant);
+    async getTenantRoles(tenant: Tenant): Promise<Role[]> {
+        return this.roleService.getTenantRoles(tenant);
     }
 
 

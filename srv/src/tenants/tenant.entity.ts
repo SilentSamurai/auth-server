@@ -1,9 +1,10 @@
 import {Column, CreateDateColumn, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn} from "typeorm";
-import {Scope} from "../scopes/scope.entity";
+import {Role} from "../roles/role.entity";
 import {Exclude} from "class-transformer";
-import {User} from "../users/user.entity"; // Used with ClassSerializerInterceptor to exclude from responses.
+import {User} from "../users/user.entity";
+import {Group} from "../groups/group.entity"; // Used with ClassSerializerInterceptor to exclude from responses.
 
-@Entity({name: "tenant"})
+@Entity({name: "tenants"})
 export class Tenant {
     @PrimaryGeneratedColumn("uuid")
     id: string;
@@ -33,11 +34,11 @@ export class Tenant {
     @Exclude()
     publicKey: string;
 
-    @OneToMany(type => Scope, scope => scope.tenant, {
+    @OneToMany(type => Role, role => role.tenant, {
         cascade: true,
         onDelete: "CASCADE"
     })
-    scopes: Scope[];
+    roles: Role[];
 
     @ManyToMany(() => User, (user) => user.tenants)
     @JoinTable({
@@ -55,4 +56,10 @@ export class Tenant {
 
     @CreateDateColumn({name: "created_at"})
     createdAt: Date;
+
+    @OneToMany(type => Group, group => group.tenant, {
+        cascade: true,
+        onDelete: "CASCADE"
+    })
+    groups: Group[];
 }

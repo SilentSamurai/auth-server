@@ -18,11 +18,11 @@ import {ValidationPipe} from "../validation/validation.pipe";
 import {ValidationSchema} from "../validation/validation.schema";
 import {Tenant} from "../tenants/tenant.entity";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
-import {ScopeGuard} from "../scopes/scope.guard";
-import {Rules, ScopeRule} from "../scopes/scopes.decorator";
-import {SecurityService} from "../scopes/security.service";
-import {SubjectEnum} from "../scopes/subjectEnum";
-import {Action} from "../scopes/actions.enum";
+import {RoleGuard} from "../roles/role.guard";
+import {RoleRule, Rules} from "../roles/roles.decorator";
+import {SecurityService} from "../roles/security.service";
+import {SubjectEnum} from "../roles/subjectEnum";
+import {Action} from "../roles/actions.enum";
 import {subject} from "@casl/ability";
 
 @Controller('api/tenant')
@@ -38,9 +38,9 @@ export class TenantController {
     }
 
     @Post('/create')
-    @UseGuards(JwtAuthGuard, ScopeGuard)
+    @UseGuards(JwtAuthGuard, RoleGuard)
     @Rules(
-        ScopeRule.can(Action.Create, SubjectEnum.TENANT),
+        RoleRule.can(Action.Create, SubjectEnum.TENANT),
     )
     async createTenant(
         @Request() request,
@@ -74,9 +74,9 @@ export class TenantController {
 
 
     @Delete('/:tenantId')
-    @UseGuards(JwtAuthGuard, ScopeGuard)
+    @UseGuards(JwtAuthGuard, RoleGuard)
     @Rules(
-        ScopeRule.can(Action.Delete, SubjectEnum.TENANT),
+        RoleRule.can(Action.Delete, SubjectEnum.TENANT),
     )
     async deleteTenant(
         @Param('tenantId') tenantId: string
@@ -86,9 +86,9 @@ export class TenantController {
 
 
     @Get('')
-    @UseGuards(JwtAuthGuard, ScopeGuard)
+    @UseGuards(JwtAuthGuard, RoleGuard)
     @Rules(
-        ScopeRule.can(Action.Manage, SubjectEnum.TENANT),
+        RoleRule.can(Action.Manage, SubjectEnum.TENANT),
     )
     async getTenants(): Promise<Tenant[]> {
         return await this.tenantService.getAllTenants();

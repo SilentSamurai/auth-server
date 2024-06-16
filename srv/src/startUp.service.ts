@@ -1,12 +1,12 @@
 import {Injectable, OnModuleInit} from "@nestjs/common";
 import {ConfigService} from "./config/config.service";
 import {UsersService} from "./users/users.service";
-import {ScopeService} from "./scopes/scope.service";
+import {RoleService} from "./roles/role.service";
 import {TenantService} from "./tenants/tenant.service";
 import {User} from "./users/user.entity";
 import {readFile} from "fs";
 import {Tenant} from "./tenants/tenant.entity";
-import {ScopeEnum} from "./scopes/scope.enum";
+import {RoleEnum} from "./roles/roleEnum";
 import {DataSource} from "typeorm/data-source/DataSource";
 
 @Injectable()
@@ -17,7 +17,7 @@ export class StartUpService implements OnModuleInit {
         private readonly configService: ConfigService,
         private readonly usersService: UsersService,
         private readonly tenantService: TenantService,
-        private readonly scopeService: ScopeService,
+        private readonly roleService: RoleService,
         private dataSource: DataSource
     ) {
     }
@@ -82,10 +82,10 @@ export class StartUpService implements OnModuleInit {
                     this.configService.get("SUPER_TENANT_DOMAIN"),
                     user
                 );
-                const scopeAdmin = await this.scopeService.findByNameAndTenant(ScopeEnum.TENANT_ADMIN, tenant);
-                const scopeViewer = await this.scopeService.findByNameAndTenant(ScopeEnum.TENANT_VIEWER, tenant);
-                const scopeSuperAdmin = await this.scopeService.create(ScopeEnum.SUPER_ADMIN, tenant, false);
-                await this.scopeService.updateUserScopes([scopeAdmin.name, scopeViewer.name, scopeSuperAdmin.name], tenant, user);
+                const adminRole = await this.roleService.findByNameAndTenant(RoleEnum.TENANT_ADMIN, tenant);
+                const viewerRole = await this.roleService.findByNameAndTenant(RoleEnum.TENANT_VIEWER, tenant);
+                const superAdminRole = await this.roleService.create(RoleEnum.SUPER_ADMIN, tenant, false);
+                await this.roleService.updateUserRoles([adminRole.name, viewerRole.name, superAdminRole.name], tenant, user);
             }
         } catch (e) {
             console.error(e);

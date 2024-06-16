@@ -8,9 +8,16 @@ import {UsersAdminController} from "./users.admin.controller";
 import {TenantController} from "./tenant.controller";
 import {MemberController} from "./members.controller";
 import {UsersModule} from "../users/users.module";
-import {ScopesModule} from "../scopes/scopes.module";
-import {ScopeController} from "./scope.controller";
+import {RolesModule} from "../roles/roles.module";
+import {RoleController} from "./role.controller";
 import {MainController} from "./main.controller";
+import {GenericSearchController} from "./generic-serach.controller";
+import {TypeOrmModule} from "@nestjs/typeorm";
+import {User} from "../users/user.entity";
+import {Tenant} from "../tenants/tenant.entity";
+import {Role} from "../roles/role.entity";
+import {TenantMember} from "../tenants/tenant.members.entity";
+import {Group} from "../groups/group.entity";
 
 @Module(
     {
@@ -21,15 +28,17 @@ import {MainController} from "./main.controller";
                 MailModule,
                 TenantModule,
                 UsersModule,
-                ScopesModule,
+                RolesModule,
+                TypeOrmModule.forFeature([User, Tenant, Role, TenantMember, Group])
             ],
         controllers: [
             UsersController,
             UsersAdminController,
             TenantController,
             MemberController,
-            ScopeController,
-            MainController
+            RoleController,
+            MainController,
+            GenericSearchController
         ],
         providers: [],
         exports: []

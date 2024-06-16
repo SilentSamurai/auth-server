@@ -105,13 +105,13 @@ const UpdateTenantSchema = yup.object().shape(
         domain: yup.string().max(100).nullable(),
     });
 
-const CreateScopeSchema = yup.object().shape(
+const CreateRoleSchema = yup.object().shape(
     {
         name: yup.string().required('Name is required').max(20),
         tenantId: yup.string().required('TenantId is required'),
     });
 
-const OperatingScopeSchema = yup.object().shape({
+const OperatingRoleSchema = yup.object().shape({
         scopes: yup.array().of(
             yup.string().max(20)
         )
@@ -157,7 +157,7 @@ const PasswordGrantSchema = yup.object().shape({
 });
 
 const ClientCredentialGrantSchema = yup.object().shape({
-    grant_type: yup.string().required().matches(/^client_credential$/g, {message: "grant type not recognised"}),
+    grant_type: yup.string().required().matches(/^client_credentials?$/g, {message: "grant type not recognised"}),
     client_id: yup.string().required('client_id is required'),
     client_secret: yup.string().required('client_secret is required'),
     scopes: yup.array().of(
@@ -218,6 +218,31 @@ const RefreshTokenSchema = yup.object().shape(
         domain: yup.string().required('token is invalid')
     });
 
+const CreateGroupSchema = yup.object().shape(
+    {
+        name: yup.string().required('Name is required').max(128),
+        tenantId: yup.string().required('tenantId is required').max(100),
+    });
+
+const UpdateGroupSchema = yup.object().shape(
+    {
+        name: yup.string().required('Name is required').max(128)
+    });
+
+const UpdateGroupRole = yup.object().shape(
+    {
+        roles: yup.array().of(
+            yup.string().max(128)
+        )
+    });
+
+const UpdateGroupUser = yup.object().shape(
+    {
+        users: yup.array().of(
+            yup.string().max(128)
+        )
+    });
+
 
 export const ValidationSchema =
     {
@@ -243,13 +268,17 @@ export const ValidationSchema =
         DeleteUserSchema,
         CreateTenantSchema,
         UpdateTenantSchema,
-        CreateScopeSchema,
-        OperatingScopeSchema,
+        CreateRoleSchema: CreateRoleSchema,
+        OperatingRoleSchema: OperatingRoleSchema,
         MemberOperationsSchema,
         CreateUserSchema,
         UpdateUserSchema,
         VerifyTokenSchema,
         ExchangeTokenSchema,
         SecurityContextSchema,
-        RefreshTokenSchema
+        RefreshTokenSchema,
+        CreateGroupSchema,
+        UpdateGroupRole,
+        UpdateGroupUser,
+        UpdateGroupSchema
     };
