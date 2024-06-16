@@ -8,7 +8,8 @@
         "start": "cd ./srv && npm run start:prod",
         "dev:ui:start": "cd ./ui && npm run UI:BUILD:WATCH",
         "dev:backend:start": "cd ./srv && npm run start:debug",
-        "dev:external:start": "cd ./external-user-app && node server.js"
+        "dev:external:start": "cd ./external-user-app && node server.js",
+        "run:cypress": "cd cypress && npx cypress run"
     },
     "dependencies": {
     }
