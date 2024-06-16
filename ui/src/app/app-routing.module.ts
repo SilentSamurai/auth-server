@@ -12,9 +12,9 @@ import {HomeComponent} from './secure/home.component';
 import {AdminAuthGuard} from "./shared/admin-auth-guard.service";
 import {RL01Component} from "./secure/roles/RL01.component";
 import {RL02SelectionComponent} from "./secure/roles/RL02-selection.component";
-import {GroupListComponent} from "./secure/group/group-list.component";
-import {GroupSelectionComponent} from "./secure/group/group-selection.component";
-import {GroupObjectComponent} from "./secure/group/group-object.component";
+import {GP01Component} from "./secure/group/GP01.component";
+import {GP02SelectionComponent} from "./secure/group/GP02-selection.component";
+import {GP02Component} from "./secure/group/GP02.component";
 import {RL02Component} from "./secure/roles/RL02.component";
 import {TN02SelectionComponent} from "./secure/tenants/TN02-selection.component";
 import {TNRL01Component} from "./secure/tenants/TNRL01.component";
@@ -42,9 +42,9 @@ const routes: Routes = [
             {path: 'RL02', component: RL02SelectionComponent, canActivate: []},
             {path: 'RL02/:tenantId/:roleName', component: RL02Component, canActivate: []},
             // groups
-            {path: 'GP01', component: GroupListComponent, canActivate: []},
-            {path: 'GP02', component: GroupSelectionComponent, canActivate: []},
-            {path: 'GP02/:groupId', component: GroupObjectComponent, canActivate: []},
+            {path: 'GP01', component: GP01Component, canActivate: []},
+            {path: 'GP02', component: GP02SelectionComponent, canActivate: []},
+            {path: 'GP02/:groupId', component: GP02Component, canActivate: []},
             // users
             {path: 'UR01', component: UR01Component, canActivate: []},
             {path: 'UR02', component: UR02SelectionComponent, canActivate: []},

@@ -1,8 +1,8 @@
 import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
 import {MessageService} from "primeng/api";
-import {GroupService} from "../../_services/group.service";
-import {TenantService} from "../../_services/tenant.service";
+import {GroupService} from "../../../_services/group.service";
+import {TenantService} from "../../../_services/tenant.service";
 
 @Component({
     selector: 'app-update-group',

@@ -22,11 +22,11 @@ export class GroupService {
         };
     }
 
-    async queryGroup(tenantId: string, query: any): Promise<any> {
+    async queryGroup(query: any): Promise<any> {
         return lastValueFrom(this.http.post(`${API_URL}/search/Groups/`, query, this.getHttpOptions()));
     }
 
-    async getAllTenantGroups(tenantId: string): Promise<any[]> {
+    async getGroupsByTenant(tenantId: string): Promise<any[]> {
         return await lastValueFrom(this.http.get(`${API_URL}/tenant/${tenantId}/groups`, this.getHttpOptions())) as any[];
     }
 

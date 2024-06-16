@@ -7,7 +7,7 @@ import {InternalFilter} from "./filter-field.component";
 @Component({
     selector: 'app-fvh',
     template: `
-        <div class="modal-header pb-0">
+        <div class="modal-header pb-0 bg-primary-subtle">
             <div class="container-fluid">
                 <div class="row">
                     <div class="col d-flex justify-content-between ">
@@ -27,11 +27,11 @@ import {InternalFilter} from "./filter-field.component";
                 <div class="row">
                     <ul class="nav nav-tabs" role="tablist">
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link active"
+                            <button class="nav-link active bg-primary-subtle tab-bottom-color"
                                     data-bs-toggle="tab"
                                     data-bs-target="#conditions"
                                     type="button" role="tab" aria-controls="conditions" aria-selected="true">
-                                Conditions
+                                Define Conditions
                             </button>
                         </li>
                     </ul>

@@ -27,6 +27,8 @@ import {TableColumnComponent} from "./table/app-table-column.component";
 import {PageViewBodyComponent} from "./page-view/page-view-body.component";
 import {FilterFieldComponent} from "./filter-bar/filter-field.component";
 import {FilterValueHelpComponent} from "./filter-bar/filter-value-help.component";
+import {ButtonModule} from "primeng/button";
+import {RippleModule} from "primeng/ripple";
 
 @NgModule({
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -63,7 +65,9 @@ import {FilterValueHelpComponent} from "./filter-bar/filter-value-help.component
         NgbCollapseModule,
         NgbDropdownModule,
         CardModule,
-        SkeletonModule
+        SkeletonModule,
+        ButtonModule,
+        RippleModule
     ],
     providers: [],
     exports: [

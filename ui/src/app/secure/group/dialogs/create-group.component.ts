@@ -2,9 +2,9 @@ import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
 import {lastValueFrom} from "rxjs";
 import {MessageService} from "primeng/api";
-import {GroupService} from "../../_services/group.service";
-import {TableAsyncLoadEvent} from "../../component/table/app-table.component";
-import {TenantService} from "../../_services/tenant.service";
+import {GroupService} from "../../../_services/group.service";
+import {TableAsyncLoadEvent} from "../../../component/table/app-table.component";
+import {TenantService} from "../../../_services/tenant.service";
 
 @Component({
     selector: 'app-create-group',

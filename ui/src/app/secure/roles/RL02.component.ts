@@ -18,8 +18,14 @@ import {RoleService} from "../../_services/role.service";
                     <div class="col">
                         <div class=" my-2 mb-4">
                             <div class="p-disabled">Name</div>
-                            <h4>{{ role.name }}</h4>
+                            <h5>{{ role.name }}</h5>
                         </div>
+                        <div class="my-2">
+                            <div class="p-disabled">Description</div>
+                            <div>{{ role.description }}</div>
+                        </div>
+                    </div>
+                    <div class="col">
                         <div class="my-2">
                             <div class="p-disabled">Tenant Id</div>
                             <div>{{ role.tenant.id }}</div>

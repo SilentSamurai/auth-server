@@ -16,24 +16,26 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
         <app-page-view>
             <app-page-view-header>
                 <div class="mb-4">
-                    <div class="d-flex justify-content-between">
-                        <h5>Tenant List</h5>
-                        <button (click)="openCreateModal()" [disabled]="!this.creationAllowed"
-                                class="btn btn-success btn-sm"
-                                type="button">
-                            <i class="fa fa-solid fa-plus me-2"></i> Add Tenant
-                        </button>
-                    </div>
                     <app-fb (onFilter)="onFilter($event)">
                         <app-fb-col label="Tenant Id" name="id"></app-fb-col>
                         <app-fb-col label="Name" name="name"></app-fb-col>
                         <app-fb-col label="Domain" name="domain"></app-fb-col>
                     </app-fb>
+                    <div class="d-flex justify-content-between mt-2">
+                        <div></div>
+                        <button (click)="openCreateModal()" [disabled]="!this.creationAllowed"
+                                class="btn btn-outline-success btn-sm"
+                                type="button">
+                            <i class="fa fa-solid fa-plus me-2"></i> Create Tenant
+                        </button>
+                    </div>
+
                 </div>
             </app-page-view-header>
 
             <app-page-view-body>
                 <app-table
+                    title="Tenant List"
                     (onLoad)="lazyLoad($event)"
                     idField="id"
                     isFilterAsync="true"

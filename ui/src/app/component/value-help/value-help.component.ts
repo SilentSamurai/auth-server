@@ -9,7 +9,7 @@ import {Filter, FilterBarColumnComponent} from "../filter-bar/filter-bar.compone
 @Component({
     selector: 'app-value-help',
     template: `
-        <div class="modal-header p-2 bg-primary-subtle" style="display:block">
+        <div class="modal-header py-2 bg-primary-subtle" style="display:block">
             <div class="row ">
                 <div class="col d-flex justify-content-between">
                     <div class="h5 mb-0 modal-title">{{ name }}</div>
@@ -34,8 +34,9 @@ import {Filter, FilterBarColumnComponent} from "../filter-bar/filter-bar.compone
                 </div>
             </div>
         </div>
-        <div class="modal-body p-0 w-100">
+        <div class="modal-body p-0 ">
             <app-table
+                [title]="name"
                 [idField]="idField"
                 [multi]="multi"
                 [isFilterAsync]="isFilterAsync"
@@ -83,6 +84,7 @@ export class ValueHelpComponent implements OnInit {
 
 
     onLoad!: EventEmitter<TableAsyncLoadEvent>;
+
     isFilterAsync: boolean = false;
 
     @ViewChild(AppTableComponent)
@@ -130,6 +132,6 @@ export class ValueHelpComponent implements OnInit {
     }
 
     onFilter(filters: Filter[]) {
-
+        this.table.filter(filters);
     }
 }

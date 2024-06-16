@@ -11,7 +11,7 @@ import {
     ViewChild
 } from '@angular/core';
 import {Filter, FilterBarComponent} from "../filter-bar/filter-bar.component";
-import {FilterMatchMode, LazyLoadEvent} from "primeng/api";
+import {LazyLoadEvent} from "primeng/api";
 import {Table} from "primeng/table"
 import {TableColumnComponent} from "./app-table-column.component";
 import {Util} from "../utils";
@@ -41,11 +41,24 @@ export class TableAsyncLoadEvent {
             selectionMode="{{ multi ? 'multiple' : 'single' }}"
             [virtualRowHeight]="20"
             [virtualScroll]="true"
-            styleClass="p-datatable-gridlines p-datatable-sm"
+            styleClass="p-datatable-striped p-datatable-sm"
         >
-            <!--                <ng-template pTemplate="caption">-->
+            <ng-template pTemplate="caption">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        {{ title }}
+                    </div>
+                    <div>
+                        <button type="button" class="btn btn-sm " (click)="reset()" pRipple>
+                            <i class="pi pi-refresh "></i>
+                        </button>
+                        <button type="button" class="btn btn-sm ps-2" (click)="reset()" pRipple>
+                            <i class="pi pi-sort-alt "></i>
+                        </button>
+                    </div>
+                </div>
 
-            <!--                </ng-template>-->
+            </ng-template>
             <ng-template pTemplate="header">
                 <tr style="height:40px">
                     <th style="max-width:40px">
@@ -66,6 +79,8 @@ export class TableAsyncLoadEvent {
                 <tr [pSelectableRow]="row">
                     <td style="max-width:40px">
                         <p-tableCheckbox [value]="row"></p-tableCheckbox>
+
+                        <!--                        <p-tableRadioButton *ngIf="!multi" [value]="row" ></p-tableRadioButton>-->
                     </td>
                     <ng-container *ngTemplateOutlet="body; context: {$implicit: row}"></ng-container>
                 </tr>
@@ -87,6 +102,7 @@ export class TableAsyncLoadEvent {
 })
 export class AppTableComponent implements OnInit {
 
+    @Input() title: string = "";
     @Input() scrollHeight: string = "65vh";
     @Input() idField!: string;
     @Input() multi: string | boolean = true;
@@ -174,16 +190,25 @@ export class AppTableComponent implements OnInit {
                 update: this.setData.bind(this)
             })
         } else {
-            if (Object.keys(filters).length > 0) {
-                console.log(filters);
-                this.pTable.clearState()
-                for (let filter of filters) {
-                    let value = filter.value;
-                    let pattern = new RegExp(value, 'iug');
-                    this.pTable.filter(value, filter.name, FilterMatchMode.CONTAINS);
-                }
-            }
+            // if (filters.length > 0) {
+            //     console.log(filters);
+            //     this.pTable.clearState();
+            //     for (let filter of filters) {
+            //         let value = filter.value;
+            //         this.pTable.filter(value, filter.name, FilterMatchMode.CONTAINS);
+            //     }
+            // }
         }
 
+    }
+
+    reset() {
+        this.onLoad.emit({
+            pageNo: 0,
+            pageSize: 100,
+            sortBy: [],
+            filters: this.filters,
+            update: this.setData.bind(this)
+        })
     }
 }

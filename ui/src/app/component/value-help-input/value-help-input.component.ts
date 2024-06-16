@@ -71,7 +71,7 @@ export class ValueHelpInputComponent implements OnInit, AfterViewInit {
     @Input() multi: string | boolean = false;
     @Input() labelField!: string;
     @Input() idField!: string;
-    @Input() isFilterAsync: string | boolean = false;
+    @Input() isFilterAsync: string | boolean = true;
     @Input() placeholder: string = '';
     @Input() selection: any[] = [];
     @Output() selectionChange = new EventEmitter<any[]>();

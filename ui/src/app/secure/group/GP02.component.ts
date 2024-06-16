@@ -7,7 +7,7 @@ import {TokenStorageService} from "../../_services/token-storage.service";
 import {GroupService} from "../../_services/group.service";
 import {AuthDefaultService} from "../../_services/auth.default.service";
 import {TableAsyncLoadEvent} from "../../component/table/app-table.component";
-import {UpdateGroupComponent} from "./update-group.component";
+import {UpdateGroupComponent} from "./dialogs/update-group.component";
 
 @Component({
     selector: 'app-group-object',
@@ -76,19 +76,22 @@ import {UpdateGroupComponent} from "./update-group.component";
                                     Assign Roles
                                 </button>
                             </div>
-
-
                         </div>
                     </ng-template>
                     <ng-template let-columns pTemplate="header">
                         <tr>
                             <th>Name</th>
+                            <th>Description</th>
                             <th>Actions</th>
                         </tr>
                     </ng-template>
                     <ng-template let-columns="columns" let-role pTemplate="body">
                         <tr>
-                            <td><span class="p-column-title">Name</span>{{ role.name }}</td>
+                            <td>
+                                <a [routerLink]="['/RL02', group.tenant.id, role.name]"
+                                   href="javascript:void(0)">{{ role.name }}</a>
+                            </td>
+                            <td></td>
                             <td>
                                 <button (click)="onRemoveRole(role)"
                                         class="btn btn-sm"
@@ -141,7 +144,11 @@ import {UpdateGroupComponent} from "./update-group.component";
                     <ng-template let-columns="columns" let-user pTemplate="body">
                         <tr>
                             <td>{{ user.name }}</td>
-                            <td>{{ user.email }}</td>
+                            <td>
+                                <a [routerLink]="['/TNRL01', group.tenant.id, user.email]"
+                                   href="javascript:void(0)">{{ user.email }}</a>
+
+                            </td>
                             <td>
                                 <button (click)="onUserRemove(user)"
                                         class="btn btn-sm"
@@ -154,20 +161,17 @@ import {UpdateGroupComponent} from "./update-group.component";
                 </p-table>
             </app-object-page-section>
         </app-object-page>
-
         <div class="text-center" *ngIf="loading">
             <div class="spinner-border" role="status">
                 <span class="sr-only">Loading...</span>
             </div>
         </div>
         <p-confirmDialog></p-confirmDialog>
-
-
     `,
     styles: [''],
     providers: [ConfirmationService, MessageService]
 })
-export class GroupObjectComponent implements OnInit {
+export class GP02Component implements OnInit {
 
     loading = true;
     group: any;

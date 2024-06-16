@@ -74,12 +74,19 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
                     <ng-template let-columns pTemplate="header">
                         <tr>
                             <th>Name</th>
+                            <th>Description</th>
                             <th>Actions</th>
                         </tr>
                     </ng-template>
                     <ng-template let-columns="columns" let-role pTemplate="body">
                         <tr>
-                            <td><span class="p-column-title">Name</span>{{ role.name }}</td>
+                            <td>
+                                <a [routerLink]="['/RL02', tenant.id, role.name]"
+                                   href="javascript:void(0)">{{ role.name }}</a>
+                            </td>
+                            <td>
+
+                            </td>
                             <td>
                                 <button (click)="onRemoveRole(role)"
                                         *ngIf="role.removable"

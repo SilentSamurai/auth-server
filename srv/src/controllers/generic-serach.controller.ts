@@ -35,7 +35,9 @@ export class GenericSearchController {
             "Users": "users",
             "Tenants": "tenant"
         },
-        "Groups": {}
+        "Groups": {
+            "Tenants": "tenant"
+        }
     }
 
     constructor(

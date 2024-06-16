@@ -29,13 +29,13 @@ import {RL01Component} from "./roles/RL01.component";
 import {RL02SelectionComponent} from "./roles/RL02-selection.component";
 import {InputTextModule} from "primeng/inputtext";
 import {MessagesModule} from "primeng/messages";
-import {GroupSelectionComponent} from "./group/group-selection.component";
-import {GroupListComponent} from "./group/group-list.component";
-import {CreateGroupComponent} from "./group/create-group.component";
-import {GroupObjectComponent} from "./group/group-object.component";
+import {GP02SelectionComponent} from "./group/GP02-selection.component";
+import {GP01Component} from "./group/GP01.component";
+import {CreateGroupComponent} from "./group/dialogs/create-group.component";
+import {GP02Component} from "./group/GP02.component";
 import {ConfirmDialogModule} from "primeng/confirmdialog";
 import {ConfirmationService, MessageService} from "primeng/api";
-import {UpdateGroupComponent} from "./group/update-group.component";
+import {UpdateGroupComponent} from "./group/dialogs/update-group.component";
 import {RL02Component} from "./roles/RL02.component";
 import {TN02SelectionComponent} from "./tenants/TN02-selection.component";
 import {TNRL01Component} from "./tenants/TNRL01.component";
@@ -67,10 +67,10 @@ import {UR02SelectionComponent} from "./users/UR02-selection.component";
         RemoveRoleComponent,
         RL01Component,
         RL02SelectionComponent,
-        GroupSelectionComponent,
-        GroupListComponent,
+        GP02SelectionComponent,
+        GP01Component,
         CreateGroupComponent,
-        GroupObjectComponent,
+        GP02Component,
         UpdateGroupComponent,
         RL02Component
     ],
