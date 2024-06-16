@@ -48,7 +48,7 @@ import {CreateGroupComponent} from "./dialogs/create-group.component";
                                href="javascript:void(0)">{{ group.name }}</a>
                         </td>
                         <td>
-                            <a [routerLink]="['/tenant/', group.tenantId]"
+                            <a [routerLink]="['/TN02/', group.tenantId]"
                                href="javascript:void(0)">{{ group.tenantId }}</a>
                         </td>
                         <td><span class="p-column-title">Created At</span>{{ group.createdAt | date }}</td>
@@ -86,7 +86,7 @@ export class GP01Component implements OnInit {
 
     async ngOnInit(): Promise<void> {
         // this.users = await this.userService.queryUser({});
-        this.authDefaultService.setTitle("Manage Groups");
+        this.authDefaultService.setTitle("GP01: Manage Groups");
         // this.tenantId = this.route.snapshot.params['tenantId'];
     }
 

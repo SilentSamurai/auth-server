@@ -11,36 +11,37 @@ import {lastValueFrom} from "rxjs";
         <nav-bar></nav-bar>
         <app-object-page>
             <app-object-page-header>
+                <app-object-page-title>
+                    {{ user_email }}
+                </app-object-page-title>
+                <app-object-page-subtitle>
+                    {{ user.name }}
+                </app-object-page-subtitle>
                 <div class="row">
                     <div class="col">
-                        <div class="my-2">
-                            <div class="p-disabled">Email</div>
-                            <h5>{{ user_email }}</h5>
-                        </div>
-                        <div class="my-2">
-                            <div class="p-disabled">Name</div>
-                            <div>{{ user.name }}</div>
-                        </div>
-                        <div class="my-2">
-                            <div class="p-disabled">Created At</div>
-                            <div>{{ user.createdAt | date }}</div>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="d-flex justify-content-end total font-weight-bold mt-4">
-                            <button (click)="openUpdateModal()" class="btn btn-sm btn-primary mx-2">
-                                Update
-                            </button>
-                            <button (click)="openUpdateModal()" class="btn btn-sm  btn-primary mx-2">
-                                Change Password
-                            </button>
-                            <button (click)="openUpdateModal()" class="btn btn-sm  btn-primary mx-2">
-                                Lock / Unlock
-                            </button>
-                        </div>
+                        <app-attribute label="Email">
+                            {{ user_email }}
+                        </app-attribute>
+                        <app-attribute label="Name">
+                            {{ user.name }}
+                        </app-attribute>
+                        <app-attribute label="Created At">
+                            {{ user.createdAt | date }}
+                        </app-attribute>
                     </div>
                 </div>
             </app-object-page-header>
+            <app-object-page-actions>
+                <button (click)="openUpdateModal()" class="btn btn-sm btn-primary mx-2">
+                    Update
+                </button>
+                <button (click)="openUpdateModal()" class="btn btn-sm  btn-primary mx-2">
+                    Change Password
+                </button>
+                <button (click)="openUpdateModal()" class="btn btn-sm  btn-primary mx-2">
+                    Lock / Unlock
+                </button>
+            </app-object-page-actions>
             <app-object-page-section name="Tenants">
                 <p-table [value]="tenants" responsiveLayout="scroll">
                     <ng-template pTemplate="caption">

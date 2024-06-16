@@ -13,40 +13,40 @@ import {RoleService} from "../../_services/role.service";
     template: `
         <nav-bar></nav-bar>
         <app-object-page *ngIf="!loading">
+            <app-object-page-title>
+                {{ role.name }}
+            </app-object-page-title>
+            <app-object-page-subtitle>
+                {{ role.tenant.name }}
+            </app-object-page-subtitle>
+            <app-object-page-actions>
+                <button (click)="onUpdateGroup()"
+                        class="btn btn-primary btn-sm me-2">
+                    Update
+                </button>
+
+                <button (click)="onDeleteGroup()"
+                        class="btn btn-danger btn-sm">
+                    Delete
+                </button>
+            </app-object-page-actions>
             <app-object-page-header>
                 <div class="row">
                     <div class="col">
-                        <div class=" my-2 mb-4">
-                            <div class="p-disabled">Name</div>
-                            <h5>{{ role.name }}</h5>
-                        </div>
-                        <div class="my-2">
-                            <div class="p-disabled">Description</div>
-                            <div>{{ role.description }}</div>
-                        </div>
+                        <app-attribute label="Name">
+                            {{ role.name }}
+                        </app-attribute>
+                        <app-attribute label="Description">
+                            {{ role.description }}
+                        </app-attribute>
                     </div>
                     <div class="col">
-                        <div class="my-2">
-                            <div class="p-disabled">Tenant Id</div>
-                            <div>{{ role.tenant.id }}</div>
-                        </div>
-                        <div class="my-2">
-                            <div class="p-disabled">Tenant Name</div>
-                            <div>{{ role.tenant.name }}</div>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="d-flex justify-content-end total font-weight-bold mt-4">
-                            <button (click)="onUpdateGroup()"
-                                    class="btn btn-primary btn-sm me-2">
-                                Update
-                            </button>
-
-                            <button (click)="onDeleteGroup()"
-                                    class="btn btn-danger btn-sm">
-                                Delete
-                            </button>
-                        </div>
+                        <app-attribute label="Tenant Id">
+                            {{ role.tenant.id }}
+                        </app-attribute>
+                        <app-attribute label="Tenant Name">
+                            {{ role.tenant.name }}
+                        </app-attribute>
                     </div>
                 </div>
             </app-object-page-header>
@@ -121,13 +121,7 @@ import {RoleService} from "../../_services/role.service";
 export class RL02Component implements OnInit {
 
     loading = true;
-    role: any = {
-        name: "Role 1",
-        tenant: {
-            id: "wegwegweg",
-            name: "Tenant 1"
-        }
-    };
+    role: any;
     users: any[] = [];
     selectedUsers: any[] = [];
     private roleName: string = "";
@@ -146,7 +140,6 @@ export class RL02Component implements OnInit {
 
     async ngOnInit() {
         this.loading = true;
-        this.authDefaultService.setTitle("Role Details");
 
         if (!this.actRoute.snapshot.params.hasOwnProperty("roleName") || !this.actRoute.snapshot.params.hasOwnProperty("tenantId")) {
             await this.router.navigate(["/RL01"]);
@@ -160,7 +153,7 @@ export class RL02Component implements OnInit {
         this.role = response.role;
         this.users = response.users;
 
-        this.authDefaultService.setTitle("Role: " + this.role.name);
+        this.authDefaultService.setTitle("RL02: " + this.role.name);
 
         this.loading = false;
     }

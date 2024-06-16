@@ -10,8 +10,8 @@ import {PageViewBodyComponent} from "./page-view-body.component";
     selector: 'app-page-view',
     template: `
         <div class="container-fluid mb-5 px-0" *ngIf="!loading">
-            <div class="card" style="border-radius: 0">
-                <div class="{{containerClass}} mt-4 mb-2 px-4">
+            <div class="card shadow-sm" style="border-radius: 0">
+                <div class="{{containerClass}} mt-4 mb-4 px-4">
                     <div class="row">
                         <div class="col">
                             <ng-container [ngTemplateOutlet]="header.template"></ng-container>

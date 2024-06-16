@@ -15,6 +15,7 @@ import {RoleService} from "../../_services/role.service";
         <div class="container-fluid">
             <div class="row">
                 <div class="col-4">
+                    <h5 class="my-2">Select Role</h5>
                     <form class="form-group g-3">
 
                         <label class="col-3 col-form-label control-label-required" for="Role">
@@ -75,7 +76,7 @@ export class RL02SelectionComponent implements OnInit {
     }
 
     async ngOnInit(): Promise<void> {
-        this.authDefaultService.setTitle("RLO2: Select Role");
+        this.authDefaultService.setTitle("RL02: Select Role");
     }
 
     async continue() {

@@ -14,35 +14,40 @@ import {UpdateGroupComponent} from "./dialogs/update-group.component";
     template: `
         <nav-bar></nav-bar>
         <app-object-page *ngIf="!loading">
+            <app-object-page-title>
+                {{ group.name }}
+            </app-object-page-title>
+            <app-object-page-subtitle>
+                {{ group.tenant.name }}
+            </app-object-page-subtitle>
+            <app-object-page-actions>
+                <button (click)="onUpdateGroup()"
+                        class="btn btn-primary btn-sm me-2">
+                    Update
+                </button>
+
+                <button (click)="onDeleteGroup()"
+                        class="btn btn-danger btn-sm">
+                    Delete
+                </button>
+            </app-object-page-actions>
             <app-object-page-header>
                 <div class="row">
-                    <div class="col">
-
-                        <div class=" my-2 mb-4">
-                            <div class="p-disabled">Name</div>
-                            <h4>{{ group.name }}</h4>
-                        </div>
-                        <div class="my-2">
-                            <div class="p-disabled">Tenant Id</div>
-                            <div>{{ group.tenant.id }}</div>
-                        </div>
-                        <div class="my-2">
-                            <div class="p-disabled">Tenant Name</div>
-                            <div>{{ group.tenant.name }}</div>
-                        </div>
+                    <div class="col-md">
+                        <app-attribute label="Group Name" valueClass="">
+                            {{ group.name }}
+                        </app-attribute>
+                        <app-attribute label="Description" valueClass="">
+                            {{ group.description }}
+                        </app-attribute>
                     </div>
-                    <div class="col">
-                        <div class="d-flex justify-content-end total font-weight-bold mt-4">
-                            <button (click)="onUpdateGroup()"
-                                    class="btn btn-primary btn-sm me-2">
-                                Update
-                            </button>
-
-                            <button (click)="onDeleteGroup()"
-                                    class="btn btn-danger btn-sm">
-                                Delete
-                            </button>
-                        </div>
+                    <div class="col-md">
+                        <app-attribute label="Tenant Id">
+                            {{ group.tenant.id }}
+                        </app-attribute>
+                        <app-attribute label="Tenant Name">
+                            {{ group.tenant.name }}
+                        </app-attribute>
                     </div>
                 </div>
             </app-object-page-header>
@@ -138,6 +143,7 @@ import {UpdateGroupComponent} from "./dialogs/update-group.component";
                         <tr>
                             <th>Name</th>
                             <th>Email</th>
+                            <th>Assignments</th>
                             <th>Actions</th>
                         </tr>
                     </ng-template>
@@ -145,8 +151,12 @@ import {UpdateGroupComponent} from "./dialogs/update-group.component";
                         <tr>
                             <td>{{ user.name }}</td>
                             <td>
-                                <a [routerLink]="['/TNRL01', group.tenant.id, user.email]"
+                                <a [routerLink]="['/UR02', user.email]"
                                    href="javascript:void(0)">{{ user.email }}</a>
+                            </td>
+                            <td>
+                                <a [routerLink]="['/TNRL01', group.tenant.id, user.email]"
+                                   href="javascript:void(0)">View Assignments</a>
 
                             </td>
                             <td>

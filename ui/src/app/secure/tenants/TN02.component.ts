@@ -16,53 +16,47 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
     template: `
         <nav-bar></nav-bar>
         <app-object-page>
+            <app-object-page-title>
+                {{ tenant.domain }}
+            </app-object-page-title>
+            <app-object-page-subtitle>
+                {{ tenant.name }}
+            </app-object-page-subtitle>
+            <app-object-page-actions>
+                <button (click)="onUpdateTenant()" [disabled]="!isTenantAdmin"
+                        class="btn btn-primary btn-sm">
+                    Update
+                </button>
+            </app-object-page-actions>
             <app-object-page-header>
                 <div class="row">
                     <div class="col-lg-5">
-                        <div class=" my-2 mb-4">
-                            <div class="p-disabled">Tenant Domain</div>
-                            <h4>{{ tenant.domain }}</h4>
-                        </div>
-                        <div class="my-2">
-                            <div class="p-disabled">Tenant Id</div>
-                            <div>{{ tenant_id }}</div>
-                        </div>
-                        <div class="my-2">
-                            <div class="p-disabled">Tenant Name</div>
-                            <div>{{ tenant.name }}</div>
-                        </div>
-                        <div class="d-flex justify-content-between total font-weight-bold mt-4">
-                            <button (click)="onUpdateTenant()" [disabled]="!isTenantAdmin"
-                                    class="btn btn-primary btn-sm">
-                                Update
-                            </button>
-                        </div>
+                        <app-attribute label="Tenant Domain">
+                            {{ tenant.domain }}
+                        </app-attribute>
+                        <app-attribute label="Tenant Id">
+                            {{ tenant_id }}
+                        </app-attribute>
+                        <app-attribute label="Tenant Name">
+                            {{ tenant.name }}
+                        </app-attribute>
                     </div>
                     <div class="col-lg-7">
-                        <div class="my-2">
-                            <div class="p-disabled">Client Id</div>
-                            <div>
-                                <code>
-                                    <pre class="text-wrap text-break">{{ credentials.clientId }}</pre>
-                                </code>
-                            </div>
-                        </div>
-                        <div class="my-2">
-                            <div class="p-disabled">Client Secret</div>
-                            <div>
-                                <code>
-                                    <pre class="text-wrap text-break">{{ credentials.clientSecret }}</pre>
-                                </code>
-                            </div>
-                        </div>
-                        <div class="my-2">
-                            <div class="p-disabled">Public Key</div>
-                            <div>
-                                <code>
-                                    <pre class="text-wrap text-break">{{ credentials.publicKey }}</pre>
-                                </code>
-                            </div>
-                        </div>
+                        <app-attribute label="Client Id">
+                            <code>
+                                <pre class="text-wrap text-break">{{ credentials.clientId }}</pre>
+                            </code>
+                        </app-attribute>
+                        <app-attribute label="Client Secret">
+                            <code>
+                                <pre class="text-wrap text-break">{{ credentials.clientSecret }}</pre>
+                            </code>
+                        </app-attribute>
+                        <app-attribute label="Public Key">
+                            <code>
+                                <pre class="text-wrap text-break">{{ credentials.publicKey }}</pre>
+                            </code>
+                        </app-attribute>
                     </div>
                 </div>
             </app-object-page-header>
@@ -175,7 +169,7 @@ export class TN02Component implements OnInit {
         this.tenant = await this.tenantService.getTenantDetails(this.tenant_id);
         this.members = await this.tenantService.getMembers(this.tenant_id);
 
-        this.authDefaultService.setTitle("Tenant: " + this.tenant.name);
+        this.authDefaultService.setTitle("TN02: " + this.tenant.name);
     }
 
     async onUpdateTenant() {

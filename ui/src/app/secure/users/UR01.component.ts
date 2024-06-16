@@ -78,7 +78,7 @@ export class UR01Component implements OnInit {
 
     async ngOnInit(): Promise<void> {
         // this.users = await this.userService.queryUser({});
-        this.authDefaultService.setTitle("Manage Users");
+        this.authDefaultService.setTitle("UR01: Manage Users");
     }
 
     async openCreateModal() {

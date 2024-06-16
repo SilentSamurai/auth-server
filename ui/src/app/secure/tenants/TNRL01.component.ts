@@ -14,28 +14,30 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
     template: `
         <nav-bar></nav-bar>
         <app-object-page *ngIf="!loading">
+            <app-object-page-title>
+                {{ user.email }}
+            </app-object-page-title>
+            <app-object-page-subtitle>
+                {{ tenant.name }}
+            </app-object-page-subtitle>
 
             <app-object-page-header>
                 <div class="row mb-2">
                     <div class="col">
-                        <div class=" my-2 mb-4">
-                            <div class="p-disabled">Email</div>
-                            <h4>{{ user.email }}</h4>
-                        </div>
-                        <div class=" my-2 mb-4">
-                            <div class="p-disabled">Name</div>
-                            <div>{{ user.name }}</div>
-                        </div>
+                        <app-attribute label="Email">
+                            {{ user.email }}
+                        </app-attribute>
+                        <app-attribute label="Name">
+                            {{ user.name }}
+                        </app-attribute>
                     </div>
                     <div class="col">
-                        <div class="my-2">
-                            <div class="p-disabled">Tenant Name</div>
-                            <h5>{{ tenant.name }}</h5>
-                        </div>
-                        <div class="my-2">
-                            <div class="p-disabled">Tenant Id</div>
-                            <div>{{ tenant.id }}</div>
-                        </div>
+                        <app-attribute label="Tenant Name">
+                            {{ tenant.name }}
+                        </app-attribute>
+                        <app-attribute label="Tenant Id">
+                            {{ tenant.id }}
+                        </app-attribute>
                     </div>
                 </div>
             </app-object-page-header>
@@ -126,7 +128,7 @@ export class TNRL01Component implements OnInit {
     }
 
     async ngOnInit(): Promise<void> {
-        this.authDefaultService.setTitle("Manage Role Assignments");
+        this.authDefaultService.setTitle("TNRL01: Role Assignment of User");
 
         this.tenantId = this.route.snapshot.params['tenantId'];
         this.email = this.route.snapshot.params['email'];

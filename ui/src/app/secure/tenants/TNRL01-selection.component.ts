@@ -15,14 +15,14 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
         <nav-bar></nav-bar>
         <div class="container-fluid">
             <div class="row">
-                <div class="h4 py-2">
-                    Manage Roles
+                <div class="h5 py-2">
+                    Select Tenant & User:
                 </div>
                 <div class="col-4">
                     <form class="form-group g-3">
 
                         <label class="col-3 col-form-label" for="Tenant">
-                            Tenant
+                            Tenant:
                         </label>
 
                         <app-value-help-input
@@ -50,7 +50,7 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
                         </app-value-help-input>
 
                         <label class="col-3 col-form-label" for="Email">
-                            Email
+                            Email:
                         </label>
                         <app-value-help-input
                             (dataProvider)="userDataProvider($event)"
@@ -113,7 +113,7 @@ export class TNRL01SelectionComponent implements OnInit {
     }
 
     async ngOnInit(): Promise<void> {
-        this.authDefaultService.setTitle("Manage Role Assignments");
+        this.authDefaultService.setTitle("TNRL01: Manage Role Assignments of Tenant");
     }
 
     async continue() {

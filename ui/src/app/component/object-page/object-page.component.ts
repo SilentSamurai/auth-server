@@ -5,13 +5,34 @@ import {ObjectPageHeaderComponent} from "./object-page-header.component";
 import {ObjectPageSectionComponent} from "./object-page-section.component";
 import {ActivatedRoute} from "@angular/router";
 import {firstValueFrom} from "rxjs";
+import {ObjectPageTitleComponent} from "./object-page-title.component";
+import {ObjectPageActionsComponent} from "./object-page-actions.component";
+import {ObjectPageSubTitleComponent} from "./object-page-subtitle.component";
 
 @Component({
     selector: 'app-object-page',
     template: `
         <div class="container-fluid mb-5 px-0" *ngIf="!loading">
-            <div class="card" style="border-radius: 0">
+            <div class="card shadow-sm" style="border-radius: 0">
                 <div class="container mt-4">
+                    <div class="row" *ngIf="titleComponent || subTitleComponent || actions">
+                        <div class="col mb-4">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div *ngIf="titleComponent || subTitleComponent">
+                                    <div class="h3 text-primary">
+                                        <ng-container [ngTemplateOutlet]="titleComponent.template"></ng-container>
+                                    </div>
+                                    <div class="h6 text-secondary" *ngIf="subTitleComponent">
+                                        <ng-container [ngTemplateOutlet]="subTitleComponent.template"></ng-container>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex justify-content-end" *ngIf="actions">
+                                    <ng-container [ngTemplateOutlet]="actions.template"></ng-container>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="row">
                         <div class="col">
                             <ng-container [ngTemplateOutlet]="header.template"></ng-container>
@@ -73,6 +94,15 @@ export class ObjectPageComponent implements OnInit, AfterViewInit {
 
     @ContentChild(ObjectPageHeaderComponent)
     header!: ObjectPageHeaderComponent;
+
+    @ContentChild(ObjectPageTitleComponent)
+    titleComponent!: ObjectPageTitleComponent;
+
+    @ContentChild(ObjectPageSubTitleComponent)
+    subTitleComponent!: ObjectPageSubTitleComponent;
+
+    @ContentChild(ObjectPageActionsComponent)
+    actions!: ObjectPageActionsComponent;
 
     @ContentChildren(ObjectPageSectionComponent)
     sections!: QueryList<ObjectPageSectionComponent>;

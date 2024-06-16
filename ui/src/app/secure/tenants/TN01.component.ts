@@ -15,7 +15,7 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
         <nav-bar></nav-bar>
         <app-page-view>
             <app-page-view-header>
-                <div class="mb-4">
+                <div class="">
                     <app-fb (onFilter)="onFilter($event)">
                         <app-fb-col label="Tenant Id" name="id"></app-fb-col>
                         <app-fb-col label="Name" name="name"></app-fb-col>
@@ -93,7 +93,7 @@ export class TN01Component implements OnInit {
 
     async ngOnInit(): Promise<void> {
         // this.tenants = await lastValueFrom(this.tenantService.getAllTenants());
-        this.authDefaultService.setTitle("TN01: Tenant List");
+        this.authDefaultService.setTitle("TN01: Manage Tenants");
         if (this.tokenStorageService.isSuperAdmin()) {
             this.creationAllowed = true;
         }

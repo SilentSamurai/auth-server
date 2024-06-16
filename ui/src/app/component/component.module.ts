@@ -29,6 +29,10 @@ import {FilterFieldComponent} from "./filter-bar/filter-field.component";
 import {FilterValueHelpComponent} from "./filter-bar/filter-value-help.component";
 import {ButtonModule} from "primeng/button";
 import {RippleModule} from "primeng/ripple";
+import {AttributeComponent} from "./fields/attribute.component";
+import {ObjectPageTitleComponent} from "./object-page/object-page-title.component";
+import {ObjectPageActionsComponent} from "./object-page/object-page-actions.component";
+import {ObjectPageSubTitleComponent} from "./object-page/object-page-subtitle.component";
 
 @NgModule({
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -48,9 +52,13 @@ import {RippleModule} from "primeng/ripple";
         ObjectPageComponent,
         ObjectPageHeaderComponent,
         ObjectPageSectionComponent,
+        ObjectPageTitleComponent,
+        ObjectPageSubTitleComponent,
+        ObjectPageActionsComponent,
         PageViewComponent,
         PageViewBodyComponent,
-        PageViewHeaderComponent
+        PageViewHeaderComponent,
+        AttributeComponent
     ],
     imports: [
         TableModule,
@@ -85,7 +93,11 @@ import {RippleModule} from "primeng/ripple";
         LaunchPadComponent,
         PageViewComponent,
         PageViewHeaderComponent,
-        PageViewBodyComponent
+        PageViewBodyComponent,
+        AttributeComponent,
+        ObjectPageTitleComponent,
+        ObjectPageActionsComponent,
+        ObjectPageSubTitleComponent
     ]
 })
 export class ComponentModule {

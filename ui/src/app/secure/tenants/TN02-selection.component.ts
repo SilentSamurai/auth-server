@@ -85,7 +85,7 @@ export class TN02SelectionComponent implements OnInit {
     }
 
     async ngOnInit(): Promise<void> {
-        this.authDefaultService.setTitle("Select Tenant");
+        this.authDefaultService.setTitle("TN02: Select Tenant");
     }
 
     async continue() {

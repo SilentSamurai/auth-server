@@ -80,7 +80,8 @@ export class GP02SelectionComponent implements OnInit {
     }
 
     async ngOnInit(): Promise<void> {
-        this.authDefaultService.setTitle("Manage Groups");
+        this.authDefaultService.setTitle("GP02: Select Group");
+
     }
 
     async continue() {
