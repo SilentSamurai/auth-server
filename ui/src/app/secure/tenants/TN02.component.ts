@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {MessageService} from "primeng/api";
 import {TenantService} from "../../_services/tenant.service";
@@ -10,6 +10,7 @@ import {AddRoleComponent} from "./dialogs/add-role.component";
 import {RemoveRoleComponent} from "./dialogs/remove-role.component";
 import {RemoveMemberComponent} from "./dialogs/remove-member.component";
 import {AuthDefaultService} from "../../_services/auth.default.service";
+import {DeleteTenantComponent} from "./dialogs/delete-tenant.component";
 
 @Component({
     selector: 'view-tenant',
@@ -26,6 +27,10 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
                 <button (click)="onUpdateTenant()" [disabled]="!isTenantAdmin"
                         class="btn btn-primary btn-sm">
                     Update
+                </button>
+                <button (click)="onDeleteTenant()" [disabled]="!isTenantAdmin"
+                        class="btn btn-danger btn-sm ms-2 ">
+                    Delete Tenant
                 </button>
             </app-object-page-actions>
             <app-object-page-header>
@@ -154,6 +159,7 @@ export class TN02Component implements OnInit {
                 private tokenStorageService: TokenStorageService,
                 private messageService: MessageService,
                 private actRoute: ActivatedRoute,
+                private router: Router,
                 private authDefaultService: AuthDefaultService,
                 private modalService: NgbModal) {
     }
@@ -214,4 +220,11 @@ export class TN02Component implements OnInit {
         await this.ngOnInit();
     }
 
+    async onDeleteTenant() {
+        const modalRef = this.modalService.open(DeleteTenantComponent);
+        modalRef.componentInstance.tenant = this.tenant;
+        const deletedTenant = await modalRef.result;
+        console.log(deletedTenant);
+        await this.router.navigate(['/home']);
+    }
 }

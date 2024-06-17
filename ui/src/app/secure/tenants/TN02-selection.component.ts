@@ -2,7 +2,6 @@ import {Component, OnInit} from '@angular/core';
 import {UserService} from '../../_services/user.service';
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {ActivatedRoute, Router} from "@angular/router";
-import {lastValueFrom} from "rxjs";
 import {TenantService} from "../../_services/tenant.service";
 import {TableAsyncLoadEvent} from "../../component/table/app-table.component";
 import {MessageService} from "primeng/api";
@@ -51,7 +50,8 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
 
 
                         <div class=" d-grid gap-2 py-3 d-flex justify-content-end ">
-                            <button (click)="continue()" class="btn btn-primary btn-block btn-sm" id="login-btn">
+                            <button (click)="continue()" class="btn btn-primary btn-block btn-sm"
+                                    id="TN02_SEL_CONT_BTN">
                                 Continue
                             </button>
                         </div>
@@ -99,10 +99,12 @@ export class TN02SelectionComponent implements OnInit {
 
 
     async onTenantLoad(event: TableAsyncLoadEvent) {
-        if (event.pageNo == 0) {
-            this.tenants = await lastValueFrom(this.tenantService.getAllTenants());
-            event.update(this.tenants);
-        }
+        let response = await this.tenantService.queryTenant({
+            pageNo: event.pageNo,
+            where: event.filters.filter(item => item.value != null && item.value.length > 0)
+        });
+        this.tenants = response.data;
+        event.update(this.tenants);
     }
 
 }

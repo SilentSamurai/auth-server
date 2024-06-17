@@ -40,7 +40,7 @@ import {Filter, FilterBarColumnComponent} from "../filter-bar/filter-bar.compone
                 [idField]="idField"
                 [multi]="multi"
                 [isFilterAsync]="isFilterAsync"
-                (onLoad)="lazyLoad($event)"
+                (onDataRequest)="lazyLoad($event)"
                 [(selection)]="selectedItem">
                 <app-table-col *ngFor="let col of columns"
                                label="{{col.label}}"

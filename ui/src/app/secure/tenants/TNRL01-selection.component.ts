@@ -79,7 +79,8 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
 
 
                         <div class=" d-grid gap-2 py-3 d-flex justify-content-end ">
-                            <button (click)="continue()" class="btn btn-primary btn-block btn-sm" id="login-btn">
+                            <button (click)="continue()" class="btn btn-primary btn-block btn-sm"
+                                    id="TNRL01-SEL-CONT-BTN">
                                 Continue
                             </button>
                         </div>

@@ -87,7 +87,7 @@ export class TenantService {
         return lastValueFrom(this.http.get(`${API_URL}/tenant/${tenantId}/roles`, this.getHttpOptions()))
     }
 
-    async queryTenant(query: any): Promise<any[]> {
+    async queryTenant(query: any): Promise<any> {
         return await lastValueFrom(this.http.post(`${API_URL}/search/Tenants`, query, this.getHttpOptions())) as any;
     }
 

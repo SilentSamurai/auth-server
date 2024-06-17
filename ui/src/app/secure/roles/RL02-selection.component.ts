@@ -45,7 +45,7 @@ import {RoleService} from "../../_services/role.service";
 
 
                         <div class=" d-grid gap-2 py-3 d-flex justify-content-end ">
-                            <button (click)="continue()" class="btn btn-primary btn-block btn-sm" id="login-btn">
+                            <button (click)="continue()" class="btn btn-primary btn-block btn-sm">
                                 Continue
                             </button>
                         </div>

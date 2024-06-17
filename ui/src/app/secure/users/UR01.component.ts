@@ -30,7 +30,7 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
             <app-page-view-body>
                 <app-table
                     title="Users"
-                    (onLoad)="lazyLoad($event)"
+                    (onDataRequest)="lazyLoad($event)"
                     idField="email"
                     isFilterAsync="true"
                     multi="true"

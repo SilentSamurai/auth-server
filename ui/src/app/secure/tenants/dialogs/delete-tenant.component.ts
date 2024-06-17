@@ -6,15 +6,15 @@ import {TenantService} from "../../../_services/tenant.service";
 @Component({
     selector: 'delete-tenant-modal',
     template: `
-        <div class="modal-header">
-            <h4 class="modal-title" id="modal-basic-title">Delete Tenant</h4>
+        <div class="modal-header d-flex justify-content-between bg-primary-subtle">
+            <h5 class="modal-title" id="modal-basic-title">Delete Tenant</h5>
             <button (click)="activeModal.close('Cross click')"
                     aria-label="Close"
                     class="btn-sm btn "
                     type="button">
-        <span aria-hidden="true">
-            <i class="fa fa-icons fa-close"></i>
-        </span>
+                <span aria-hidden="true">
+                    <i class="fa fa-icons fa-close"></i>
+                </span>
             </button>
         </div>
         <div class="modal-body">

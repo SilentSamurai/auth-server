@@ -37,6 +37,7 @@ export class TableAsyncLoadEvent {
             (onLazyLoad)="lazyLoad($event)"
             [dataKey]="idField"
             [rowHover]="true"
+            [loading]="loading"
             [value]="actualRows"
             selectionMode="{{ multi ? 'multiple' : 'single' }}"
             [virtualRowHeight]="20"
@@ -102,6 +103,8 @@ export class TableAsyncLoadEvent {
 })
 export class AppTableComponent implements OnInit {
 
+    loading: boolean = false;
+
     @Input() title: string = "";
     @Input() scrollHeight: string = "65vh";
     @Input() idField!: string;
@@ -112,7 +115,7 @@ export class AppTableComponent implements OnInit {
     @Input() selection: any[] = [];
     @Output() selectionChange: EventEmitter<any[]> = new EventEmitter();
 
-    @Output() onLoad: EventEmitter<TableAsyncLoadEvent> = new EventEmitter();
+    @Output() onDataRequest: EventEmitter<TableAsyncLoadEvent> = new EventEmitter();
 
     @ContentChild('table_body')
     body: TemplateRef<any> | null = null;
@@ -128,7 +131,9 @@ export class AppTableComponent implements OnInit {
     @ViewChild(Table)
     pTable!: Table;
 
-    pageNo: number = 0;
+    pageNo: number = -1;
+    isLastPageReached: boolean = false;
+    private sortBy: any[] = [];
 
 
     constructor() {
@@ -159,36 +164,56 @@ export class AppTableComponent implements OnInit {
 
     setData(data: any[]) {
         this.pageNo = 0;
+        this.isLastPageReached = false;
         this.actualRows = data;
     }
 
     appendData(data: any[]) {
-        this.pageNo += 1;
-        // this.actualRows.push(...data);
-        this.actualRows = [...this.actualRows, ...data];
+        if (data.length > 0) {
+            // this.actualRows.push(...data);
+            this.actualRows = [...this.actualRows, ...data];
+            this.pageNo += 1;
+        } else {
+            this.isLastPageReached = true;
+        }
+    }
+
+    requestForData(options: any) {
+        this.filters = options.filters || this.filters;
+        this.sortBy = options.sortBy || this.sortBy;
+        this.pageNo = options.pageNo || this.pageNo;
+        if (options.append === false) {
+            this.pageNo = 0;
+            this.isLastPageReached = false;
+        }
+        const eventObj = {
+            pageNo: options.append === true ? this.pageNo + 1 : this.pageNo,
+            pageSize: 30,
+            sortBy: this.sortBy,
+            filters: this.filters,
+            update: (data: any[]) => {
+                if (options.append === true) {
+                    this.appendData(data);
+                } else {
+                    this.setData(data);
+                }
+                this.loading = false;
+            }
+        }
+        this.loading = true;
+        this.onDataRequest.emit(eventObj);
     }
 
     lazyLoad(event: LazyLoadEvent) {
         console.log("lazy", event);
-        this.onLoad.emit({
-            pageNo: this.pageNo,
-            pageSize: 10,
-            sortBy: [],
-            filters: this.filters,
-            update: this.appendData.bind(this)
-        })
+        if (!this.isLastPageReached && !this.loading) {
+            this.requestForData({append: true})
+        }
     }
 
     filter(filters: Filter[]) {
-        this.filters = filters;
         if (this.isFilterAsync) {
-            this.onLoad.emit({
-                pageNo: this.pageNo,
-                pageSize: 100,
-                sortBy: [],
-                filters: filters,
-                update: this.setData.bind(this)
-            })
+            this.requestForData({pageNo: 0, filters, append: false});
         } else {
             // if (filters.length > 0) {
             //     console.log(filters);
@@ -203,12 +228,6 @@ export class AppTableComponent implements OnInit {
     }
 
     reset() {
-        this.onLoad.emit({
-            pageNo: 0,
-            pageSize: 100,
-            sortBy: [],
-            filters: this.filters,
-            update: this.setData.bind(this)
-        })
+        this.requestForData({pageNo: 0, append: false});
     }
 }

@@ -13,9 +13,9 @@ import {MessageService} from "primeng/api";
                     aria-label="Close"
                     class="btn-sm btn "
                     type="button">
-        <span aria-hidden="true">
-            <i class="fa fa-icons fa-close"></i>
-        </span>
+                <span aria-hidden="true">
+                    <i class="fa fa-icons fa-close"></i>
+                </span>
             </button>
         </div>
         <div class="modal-body">

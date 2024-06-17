@@ -31,7 +31,7 @@ import {CreateGroupComponent} from "./dialogs/create-group.component";
             <app-page-view-body>
                 <app-table
                     title="Groups"
-                    (onLoad)="lazyLoad($event)"
+                    (onDataRequest)="lazyLoad($event)"
                     idField="id"
                     isFilterAsync="true"
                     multi="true"

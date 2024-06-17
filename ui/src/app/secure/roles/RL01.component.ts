@@ -27,7 +27,7 @@ import {RoleService} from "../../_services/role.service";
             </app-page-view-header>
             <app-page-view-body>
                 <app-table
-                    (onLoad)="loadTable($event)"
+                    (onDataRequest)="loadTable($event)"
                     idField="id"
                     isFilterAsync="true"
                     multi="true"
