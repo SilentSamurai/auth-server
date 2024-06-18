@@ -24,7 +24,7 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
                             Tenant
                         </label>
 
-                        <app-value-help-input
+                        <app-value-help-input id="select-tenant"
                             (dataProvider)="onTenantLoad($event)"
                             [(selection)]="selectedTenant"
                             class="col-3"
