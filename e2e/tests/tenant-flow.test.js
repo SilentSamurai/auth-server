@@ -6,8 +6,8 @@ const helper = require('./helper');
 describe('e2e Tenant Flow', () => {
     let page;
     let browser;
-    let TenantName = 'Test Tenant';
-    let TenantDomain = "test-tenant.com"
+    let TENANT_NAME = 'Test Tenant';
+    let TENANT_DOMAIN = "test-tenant.com"
     const TenantUpdateName = 'Test Updated Tenant';
     const timeout = 5000;
 
@@ -25,7 +25,7 @@ describe('e2e Tenant Flow', () => {
     beforeEach(async () => {
         page = await browser.newPage();
         await page.goto('http://localhost:9001/');
-        await page.setViewport({width: 1080, height: 1024});
+        await page.setViewport({width: 1024, height: 1024});
     });
 
     afterAll(async () => {
@@ -109,7 +109,7 @@ describe('e2e Tenant Flow', () => {
                 targetPage.locator(':scope >>> #create\\.tenant\\.name')
             ])
                 .setTimeout(timeout)
-                .fill(TenantName);
+                .fill(TENANT_NAME);
         }
         {
             const targetPage = page;
@@ -136,7 +136,7 @@ describe('e2e Tenant Flow', () => {
                 targetPage.locator(':scope >>> #create\\.tenant\\.domain')
             ])
                 .setTimeout(timeout)
-                .fill(TenantDomain);
+                .fill(TENANT_DOMAIN);
         }
         {
             const targetPage = page;
@@ -259,7 +259,7 @@ describe('e2e Tenant Flow', () => {
                 targetPage.locator(':scope >>> div.col-md-11 > div > div:nth-of-type(2) input')
             ])
                 .setTimeout(timeout)
-                .fill(TenantDomain);
+                .fill(TENANT_DOMAIN);
         }
         {
             const targetPage = page;
@@ -764,7 +764,653 @@ describe('e2e Tenant Flow', () => {
     });
 
     it(`Create Tenant Role`, async () => {
+        const ROLE_NAME = "DUMMY_ROLE_1";
+        const ROLE_DESC = "DUMMY_ROLE_1";
+        {
+            const targetPage = page;
+            const promises = [];
+            const startWaitingForEvents = () => {
+                promises.push(targetPage.waitForNavigation());
+            }
+            startWaitingForEvents();
+            await targetPage.goto('http://localhost:9001/home');
+            await Promise.all(promises);
+        }
+        {
+            const targetPage = page;
+            await puppeteer.Locator.race([
+                targetPage.locator('::-p-aria(Tenants) >>>> ::-p-aria([role=\\"strong\\"])'),
+                targetPage.locator('li:nth-of-type(2) strong'),
+                targetPage.locator('::-p-xpath(//*[@id=\\"app\\"]/app-home/app-launchpad/div[1]/ul/li[2]/button/strong)'),
+                targetPage.locator(':scope >>> li:nth-of-type(2) strong')
+            ])
+                .setTimeout(timeout)
+                .click({
+                    offset: {
+                        x: 22.982635498046875,
+                        y: 19.96179962158203,
+                    },
+                });
+        }
+        {
+            const targetPage = page;
+            await puppeteer.Locator.race([
+                targetPage.locator('div:nth-of-type(2) > app-tile-group > div > div:nth-of-type(2) div.tile-body-md'),
+                targetPage.locator('::-p-xpath(//*[@id=\\"app\\"]/app-home/app-launchpad/div[2]/div[2]/app-tile-group/div/div[2]/a/app-tile/div/div/div[2])'),
+                targetPage.locator(':scope >>> div:nth-of-type(2) > app-tile-group > div > div:nth-of-type(2) div.tile-body-md'),
+                targetPage.locator('::-p-text(Display Tenant)')
+            ])
+                .setTimeout(timeout)
+                .click({
+                    offset: {
+                        x: 130.91665649414062,
+                        y: 58.326385498046875,
+                    },
+                });
+        }
+        {
+            const targetPage = page;
+            await puppeteer.Locator.race([
+                targetPage.locator('::-p-aria()'),
+                targetPage.locator('#Tenant-vh-btn'),
+                targetPage.locator('::-p-xpath(//*[@id=\\"Tenant-vh-btn\\"])'),
+                targetPage.locator(':scope >>> #Tenant-vh-btn')
+            ])
+                .setTimeout(timeout)
+                .click({
+                    offset: {
+                        x: 25.12493896484375,
+                        y: 5.3055419921875,
+                    },
+                });
+        }
+        {
+            const targetPage = page;
+            await puppeteer.Locator.race([
+                targetPage.locator('div.col-md-11 > div > div:nth-of-type(2) input'),
+                targetPage.locator('::-p-xpath(/html/body/ngb-modal-window/div/div/app-value-help/div[1]/div[2]/div/app-fb/div/div[1]/div/div[2]/app-filter-field/div/div[2]/div/input)'),
+                targetPage.locator(':scope >>> div.col-md-11 > div > div:nth-of-type(2) input')
+            ])
+                .setTimeout(timeout)
+                .click({
+                    offset: {
+                        x: 79.23956298828125,
+                        y: 7.7222137451171875,
+                    },
+                });
+        }
+        {
+            const targetPage = page;
+            await puppeteer.Locator.race([
+                targetPage.locator('div.col-md-11 > div > div:nth-of-type(2) input'),
+                targetPage.locator('::-p-xpath(/html/body/ngb-modal-window/div/div/app-value-help/div[1]/div[2]/div/app-fb/div/div[1]/div/div[2]/app-filter-field/div/div[2]/div/input)'),
+                targetPage.locator(':scope >>> div.col-md-11 > div > div:nth-of-type(2) input')
+            ])
+                .setTimeout(timeout)
+                .fill(TENANT_DOMAIN);
+        }
+        {
+            const targetPage = page;
+            await puppeteer.Locator.race([
+                targetPage.locator('::-p-aria(Go)'),
+                targetPage.locator('div.modal-header button.btn-primary'),
+                targetPage.locator('::-p-xpath(/html/body/ngb-modal-window/div/div/app-value-help/div[1]/div[2]/div/app-fb/div/div[2]/div/button[1])'),
+                targetPage.locator(':scope >>> div.modal-header button.btn-primary'),
+                targetPage.locator('::-p-text(Go)')
+            ])
+                .setTimeout(timeout)
+                .click({
+                    offset: {
+                        x: 22.6527099609375,
+                        y: 21.732635498046875,
+                    },
+                });
+        }
+        {
+            const targetPage = page;
+            await puppeteer.Locator.race([
+                targetPage.locator(`::-p-aria(${TENANT_DOMAIN})`),
+                targetPage.locator('td:nth-of-type(3)'),
+                targetPage.locator('::-p-xpath(//*[@id=\\"pr_id_3-table\\"]/tbody/tr/td[3])'),
+                targetPage.locator(':scope >>> td:nth-of-type(3)')
+            ])
+                .setTimeout(timeout)
+                .click({
+                    offset: {
+                        x: 155.333251953125,
+                        y: 18.048599243164062,
+                    },
+                });
+        }
+        {
+            const targetPage = page;
+            await puppeteer.Locator.race([
+                targetPage.locator('::-p-aria(Select)'),
+                targetPage.locator('div.modal-footer > button.btn-primary'),
+                targetPage.locator('::-p-xpath(/html/body/ngb-modal-window/div/div/app-value-help/div[3]/button[2])'),
+                targetPage.locator(':scope >>> div.modal-footer > button.btn-primary')
+            ])
+                .setTimeout(timeout)
+                .click({
+                    offset: {
+                        x: 30.31591796875,
+                        y: 14.2291259765625,
+                    },
+                });
+        }
+        {
+            await helper.LoginHelper.delay(1000);
+        }
+        {
+            const targetPage = page;
+            await puppeteer.Locator.race([
+                targetPage.locator('::-p-aria(Continue)'),
+                targetPage.locator('#TN02_SEL_CONT_BTN'),
+                targetPage.locator('::-p-xpath(//*[@id=\\"TN02_SEL_CONT_BTN\\"])'),
+                targetPage.locator(':scope >>> #TN02_SEL_CONT_BTN'),
+                targetPage.locator('::-p-text(Continue)')
+            ])
+                .setTimeout(timeout)
+                .click({
+                    offset: {
+                        x: 38.20831298828125,
+                        y: 12.104156494140625,
+                    },
+                });
+        }
+        {
+            const targetPage = page;
+            await puppeteer.Locator.race([
+                targetPage.locator('::-p-aria(ROLES) >>>> ::-p-aria([role=\\"strong\\"])'),
+                targetPage.locator('li:nth-of-type(2) strong'),
+                targetPage.locator('::-p-xpath(//*[@id=\\"app\\"]/view-tenant/app-object-page/div/div[1]/div/div[3]/div/ul/li[2]/button/strong)'),
+                targetPage.locator(':scope >>> li:nth-of-type(2) strong')
+            ])
+                .setTimeout(timeout)
+                .click({
+                    offset: {
+                        x: 27.111083984375,
+                        y: 15.673583984375,
+                    },
+                });
+        }
+        {
+            const targetPage = page;
+            await puppeteer.Locator.race([
+                targetPage.locator('::-p-aria(Create Role)'),
+                targetPage.locator('div.container > div:nth-of-type(2) div.p-datatable-header button'),
+                targetPage.locator('::-p-xpath(//*[@id=\\"pr_id_5\\"]/div[1]/div/button)'),
+                targetPage.locator(':scope >>> div.container > div:nth-of-type(2) div.p-datatable-header button'),
+                targetPage.locator('::-p-text(Create Role)')
+            ])
+                .setTimeout(timeout)
+                .click({
+                    offset: {
+                        x: 55.833251953125,
+                        y: 14.798583984375,
+                    },
+                });
+        }
+        {
+            const targetPage = page;
+            await puppeteer.Locator.race([
+                targetPage.locator('::-p-aria(Role Name)'),
+                targetPage.locator('#add\\.role\\.name'),
+                targetPage.locator('::-p-xpath(//*[@id=\\"add.role.name\\"])'),
+                targetPage.locator(':scope >>> #add\\.role\\.name')
+            ])
+                .setTimeout(timeout)
+                .click({
+                    offset: {
+                        x: 71.23260498046875,
+                        y: 9.8367919921875,
+                    },
+                });
+        }
+        {
+            const targetPage = page;
+            await puppeteer.Locator.race([
+                targetPage.locator('::-p-aria(Role Name)'),
+                targetPage.locator('#add\\.role\\.name'),
+                targetPage.locator('::-p-xpath(//*[@id=\\"add.role.name\\"])'),
+                targetPage.locator(':scope >>> #add\\.role\\.name')
+            ])
+                .setTimeout(timeout)
+                .fill(ROLE_NAME);
+        }
+        {
+            const targetPage = page;
+            await puppeteer.Locator.race([
+                targetPage.locator('::-p-aria(Create)'),
+                targetPage.locator('div.modal-body button'),
+                targetPage.locator('::-p-xpath(/html/body/ngb-modal-window/div/div/app-create-tenant/div[2]/form/button)'),
+                targetPage.locator(':scope >>> div.modal-body button')
+            ])
+                .setTimeout(timeout)
+                .click({
+                    offset: {
+                        x: 34.23260498046875,
+                        y: 21.670135498046875,
+                    },
+                });
+        }
+        {
+            await page.mouse.click(10, 10);
+            await page.mouse.click(10, 10);
+            await helper.LoginHelper.delay(1000);
+        }
+        {
+            const targetPage = page;
+            await puppeteer.Locator.race([
+                targetPage.locator('#BCK_TO_HOME_BTN'),
+                targetPage.locator('[id="BCK_TO_HOME_BTN"]')
+            ])
+                .setTimeout(timeout)
+                .click({
+                    offset: {
+                        x: 158,
+                        y: 13.145833015441895,
+                    },
+                });
+        }
+        {
+            const targetPage = page;
+            await puppeteer.Locator.race([
+                targetPage.locator('::-p-aria(Roles) >>>> ::-p-aria([role=\\"strong\\"])'),
+                targetPage.locator('li:nth-of-type(5) strong'),
+                targetPage.locator('::-p-xpath(//*[@id=\\"app\\"]/app-home/app-launchpad/div[1]/ul/li[5]/button/strong)'),
+                targetPage.locator(':scope >>> li:nth-of-type(5) strong')
+            ])
+                .setTimeout(timeout)
+                .click({
+                    offset: {
+                        x: 21.611083984375,
+                        y: 17.96179962158203,
+                    },
+                });
+        }
+        {
+            const targetPage = page;
+            await puppeteer.Locator.race([
+                targetPage.locator('div:nth-of-type(5) div > div:nth-of-type(2) app-tile > div > div'),
+                targetPage.locator('::-p-xpath(//*[@id=\\"app\\"]/app-home/app-launchpad/div[2]/div[5]/app-tile-group/div/div[2]/a/app-tile/div/div)'),
+                targetPage.locator(':scope >>> div:nth-of-type(5) div > div:nth-of-type(2) app-tile > div > div'),
+                targetPage.locator('::-p-text(RL02  Display)')
+            ])
+                .setTimeout(timeout)
+                .click({
+                    offset: {
+                        x: 81.90625,
+                        y: 45.96527099609375,
+                    },
+                });
+        }
+        {
+            const targetPage = page;
+            await puppeteer.Locator.race([
+                targetPage.locator('::-p-aria()'),
+                targetPage.locator('#Role-vh-btn'),
+                targetPage.locator('::-p-xpath(//*[@id=\\"Role-vh-btn\\"])'),
+                targetPage.locator(':scope >>> #Role-vh-btn')
+            ])
+                .setTimeout(timeout)
+                .click({
+                    offset: {
+                        x: 10.12493896484375,
+                        y: 9.083328247070312,
+                    },
+                });
+        }
+        {
+            const targetPage = page;
+            await puppeteer.Locator.race([
+                targetPage.locator('div.col-md-11 > div > div:nth-of-type(2) input'),
+                targetPage.locator('::-p-xpath(/html/body/ngb-modal-window/div/div/app-value-help/div[1]/div[2]/div/app-fb/div/div[1]/div/div[2]/app-filter-field/div/div[2]/div/input)'),
+                targetPage.locator(':scope >>> div.col-md-11 > div > div:nth-of-type(2) input')
+            ])
+                .setTimeout(timeout)
+                .click({
+                    offset: {
+                        x: 97.23956298828125,
+                        y: 15.722213745117188,
+                    },
+                });
+        }
+        {
+            const targetPage = page;
+            await puppeteer.Locator.race([
+                targetPage.locator('div.col-md-11 > div > div:nth-of-type(2) input'),
+                targetPage.locator('::-p-xpath(/html/body/ngb-modal-window/div/div/app-value-help/div[1]/div[2]/div/app-fb/div/div[1]/div/div[2]/app-filter-field/div/div[2]/div/input)'),
+                targetPage.locator(':scope >>> div.col-md-11 > div > div:nth-of-type(2) input')
+            ])
+                .setTimeout(timeout)
+                .fill(TENANT_DOMAIN);
+        }
+        {
+            const targetPage = page;
+            await puppeteer.Locator.race([
+                targetPage.locator('div.col-md-11 > div > div:nth-of-type(1) input'),
+                targetPage.locator('::-p-xpath(/html/body/ngb-modal-window/div/div/app-value-help/div[1]/div[2]/div/app-fb/div/div[1]/div/div[1]/app-filter-field/div/div[2]/div/input)'),
+                targetPage.locator(':scope >>> div.col-md-11 > div > div:nth-of-type(1) input')
+            ])
+                .setTimeout(timeout)
+                .click({
+                    offset: {
+                        x: 189.23260498046875,
+                        y: 0.7222137451171875,
+                    },
+                });
+        }
+        {
+            const targetPage = page;
+            await puppeteer.Locator.race([
+                targetPage.locator('div.col-md-11 > div > div:nth-of-type(1) input'),
+                targetPage.locator('::-p-xpath(/html/body/ngb-modal-window/div/div/app-value-help/div[1]/div[2]/div/app-fb/div/div[1]/div/div[1]/app-filter-field/div/div[2]/div/input)'),
+                targetPage.locator(':scope >>> div.col-md-11 > div > div:nth-of-type(1) input')
+            ])
+                .setTimeout(timeout)
+                .fill(ROLE_NAME);
+        }
+        {
+            const targetPage = page;
+            await puppeteer.Locator.race([
+                targetPage.locator('::-p-aria(Go)'),
+                targetPage.locator('div.modal-header button.btn-primary'),
+                targetPage.locator('::-p-xpath(/html/body/ngb-modal-window/div/div/app-value-help/div[1]/div[2]/div/app-fb/div/div[2]/div/button[1])'),
+                targetPage.locator(':scope >>> div.modal-header button.btn-primary'),
+                targetPage.locator('::-p-text(Go)')
+            ])
+                .setTimeout(timeout)
+                .click({
+                    offset: {
+                        x: 18.6527099609375,
+                        y: 6.732635498046875,
+                    },
+                });
+        }
+        {
+            const targetPage = page;
+            await puppeteer.Locator.race([
+                targetPage.locator(`::-p-aria(${TENANT_NAME})`),
+                targetPage.locator('td:nth-of-type(4)'),
+                targetPage.locator('::-p-xpath(//*[@id=\\"pr_id_6-table\\"]/tbody/tr/td[4])'),
+                targetPage.locator(':scope >>> td:nth-of-type(4)'),
+                targetPage.locator(`::-p-text(${TENANT_NAME}`)
+            ])
+                .setTimeout(timeout)
+                .click({
+                    offset: {
+                        x: 98.048583984375,
+                        y: 23.048599243164062,
+                    },
+                });
+        }
+        {
+            const targetPage = page;
+            await puppeteer.Locator.race([
+                targetPage.locator('::-p-aria(Select)'),
+                targetPage.locator('div.modal-footer > button.btn-primary'),
+                targetPage.locator('::-p-xpath(/html/body/ngb-modal-window/div/div/app-value-help/div[3]/button[2])'),
+                targetPage.locator(':scope >>> div.modal-footer > button.btn-primary')
+            ])
+                .setTimeout(timeout)
+                .click({
+                    offset: {
+                        x: 4.31591796875,
+                        y: 15.2291259765625,
+                    },
+                });
+        }
+        {
+            await helper.LoginHelper.delay(2000);
+        }
+        {
+            const targetPage = page;
+            await puppeteer.Locator.race([
+                targetPage.locator('::-p-aria(Continue)'),
+                targetPage.locator('form > div > button'),
+                targetPage.locator('::-p-xpath(//*[@id=\\"app\\"]/app-role-list/div/div/div/form/div/button)'),
+                targetPage.locator(':scope >>> form > div > button'),
+                targetPage.locator('::-p-text(Continue)')
+            ])
+                .setTimeout(timeout)
+                .click({
+                    offset: {
+                        x: 30.20831298828125,
+                        y: 1.8819427490234375,
+                    },
+                });
+        }
+        {
+            const targetPage = page;
+            await puppeteer.Locator.race([
+                targetPage.locator('app-object-page li'),
+                targetPage.locator('::-p-xpath(//*[@id=\\"app\\"]/app-group-object/app-object-page/div/div[1]/div/div[3]/div/ul/li)'),
+                targetPage.locator(':scope >>> app-object-page li')
+            ])
+                .setTimeout(timeout)
+                .click({
+                    offset: {
+                        x: 55.3367919921875,
+                        y: 8.194427490234375,
+                    },
+                });
+        }
+        {
+            const targetPage = page;
+            await puppeteer.Locator.race([
+                targetPage.locator('::-p-aria(USERS) >>>> ::-p-aria([role=\\"strong\\"])'),
+                targetPage.locator('strong'),
+                targetPage.locator('::-p-xpath(//*[@id=\\"app\\"]/app-group-object/app-object-page/div/div[1]/div/div[3]/div/ul/li/button/strong)'),
+                targetPage.locator(':scope >>> strong')
+            ])
+                .setTimeout(timeout)
+                .click({
+                    offset: {
+                        x: 37.225677490234375,
+                        y: 9.097213745117188,
+                    },
+                });
+        }
+    });
 
+    it(`Delete Role`, async () => {
+        {
+            const targetPage = page;
+            const promises = [];
+            const startWaitingForEvents = () => {
+                promises.push(targetPage.waitForNavigation());
+            }
+            startWaitingForEvents();
+            await targetPage.goto('http://localhost:9001/home');
+            await Promise.all(promises);
+        }
+        {
+            const targetPage = page;
+            await puppeteer.Locator.race([
+                targetPage.locator('::-p-aria(Tenants) >>>> ::-p-aria([role=\\"strong\\"])'),
+                targetPage.locator('li:nth-of-type(2) strong'),
+                targetPage.locator('::-p-xpath(//*[@id=\\"app\\"]/app-home/app-launchpad/div[1]/ul/li[2]/button/strong)'),
+                targetPage.locator(':scope >>> li:nth-of-type(2) strong')
+            ])
+                .setTimeout(timeout)
+                .click({
+                    offset: {
+                        x: 12.982635498046875,
+                        y: 6.961799621582031,
+                    },
+                });
+        }
+        {
+            const targetPage = page;
+            await puppeteer.Locator.race([
+                targetPage.locator('div:nth-of-type(2) > app-tile-group > div > div:nth-of-type(2) div.tile-body-md'),
+                targetPage.locator('::-p-xpath(//*[@id=\\"app\\"]/app-home/app-launchpad/div[2]/div[2]/app-tile-group/div/div[2]/a/app-tile/div/div/div[2])'),
+                targetPage.locator(':scope >>> div:nth-of-type(2) > app-tile-group > div > div:nth-of-type(2) div.tile-body-md'),
+                targetPage.locator('::-p-text(Display Tenant)')
+            ])
+                .setTimeout(timeout)
+                .click({
+                    offset: {
+                        x: 68.91665649414062,
+                        y: 41.48957824707031,
+                    },
+                });
+        }
+        {
+            const targetPage = page;
+            await puppeteer.Locator.race([
+                targetPage.locator('::-p-aria() >>>> ::-p-aria([role=\\"generic\\"])'),
+                targetPage.locator('i'),
+                targetPage.locator('::-p-xpath(//*[@id=\\"Tenant-vh-btn\\"]/i)'),
+                targetPage.locator(':scope >>> i')
+            ])
+                .setTimeout(timeout)
+                .click({
+                    offset: {
+                        x: 5.413177490234375,
+                        y: 1.1423492431640625,
+                    },
+                });
+        }
+        {
+            const targetPage = page;
+            await puppeteer.Locator.race([
+                targetPage.locator('div.col-md-11 > div > div:nth-of-type(2) input'),
+                targetPage.locator('::-p-xpath(/html/body/ngb-modal-window/div/div/app-value-help/div[1]/div[2]/div/app-fb/div/div[1]/div/div[2]/app-filter-field/div/div[2]/div/input)'),
+                targetPage.locator(':scope >>> div.col-md-11 > div > div:nth-of-type(2) input')
+            ])
+                .setTimeout(timeout)
+                .click({
+                    offset: {
+                        x: 85.35067749023438,
+                        y: 11.722213745117188,
+                    },
+                });
+        }
+        {
+            const targetPage = page;
+            await puppeteer.Locator.race([
+                targetPage.locator('div.col-md-11 > div > div:nth-of-type(2) input'),
+                targetPage.locator('::-p-xpath(/html/body/ngb-modal-window/div/div/app-value-help/div[1]/div[2]/div/app-fb/div/div[1]/div/div[2]/app-filter-field/div/div[2]/div/input)'),
+                targetPage.locator(':scope >>> div.col-md-11 > div > div:nth-of-type(2) input')
+            ])
+                .setTimeout(timeout)
+                .fill(TENANT_DOMAIN);
+        }
+        {
+            const targetPage = page;
+            await puppeteer.Locator.race([
+                targetPage.locator('::-p-aria(Go)'),
+                targetPage.locator('div.modal-header button.btn-primary'),
+                targetPage.locator('::-p-xpath(/html/body/ngb-modal-window/div/div/app-value-help/div[1]/div[2]/div/app-fb/div/div[2]/div/button[1])'),
+                targetPage.locator(':scope >>> div.modal-header button.btn-primary'),
+                targetPage.locator('::-p-text(Go)')
+            ])
+                .setTimeout(timeout)
+                .click({
+                    offset: {
+                        x: 11.76385498046875,
+                        y: 16.732635498046875,
+                    },
+                });
+        }
+        {
+            const targetPage = page;
+            await puppeteer.Locator.race([
+                targetPage.locator(`::-p-aria(${TENANT_DOMAIN})`),
+                targetPage.locator('td:nth-of-type(3)'),
+                targetPage.locator('::-p-xpath(//*[@id=\\"pr_id_11-table\\"]/tbody/tr/td[3])'),
+                targetPage.locator(':scope >>> td:nth-of-type(3)')
+            ])
+                .setTimeout(timeout)
+                .click({
+                    offset: {
+                        x: 91.44439697265625,
+                        y: 14.048599243164062,
+                    },
+                });
+        }
+        {
+            const targetPage = page;
+            await puppeteer.Locator.race([
+                targetPage.locator('::-p-aria(Select)'),
+                targetPage.locator('div.modal-footer > button.btn-primary'),
+                targetPage.locator('::-p-xpath(/html/body/ngb-modal-window/div/div/app-value-help/div[3]/button[2])'),
+                targetPage.locator(':scope >>> div.modal-footer > button.btn-primary')
+            ])
+                .setTimeout(timeout)
+                .click({
+                    offset: {
+                        x: 39.42706298828125,
+                        y: 23.2291259765625,
+                    },
+                });
+        }
+        {
+            const targetPage = page;
+            await puppeteer.Locator.race([
+                targetPage.locator('::-p-aria(Continue)'),
+                targetPage.locator('#TN02_SEL_CONT_BTN'),
+                targetPage.locator('::-p-xpath(//*[@id=\\"TN02_SEL_CONT_BTN\\"])'),
+                targetPage.locator(':scope >>> #TN02_SEL_CONT_BTN'),
+                targetPage.locator('::-p-text(Continue)')
+            ])
+                .setTimeout(timeout)
+                .click({
+                    offset: {
+                        x: 22.604156494140625,
+                        y: 15.486099243164062,
+                    },
+                });
+        }
+        {
+            const targetPage = page;
+            await puppeteer.Locator.race([
+                targetPage.locator('::-p-aria(ROLES) >>>> ::-p-aria([role=\\"strong\\"])'),
+                targetPage.locator('li:nth-of-type(2) strong'),
+                targetPage.locator('::-p-xpath(//*[@id=\\"app\\"]/view-tenant/app-object-page/div/div[1]/div/div[3]/div/ul/li[2]/button/strong)'),
+                targetPage.locator(':scope >>> li:nth-of-type(2) strong')
+            ])
+                .setTimeout(timeout)
+                .click({
+                    offset: {
+                        x: 27.222213745117188,
+                        y: 11.683990478515625,
+                    },
+                });
+        }
+        {
+            const targetPage = page;
+            await puppeteer.Locator.race([
+                targetPage.locator('div.container > div:nth-of-type(2) tr:nth-of-type(1) button'),
+                targetPage.locator(':scope >>> div.container > div:nth-of-type(2) tr:nth-of-type(1) button')
+            ])
+                .setTimeout(timeout)
+                .click({
+                    offset: {
+                        x: 24.96868896484375,
+                        y: 9.861083984375,
+                    },
+                });
+        }
+        {
+            const targetPage = page;
+            await puppeteer.Locator.race([
+                targetPage.locator('::-p-aria(Yes)'),
+                targetPage.locator('ngb-modal-window button.btn-primary'),
+                targetPage.locator('::-p-xpath(/html/body/ngb-modal-window/div/div/delete-tenant-modal/div[2]/div/button[2])'),
+                targetPage.locator(':scope >>> ngb-modal-window button.btn-primary'),
+                targetPage.locator('::-p-text(Yes)')
+            ])
+                .setTimeout(timeout)
+                .click({
+                    offset: {
+                        x: 27.788177490234375,
+                        y: 29.315963745117188,
+                    },
+                });
+        }
     });
 
     it(`Delete Tenant`, async () => {
@@ -856,7 +1502,7 @@ describe('e2e Tenant Flow', () => {
                 targetPage.locator(':scope >>> div.col-md-11 > div > div:nth-of-type(2) input')
             ])
                 .setTimeout(timeout)
-                .fill(TenantDomain);
+                .fill(TENANT_DOMAIN);
         }
         {
             const targetPage = page;
@@ -878,7 +1524,7 @@ describe('e2e Tenant Flow', () => {
         {
             const targetPage = page;
             await puppeteer.Locator.race([
-                targetPage.locator(`::-p-aria(${TenantDomain})`),
+                targetPage.locator(`::-p-aria(${TENANT_DOMAIN})`),
             ])
                 .setTimeout(timeout)
                 .click({
@@ -1028,8 +1674,8 @@ describe('e2e Tenant Flow', () => {
 
     it.skip(`Mass Create Tenant`, async () => {
         for (let i = 0; i < 100; i++) {
-            TenantName = 'Auto Test Tenant ' + i;
-            TenantDomain = `auto-test-tenant-${i}.com`
+            TENANT_NAME = 'Auto Test Tenant ' + i;
+            TENANT_DOMAIN = `auto-test-tenant-${i}.com`
             {
                 const targetPage = page;
                 const promises = [];
@@ -1098,7 +1744,7 @@ describe('e2e Tenant Flow', () => {
                     targetPage.locator(':scope >>> #create\\.tenant\\.name')
                 ])
                     .setTimeout(timeout)
-                    .fill(TenantName);
+                    .fill(TENANT_NAME);
             }
             {
                 const targetPage = page;
@@ -1125,7 +1771,7 @@ describe('e2e Tenant Flow', () => {
                     targetPage.locator(':scope >>> #create\\.tenant\\.domain')
                 ])
                     .setTimeout(timeout)
-                    .fill(TenantDomain);
+                    .fill(TENANT_DOMAIN);
             }
             {
                 const targetPage = page;

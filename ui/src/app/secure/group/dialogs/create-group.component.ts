@@ -1,6 +1,5 @@
 import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
-import {lastValueFrom} from "rxjs";
 import {MessageService} from "primeng/api";
 import {GroupService} from "../../../_services/group.service";
 import {TableAsyncLoadEvent} from "../../../component/table/app-table.component";
@@ -103,9 +102,11 @@ export class CreateGroupComponent implements OnInit {
     }
 
     async onTenantLoad(event: TableAsyncLoadEvent) {
-        if (event.pageNo == 0) {
-            this.tenants = await lastValueFrom(this.tenantService.getAllTenants());
-            event.update(this.tenants);
-        }
+        let response = await this.tenantService.queryTenant({
+            pageNo: event.pageNo,
+            where: event.filters.filter(f => f.value != null && f.value.length > 0),
+        });
+        this.tenants = response.data;
+        event.update(this.tenants);
     }
 }

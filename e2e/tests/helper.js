@@ -7,12 +7,12 @@ class LoginHelper {
     static async getBrowser() {
         let executablePath;
         if(process.platform === 'win32') {
-            executablePath = ''
+            executablePath = `C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe`
         } else if (process.platform === 'linux') {
             executablePath = '/usr/bin/google-chrome'
         }
         const browser = await puppeteer.launch({
-            slowMo: 15,
+            slowMo: 20,
             headless: false,
             executablePath: executablePath
         });

@@ -50,7 +50,11 @@ import {HttpErrorComponent} from "./error-pages/HttpError.component";
         ComponentModule,
         ConfirmDialogModule
     ],
-    providers: [authInterceptorProviders, NgbDropdown, MessageService, ConfirmationService],
+    providers: [
+        authInterceptorProviders,
+        NgbDropdown,
+        MessageService,
+        ConfirmationService],
     exports: [],
     bootstrap: [AppComponent]
 })

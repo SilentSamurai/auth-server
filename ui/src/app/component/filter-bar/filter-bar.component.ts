@@ -72,7 +72,6 @@ export class FilterBarColumnComponent implements OnInit {
                     </button>
                 </div>
             </div>
-
         </div>
     `,
     styles: [

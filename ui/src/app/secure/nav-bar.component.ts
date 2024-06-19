@@ -10,9 +10,9 @@ import {ProfileComponent} from "../profile/profile.component";
     selector: 'nav-bar',
     template: `
         <nav class="navbar navbar-expand-lg " ngbNav style="background-color: steelblue;">
-            <a class="navbar-brand" href="javascript:void(0)" routerLink="/home">
+            <a class="navbar-brand" href="javascript:void(0)" routerLink="/home" id="BCK_TO_HOME_BTN">
                 <img alt="" class="rounded-circle mx-2" height="30" src="/assets/logo-img.jpg" width="30">
-                {{ this.getTitle() }}
+                <span class="fw-semibold">{{ this.getTitle() }}</span>
             </a>
             <button aria-controls="navbarSupportedContent"
                     aria-expanded="false"
@@ -27,10 +27,10 @@ import {ProfileComponent} from "../profile/profile.component";
             <div [ngbCollapse]="isCollapsed" class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav px-2 w-100">
                     <li [ngbNavItem]="3" class="nav-item" class="ms-auto" ngbDropdown placement="bottom-left">
-                        <a class="nav-link mt-1"
+                        <a class="nav-link"
                            id="dropdownUser1"
                            ngbDropdownToggle>
-                            <span class="mt-1">{{ email }}</span>
+                            <span class="mt-1 fw-semibold">{{ email }}</span>
                         </a>
                         <div aria-labelledby="dropdownUser1"
                              class="dropdown-menu text-small shadow" ngbDropdownMenu>

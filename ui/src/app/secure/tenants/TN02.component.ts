@@ -18,10 +18,10 @@ import {DeleteTenantComponent} from "./dialogs/delete-tenant.component";
         <nav-bar></nav-bar>
         <app-object-page>
             <app-object-page-title>
-                {{ tenant.domain }}
+                {{ tenant.name }}
             </app-object-page-title>
             <app-object-page-subtitle>
-                {{ tenant.name }}
+                {{ tenant.domain }}
             </app-object-page-subtitle>
             <app-object-page-actions>
                 <button (click)="onUpdateTenant()" [disabled]="!isTenantAdmin"

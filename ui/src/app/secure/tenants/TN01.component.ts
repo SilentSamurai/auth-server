@@ -42,9 +42,8 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
                     multi="true"
                     scrollHeight="75vh">
 
-                    <app-table-col label="Tenant Id" name="id"></app-table-col>
-                    <app-table-col label="Name" name="name"></app-table-col>
                     <app-table-col label="Domain" name="domain"></app-table-col>
+                    <app-table-col label="Name" name="name"></app-table-col>
                     <app-table-col>
                         <th style="max-width: 100px">Action</th>
                     </app-table-col>
@@ -53,10 +52,9 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
                         <td>
                             <span class="p-column-title">Name</span>
                             <a [routerLink]="['/TN02/', tenant.id]"
-                               href="javascript:void(0)">{{ tenant.id }}</a>
+                               href="javascript:void(0)">{{ tenant.domain }}</a>
                         </td>
                         <td>{{ tenant.name }}</td>
-                        <td>{{ tenant.domain }}</td>
                         <td class="" style="max-width: 100px">
                             <button (click)="openUpdateModal(tenant)" [disabled]="!this.isTenantAdmin"
                                     class="btn"

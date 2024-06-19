@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {lastValueFrom, Observable} from 'rxjs';
+import {lastValueFrom} from 'rxjs';
 import {TokenStorageService} from "./token-storage.service";
 
 const API_URL = '/api';
@@ -20,10 +20,6 @@ export class UserService {
                 // 'Authorization': 'Bearer ' + this.tokenService.getToken()
             })
         };
-    }
-
-    getAllUsers(): Observable<any> {
-        return this.http.get(`${API_URL}/users`, this.getHttpOptions());
     }
 
     createUser(name: string, email: string, password: string) {
