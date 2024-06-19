@@ -1,4 +1,24 @@
+const puppeteer = require("puppeteer-core");
+const {executablePath} = require("puppeteer-core");
+
+
 class LoginHelper {
+
+    static async getBrowser() {
+        let executablePath;
+        if(process.platform === 'win32') {
+            executablePath = ''
+        } else if (process.platform === 'linux') {
+            executablePath = '/usr/bin/google-chrome'
+        }
+        const browser = await puppeteer.launch({
+            slowMo: 15,
+            headless: false,
+            executablePath: executablePath
+        });
+
+        return browser;
+    }
 
     static async adminLogin(page) {
         await page.waitForSelector('#domain-pre');

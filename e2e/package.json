@@ -12,5 +12,8 @@
     "dependencies": {
         "jest": "^29.7.0",
         "puppeteer-core": "^22.11.0"
+    },
+    "jest": {
+        "testTimeout": 15000
     }
 }

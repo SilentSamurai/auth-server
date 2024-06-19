@@ -1,5 +1,4 @@
 const puppeteer = require('puppeteer-core')
-const {homedir} = require("node:os");
 const helper = require('./helper');
 
 // or import puppeteer from 'puppeteer-core';
@@ -13,10 +12,7 @@ describe('e2e Tenant Flow', () => {
     const timeout = 5000;
 
     beforeAll(async () => {
-        browser = await puppeteer.launch({
-            headless: false,
-            executablePath: `C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe`
-        });
+        browser = await helper.LoginHelper.getBrowser();
 
         page = await browser.newPage();
         await page.goto('http://localhost:9001/');
