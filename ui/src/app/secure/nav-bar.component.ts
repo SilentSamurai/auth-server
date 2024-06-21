@@ -26,7 +26,7 @@ import {ProfileComponent} from "../profile/profile.component";
             </button>
             <div [ngbCollapse]="isCollapsed" class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav px-2 w-100">
-                    <li [ngbNavItem]="3" class="nav-item" class="ms-auto" ngbDropdown placement="bottom-left">
+                    <li [ngbNavItem]="3" class="ms-auto nav-item" ngbDropdown placement="bottom-left">
                         <a class="nav-link"
                            id="dropdownUser1"
                            ngbDropdownToggle>
