@@ -12,7 +12,7 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
             <ul class="nav nav-tabs nav-tab-btn ">
                 <li class="nav-item " *ngFor="let group of internalGroups">
                     <button class="nav-link nav-tab-btn text-capitalize px-0 me-4"
-                            type="button" (click)="doScroll(group.id)">
+                            type="button" (click)="doScroll(group.id)" id="{{group.id}}_HOME_NAV">
                         <strong>{{ group.navName }} </strong>
                     </button>
                 </li>

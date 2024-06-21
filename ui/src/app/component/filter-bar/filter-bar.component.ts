@@ -63,7 +63,9 @@ export class FilterBarColumnComponent implements OnInit {
             </div>
             <div class="col-md-1 col-sm-12 my-2 ">
                 <div class="col align-content-end d-flex justify-content-end">
-                    <button *ngIf="visibility" (click)="onGo()" class="btn btn-primary btn-block btn-sm">
+                    <button *ngIf="visibility"
+                            (click)="onGo()" id="{{name}}FILTER_BAR_GO_BTN"
+                            class="btn btn-primary btn-block btn-sm">
                         Go
                     </button>
 
@@ -87,6 +89,8 @@ export class FilterBarComponent implements OnInit, AfterViewInit {
 
     Operators = Operators;
 
+    @Input() name: string = "";
+
     @Input() editable: boolean | string = true;
     @Input() visibility: boolean = true;
     @Output() onFilter = new EventEmitter<Filter[]>();
@@ -103,6 +107,9 @@ export class FilterBarComponent implements OnInit, AfterViewInit {
     async ngOnInit(): Promise<void> {
         if (typeof this.editable === 'string') {
             this.editable = Util.parseBoolean(this.editable);
+        }
+        if (this.name.length > 0) {
+            this.name = this.name + "_";
         }
     }
 

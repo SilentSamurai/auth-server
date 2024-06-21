@@ -5,7 +5,8 @@
     "main": "index.js",
     "scripts": {
         "test": "jest",
-        "test:watch": "jest --watch"
+        "test:watch": "jest --watch",
+        "cy:open": "cypress open"
     },
     "author": "",
     "license": "ISC",
@@ -15,5 +16,8 @@
     },
     "jest": {
         "testTimeout": 15000
+    },
+    "devDependencies": {
+        "cypress": "^13.12.0"
     }
 }
