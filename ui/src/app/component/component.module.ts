@@ -37,6 +37,7 @@ import {StandardDialogComponent} from "./dialogs/standard-dialog.component";
 import {DialogActionsComponent} from "./dialogs/dialog-actions.component";
 import {DialogTabComponent} from "./dialogs/dialog-tab.component";
 import {DialogFooterComponent} from "./dialogs/dialog-footer.component";
+import {ConfirmationDialogComponent, ConfirmationService} from "./dialogs/confirmation.service";
 
 @NgModule({
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -66,7 +67,8 @@ import {DialogFooterComponent} from "./dialogs/dialog-footer.component";
         StandardDialogComponent,
         DialogActionsComponent,
         DialogTabComponent,
-        DialogFooterComponent
+        DialogFooterComponent,
+        ConfirmationDialogComponent
     ],
     imports: [
         TableModule,
@@ -85,7 +87,7 @@ import {DialogFooterComponent} from "./dialogs/dialog-footer.component";
         ButtonModule,
         RippleModule
     ],
-    providers: [],
+    providers: [ConfirmationService],
     exports: [
         TileComponent,
         ValueHelpInputComponent,
@@ -108,7 +110,8 @@ import {DialogFooterComponent} from "./dialogs/dialog-footer.component";
         ObjectPageSubTitleComponent,
         StandardDialogComponent,
         DialogTabComponent,
-        DialogFooterComponent
+        DialogFooterComponent,
+
     ]
 })
 export class ComponentModule {

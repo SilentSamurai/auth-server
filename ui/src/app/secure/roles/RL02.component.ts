@@ -1,12 +1,13 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from "@angular/router";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
-import {ConfirmationService, MessageService} from "primeng/api";
 import {TenantService} from "../../_services/tenant.service";
 import {TokenStorageService} from "../../_services/token-storage.service";
 import {AuthDefaultService} from "../../_services/auth.default.service";
 import {TableAsyncLoadEvent} from "../../component/table/app-table.component";
 import {RoleService} from "../../_services/role.service";
+import {MessageService} from "primeng/api";
+import {ConfirmationService} from "../../component/dialogs/confirmation.service";
 
 @Component({
     selector: 'app-group-object',
@@ -20,12 +21,12 @@ import {RoleService} from "../../_services/role.service";
                 {{ role.tenant.name }}
             </app-object-page-subtitle>
             <app-object-page-actions>
-                <button (click)="onUpdateGroup()"
+                <button (click)="onUpdateRole()"
                         class="btn btn-primary btn-sm me-2">
                     Update
                 </button>
 
-                <button (click)="onDeleteGroup()"
+                <button (click)="onDeleteRole()"
                         class="btn btn-danger btn-sm">
                     Delete
                 </button>
@@ -115,8 +116,7 @@ import {RoleService} from "../../_services/role.service";
 
 
     `,
-    styles: [''],
-    providers: [ConfirmationService, MessageService]
+    styles: ['']
 })
 export class RL02Component implements OnInit {
 
@@ -158,7 +158,7 @@ export class RL02Component implements OnInit {
         this.loading = false;
     }
 
-    async onUpdateGroup() {
+    async onUpdateRole() {
         // const modalRef = this.modalService.open(UpdateGroupComponent);
         // modalRef.componentInstance.groupId = this.group_id;
         // const user = await modalRef.result;
@@ -166,18 +166,13 @@ export class RL02Component implements OnInit {
         this.ngOnInit();
     }
 
-    onDeleteGroup() {
-        this.confirmationService.confirm({
+    async onDeleteRole() {
+        await this.confirmationService.confirm({
             message: 'Are you sure you want to proceed?',
-            header: 'Confirmation',
-            icon: 'pi pi-info-circle',
-            acceptIcon: "none",
-            rejectIcon: "none",
-            rejectButtonStyleClass: "p-button-text",
             accept: async () => {
                 await this.roleService.deleteRole(this.role.tenantId, this.role.name);
                 this.messageService.add({severity: 'info', summary: 'Successful', detail: 'Group removed'});
-                await this.router.navigate(["/GP01"]);
+                await this.router.navigate(["/RL01"]);
             },
             reject: () => {
 
@@ -186,23 +181,18 @@ export class RL02Component implements OnInit {
     }
 
 
-    onUserRemove(user: any) {
-        this.confirmationService.confirm({
+    async onUserRemove(user: any) {
+        await this.confirmationService.confirm({
             message: 'Are you sure you want to proceed?',
-            header: 'Confirmation',
-            icon: 'pi pi-info-circle',
-            acceptIcon: "none",
-            rejectIcon: "none",
-            rejectButtonStyleClass: "p-button-text",
             accept: async () => {
                 await this.roleService.removeUser(this.tenantId, this.roleName, [user.email]);
                 this.messageService.add({severity: 'info', summary: 'Successful', detail: 'User removed'});
-                await this.ngOnInit();
             },
             reject: () => {
 
             }
-        })
+        });
+        await this.ngOnInit();
     }
 
     async onAddUsers() {

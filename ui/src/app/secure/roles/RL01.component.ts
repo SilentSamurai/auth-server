@@ -8,6 +8,7 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
 import {Filter} from "../../component/filter-bar/filter-bar.component";
 import {AppTableComponent, TableAsyncLoadEvent} from "../../component/table/app-table.component";
 import {RoleService} from "../../_services/role.service";
+import {ConfirmationService} from "../../component/dialogs/confirmation.service";
 
 
 @Component({
@@ -51,7 +52,7 @@ import {RoleService} from "../../_services/role.service";
                         <td>{{ role.tenant.name }}</td>
                         <td>{{ role.createdAt | date:'medium' }}</td>
                         <td class="d-flex ">
-                            <button (click)="openDeleteModal(role)" class="btn " type="button">
+                            <button (click)="openDeleteModal(role)" class="btn " type="button" *ngIf="role.removable">
                                 <i class="fa fa-solid fa-trash"></i>
                             </button>
                         </td>
@@ -77,6 +78,7 @@ export class RL01Component implements OnInit {
                 private router: Router,
                 private messageService: MessageService,
                 private authDefaultService: AuthDefaultService,
+                private confirmationService: ConfirmationService,
                 private modalService: NgbModal) {
     }
 
@@ -98,7 +100,17 @@ export class RL01Component implements OnInit {
         this.table.filter(filters);
     }
 
-    openDeleteModal(role: any) {
-
+    async openDeleteModal(role: any) {
+        await this.confirmationService.confirm({
+            message: "Are you sure you want to continue ?",
+            accept: async () => {
+                await this.roleService.deleteRole(role.tenantId, role.name);
+                this.messageService.add({severity: 'success', summary: 'Successful', detail: 'Group removed'});
+            },
+            reject: async () => {
+                // this.messageService.add({severity: 'info', summary: 'Successful', detail: 'Group removed'});
+            }
+        })
+        this.ngOnInit();
     }
 }

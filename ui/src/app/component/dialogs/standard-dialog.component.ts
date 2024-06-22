@@ -32,10 +32,12 @@ import {DialogFooterComponent} from "./dialog-footer.component";
                 <div class="row" *ngIf="tabs.length > 1">
                     <ul class="nav nav-tabs" role="tablist">
                         <li class="nav-item" role="presentation" *ngFor="let tab of tabs">
-                            <button class="nav-link {{isTabVisible(tab) ? 'tab-bottom-color' : ''}}  bg-primary-subtle  py-0 dialog-tab fw-semibold fs-6"
+                            <button class="nav-link {{isTabVisible(tab) ? 'tab-bottom-color' : ''}}
+                            text-capitalize dialog-tab
+                             bg-primary-subtle py-0 fw-semibold"
                                     id="{{tab.name}}_DIALOG_TAB_NAV"
                                     (click)="onNavLink(tab)">
-                                {{ tab.name | uppercase }}
+                                {{ tab.name }}
                             </button>
                         </li>
                     </ul>
@@ -57,6 +59,7 @@ import {DialogFooterComponent} from "./dialog-footer.component";
         `
             .dialog-tab {
                 color: black;
+                font-size: smaller !important;
             }
             .nav-tabs .nav-link:hover, .nav-tabs .nav-link:focus {
                 border-top-color: transparent !important;

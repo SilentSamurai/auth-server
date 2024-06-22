@@ -7,6 +7,9 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {GroupService} from "../../_services/group.service";
 import {CreateGroupComponent} from "./dialogs/create-group.component";
+import {ConfirmationService} from "../../component/dialogs/confirmation.service";
+import {MessageService} from "primeng/api";
+import {UpdateGroupComponent} from "./dialogs/update-group.component";
 
 @Component({
     selector: 'app-board-user',
@@ -81,6 +84,8 @@ export class GP01Component implements OnInit {
                 private groupService: GroupService,
                 private route: ActivatedRoute,
                 private router: Router,
+                private messageService: MessageService,
+                private confirmationService: ConfirmationService,
                 private modalService: NgbModal) {
     }
 
@@ -97,29 +102,30 @@ export class GP01Component implements OnInit {
         this.ngOnInit();
     }
 
-    async openUpdateModal(user: any) {
-        // const modalRef = this.modalService.open(EditUserModalComponent);
-        // modalRef.componentInstance.user = user;
-        // const editedUser = await modalRef.result;
-        // console.log(editedUser);
+    async openUpdateModal(group: any) {
+        const modalRef = this.modalService.open(UpdateGroupComponent);
+        modalRef.componentInstance.groupId = group.id;
+        modalRef.componentInstance.form.name = group.name;
+        group = await modalRef.result;
+        console.log(group);
         this.ngOnInit();
     }
 
-    async openDeleteModal(user: any) {
-        // const modalRef = this.modalService.open(DeleteUserModalComponent);
-        // modalRef.componentInstance.user = user;
-        // const deletedUser = await modalRef.result;
-        // console.log(deletedUser);
+    async openDeleteModal(group: any) {
+        await this.confirmationService.confirm({
+            message: "Are you sure you want to continue ?",
+            accept: async () => {
+                await this.groupService.deleteGroup(group.id);
+                this.messageService.add({severity: 'success', summary: 'Successful', detail: 'Group removed'});
+            },
+            reject: async () => {
+                // this.messageService.add({severity: 'info', summary: 'Successful', detail: 'Group removed'});
+            }
+        })
         this.ngOnInit();
     }
 
     async lazyLoad($event: TableAsyncLoadEvent) {
-        // let filters = $event.filters.filter(item => item.value != null && item.value.length > 0);
-        // filters.push({
-        //     name: "tenantId",
-        //     value: this.tenantId,
-        //     operator: "equals"
-        // })
         this.groups = await this.groupService.queryGroup({
             pageNo: $event.pageNo,
             where: $event.filters.filter(item => item.value != null && item.value.length > 0),

@@ -1,13 +1,14 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from "@angular/router";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
-import {ConfirmationService, MessageService} from "primeng/api";
 import {TenantService} from "../../_services/tenant.service";
 import {TokenStorageService} from "../../_services/token-storage.service";
 import {GroupService} from "../../_services/group.service";
 import {AuthDefaultService} from "../../_services/auth.default.service";
 import {TableAsyncLoadEvent} from "../../component/table/app-table.component";
 import {UpdateGroupComponent} from "./dialogs/update-group.component";
+import {MessageService} from "primeng/api";
+import {ConfirmationService} from "../../component/dialogs/confirmation.service";
 
 @Component({
     selector: 'app-group-object',
@@ -179,7 +180,7 @@ import {UpdateGroupComponent} from "./dialogs/update-group.component";
         <p-confirmDialog></p-confirmDialog>
     `,
     styles: [''],
-    providers: [ConfirmationService, MessageService]
+    providers: []
 })
 export class GP02Component implements OnInit {
 
@@ -225,8 +226,9 @@ export class GP02Component implements OnInit {
     async onUpdateGroup() {
         const modalRef = this.modalService.open(UpdateGroupComponent);
         modalRef.componentInstance.groupId = this.group_id;
-        const user = await modalRef.result;
-        console.log(user);
+        modalRef.componentInstance.form.name = this.group.name;
+        const group = await modalRef.result;
+        console.log(group);
         this.ngOnInit();
     }
 
@@ -235,9 +237,6 @@ export class GP02Component implements OnInit {
             message: 'Are you sure you want to proceed?',
             header: 'Confirmation',
             icon: 'pi pi-info-circle',
-            acceptIcon: "none",
-            rejectIcon: "none",
-            rejectButtonStyleClass: "p-button-text",
             accept: async () => {
                 await this.groupService.deleteGroup(this.group_id);
                 this.messageService.add({severity: 'info', summary: 'Successful', detail: 'Group removed'});
@@ -255,9 +254,6 @@ export class GP02Component implements OnInit {
             message: 'Are you sure you want to proceed?',
             header: 'Confirmation',
             icon: 'pi pi-info-circle',
-            acceptIcon: "none",
-            rejectIcon: "none",
-            rejectButtonStyleClass: "p-button-text",
             accept: async () => {
                 await this.groupService.removeUser(this.group_id, [user.email]);
                 this.messageService.add({severity: 'info', summary: 'Successful', detail: 'User removed'});
@@ -294,13 +290,10 @@ export class GP02Component implements OnInit {
     }
 
     async onRemoveRole(role: any) {
-        this.confirmationService.confirm({
+        await this.confirmationService.confirm({
             message: 'Are you sure you want to proceed?',
             header: 'Confirmation',
             icon: 'pi pi-info-circle',
-            acceptIcon: "none",
-            rejectIcon: "none",
-            rejectButtonStyleClass: "p-button-text",
             accept: async () => {
                 await this.groupService.removeRoles(this.group_id, [role.name]);
                 this.messageService.add({severity: 'info', summary: 'Successful', detail: 'Role removed'});

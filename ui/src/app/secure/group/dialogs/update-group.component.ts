@@ -7,7 +7,7 @@ import {TenantService} from "../../../_services/tenant.service";
 @Component({
     selector: 'app-update-group',
     template: `
-        <app-standard-dialog>
+        <app-standard-dialog title="Update Group">
             <app-dialog-tab>
                 <form #updateGroupForm="ngForm"
                       (ngSubmit)="updateGroupForm.form.valid && onSubmit()"
