@@ -8,67 +8,61 @@ import {TenantService} from "../../../_services/tenant.service";
 @Component({
     selector: 'app-create-group',
     template: `
-        <div class="modal-header d-flex justify-content-between bg-primary-subtle">
-            <h4 class="modal-title">Create Group</h4>
-            <button (click)="activeModal.close('Cross click')"
-                    aria-label="Close"
-                    class="btn-sm btn "
-                    type="button">
-        <span aria-hidden="true">
-            <i class="fa fa-icons fa-close"></i>
-        </span>
-            </button>
-        </div>
-        <div class="modal-body">
-            <form #createGroupForm="ngForm"
-                  (ngSubmit)="createGroupForm.form.valid && onSubmit()"
-                  name="createGroupForm"
-                  novalidate>
-                <div class="mb-3 form-group">
-                    <label class="form-label" for="create.group.name">Name</label>
-                    <input #name="ngModel"
-                           [(ngModel)]="form.name"
-                           class="form-control"
-                           id="create.group.name"
-                           name="name"
-                           required type="text">
-                    <div
-                        *ngIf="name.errors && createGroupForm.submitted"
-                        class="alert alert-danger"
-                        role="alert">
-                        Name is required!
+        <app-standard-dialog title="Create Group">
+            <app-dialog-tab>
+                <form #createGroupForm="ngForm"
+                      (ngSubmit)="createGroupForm.form.valid && onSubmit()"
+                      name="createGroupForm"
+                      novalidate>
+                    <div class="mb-3 form-group">
+                        <label class="form-label" for="create.group.name">Name</label>
+                        <input #name="ngModel"
+                               [(ngModel)]="form.name"
+                               class="form-control"
+                               id="create.group.name"
+                               name="name"
+                               required type="text">
+                        <div
+                            *ngIf="name.errors && createGroupForm.submitted"
+                            class="alert alert-danger"
+                            role="alert">
+                            Name is required!
+                        </div>
                     </div>
-                </div>
-                <div class="mb-3 form-group">
-                    <label class="form-label" for="create.group.domain">Tenant</label>
-                    <app-value-help-input
-                        (dataProvider)="onTenantLoad($event)"
-                        [(selection)]="form.tenantId"
-                        class=""
-                        id="create.group.tenantId"
-                        idField="id"
-                        labelField="name"
-                        name="tenantId">
+                    <div class="mb-3 form-group">
+                        <label class="form-label" for="create.group.domain">Tenant</label>
+                        <app-value-help-input
+                            (dataProvider)="onTenantLoad($event)"
+                            [(selection)]="form.tenantId"
+                            class=""
+                            id="create.group.tenantId"
+                            idField="id"
+                            labelField="name"
+                            name="tenantId">
 
-                        <app-fb-col name="name" label="Name"></app-fb-col>
-                        <app-fb-col name="domain" label="Domain"></app-fb-col>
+                            <app-fb-col name="name" label="Name"></app-fb-col>
+                            <app-fb-col name="domain" label="Domain"></app-fb-col>
 
-                        <app-vh-col name="name" label="Name"></app-vh-col>
-                        <app-vh-col name="domain" label="Domain"></app-vh-col>
+                            <app-vh-col name="name" label="Name"></app-vh-col>
+                            <app-vh-col name="domain" label="Domain"></app-vh-col>
 
 
-                        <ng-template #vh_body let-row>
-                            <td>{{ row.name }}</td>
-                            <td>
-                                {{ row.domain }}
-                            </td>
-                        </ng-template>
+                            <ng-template #vh_body let-row>
+                                <td>{{ row.name }}</td>
+                                <td>
+                                    {{ row.domain }}
+                                </td>
+                            </ng-template>
 
-                    </app-value-help-input>
-                </div>
-                <button class="btn btn-primary" type="submit">Create</button>
-            </form>
-        </div>
+                        </app-value-help-input>
+                    </div>
+                </form>
+            </app-dialog-tab>
+            <app-dialog-footer>
+                <button class="btn btn-primary" type="submit" (click)="createGroupForm.onSubmit(krishna)">
+                    Create</button>
+            </app-dialog-footer>
+        </app-standard-dialog>
     `,
     styles: ['']
 })
@@ -80,6 +74,7 @@ export class CreateGroupComponent implements OnInit {
         tenantId: [] as any[]
     }
     private tenants: any[] = [];
+    krishna: any;
 
     constructor(private groupService: GroupService,
                 private tenantService: TenantService,

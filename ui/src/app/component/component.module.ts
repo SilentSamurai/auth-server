@@ -33,6 +33,10 @@ import {AttributeComponent} from "./fields/attribute.component";
 import {ObjectPageTitleComponent} from "./object-page/object-page-title.component";
 import {ObjectPageActionsComponent} from "./object-page/object-page-actions.component";
 import {ObjectPageSubTitleComponent} from "./object-page/object-page-subtitle.component";
+import {StandardDialogComponent} from "./dialogs/standard-dialog.component";
+import {DialogActionsComponent} from "./dialogs/dialog-actions.component";
+import {DialogTabComponent} from "./dialogs/dialog-tab.component";
+import {DialogFooterComponent} from "./dialogs/dialog-footer.component";
 
 @NgModule({
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -58,7 +62,11 @@ import {ObjectPageSubTitleComponent} from "./object-page/object-page-subtitle.co
         PageViewComponent,
         PageViewBodyComponent,
         PageViewHeaderComponent,
-        AttributeComponent
+        AttributeComponent,
+        StandardDialogComponent,
+        DialogActionsComponent,
+        DialogTabComponent,
+        DialogFooterComponent
     ],
     imports: [
         TableModule,
@@ -97,7 +105,10 @@ import {ObjectPageSubTitleComponent} from "./object-page/object-page-subtitle.co
         AttributeComponent,
         ObjectPageTitleComponent,
         ObjectPageActionsComponent,
-        ObjectPageSubTitleComponent
+        ObjectPageSubTitleComponent,
+        StandardDialogComponent,
+        DialogTabComponent,
+        DialogFooterComponent
     ]
 })
 export class ComponentModule {

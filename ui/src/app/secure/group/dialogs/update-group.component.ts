@@ -7,40 +7,34 @@ import {TenantService} from "../../../_services/tenant.service";
 @Component({
     selector: 'app-update-group',
     template: `
-        <div class="modal-header d-flex justify-content-between bg-primary-subtle">
-            <h4 class="modal-title">Update Group</h4>
-            <button (click)="activeModal.close('Cross click')"
-                    aria-label="Close"
-                    class="btn-sm btn "
-                    type="button">
-        <span aria-hidden="true">
-            <i class="fa fa-icons fa-close"></i>
-        </span>
-            </button>
-        </div>
-        <div class="modal-body">
-            <form #updateGroupForm="ngForm"
-                  (ngSubmit)="updateGroupForm.form.valid && onSubmit()"
-                  name="createGroupForm"
-                  novalidate>
-                <div class="mb-3 form-group">
-                    <label class="form-label" for="create.group.name">Name</label>
-                    <input #name="ngModel"
-                           [(ngModel)]="form.name"
-                           class="form-control"
-                           id="create.group.name"
-                           name="name"
-                           required type="text">
-                    <div
-                        *ngIf="name.errors && updateGroupForm.submitted"
-                        class="alert alert-danger"
-                        role="alert">
-                        Name is required!
+        <app-standard-dialog>
+            <app-dialog-tab>
+                <form #updateGroupForm="ngForm"
+                      (ngSubmit)="updateGroupForm.form.valid && onSubmit()"
+                      name="createGroupForm"
+                      novalidate>
+                    <div class="mb-3 form-group">
+                        <label class="form-label" for="create.group.name">Name</label>
+                        <input #name="ngModel"
+                               [(ngModel)]="form.name"
+                               class="form-control"
+                               id="create.group.name"
+                               name="name"
+                               required type="text">
+                        <div
+                            *ngIf="name.errors && updateGroupForm.submitted"
+                            class="alert alert-danger"
+                            role="alert">
+                            Name is required!
+                        </div>
                     </div>
-                </div>
-                <button class="btn btn-primary" type="submit">Update</button>
-            </form>
-        </div>
+                </form>
+            </app-dialog-tab>
+            <app-dialog-footer>
+                <button class="btn btn-primary" type="submit" (click)="updateGroupForm.onSubmit(krishna)">
+                    Update</button>
+            </app-dialog-footer>
+        </app-standard-dialog>
     `,
     styles: ['']
 })
@@ -51,6 +45,7 @@ export class UpdateGroupComponent implements OnInit {
         name: "",
     }
     groupId: string = "";
+    krishna: any;
 
     constructor(private groupService: GroupService,
                 private tenantService: TenantService,

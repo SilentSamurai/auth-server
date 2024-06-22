@@ -6,25 +6,16 @@ import {TenantService} from "../../../_services/tenant.service";
 @Component({
     selector: 'delete-tenant-modal',
     template: `
-        <div class="modal-header">
-            <h4 class="modal-title" id="modal-basic-title">Remove Member</h4>
-            <button (click)="activeModal.close('Cross click')"
-                    aria-label="Close"
-                    class="btn-sm btn "
-                    type="button">
-        <span aria-hidden="true">
-            <i class="fa fa-icons fa-close"></i>
-        </span>
-            </button>
-        </div>
-        <div class="modal-body">
-            <p>Sure, you want to remove member "<b>{{ member.email }}</b>" ?</p>
-            <div>
-                <button (click)="activeModal.close('Cross click')" class="btn btn-secondary btn-md" type="button">No
+        <app-standard-dialog title="Remove Member">
+            <app-dialog-tab>
+                <p>Sure, you want to remove member "<b>{{ member.email }}</b>" ?</p>
+            </app-dialog-tab>
+            <app-dialog-footer>
+                <button (click)="activeModal.close('Cross click')" class="btn btn-secondary" type="button">No
                 </button>
-                <button (click)="onYes()" class="btn btn-primary btn-md m-2" type="button">Yes</button>
-            </div>
-        </div>
+                <button (click)="onYes()" class="btn btn-primary" type="button">Yes</button>
+            </app-dialog-footer>
+        </app-standard-dialog>
     `,
     styles: ['']
 })

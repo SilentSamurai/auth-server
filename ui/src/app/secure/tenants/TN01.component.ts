@@ -24,7 +24,7 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
                     <div class="d-flex justify-content-between mt-2">
                         <div></div>
                         <button (click)="openCreateModal()" [disabled]="!this.creationAllowed"
-                                class="btn btn-outline-success btn-sm"
+                                class="btn btn-outline-success btn-sm" id="CREATE_TENANT_DIALOG_BTN"
                                 type="button">
                             <i class="fa fa-solid fa-plus me-2"></i> Create Tenant
                         </button>

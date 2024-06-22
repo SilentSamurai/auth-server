@@ -1,72 +1,71 @@
-import {Component, EventEmitter, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, OnInit, Output, ViewChild} from '@angular/core';
 import {NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
 import {lastValueFrom} from "rxjs";
 import {TenantService} from "../../../_services/tenant.service";
 import {MessageService} from "primeng/api";
+import {NgForm} from "@angular/forms";
 
 @Component({
     selector: 'app-create-tenant',
     template: `
-        <div class="modal-header d-flex justify-content-between bg-primary-subtle">
-            <h4 class="modal-title">Create Tenant</h4>
-            <button (click)="activeModal.close('Cross click')"
-                    aria-label="Close"
-                    class="btn-sm btn "
-                    type="button">
-                <span aria-hidden="true">
-                    <i class="fa fa-icons fa-close"></i>
-                </span>
-            </button>
-        </div>
-        <div class="modal-body">
-            <form #createTenantForm="ngForm"
-                  (ngSubmit)="createTenantForm.form.valid && onSubmit()"
-                  name="createTenantForm"
-                  novalidate>
-                <div class="mb-3 form-group">
-                    <label class="form-label" for="create.tenant.name">Name</label>
-                    <input #name="ngModel"
-                           [(ngModel)]="form.name"
-                           class="form-control"
-                           id="create.tenant.name"
-                           name="name"
-                           required type="text">
-                    <div
-                        *ngIf="name.errors && createTenantForm.submitted"
-                        class="alert alert-danger"
-                        role="alert">
-                        Name is required!
+        <app-standard-dialog title="Create Tenant" subtitle="Create a new tenant">
+            <app-dialog-tab name="Basic">
+                <form #createTenantForm="ngForm"
+                      (ngSubmit)="createTenantForm.form.valid && onSubmit()"
+                      name="createTenantForm"
+                      novalidate>
+                    <div class="mb-3 form-group">
+                        <label class="form-label control-label-required" for="create.tenant.name">Name: </label>
+                        <input #name="ngModel"
+                               [(ngModel)]="form.name"
+                               class="form-control"
+                               id="create.tenant.name"
+                               name="name"
+                               required type="text">
+                        <div *ngIf="name.errors && createTenantForm.submitted"
+                            class="text-danger"
+                            role="alert">
+                            Name is required!
+                        </div>
                     </div>
-                </div>
-                <div class="mb-3 form-group">
-                    <label class="form-label" for="create.tenant.domain">Domain</label>
-                    <input #domain="ngModel"
-                           [(ngModel)]="form.domain"
-                           aria-describedby="emailHelp"
-                           class="form-control"
-                           id="create.tenant.domain"
-                           name="domain"
-                           required type="text">
-                    <div
-                        *ngIf="domain.errors && createTenantForm.submitted"
-                        class="alert alert-danger"
-                        role="alert">
-                        Domain is required!
+                    <div class="mb-3 form-group">
+                        <label class="form-label control-label-required" for="create.tenant.domain">Domain: </label>
+                        <input #domain="ngModel"
+                               [(ngModel)]="form.domain"
+                               aria-describedby="emailHelp"
+                               class="form-control"
+                               id="create.tenant.domain"
+                               name="domain"
+                               required type="text">
+                        <div
+                            *ngIf="domain.errors && createTenantForm.submitted"
+                            class="text-danger"
+                            role="alert">
+                            Domain is required!
+                        </div>
                     </div>
-                </div>
-                <button class="btn btn-primary" type="submit">Create</button>
-            </form>
-        </div>
+                </form>
+            </app-dialog-tab>
+            <app-dialog-footer>
+                <button class="btn btn-primary" (click)="createTenantForm.onSubmit(krishna)"
+                        type="submit" id="CREATE_TENANT_SUBMIT_BTN">Create
+                </button>
+            </app-dialog-footer>
+        </app-standard-dialog>
+
     `,
     styles: ['']
 })
 export class CreateTenantComponent implements OnInit {
+
     @Output() passEntry: EventEmitter<any> = new EventEmitter();
 
     form = {
         name: "",
         domain: ""
     }
+
+    krishna: any
 
     constructor(private tenantService: TenantService,
                 private messageService: MessageService,

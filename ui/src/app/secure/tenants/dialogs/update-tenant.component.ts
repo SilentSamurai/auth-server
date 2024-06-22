@@ -7,69 +7,69 @@ import {TenantService} from "../../../_services/tenant.service";
 @Component({
     selector: 'app-update-tenant',
     template: `
-        <div class="modal-header d-flex justify-content-between">
-            <h4 class="modal-title">Update Tenant</h4>
-            <button (click)="activeModal.close('Cross click')"
-                    aria-label="Close"
-                    class="btn-sm btn "
-                    type="button">
-                <span aria-hidden="true">
-                    <i class="fa fa-icons fa-close"></i>
-                </span>
-            </button>
-        </div>
-        <div class="modal-body">
-            <form #updateTenantForm="ngForm"
-                  (ngSubmit)="updateTenantForm.form.valid && onSubmit()"
-                  name="updateTenantForm"
-                  novalidate>
-                <div class="mb-3 form-group">
-                    <label class="form-label" for="update.tenant.name">Name</label>
-                    <input #name="ngModel"
-                           [(ngModel)]="form.name"
-                           class="form-control"
-                           id="update.tenant.name"
-                           name="name"
-                           required type="text">
-                    <div
-                        *ngIf="name.errors && updateTenantForm.submitted"
-                        class="alert alert-danger"
-                        role="alert">
-                        Name is required!
+        <app-standard-dialog title="Update Tenant" subtitle="{{subtitle}}">
+            <app-dialog-tab >
+                <form #updateTenantForm="ngForm"
+                      (ngSubmit)="updateTenantForm.form.valid && onSubmit()"
+                      name="updateTenantForm"
+                      novalidate>
+                    <div class="mb-3 form-group">
+                        <label class="form-label" for="update.tenant.name">Name</label>
+                        <input #name="ngModel"
+                               [(ngModel)]="form.name"
+                               class="form-control"
+                               id="update.tenant.name"
+                               name="name"
+                               required type="text">
+                        <div
+                            *ngIf="name.errors && updateTenantForm.submitted"
+                            class="text-danger"
+                            role="alert">
+                            Name is required!
+                        </div>
                     </div>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label" for="update.tenant.domain">Domain</label>
-                    <input #domain="ngModel"
-                           [(ngModel)]="form.domain"
-                           aria-describedby="emailHelp"
-                           class="form-control"
-                           id="update.tenant.domain"
-                           name="domain"
-                           required type="text">
-                    <div
-                        *ngIf="domain.errors && updateTenantForm.submitted"
-                        class="alert alert-danger"
-                        role="alert">
-                        Domain is required!
+                    <div class="mb-3">
+                        <label class="form-label" for="update.tenant.domain">Domain</label>
+                        <input #domain="ngModel"
+                               [(ngModel)]="form.domain"
+                               aria-describedby="emailHelp"
+                               class="form-control"
+                               id="update.tenant.domain"
+                               name="domain"
+                               required type="text">
+                        <div
+                            *ngIf="domain.errors && updateTenantForm.submitted"
+                            class="text-danger"
+                            role="alert">
+                            Domain is required!
+                        </div>
                     </div>
-                </div>
-                <button class="btn btn-primary" type="submit">Update</button>
-            </form>
-        </div>
+
+                </form>
+            </app-dialog-tab>
+
+            <app-dialog-footer>
+                <button class="btn btn-primary" type="submit" (click)="updateTenantForm.onSubmit(krishna)">Update</button>
+            </app-dialog-footer>
+
+        </app-standard-dialog>
     `,
     styles: [
         ``
     ]
 })
 export class UpdateTenantComponent implements OnInit {
+
     @Input() tenant: any;
     @Output() passEntry: EventEmitter<any> = new EventEmitter();
+
+    subtitle: string = "";
 
     form = {
         name: "",
         domain: ""
     }
+    krishna: any;
 
     constructor(private tenantService: TenantService,
                 private messageService: MessageService,
@@ -81,6 +81,7 @@ export class UpdateTenantComponent implements OnInit {
             name: this.tenant.name,
             domain: this.tenant.domain
         }
+        this.subtitle = "Update: " + this.tenant.name;
     }
 
     async onSubmit() {

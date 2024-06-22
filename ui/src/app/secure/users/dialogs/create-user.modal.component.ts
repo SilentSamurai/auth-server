@@ -6,75 +6,69 @@ import {MessageService} from "primeng/api";
 @Component({
     selector: 'create-user-modal',
     template: `
-        <div class="modal-header">
-            <h4 class="modal-title" id="modal-basic-title">Create User</h4>
-            <button (click)="activeModal.close('Cross click')"
-                    aria-label="Close"
-                    class="btn-sm btn "
-                    type="button">
-        <span aria-hidden="true">
-            <i class="fa fa-icons fa-close"></i>
-        </span>
-            </button>
-        </div>
-        <div class="modal-body">
-            <form #createUserForm="ngForm"
-                  (ngSubmit)="createUserForm.form.valid && onSubmit()"
-                  name="createUserForm"
-                  novalidate>
-                <div class="mb-3 form-group">
-                    <label class="form-label" for="create.user.name">Name</label>
-                    <input #name="ngModel"
-                           [(ngModel)]="form.name"
-                           class="form-control"
-                           id="create.user.name"
-                           name="name"
-                           required
-                           type="text">
-                    <div
-                        *ngIf="name.errors && createUserForm.submitted"
-                        class="alert alert-danger"
-                        role="alert">
-                        Name is required!
+        <app-standard-dialog title="Create User" subtitle="Create a system user">
+            <app-dialog-tab>
+                <form #createUserForm="ngForm"
+                      (ngSubmit)="createUserForm.form.valid && onSubmit()"
+                      name="createUserForm"
+                      novalidate>
+                    <div class="mb-3 form-group">
+                        <label class="form-label" for="create.user.name">Name</label>
+                        <input #name="ngModel"
+                               [(ngModel)]="form.name"
+                               class="form-control"
+                               id="create.user.name"
+                               name="name"
+                               required
+                               type="text">
+                        <div
+                            *ngIf="name.errors && createUserForm.submitted"
+                            class="text-danger"
+                            role="alert">
+                            Name is required!
+                        </div>
                     </div>
-                </div>
-                <div class="mb-3 form-group">
-                    <label class="form-label" for="create.user.email">Email address</label>
-                    <input #email="ngModel"
-                           [(ngModel)]="form.email"
-                           aria-describedby="emailHelp"
-                           class="form-control"
-                           id="create.user.email"
-                           name="email"
-                           required type="email">
-                    <div
-                        *ngIf="email.errors && createUserForm.submitted"
-                        class="alert alert-danger"
-                        role="alert">
-                        Email is required!
+                    <div class="mb-3 form-group">
+                        <label class="form-label" for="create.user.email">Email address</label>
+                        <input #email="ngModel"
+                               [(ngModel)]="form.email"
+                               aria-describedby="emailHelp"
+                               class="form-control"
+                               id="create.user.email"
+                               name="email"
+                               required type="email">
+                        <div
+                            *ngIf="email.errors && createUserForm.submitted"
+                            class="text-danger"
+                            role="alert">
+                            Email is required!
+                        </div>
                     </div>
-                </div>
 
-                <div class="mb-3 form-group">
-                    <label class="form-label" for="create.user.password">Default Password</label>
-                    <input #password="ngModel"
-                           [(ngModel)]="form.password"
-                           class="form-control"
-                           id="create.user.password"
-                           name="password"
-                           required type="password">
-                    <div
-                        *ngIf="password.errors && createUserForm.submitted"
-                        class="alert alert-danger"
-                        role="alert">
-                        Password is required!
+                    <div class="mb-3 form-group">
+                        <label class="form-label" for="create.user.password">Default Password</label>
+                        <input #password="ngModel"
+                               [(ngModel)]="form.password"
+                               class="form-control"
+                               id="create.user.password"
+                               name="password"
+                               required type="password">
+                        <div
+                            *ngIf="password.errors && createUserForm.submitted"
+                            class="text-danger"
+                            role="alert">
+                            Password is required!
+                        </div>
                     </div>
-                </div>
 
-                <button class="btn btn-primary" type="submit">Create</button>
-            </form>
-        </div>
 
+                </form>
+            </app-dialog-tab>
+            <app-dialog-footer>
+                <button class="btn btn-primary" type="submit" (click)="createUserForm.onSubmit(krishna)">
+                    Create</button>
+            </app-dialog-footer>
+        </app-standard-dialog>
     `,
     styles: [`
 
@@ -88,6 +82,7 @@ export class CreateUserModalComponent implements OnInit {
         name: null,
         password: null
     };
+    krishna: any;
 
     constructor(private userService: UserService,
                 private messageService: MessageService,

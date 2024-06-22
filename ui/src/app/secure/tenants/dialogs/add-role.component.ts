@@ -6,43 +6,35 @@ import {TenantService} from "../../../_services/tenant.service";
 @Component({
     selector: 'app-create-tenant',
     template: `
-        <div class="modal-header d-flex justify-content-between">
-            <h4 class="modal-title">Add Role</h4>
-            <button (click)="activeModal.close('Cross click')"
-                    aria-label="Close"
-                    class="btn-sm btn "
-                    type="button">
-        <span aria-hidden="true">
-            <i class="fa fa-icons fa-close"></i>
-        </span>
-            </button>
-        </div>
-        <div class="modal-body">
-            <form #addRoleForm="ngForm"
-                  (ngSubmit)="addRoleForm.form.valid && onSubmit()"
-                  name="addRoleForm"
-                  novalidate>
-                <div class="mb-3">
-                    <label class="form-label" for="add.role.name">Role Name</label>
-                    <input #name="ngModel"
-                           [(ngModel)]="form.name"
-                           class="form-control"
-                           id="add.role.name"
-                           name="name"
-                           required type="text">
+        <app-standard-dialog title="Add Role">
+            <app-dialog-tab>
+                <form #addRoleForm="ngForm"
+                      (ngSubmit)="addRoleForm.form.valid && onSubmit()"
+                      name="addRoleForm"
+                      novalidate>
+                    <div class="mb-3">
+                        <label class="form-label" for="add.role.name">Role Name</label>
+                        <input #name="ngModel"
+                               [(ngModel)]="form.name"
+                               class="form-control"
+                               id="add.role.name"
+                               name="name"
+                               required type="text">
 
-                    <div
-                        *ngIf="name.errors && addRoleForm.submitted"
-                        class="alert alert-danger"
-                        role="alert">
-                        Role Name is required!
+                        <div
+                            *ngIf="name.errors && addRoleForm.submitted"
+                            class="alert alert-danger"
+                            role="alert">
+                            Role Name is required!
+                        </div>
                     </div>
-                </div>
-
-
-                <button class="btn btn-primary" type="submit">Create</button>
-            </form>
-        </div>
+                </form>
+            </app-dialog-tab>
+            <app-dialog-footer>
+                <button class="btn btn-primary" type="submit" (click)="addRoleForm.onSubmit(krishna)">
+                    Create</button>
+            </app-dialog-footer>
+        </app-standard-dialog>
     `,
     styles: ['']
 })
@@ -54,6 +46,7 @@ export class AddRoleComponent implements OnInit {
     form = {
         name: ""
     }
+    krishna: any;
 
     constructor(private tenantService: TenantService,
                 private messageService: MessageService,

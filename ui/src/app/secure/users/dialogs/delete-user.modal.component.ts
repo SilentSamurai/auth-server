@@ -7,25 +7,19 @@ import {lastValueFrom} from "rxjs";
 @Component({
     selector: 'create-user-modal',
     template: `
-        <div class="modal-header">
-            <h4 class="modal-title" id="modal-basic-title">Delete User</h4>
-            <button (click)="activeModal.close('Cross click')"
-                    aria-label="Close"
-                    class="btn-sm btn "
-                    type="button">
-        <span aria-hidden="true">
-            <i class="fa fa-icons fa-close"></i>
-        </span>
-            </button>
-        </div>
-        <div class="modal-body">
-            <p>Are you sure, you want to delete user <strong>{{ user.name }}</strong> ?</p>
-            <div class="align-items-end">
-                <button (click)="activeModal.close('Cross click')" class="btn btn-secondary btn-md" type="button">No
+        <app-standard-dialog title="Delete User">
+            <app-dialog-tab>
+                <p>Are you sure, you want to delete user <strong>{{ user.name }}</strong> ?</p>
+            </app-dialog-tab>
+            <app-dialog-footer>
+                <button (click)="activeModal.close('Cross click')" class="btn btn-secondary" type="button">
+                    No
                 </button>
-                <button (click)="onYes()" class="btn btn-primary btn-md m-2" type="button">Yes</button>
-            </div>
-        </div>
+                <button (click)="onYes()" class="btn btn-primary" type="button">
+                    Yes
+                </button>
+            </app-dialog-footer>
+        </app-standard-dialog>
     `,
     styles: ['']
 })

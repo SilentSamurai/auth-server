@@ -1,6 +1,6 @@
-const { defineConfig } = require("cypress");
+// const { defineConfig } = require("cypress");
 
-module.exports = defineConfig({
+module.exports = {
   e2e: {
     baseUrl: 'http://localhost:9001',
     supportFile: "cypress/support/e2e.js",
@@ -8,4 +8,4 @@ module.exports = defineConfig({
       // implement node event listeners here
     },
   },
-});
+};

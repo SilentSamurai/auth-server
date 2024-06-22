@@ -15,6 +15,26 @@ describe('Tenant Flow', () => {
         cy.visit('/');
     })
 
+    it('Create Tenant',  function () {
+
+        cy.url().should('include', '/home');
+
+        cy.get('#Tenants_HOME_NAV').click()
+
+        cy.get('a[href="/TN01"]').click()
+
+        cy.get('#CREATE_TENANT_DIALOG_BTN').click()
+
+
+        cy.get('#create.tenant.name').fill(TENANT_NAME);
+        cy.get('#create.tenant.domain').fill(TENANT_DOMAIN);
+
+
+        cy.get('#CREATE_TENANT_SUBMIT_BTN').click()
+
+
+    })
+
 
     it('Create Tenant',  function () {
 
