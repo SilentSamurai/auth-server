@@ -4,6 +4,9 @@ import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {EditUserModalComponent} from "./dialogs/edit-user.modal.component";
 import {UserService} from "../../_services/user.service";
 import {lastValueFrom} from "rxjs";
+import {ConfirmationService} from "../../component/dialogs/confirmation.service";
+import {MessageService} from "primeng/api";
+import {Location} from "@angular/common";
 
 @Component({
     selector: 'tenant-details',
@@ -40,6 +43,9 @@ import {lastValueFrom} from "rxjs";
                 </button>
                 <button (click)="openUpdateModal()" class="btn btn-sm  btn-primary mx-2">
                     Lock / Unlock
+                </button>
+                <button (click)="onDelete()" class="btn btn-sm  btn-danger mx-2">
+                    Delete
                 </button>
             </app-object-page-actions>
             <app-object-page-section name="Tenants">
@@ -90,6 +96,9 @@ export class UR02Component implements OnInit {
 
     constructor(private userService: UserService,
                 private actRoute: ActivatedRoute,
+                private confirmationService: ConfirmationService,
+                private messageService: MessageService,
+                private _location: Location,
                 private modalService: NgbModal) {
     }
 
@@ -103,6 +112,26 @@ export class UR02Component implements OnInit {
     openUpdateModal() {
         const modalRef = this.modalService.open(EditUserModalComponent);
         modalRef.componentInstance.user = this.user;
+    }
+
+    async onDelete() {
+        const deletedUser = await this.confirmationService.confirm({
+            message: `Are you sure you want to delete ${this.user_email} ?`,
+            header: 'Confirmation',
+            icon: 'pi pi-info-circle',
+            accept: async () => {
+                try {
+                    let deletedUser = await this.userService.deleteUser(this.user.id);
+                    this.messageService.add({severity: 'success', summary: 'Success', detail: 'User Deleted'});
+                    return deletedUser;
+                } catch (e) {
+                    this.messageService.add({severity: 'error', summary: 'Error', detail: 'User Deletion Failed'});
+                }
+                return null;
+            }
+        })
+        console.log(deletedUser);
+        this._location.back();
     }
 
 }

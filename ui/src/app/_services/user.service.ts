@@ -40,7 +40,7 @@ export class UserService {
     }
 
     deleteUser(id: string) {
-        return this.http.delete(`${API_URL}/users/${id}`, this.getHttpOptions())
+        return lastValueFrom(this.http.delete(`${API_URL}/users/${id}`, this.getHttpOptions()))
     }
 
     getUser(email: string) {

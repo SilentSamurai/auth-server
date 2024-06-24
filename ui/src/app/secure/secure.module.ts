@@ -17,7 +17,6 @@ import {UR02Component} from "./users/UR02.component";
 import {UR01Component} from "./users/UR01.component";
 import {CreateUserModalComponent} from "./users/dialogs/create-user.modal.component";
 import {EditUserModalComponent} from "./users/dialogs/edit-user.modal.component";
-import {DeleteUserModalComponent} from "./users/dialogs/delete-user.modal.component";
 import {TN02Component} from "./tenants/TN02.component";
 import {AddMemberComponent} from "./tenants/dialogs/add-member.component";
 import {AddRoleComponent} from "./tenants/dialogs/add-role.component";
@@ -52,7 +51,6 @@ import {UR02SelectionComponent} from "./users/UR02-selection.component";
         UR02SelectionComponent,
         CreateUserModalComponent,
         EditUserModalComponent,
-        DeleteUserModalComponent,
         TN02Component,
         TN02SelectionComponent,
         TNRL01SelectionComponent,
