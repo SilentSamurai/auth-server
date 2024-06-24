@@ -12,7 +12,6 @@ import {AdminNavBarComponent} from "./nav-bar.component";
 import {NgbCollapseModule, NgbDropdownModule, NgbNavModule} from "@ng-bootstrap/ng-bootstrap";
 import {TN01Component} from "./tenants/TN01.component";
 import {UpdateTenantComponent} from "./tenants/dialogs/update-tenant.component";
-import {DeleteTenantComponent} from "./tenants/dialogs/delete-tenant.component";
 import {CreateTenantComponent} from "./tenants/dialogs/create-tenant.component";
 import {UR02Component} from "./users/UR02.component";
 import {UR01Component} from "./users/UR01.component";
@@ -22,8 +21,6 @@ import {DeleteUserModalComponent} from "./users/dialogs/delete-user.modal.compon
 import {TN02Component} from "./tenants/TN02.component";
 import {AddMemberComponent} from "./tenants/dialogs/add-member.component";
 import {AddRoleComponent} from "./tenants/dialogs/add-role.component";
-import {RemoveMemberComponent} from "./tenants/dialogs/remove-member.component";
-import {RemoveRoleComponent} from "./tenants/dialogs/remove-role.component";
 import {ComponentModule} from "../component/component.module";
 import {RL01Component} from "./roles/RL01.component";
 import {RL02SelectionComponent} from "./roles/RL02-selection.component";
@@ -49,7 +46,6 @@ import {UR02SelectionComponent} from "./users/UR02-selection.component";
         AdminNavBarComponent,
         TN01Component,
         UpdateTenantComponent,
-        DeleteTenantComponent,
         CreateTenantComponent,
         UR02Component,
         UR01Component,
@@ -63,8 +59,6 @@ import {UR02SelectionComponent} from "./users/UR02-selection.component";
         TNRL01Component,
         AddMemberComponent,
         AddRoleComponent,
-        RemoveMemberComponent,
-        RemoveRoleComponent,
         RL01Component,
         RL02SelectionComponent,
         GP02SelectionComponent,

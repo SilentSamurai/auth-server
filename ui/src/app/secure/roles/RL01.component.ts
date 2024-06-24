@@ -106,9 +106,6 @@ export class RL01Component implements OnInit {
             accept: async () => {
                 await this.roleService.deleteRole(role.tenantId, role.name);
                 this.messageService.add({severity: 'success', summary: 'Successful', detail: 'Group removed'});
-            },
-            reject: async () => {
-                // this.messageService.add({severity: 'info', summary: 'Successful', detail: 'Group removed'});
             }
         })
         this.ngOnInit();

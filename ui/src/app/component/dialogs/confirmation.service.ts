@@ -2,14 +2,14 @@ import {Component, Injectable, OnInit} from "@angular/core";
 import {NgbActiveModal, NgbModal} from "@ng-bootstrap/ng-bootstrap";
 
 
-export interface ConfirmationOptions {
+export interface ConfirmationOptions<Type> {
     message: string;
     header?: string;
     icon?: string;
     acceptIcon?: string | null;
     rejectIcon?: string | null;
-    accept: () => any;
-    reject: () => any;
+    reject?: () => Promise<Type | null>;
+    accept?: () => Promise<Type | null>;
 }
 
 @Injectable({
@@ -21,7 +21,7 @@ export class ConfirmationService {
 
     }
 
-    async confirm(options: ConfirmationOptions) {
+    async confirm<Type>(options: ConfirmationOptions<Type>): Promise<null | Type> {
         const modalRef = this.modalService.open(
             ConfirmationDialogComponent,
             {centered: true, backdrop: 'static'});
@@ -30,16 +30,17 @@ export class ConfirmationService {
         modalRef.componentInstance.icon = options.icon ? options.icon : 'fa fa-info-circle';
         modalRef.componentInstance.rejectIcon = options.rejectIcon ? options.rejectIcon : null;
         modalRef.componentInstance.acceptIcon = options.acceptIcon ? options.acceptIcon : null;
-        const returnedValue = await modalRef.result;
-        if (returnedValue === "YES") {
+        const modalResult = await modalRef.result;
+        if (modalResult === "YES") {
             if (options.accept) {
-                await options.accept();
+                return await options.accept();
             }
         } else {
             if (options.reject) {
-                await options.reject();
+                return await options.reject();
             }
         }
+        return null;
     }
 
 }
@@ -53,11 +54,11 @@ export class ConfirmationService {
                 <p><i class="{{icon}} pe-2 pt-2"></i> {{ message }} </p>
             </app-dialog-tab>
             <app-dialog-footer>
-                <button (click)="activeModal.close('NO')" class="btn btn-secondary" type="button">
+                <button (click)="activeModal.close('NO')" class="btn btn-secondary" type="button" id="CONFIRMATION_NO_BTN">
                     <i class="{{rejectIcon}} pe-2" *ngIf="rejectIcon"></i>
                     No
                 </button>
-                <button (click)="onYes()" class="btn btn-primary" type="button">
+                <button (click)="onYes()" class="btn btn-primary" type="button" id="CONFIRMATION_YES_BTN">
                     <i class="{{acceptIcon}} pe-2" *ngIf="acceptIcon"></i>
                     Yes
                 </button>

@@ -31,7 +31,7 @@ import {TenantService} from "../../../_services/tenant.service";
                 </form>
             </app-dialog-tab>
             <app-dialog-footer>
-                <button class="btn btn-primary" type="submit" (click)="addRoleForm.onSubmit(krishna)">
+                <button class="btn btn-primary" type="submit" (click)="addRoleForm.onSubmit(krishna)" id="ADD_TENANT_ROLE_BTN">
                     Create</button>
             </app-dialog-footer>
         </app-standard-dialog>

@@ -31,8 +31,11 @@ import {TenantService} from "../../../_services/tenant.service";
                 </form>
             </app-dialog-tab>
             <app-dialog-footer>
-                <button class="btn btn-primary" type="submit" (click)="addMemberForm.onSubmit(krishna)">
-                    Add Member</button>
+                <button class="btn btn-primary" type="submit"
+                        id="ADD_TENANT_MEMBER_BTN"
+                        (click)="addMemberForm.onSubmit(krishna)">
+                    Add Member
+                </button>
             </app-dialog-footer>
         </app-standard-dialog>
     `,

@@ -241,9 +241,6 @@ export class GP02Component implements OnInit {
                 await this.groupService.deleteGroup(this.group_id);
                 this.messageService.add({severity: 'info', summary: 'Successful', detail: 'Group removed'});
                 await this.router.navigate(["/GP01"]);
-            },
-            reject: () => {
-
             }
         })
     }
@@ -258,9 +255,6 @@ export class GP02Component implements OnInit {
                 await this.groupService.removeUser(this.group_id, [user.email]);
                 this.messageService.add({severity: 'info', summary: 'Successful', detail: 'User removed'});
                 await this.ngOnInit();
-            },
-            reject: () => {
-
             }
         })
     }
@@ -298,9 +292,6 @@ export class GP02Component implements OnInit {
                 await this.groupService.removeRoles(this.group_id, [role.name]);
                 this.messageService.add({severity: 'info', summary: 'Successful', detail: 'Role removed'});
                 await this.ngOnInit();
-            },
-            reject: () => {
-
             }
         })
 

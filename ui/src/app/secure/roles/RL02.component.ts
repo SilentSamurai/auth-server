@@ -173,9 +173,6 @@ export class RL02Component implements OnInit {
                 await this.roleService.deleteRole(this.role.tenantId, this.role.name);
                 this.messageService.add({severity: 'info', summary: 'Successful', detail: 'Group removed'});
                 await this.router.navigate(["/RL01"]);
-            },
-            reject: () => {
-
             }
         })
     }
@@ -187,9 +184,6 @@ export class RL02Component implements OnInit {
             accept: async () => {
                 await this.roleService.removeUser(this.tenantId, this.roleName, [user.email]);
                 this.messageService.add({severity: 'info', summary: 'Successful', detail: 'User removed'});
-            },
-            reject: () => {
-
             }
         });
         await this.ngOnInit();

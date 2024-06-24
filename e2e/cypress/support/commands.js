@@ -25,69 +25,43 @@
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 
 Cypress.Commands.add('adminLogin', (email, password) => {
-    cy.session(
-        email,
-        () => {
-            cy.visit("/");
-            cy.get('#domain-pre').type("auth.server.com")
+    cy.visit("/home");
+    cy.get('#domain-pre').type("auth.server.com")
 
-            // After filtering, we can assert that there is only the one
-            // incomplete item in the list.
-            cy.get('#continue-btn').click()
+    // After filtering, we can assert that there is only the one
+    // incomplete item in the list.
+    cy.get('#continue-btn').click()
 
-            cy.get('#email').type(email)
-            cy.get('#password').type(password)
+    cy.get('#email').type(email)
+    cy.get('#password').type(password)
 
-            cy.intercept('POST', '**/api/oauth/login*').as('authCode')
+    cy.intercept('POST', '**/api/oauth/token*').as('authCode')
 
-            cy.get('#login-btn').click();
+    cy.get('#login-btn').click();
 
-            cy.wait('@authCode').should(({request, response}) => {
-                expect(response.statusCode).to.be.oneOf([201]);
-                // expect(response && response.body).to.include('authentication_code')
-            })
-        },
-        {
-            validate() {
-                cy.getAllLocalStorage().then((result) => {
-                    expect(localStorage.getItem("auth-token")).to.be.not.null;
-                })
-                // expect(localStorage.getItem("auth-token")).to.be.not.null;
-
-            },
-        }
-    )
-
+    cy.wait('@authCode').should(({request, response}) => {
+        expect(response.statusCode).to.be.oneOf([201, 200]);
+        // expect(response && response.body).to.include('authentication_code')
+    })
 });
 
 Cypress.Commands.add('login', (email, password, tenant) => {
-    cy.session(
-        email,
-        () => {
-            cy.visit("/");
-            cy.get('#domain-pre').type(tenant)
+    cy.visit("/home");
+    cy.get('#domain-pre').type(tenant)
 
-            // After filtering, we can assert that there is only the one
-            // incomplete item in the list.
-            cy.get('#continue-btn').click()
+    // After filtering, we can assert that there is only the one
+    // incomplete item in the list.
+    cy.get('#continue-btn').click()
 
-            cy.get('#email').type(email)
-            cy.get('#password').type(password)
+    cy.get('#email').type(email)
+    cy.get('#password').type(password)
 
-            cy.intercept('POST', '**/api/oauth/login*').as('authCode')
+    cy.intercept('POST', '**/api/oauth/token*').as('authCode')
 
-            cy.get('#login-btn').click();
+    cy.get('#login-btn').click();
 
-            cy.wait('@authCode').should(({request, response}) => {
-                expect(response.statusCode).to.be.oneOf([201]);
-                // expect(response && response.body).to.include('authentication_code')
-            })
-        }, {
-            validate() {
-                cy.getAllLocalStorage().then((result) => {
-                    expect(localStorage.getItem("auth-token")).to.be.not.null;
-                })
-            },
-        }
-    )
+    cy.wait('@authCode').should(({request, response}) => {
+        expect(response.statusCode).to.be.oneOf([201, 200]);
+        // expect(response && response.body).to.include('authentication_code')
+    })
 });

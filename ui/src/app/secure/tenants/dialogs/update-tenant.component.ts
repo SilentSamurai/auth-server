@@ -49,7 +49,9 @@ import {TenantService} from "../../../_services/tenant.service";
             </app-dialog-tab>
 
             <app-dialog-footer>
-                <button class="btn btn-primary" type="submit" (click)="updateTenantForm.onSubmit(krishna)">Update</button>
+                <button id="UPDATE_TENANT_SAVE_BTN" class="btn btn-primary" type="submit" (click)="updateTenantForm.onSubmit(krishna)">
+                    Update
+                </button>
             </app-dialog-footer>
 
         </app-standard-dialog>
