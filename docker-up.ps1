@@ -7,7 +7,7 @@ cd ../srv
 npm run build
 
 # build image
-#docker build
+docker build
 
 # deploy
-docker-compose up
+#docker-compose up
