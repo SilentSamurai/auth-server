@@ -34,7 +34,7 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
 
                             <app-fb-col name="email" label="Email"></app-fb-col>
                             <app-fb-col name="name" label="Name"></app-fb-col>
-                            <app-fb-col name="domain" label="Domain"></app-fb-col>
+                            <app-fb-col name="tenants/domain" label="Domain"></app-fb-col>
 
                             <app-vh-col name="name" label="Name"></app-vh-col>
                             <app-vh-col name="email" label="Email"></app-vh-col>

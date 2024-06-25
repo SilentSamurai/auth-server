@@ -2,7 +2,7 @@ import {CUSTOM_ELEMENTS_SCHEMA, NgModule} from '@angular/core';
 import {TableModule} from "primeng/table";
 import {RouterModule} from "@angular/router";
 import {CommonModule} from "@angular/common";
-import {FormsModule} from "@angular/forms";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {MultiSelectModule} from "primeng/multiselect";
 import {ChipModule} from "primeng/chip";
 import {MenuModule} from "primeng/menu";
@@ -81,7 +81,8 @@ import {UR02SelectionComponent} from "./users/UR02-selection.component";
         ComponentModule,
         InputTextModule,
         MessagesModule,
-        ConfirmDialogModule
+        ConfirmDialogModule,
+        ReactiveFormsModule
     ],
     providers: [ConfirmationService, MessageService],
     exports: [

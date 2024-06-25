@@ -2,7 +2,7 @@ import {CUSTOM_ELEMENTS_SCHEMA, NgModule} from '@angular/core';
 import {TableModule} from "primeng/table";
 import {RouterModule} from "@angular/router";
 import {CommonModule} from "@angular/common";
-import {FormsModule} from "@angular/forms";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {MultiSelectModule} from "primeng/multiselect";
 import {ChipModule} from "primeng/chip";
 import {MenuModule} from "primeng/menu";
@@ -38,6 +38,7 @@ import {DialogActionsComponent} from "./dialogs/dialog-actions.component";
 import {DialogTabComponent} from "./dialogs/dialog-tab.component";
 import {DialogFooterComponent} from "./dialogs/dialog-footer.component";
 import {ConfirmationDialogComponent, ConfirmationService} from "./dialogs/confirmation.service";
+import {InputErrorComponent, TextInputComponent} from "./inputs/text-input.component";
 
 @NgModule({
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -68,7 +69,9 @@ import {ConfirmationDialogComponent, ConfirmationService} from "./dialogs/confir
         DialogActionsComponent,
         DialogTabComponent,
         DialogFooterComponent,
-        ConfirmationDialogComponent
+        ConfirmationDialogComponent,
+        TextInputComponent,
+        InputErrorComponent
     ],
     imports: [
         TableModule,
@@ -85,7 +88,8 @@ import {ConfirmationDialogComponent, ConfirmationService} from "./dialogs/confir
         CardModule,
         SkeletonModule,
         ButtonModule,
-        RippleModule
+        RippleModule,
+        ReactiveFormsModule
     ],
     providers: [ConfirmationService],
     exports: [
@@ -111,7 +115,8 @@ import {ConfirmationDialogComponent, ConfirmationService} from "./dialogs/confir
         StandardDialogComponent,
         DialogTabComponent,
         DialogFooterComponent,
-
+        TextInputComponent,
+        InputErrorComponent,
     ]
 })
 export class ComponentModule {
