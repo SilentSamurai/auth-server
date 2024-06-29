@@ -43,9 +43,9 @@ envs:
     envFile:  "/home/app/dist/envs/.env.aws"
     port: 80
     DATABASE_TYPE: postgres
-    DATABASE_HOST: postgres-postgresql.default.svc.cluster.local
+    DATABASE_HOST: postgres-postgresql.database.svc.cluster.local
     DATABASE_PORT: 5432
-    DATABASE_USERNAME: UAA_DB_ADM_ROLE
+    DATABASE_USERNAME: uaa_db_adm
     DATABASE_PASSWORD: root@1234
     DATABASE_NAME: UAA_MASTER
 
