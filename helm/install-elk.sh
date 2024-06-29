@@ -11,5 +11,5 @@ helm ls -n logging
 helm uninstall elk-elasticsearch -n logging
 helm uninstall elk-kibana -n logging
 helm uninstall elk-metricbeat -n logging
-helm uninstall elk-metricbeat -n logging
-helm uninstall elk-metricbeat -n logging
+helm uninstall elk-logstash -n logging
+helm uninstall elk-filebeat -n logging
