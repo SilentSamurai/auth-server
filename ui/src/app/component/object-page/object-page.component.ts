@@ -44,6 +44,7 @@ import {ObjectPageSubTitleComponent} from "./object-page-subtitle.component";
                             <ul class="nav nav-tabs">
                                 <li class="nav-item " *ngFor="let section of sections">
                                     <button class="nav-link nav-tab-btn text-uppercase px-0 me-4"
+                                            id="{{section.name.toUpperCase()}}_SECTION_NAV"
                                             type="button" (click)="doScroll(section.name.toUpperCase())">
                                         <strong>{{ section.name }} </strong>
                                     </button>

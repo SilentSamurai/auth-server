@@ -9,7 +9,7 @@
         "dev:ui:start": "cd ./ui && npm run UI:BUILD:WATCH",
         "dev:backend:start": "cd ./srv && npm run start:debug",
         "dev:external:start": "cd ./external-user-app && node server.js",
-        "run:cypress": "cd cypress && npx cypress run"
+        "run:e2e-tests": "cd ./e2e && npm run test"
     },
     "dependencies": {
     }

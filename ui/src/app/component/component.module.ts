@@ -2,7 +2,7 @@ import {CUSTOM_ELEMENTS_SCHEMA, NgModule} from '@angular/core';
 import {TableModule} from "primeng/table";
 import {RouterModule} from "@angular/router";
 import {CommonModule} from "@angular/common";
-import {FormsModule} from "@angular/forms";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {MultiSelectModule} from "primeng/multiselect";
 import {ChipModule} from "primeng/chip";
 import {MenuModule} from "primeng/menu";
@@ -33,6 +33,12 @@ import {AttributeComponent} from "./fields/attribute.component";
 import {ObjectPageTitleComponent} from "./object-page/object-page-title.component";
 import {ObjectPageActionsComponent} from "./object-page/object-page-actions.component";
 import {ObjectPageSubTitleComponent} from "./object-page/object-page-subtitle.component";
+import {StandardDialogComponent} from "./dialogs/standard-dialog.component";
+import {DialogActionsComponent} from "./dialogs/dialog-actions.component";
+import {DialogTabComponent} from "./dialogs/dialog-tab.component";
+import {DialogFooterComponent} from "./dialogs/dialog-footer.component";
+import {ConfirmationDialogComponent, ConfirmationService} from "./dialogs/confirmation.service";
+import {InputErrorComponent, TextInputComponent} from "./inputs/text-input.component";
 
 @NgModule({
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -58,7 +64,14 @@ import {ObjectPageSubTitleComponent} from "./object-page/object-page-subtitle.co
         PageViewComponent,
         PageViewBodyComponent,
         PageViewHeaderComponent,
-        AttributeComponent
+        AttributeComponent,
+        StandardDialogComponent,
+        DialogActionsComponent,
+        DialogTabComponent,
+        DialogFooterComponent,
+        ConfirmationDialogComponent,
+        TextInputComponent,
+        InputErrorComponent
     ],
     imports: [
         TableModule,
@@ -75,9 +88,10 @@ import {ObjectPageSubTitleComponent} from "./object-page/object-page-subtitle.co
         CardModule,
         SkeletonModule,
         ButtonModule,
-        RippleModule
+        RippleModule,
+        ReactiveFormsModule
     ],
-    providers: [],
+    providers: [ConfirmationService],
     exports: [
         TileComponent,
         ValueHelpInputComponent,
@@ -97,7 +111,12 @@ import {ObjectPageSubTitleComponent} from "./object-page/object-page-subtitle.co
         AttributeComponent,
         ObjectPageTitleComponent,
         ObjectPageActionsComponent,
-        ObjectPageSubTitleComponent
+        ObjectPageSubTitleComponent,
+        StandardDialogComponent,
+        DialogTabComponent,
+        DialogFooterComponent,
+        TextInputComponent,
+        InputErrorComponent,
     ]
 })
 export class ComponentModule {

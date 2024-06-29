@@ -2,13 +2,14 @@ import {
     Body,
     ClassSerializerInterceptor,
     Controller,
+    Logger,
     Param,
     Post,
     Request,
     UseGuards,
     UseInterceptors
 } from '@nestjs/common';
-import {ILike, In, IsNull, LessThan, LessThanOrEqual, MoreThan, MoreThanOrEqual, Not, Repository} from "typeorm";
+import {Equal, ILike, In, IsNull, LessThan, LessThanOrEqual, MoreThan, MoreThanOrEqual, Not, Repository} from "typeorm";
 import {InjectRepository} from "@nestjs/typeorm";
 import {User} from "../users/user.entity";
 import {Tenant} from "../tenants/tenant.entity";
@@ -21,24 +22,47 @@ import {SecurityService} from "../roles/security.service";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
 import {escapeRegExp} from "typeorm/util/escapeRegExp";
 import {Group} from "../groups/group.entity";
+import {FindOperator} from "typeorm/find-options/FindOperator";
+
+const logger = new Logger('GenericSearchController');
+const RELATIONS = {
+    "Users": {
+        "Tenants": "tenants",
+        "tenants": "tenants"
+    },
+    "Tenants": {},
+    "TenantMembers": {},
+    "Roles": {
+        "Users": "users",
+        "Tenants": "tenant",
+        "tenant": "tenant"
+    },
+    "Groups": {
+        "Tenants": "tenant"
+    }
+}
+
+class Filter {
+    label: string;
+    name: string;
+    operator: string;
+    value: any;
+}
+
+class QueryBody {
+    pageNo?: number;
+    pageSize?: number;
+    where?: Filter[];
+    expand?: string[];
+}
+
 
 @Controller('api/search')
 @UseInterceptors(ClassSerializerInterceptor)
 export class GenericSearchController {
 
     private repos = {};
-    private relations = {
-        "Users": {},
-        "Tenants": {},
-        "TenantMembers": {},
-        "Roles": {
-            "Users": "users",
-            "Tenants": "tenant"
-        },
-        "Groups": {
-            "Tenants": "tenant"
-        }
-    }
+
 
     constructor(
         @InjectRepository(User) private usersRepo: Repository<User>,
@@ -62,7 +86,7 @@ export class GenericSearchController {
     async search(
         @Request() request,
         @Param('entity') entity: string,
-        @Body() query: any
+        @Body() query: QueryBody
     ): Promise<any> {
 
         const repo = this.getRepo(entity);
@@ -77,7 +101,7 @@ export class GenericSearchController {
         let findOption: any = {
             skip: pageNo * pageSize,
             take: pageSize,
-            where: getWhere(query.where),
+            where: getWhere(entity, query.where),
             relations: this.getRelations(entity, query)
         };
         let users = await repo.find(findOption)
@@ -88,8 +112,8 @@ export class GenericSearchController {
         };
     }
 
-    getRelations(entity: string, query: any) {
-        let relations = this.relations[entity] || {};
+    getRelations(entity: string, query: QueryBody) {
+        let relations = RELATIONS[entity] || {};
         let rel_qry = {}
         let expands = query.expand || [];
         for (let related_entity of expands) {
@@ -125,56 +149,78 @@ enum FilterRule {
     REGEX = "regex"
 }
 
+export const getCondition = (operator: string, value: any): FindOperator<any> => {
+    if (operator == FilterRule.IS_NULL) {
+        return IsNull();
+    }
+    if (operator == FilterRule.IS_NOT_NULL) {
+        return Not(IsNull());
+    }
+    if (operator == FilterRule.EQUALS) {
+        return Equal(value);
+    }
+    if (operator == FilterRule.NOT_EQUALS) {
+        return Not(value);
+    }
+    if (operator == FilterRule.GREATER_THAN) {
+        return MoreThan(value);
+    }
+    if (operator == FilterRule.GREATER_THAN_OR_EQUALS) {
+        return MoreThanOrEqual(value);
+    }
+    if (operator == FilterRule.GREATER_THAN_OR_EQUALS) {
+        return MoreThanOrEqual(value);
+    }
+    if (operator == FilterRule.LESS_THAN) {
+        return LessThan(value);
+    }
+    if (operator == FilterRule.LESS_THAN_OR_EQUALS) {
+        return LessThanOrEqual(value);
+    }
+    if (operator == FilterRule.LIKE) {
+        return ILike(`%${value}%`);
+    }
+    if (operator == FilterRule.NOT_LIKE) {
+        return Not(ILike(`%${value}%`));
+    }
+    if (operator == FilterRule.IN) {
+        return In(value.split(','));
+    }
+    if (operator == FilterRule.NOT_IN) {
+        return Not(In(value.split(',')));
+    }
+    if (operator == FilterRule.REGEX) {
+        let newValue = value.replace(new RegExp(escapeRegExp("*"), 'g'), "%");
+        return ILike(newValue);
+    }
+}
 
-export const getWhere = (filters: any) => {
+export const getWhere = (entity: string, filters: Filter[]) => {
     if (!filters || filters.length < 0) return {};
 
     let where: any = {};
 
     for (let filter of filters) {
-        if (filter.operator == FilterRule.IS_NULL) {
-            where[filter.name] = IsNull();
-        }
-        if (filter.operator == FilterRule.IS_NOT_NULL) {
-            where[filter.name] = Not(IsNull());
-        }
-        if (filter.operator == FilterRule.EQUALS) {
-            where[filter.name] = filter.value;
-        }
-        if (filter.operator == FilterRule.NOT_EQUALS) {
-            where[filter.name] = Not(filter.value);
-        }
-        if (filter.operator == FilterRule.GREATER_THAN) {
-            where[filter.name] = MoreThan(filter.value);
-        }
-        if (filter.operator == FilterRule.GREATER_THAN_OR_EQUALS) {
-            where[filter.name] = MoreThanOrEqual(filter.value);
-        }
-        if (filter.operator == FilterRule.GREATER_THAN_OR_EQUALS) {
-            where[filter.name] = MoreThanOrEqual(filter.value);
-        }
-        if (filter.operator == FilterRule.LESS_THAN) {
-            where[filter.name] = LessThan(filter.value);
-        }
-        if (filter.operator == FilterRule.LESS_THAN_OR_EQUALS) {
-            where[filter.name] = LessThanOrEqual(filter.value);
-        }
-        if (filter.operator == FilterRule.LIKE) {
-            where[filter.name] = ILike(`%${filter.value}%`);
-        }
-        if (filter.operator == FilterRule.NOT_LIKE) {
-            where[filter.name] = Not(ILike(`%${filter.value}%`));
-        }
-        if (filter.operator == FilterRule.IN) {
-            where[filter.name] = In(filter.value.split(','));
-        }
-        if (filter.operator == FilterRule.NOT_IN) {
-            where[filter.name] = Not(In(filter.value.split(',')));
-        }
-        if (filter.operator == FilterRule.REGEX) {
-            let newValue = filter.value.replace(new RegExp(escapeRegExp("*"), 'g'), "%");
-            where[filter.name] = ILike(newValue);
+        if (filter.name.includes("/")) {
+            let names = filter.name.split("/");
+            names = names.filter((n: string | any[]) => n.length > 0);
+            if (names.length != 2) {
+                logger.log("Invalid filter: ", filter);
+                continue;
+            }
+            let fk_entity = names[0];
+            let fk_entity_field = names[1];
+            let relations = RELATIONS[entity] || {};
+            if (relations.hasOwnProperty(fk_entity)) {
+                fk_entity = relations[fk_entity];
+            }
+            where[fk_entity] = {};
+            where[fk_entity][fk_entity_field] = getCondition(filter.operator, filter.value);
+        } else {
+            where[filter.name] = getCondition(filter.operator, filter.value);
         }
     }
+    logger.log("Query formed Where: ", where);
     return where;
 }
+

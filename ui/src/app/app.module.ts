@@ -21,6 +21,7 @@ import {SecureModule} from "./secure/secure.module";
 import {CardModule} from "primeng/card";
 import {ComponentModule} from "./component/component.module";
 import {ConfirmDialogModule} from "primeng/confirmdialog";
+import {HttpErrorComponent} from "./error-pages/HttpError.component";
 
 @NgModule({
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -29,7 +30,8 @@ import {ConfirmDialogModule} from "primeng/confirmdialog";
         LoginComponent,
         RegisterComponent,
         ProfileComponent,
-        SessionConfirmationComponent
+        SessionConfirmationComponent,
+        HttpErrorComponent
     ],
     imports: [
         BrowserModule,
@@ -48,7 +50,11 @@ import {ConfirmDialogModule} from "primeng/confirmdialog";
         ComponentModule,
         ConfirmDialogModule
     ],
-    providers: [authInterceptorProviders, NgbDropdown, MessageService, ConfirmationService],
+    providers: [
+        authInterceptorProviders,
+        NgbDropdown,
+        MessageService,
+        ConfirmationService],
     exports: [],
     bootstrap: [AppComponent]
 })

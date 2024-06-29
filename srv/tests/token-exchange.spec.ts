@@ -96,6 +96,45 @@ describe('e2e token exchange flow', () => {
         expect(decode.tenant.domain).toEqual("test-wesite.com");
     });
 
+    it(`/POST Token Wrong Exchange`, async () => {
+        const response = await app.getHttpServer()
+            .post('/api/oauth/exchange')
+            .send({
+                "access_token": "wrong token",
+                "client_id": clientId,
+                "client_secret": clientSecret
+            })
+            .set('Accept', 'application/json');
+
+        expect(response.status).toEqual(401);
+    });
+
+    it(`/POST Token Wrong client_id`, async () => {
+        const response = await app.getHttpServer()
+            .post('/api/oauth/exchange')
+            .send({
+                "access_token": superAdminToken,
+                "client_id": "clientId",
+                "client_secret": "clientSecret"
+            })
+            .set('Accept', 'application/json');
+
+        expect(response.status).toEqual(404);
+    });
+
+    it(`/POST Token Wrong client_secret`, async () => {
+        const response = await app.getHttpServer()
+            .post('/api/oauth/exchange')
+            .send({
+                "access_token": superAdminToken,
+                "client_id": clientId,
+                "client_secret": "clientSecret"
+            })
+            .set('Accept', 'application/json');
+
+        expect(response.status).toEqual(401);
+    });
+
 
 });
 

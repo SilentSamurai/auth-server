@@ -2,12 +2,13 @@ import {Component, OnInit, ViewChild} from '@angular/core';
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {CreateTenantComponent} from "./dialogs/create-tenant.component";
 import {UpdateTenantComponent} from "./dialogs/update-tenant.component";
-import {DeleteTenantComponent} from "./dialogs/delete-tenant.component";
 import {TenantService} from "../../_services/tenant.service";
 import {TokenStorageService} from "../../_services/token-storage.service";
 import {AppTableComponent, TableAsyncLoadEvent} from "../../component/table/app-table.component";
 import {Filter} from "../../component/filter-bar/filter-bar.component";
 import {AuthDefaultService} from "../../_services/auth.default.service";
+import {ConfirmationService} from "../../component/dialogs/confirmation.service";
+import {MessageService} from "primeng/api";
 
 @Component({
     selector: 'app-TN01',
@@ -24,7 +25,7 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
                     <div class="d-flex justify-content-between mt-2">
                         <div></div>
                         <button (click)="openCreateModal()" [disabled]="!this.creationAllowed"
-                                class="btn btn-outline-success btn-sm"
+                                class="btn btn-outline-success btn-sm" id="CREATE_TENANT_DIALOG_BTN"
                                 type="button">
                             <i class="fa fa-solid fa-plus me-2"></i> Create Tenant
                         </button>
@@ -36,15 +37,14 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
             <app-page-view-body>
                 <app-table
                     title="Tenant List"
-                    (onLoad)="lazyLoad($event)"
+                    (onDataRequest)="lazyLoad($event)"
                     idField="id"
                     isFilterAsync="true"
                     multi="true"
                     scrollHeight="75vh">
 
-                    <app-table-col label="Tenant Id" name="id"></app-table-col>
-                    <app-table-col label="Name" name="name"></app-table-col>
                     <app-table-col label="Domain" name="domain"></app-table-col>
+                    <app-table-col label="Name" name="name"></app-table-col>
                     <app-table-col>
                         <th style="max-width: 100px">Action</th>
                     </app-table-col>
@@ -53,10 +53,9 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
                         <td>
                             <span class="p-column-title">Name</span>
                             <a [routerLink]="['/TN02/', tenant.id]"
-                               href="javascript:void(0)">{{ tenant.id }}</a>
+                               href="javascript:void(0)">{{ tenant.domain }}</a>
                         </td>
                         <td>{{ tenant.name }}</td>
-                        <td>{{ tenant.domain }}</td>
                         <td class="" style="max-width: 100px">
                             <button (click)="openUpdateModal(tenant)" [disabled]="!this.isTenantAdmin"
                                     class="btn"
@@ -88,6 +87,8 @@ export class TN01Component implements OnInit {
     constructor(private tokenStorageService: TokenStorageService,
                 private tenantService: TenantService,
                 private authDefaultService: AuthDefaultService,
+                private confirmationService: ConfirmationService,
+                private messageService: MessageService,
                 private modalService: NgbModal) {
     }
 
@@ -118,9 +119,21 @@ export class TN01Component implements OnInit {
     }
 
     async openDeleteModal(tenant: any) {
-        const modalRef = this.modalService.open(DeleteTenantComponent);
-        modalRef.componentInstance.tenant = tenant;
-        const deletedTenant = await modalRef.result;
+        const deletedTenant = await this.confirmationService.confirm({
+            message: `Are you sure you want to delete <b> ${tenant.domain} </b> ?`,
+            header: 'Confirmation',
+            icon: 'pi pi-info-circle',
+            accept: async () => {
+                try {
+                    let deletedTenant = await this.tenantService.deleteTenant(tenant.id);
+                    this.messageService.add({severity: 'success', summary: 'Success', detail: 'Tenant Deleted'});
+                    return deletedTenant;
+                } catch (e) {
+                    this.messageService.add({severity: 'error', summary: 'Error', detail: 'Tenant Deletion Failed'});
+                }
+                return null;
+            }
+        });
         console.log(deletedTenant);
         await this.ngOnInit();
     }

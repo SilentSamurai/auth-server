@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {lastValueFrom, Observable} from 'rxjs';
+import {lastValueFrom} from 'rxjs';
 import {TokenStorageService} from "./token-storage.service";
 
 const API_URL = '/api';
@@ -20,10 +20,6 @@ export class TenantService {
                 // 'Authorization': 'Bearer ' + this.tokenService.getToken()
             })
         };
-    }
-
-    getAllTenants(): Observable<any> {
-        return this.http.get(`${API_URL}/users/me/tenants`, this.getHttpOptions());
     }
 
     createTenant(name: string, domain: string) {
@@ -87,7 +83,7 @@ export class TenantService {
         return lastValueFrom(this.http.get(`${API_URL}/tenant/${tenantId}/roles`, this.getHttpOptions()))
     }
 
-    async queryTenant(query: any): Promise<any[]> {
+    async queryTenant(query: any): Promise<any> {
         return await lastValueFrom(this.http.post(`${API_URL}/search/Tenants`, query, this.getHttpOptions())) as any;
     }
 

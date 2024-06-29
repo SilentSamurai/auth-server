@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: uaa-auth-svr-deployment
+    labels:
+        type: restapi
+spec:
+    selector:
+        matchLabels:
+            app: uaa-auth-svr
+    replicas: 1
+    template:
+        metadata:
+            name: uaa-auth-svr-tmpl
+            labels:
+                app: uaa-auth-svr
+        spec:
+            containers:
+                -   name: uaa-auth-svr
+                    image: is-auth-server:latest
+                    imagePullPolicy: IfNotPresent
+                    ports:
+                        -   containerPort: 8080
+                    env:
+                        -   name: PORT
+                            value: "8080"
+                        -   name: ENV_FILE
+                            value: './dist/envs/env.aws'
+                    readinessProbe:
+                        initialDelaySeconds: 5
+                        periodSeconds: 5
+                        httpGet:
+                            path: /
+                            port: 8080
+---
+# services.yaml
+apiVersion: v1
+kind: Service
+metadata:
+    name: uaa-auth-svr-svc
+spec:
+    type: LoadBalancer
+    selector:
+        app: uaa-auth-svr
+    ports:
+        -   protocol: "TCP"
+            port: 8000
+            targetPort: 8080
+
+
+

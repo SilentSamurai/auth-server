@@ -40,7 +40,7 @@ import {Filter, FilterBarColumnComponent} from "../filter-bar/filter-bar.compone
                 [idField]="idField"
                 [multi]="multi"
                 [isFilterAsync]="isFilterAsync"
-                (onLoad)="lazyLoad($event)"
+                (onDataRequest)="lazyLoad($event)"
                 [(selection)]="selectedItem">
                 <app-table-col *ngFor="let col of columns"
                                label="{{col.label}}"
@@ -58,7 +58,7 @@ import {Filter, FilterBarColumnComponent} from "../filter-bar/filter-bar.compone
                     class="btn btn-outline-secondary btn-block btn-sm">
                 Clear
             </button>
-            <button (click)="confirm()"
+            <button (click)="confirm()" id="{{name}}_VH_SELECT_BTN"
                     class="btn btn-primary btn-block btn-sm">
                 Select
             </button>

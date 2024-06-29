@@ -6,40 +6,38 @@ import {TenantService} from "../../../_services/tenant.service";
 @Component({
     selector: 'app-add-member',
     template: `
-        <div class="modal-header d-flex justify-content-between">
-            <h4 class="modal-title">Add Member</h4>
-            <button (click)="activeModal.close('Cross click')"
-                    aria-label="Close"
-                    class="btn-sm btn "
-                    type="button">
-        <span aria-hidden="true">
-            <i class="fa fa-icons fa-close"></i>
-        </span>
-            </button>
-        </div>
-        <div class="modal-body">
-            <form #addMemberForm="ngForm"
-                  (ngSubmit)="addMemberForm.form.valid && onSubmit()"
-                  name="addMemberForm"
-                  novalidate>
-                <div class="mb-3 form-group">
-                    <label class="form-label" for="add.member.name">Email</label>
-                    <input #email="ngModel"
-                           [(ngModel)]="form.email"
-                           class="form-control"
-                           id="add.member.name"
-                           name="email"
-                           required type="email">
-                    <div
-                        *ngIf="email.errors && addMemberForm.submitted"
-                        class="alert alert-danger"
-                        role="alert">
-                        Email is required!
+        <app-standard-dialog title="Add Member">
+            <app-dialog-tab>
+                <form #addMemberForm="ngForm"
+                      (ngSubmit)="addMemberForm.form.valid && onSubmit()"
+                      name="addMemberForm"
+                      novalidate>
+                    <div class="mb-3 form-group">
+                        <label class="form-label" for="add.member.name">Email</label>
+                        <input #email="ngModel"
+                               [(ngModel)]="form.email"
+                               class="form-control"
+                               id="add.member.name"
+                               name="email"
+                               required type="email">
+                        <div
+                            *ngIf="email.errors && addMemberForm.submitted"
+                            class="alert alert-danger"
+                            role="alert">
+                            Email is required!
+                        </div>
                     </div>
-                </div>
-                <button class="btn btn-primary" type="submit">Add Member</button>
-            </form>
-        </div>
+
+                </form>
+            </app-dialog-tab>
+            <app-dialog-footer>
+                <button class="btn btn-primary" type="submit"
+                        id="ADD_TENANT_MEMBER_BTN"
+                        (click)="addMemberForm.onSubmit(krishna)">
+                    Add Member
+                </button>
+            </app-dialog-footer>
+        </app-standard-dialog>
     `,
     styles: ['']
 })
@@ -51,6 +49,7 @@ export class AddMemberComponent implements OnInit {
     form = {
         email: ""
     }
+    krishna: any;
 
     constructor(private tenantService: TenantService,
                 private messageService: MessageService,

@@ -3,10 +3,11 @@ import {UserService} from '../../_services/user.service';
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {CreateUserModalComponent} from "./dialogs/create-user.modal.component";
 import {EditUserModalComponent} from "./dialogs/edit-user.modal.component";
-import {DeleteUserModalComponent} from "./dialogs/delete-user.modal.component";
 import {AppTableComponent, TableAsyncLoadEvent} from "../../component/table/app-table.component";
 import {Filter} from "../../component/filter-bar/filter-bar.component";
 import {AuthDefaultService} from "../../_services/auth.default.service";
+import {ConfirmationService} from "../../component/dialogs/confirmation.service";
+import {MessageService} from "primeng/api";
 
 @Component({
     selector: 'app-board-user',
@@ -21,6 +22,7 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
                 <div class="d-flex justify-content-between">
                     <span class="h4"></span>
                     <button (click)="openCreateModal()"
+                            id="CREATE_USER_DIALOG_BTN"
                             class="btn btn-outline-success btn-sm"
                             type="button">
                         <i class="fa fa-solid fa-plus me-2"></i>Create User
@@ -30,7 +32,7 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
             <app-page-view-body>
                 <app-table
                     title="Users"
-                    (onLoad)="lazyLoad($event)"
+                    (onDataRequest)="lazyLoad($event)"
                     idField="email"
                     isFilterAsync="true"
                     multi="true"
@@ -73,6 +75,8 @@ export class UR01Component implements OnInit {
 
     constructor(private userService: UserService,
                 private authDefaultService: AuthDefaultService,
+                private confirmationService: ConfirmationService,
+                private messageService: MessageService,
                 private modalService: NgbModal) {
     }
 
@@ -97,9 +101,21 @@ export class UR01Component implements OnInit {
     }
 
     async openDeleteModal(user: any) {
-        const modalRef = this.modalService.open(DeleteUserModalComponent);
-        modalRef.componentInstance.user = user;
-        const deletedUser = await modalRef.result;
+        const deletedUser = await this.confirmationService.confirm({
+            message: `Are you sure you want to delete ${user.email} ?`,
+            header: 'Confirmation',
+            icon: 'pi pi-info-circle',
+            accept: async () => {
+                try {
+                    let deletedUser = await this.userService.deleteUser(user.id);
+                    this.messageService.add({severity: 'success', summary: 'Success', detail: 'User Deleted'});
+                    return deletedUser;
+                } catch (e) {
+                    this.messageService.add({severity: 'error', summary: 'Error', detail: 'User Deletion Failed'});
+                }
+                return null;
+            }
+        })
         console.log(deletedUser);
         this.ngOnInit();
     }

@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {MessageService} from "primeng/api";
 import {TenantService} from "../../_services/tenant.service";
@@ -7,9 +7,9 @@ import {TokenStorageService} from "../../_services/token-storage.service";
 import {UpdateTenantComponent} from "./dialogs/update-tenant.component";
 import {AddMemberComponent} from "./dialogs/add-member.component";
 import {AddRoleComponent} from "./dialogs/add-role.component";
-import {RemoveRoleComponent} from "./dialogs/remove-role.component";
-import {RemoveMemberComponent} from "./dialogs/remove-member.component";
 import {AuthDefaultService} from "../../_services/auth.default.service";
+import {ConfirmationService} from "../../component/dialogs/confirmation.service";
+import {Location} from '@angular/common';
 
 @Component({
     selector: 'view-tenant',
@@ -17,15 +17,19 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
         <nav-bar></nav-bar>
         <app-object-page>
             <app-object-page-title>
-                {{ tenant.domain }}
+                {{ tenant.name }}
             </app-object-page-title>
             <app-object-page-subtitle>
-                {{ tenant.name }}
+                {{ tenant.domain }}
             </app-object-page-subtitle>
             <app-object-page-actions>
-                <button (click)="onUpdateTenant()" [disabled]="!isTenantAdmin"
+                <button (click)="onUpdateTenant()" [disabled]="!isTenantAdmin" id="UPDATE_TENANT_BTN"
                         class="btn btn-primary btn-sm">
                     Update
+                </button>
+                <button (click)="onDeleteTenant()" [disabled]="!isTenantAdmin" id="DELETE_TENANT_BTN"
+                        class="btn btn-danger btn-sm ms-2 ">
+                    Delete Tenant
                 </button>
             </app-object-page-actions>
             <app-object-page-header>
@@ -66,6 +70,7 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
                         <div class="d-flex justify-content-between">
                             <h5>Member List</h5>
                             <button (click)="onAddMember()" [disabled]="!isTenantAdmin"
+                                    id="OPEN_ADD_MEMBER_DIALOG_BTN"
                                     class="btn btn-primary btn-sm">
                                 Add Member
                             </button>
@@ -90,7 +95,9 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
                                 </a>
                             </td>
                             <td class="">
-                                <button (click)="removeMember(user)" [disabled]="!isTenantAdmin" class="btn"
+                                <button (click)="removeMember(user)" [disabled]="!isTenantAdmin"
+                                        class="btn"
+                                        [attr.data-cy-id]="user.email"
                                         type="button">
                                     <i class="fa fa-solid fa-trash"></i>
                                 </button>
@@ -106,6 +113,7 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
                         <div class="d-flex justify-content-between">
                             <h5>Role List</h5>
                             <button (click)="onAddRole()" [disabled]="!isTenantAdmin"
+                                    id="ADD_ROLE_DIALOG_BTN"
                                     class="btn btn-primary btn-sm">
                                 Create Role
                             </button>
@@ -115,17 +123,26 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
                     <ng-template let-columns pTemplate="header">
                         <tr>
                             <th>Name</th>
+                            <th>Description</th>
                             <th>Actions</th>
                         </tr>
                     </ng-template>
                     <ng-template let-columns="columns" let-role pTemplate="body">
                         <tr>
-                            <td><span class="p-column-title">Name</span>{{ role.name }}</td>
+                            <td>
+                                <a [routerLink]="['/RL02', tenant.id, role.name]"
+                                   href="javascript:void(0)">{{ role.name }}
+                                </a>
+                            </td>
+                            <td>
+
+                            </td>
                             <td>
                                 <button (click)="onRemoveRole(role)"
                                         *ngIf="role.removable"
                                         [disabled]="!isTenantAdmin"
                                         class="btn btn-sm"
+                                        [attr.data-cy-id]="role.name"
                                         type="button">
                                     <i class="fa fa-solid fa-trash"></i>
                                 </button>
@@ -154,6 +171,9 @@ export class TN02Component implements OnInit {
                 private tokenStorageService: TokenStorageService,
                 private messageService: MessageService,
                 private actRoute: ActivatedRoute,
+                private router: Router,
+                private _location: Location,
+                private confirmationService: ConfirmationService,
                 private authDefaultService: AuthDefaultService,
                 private modalService: NgbModal) {
     }
@@ -197,21 +217,62 @@ export class TN02Component implements OnInit {
     }
 
     async onRemoveRole(role: any) {
-        const modalRef = this.modalService.open(RemoveRoleComponent);
-        modalRef.componentInstance.role = role;
-        modalRef.componentInstance.tenant = this.tenant;
-        const deletedRole = await modalRef.result;
+        const deletedRole = await this.confirmationService.confirm({
+            message: `Sure, you want to remove this role "<b>${role.name}</b>" ?`,
+            header: 'Confirmation',
+            icon: 'pi pi-info-circle',
+            accept: async () => {
+                try {
+                    let deletedRole = await this.tenantService.removeRole(role.name, this.tenant.id);
+                    this.messageService.add({severity: 'success', summary: 'Success', detail: 'Role Deleted'});
+                    return deletedRole;
+                } catch (e) {
+                    this.messageService.add({severity: 'error', summary: 'Error', detail: 'Role Deletion Failed'});
+                }
+                return null;
+            }
+        })
         console.log(deletedRole);
         await this.ngOnInit();
     }
 
     async removeMember(user: any) {
-        const modalRef = this.modalService.open(RemoveMemberComponent);
-        modalRef.componentInstance.tenant = this.tenant;
-        modalRef.componentInstance.member = user;
-        const removedMember = await modalRef.result;
+        const removedMember = await this.confirmationService.confirm({
+            message: `Are you sure you want to remove <b> ${user.email} </b> ?`,
+            header: 'Confirmation',
+            icon: 'pi pi-info-circle',
+            accept: async () => {
+                try {
+                    const removedMember = await this.tenantService.removeMember(user.email, this.tenant.id);
+                    this.messageService.add({severity: 'success', summary: 'Success', detail: 'Member Removed'});
+                    return removedMember;
+                } catch (e) {
+                    this.messageService.add({severity: 'error', summary: 'Error', detail: 'Failed to remove member'});
+                }
+                return null;
+            }
+        })
         console.log(removedMember);
         await this.ngOnInit();
     }
 
+    async onDeleteTenant() {
+        const deletedTenant = await this.confirmationService.confirm({
+            message: `Are you sure you want to delete <b> ${this.tenant.domain} </b> ?`,
+            header: 'Confirmation',
+            icon: 'pi pi-info-circle',
+            accept: async () => {
+                try {
+                    let deletedTenant = await this.tenantService.deleteTenant(this.tenant.id);
+                    this.messageService.add({severity: 'success', summary: 'Success', detail: 'Tenant Deleted'});
+                    return deletedTenant;
+                } catch (e) {
+                    this.messageService.add({severity: 'error', summary: 'Error', detail: 'Tenant Deletion Failed'});
+                }
+                return null;
+            }
+        })
+        console.log(deletedTenant);
+        this._location.back();
+    }
 }

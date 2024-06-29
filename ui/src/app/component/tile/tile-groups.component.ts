@@ -11,8 +11,7 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
         <div class="row row-cols-auto my-2">
             <div *ngFor="let tile of internalTile; index as i;" class="col py-1">
                 <ng-container *ngIf="tile.isCallbackThere">
-                    <a (click)="tile.command()"
-                       class="text-decoration-none">
+                    <a (click)="tile.command()"  class="text-decoration-none">
                         <app-tile [tile]="tile">
                         </app-tile>
                     </a>
@@ -73,6 +72,7 @@ export class TileGroupsComponent implements OnInit {
     ngOnInit(): void {
         for (let tile of this.tiles) {
             this.internalTile.push({
+                id: tile.hasOwnProperty("id") ? tile.id : "TILE_ID_" + tile.title,
                 title: tile.title,
                 link: tile.link,
                 subtitle: tile.subtitle,

@@ -7,50 +7,19 @@ import {InternalFilter} from "./filter-field.component";
 @Component({
     selector: 'app-fvh',
     template: `
-        <div class="modal-header pb-0 bg-primary-subtle">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col d-flex justify-content-between ">
-                        <div class="mb-0 modal-title">
-                            Filter: {{ internalFilter.label }}
-                        </div>
-                        <button (click)="cancel()"
-                                aria-label="Close"
-                                class="btn btn-sm "
-                                type="button">
-                            <span aria-hidden="true">
-                                <i class="fa fa-icons fa-close"></i>
-                            </span>
-                        </button>
-                    </div>
-                </div>
-                <div class="row">
-                    <ul class="nav nav-tabs" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active bg-primary-subtle tab-bottom-color"
-                                    data-bs-toggle="tab"
-                                    data-bs-target="#conditions"
-                                    type="button" role="tab" aria-controls="conditions" aria-selected="true">
-                                Define Conditions
-                            </button>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-        </div>
-        <div class="modal-body tab-content">
-            <div class="tab-pane fade show active" id="conditions" role="tabpanel" aria-labelledby="conditions-tab">
-
+        <app-standard-dialog
+            title="Filter {{ internalFilter.label }}"
+            subtitle="Define additional filters for {{ internalFilter.label }}">
+            <app-dialog-tab name="Define Conditons">
                 <div class="row my-2" *ngFor="let condition of internalFilter.conditions; index as i">
-                    <div class="col">
+                    <div class="col-3">
                         <button aria-expanded="false"
                                 class="btn btn-outline-secondary dropdown-toggle text-start"
                                 data-bs-toggle="dropdown" ngbDropdown ngbDropdownToggle
                                 type="button">
 
                             <b class="">
-                                {{ condition.operator.label }}
+                                {{ condition.operator.symbol }}
                             </b>
                             <ul class="dropdown-menu " ngbDropdownMenu>
                                 <li *ngFor="let opr of Operators.ALL_OPERATORS"
@@ -63,33 +32,33 @@ import {InternalFilter} from "./filter-field.component";
                         </button>
                     </div>
 
-                    <div class="col">
+                    <div class="col-8">
                         <input type="text" [(ngModel)]="condition.value" class="form-control" placeholder="">
                     </div>
 
-                    <div class="col">
-                        <button class="btn btn-sm " (click)="removeFilter(i)">
+                    <div class="col-1 px-0 py-1">
+                        <button class="btn btn-sm py-0" (click)="removeFilter(i)">
                             <i class="fa fa-close"></i>
                         </button>
                     </div>
                 </div>
 
                 <div class="row my-2">
-                    <div class="col">
+                    <div class="col d-flex justify-content-end mt-3">
                         <button (click)="addFilter()"
-                                class="btn btn-sm btn-outline-success">
+                                class="btn btn-sm btn-success">
                             <i class="fa fa-plus-circle"></i> Add Condition
                         </button>
                     </div>
                 </div>
-            </div>
-        </div>
-        <div class="modal-footer p-0">
-            <button (click)="confirm()"
-                    class="btn btn-primary btn-block btn-sm">
-                Done
-            </button>
-        </div>
+            </app-dialog-tab>
+            <app-dialog-footer>
+                <button (click)="confirm()"
+                        class="btn btn-primary btn-block btn-sm">
+                    Done
+                </button>
+            </app-dialog-footer>
+        </app-standard-dialog>
     `,
     styles: [],
 })

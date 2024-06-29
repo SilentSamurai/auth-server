@@ -51,7 +51,7 @@ export class VHAsyncLoadEvent {
                    type="text"
                    value="{{getLabel(0)}}"
             />
-            <button (click)="openValueHelp()" class="input-group-text btn btn-outline-secondary"
+            <button (click)="openValueHelp()" class="input-group-text btn btn-outline-secondary" id="{{name}}-vh-btn"
                     type="button">
                 <i class="fa fas fa-clone"></i>
             </button>

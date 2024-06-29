@@ -31,13 +31,16 @@ import {RoleService} from "../../_services/role.service";
                             name="Role">
 
                             <app-fb-col name="name" label="Name"></app-fb-col>
-                            <app-fb-col name="tenant" label="Tenant"></app-fb-col>
+                            <app-fb-col name="tenant/domain" label="Tenant Domain"></app-fb-col>
 
-                            <app-vh-col name="name" label="Name"></app-vh-col>
-                            <app-vh-col name="tenant/name" label="Tenant"></app-vh-col>
+                            <app-vh-col name="name" label="Role Name"></app-vh-col>
+                            <app-vh-col name="tenant/domain" label="Tenant Domain"></app-vh-col>
+                            <app-vh-col name="tenant/name" label="Tenant Name"></app-vh-col>
+
 
                             <ng-template #vh_body let-row>
                                 <td>{{ row.name }}</td>
+                                <td>{{ row.tenant.domain }}</td>
                                 <td>{{ row.tenant.name }}</td>
                             </ng-template>
 
@@ -45,7 +48,7 @@ import {RoleService} from "../../_services/role.service";
 
 
                         <div class=" d-grid gap-2 py-3 d-flex justify-content-end ">
-                            <button (click)="continue()" class="btn btn-primary btn-block btn-sm" id="login-btn">
+                            <button (click)="continue()" class="btn btn-primary btn-block btn-sm">
                                 Continue
                             </button>
                         </div>
