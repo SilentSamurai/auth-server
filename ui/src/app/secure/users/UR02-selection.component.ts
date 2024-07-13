@@ -89,7 +89,7 @@ export class UR02SelectionComponent implements OnInit {
             'users': this.selectedUser
         });
         if (this.selectedUser.length > 0) {
-            await this.router.navigate(['/UR02', this.selectedUser[0].email])
+            await this.router.navigate(['/UR02', this.selectedUser[0].id])
         }
     }
 

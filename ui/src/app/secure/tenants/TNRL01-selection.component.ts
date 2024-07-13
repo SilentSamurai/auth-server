@@ -126,16 +126,16 @@ export class TNRL01SelectionComponent implements OnInit {
             if (isMem) {
                 await this.router.navigate([
                     '/TNRL01',
-                    this.selectedTenant[0].id, this.selectedUser[0].email])
+                    this.selectedTenant[0].id, this.selectedUser[0].id])
             }
         }
     }
 
     async isMember() {
-        const email = this.selectedUser[0].email;
+        const userId = this.selectedUser[0].id;
         const tenantId = this.selectedTenant[0].id;
         try {
-            await this.tenantService.getMemberDetails(tenantId, email);
+            await this.tenantService.getMemberDetails(tenantId, userId);
         } catch (exception: any) {
             this.messageService.add({severity: 'error', summary: 'Failed', detail: exception.error.message});
             return false;

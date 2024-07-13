@@ -47,7 +47,7 @@ import {MessageService} from "primeng/api";
                         <td><span class="p-column-title">Name</span>{{ user.name }} {{ user.surname }}</td>
                         <td>
                             <span class="p-column-title">Email</span>
-                            <a [routerLink]="['/UR02/', user.email]"
+                            <a [routerLink]="['/UR02/', user.id]"
                                href="javascript:void(0)">{{ user.email }}</a>
                         </td>
                         <td><span class="p-column-title">Created At</span>{{ user.createdAt | date }}</td>

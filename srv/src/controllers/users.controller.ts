@@ -38,6 +38,7 @@ export class UsersController {
     @Post('/signup')
     async signup(
         @Headers() headers,
+        @Request() request,
         @Body(new ValidationPipe(ValidationSchema.SignUpSchema)) body: any
     ): Promise<User> {
         const user: User = await this.usersService.create(
@@ -51,7 +52,7 @@ export class UsersController {
 
         const sent: boolean = await this.mailService.sendVerificationMail(user, link);
         if (!sent) {
-            this.usersService.delete(user.id);
+            this.usersService.delete(request, user.id);
             throw new MailServiceErrorException();
         }
 

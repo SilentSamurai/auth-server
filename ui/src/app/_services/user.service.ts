@@ -43,15 +43,22 @@ export class UserService {
         return lastValueFrom(this.http.delete(`${API_URL}/users/${id}`, this.getHttpOptions()))
     }
 
-    getUser(email: string) {
-        return this.http.get(`${API_URL}/users/${email}`, this.getHttpOptions());
+    getUser(userId: string) {
+        return this.http.get(`${API_URL}/users/${userId}`, this.getHttpOptions());
     }
 
-    getUserTenants(email: string) {
-        return this.http.get(`${API_URL}/users/${email}/tenants`, this.getHttpOptions());
+    getUserTenants(userId: string) {
+        return this.http.get(`${API_URL}/users/${userId}/tenants`, this.getHttpOptions());
     }
 
     async queryUser(query: any): Promise<any> {
         return lastValueFrom(this.http.post(`${API_URL}/search/Users`, query, this.getHttpOptions()));
+    }
+
+    async verifyUser(email: string, verify: boolean) {
+        return lastValueFrom(this.http.put(`${API_URL}/users/verify-user`, {
+            verify: verify,
+            email: email,
+        }, this.getHttpOptions()))
     }
 }

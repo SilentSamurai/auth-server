@@ -11,6 +11,9 @@ import * as argon2 from 'argon2';
 import {Role} from "../roles/role.entity";
 import {Tenant} from 'src/tenants/tenant.entity';
 import {ForbiddenException} from "../exceptions/forbidden.exception";
+import {Action} from "../roles/actions.enum";
+import {SubjectEnum} from "../roles/subjectEnum";
+import {SecurityService} from "../roles/security.service";
 
 @Injectable()
 export class UsersService implements OnModuleInit {
@@ -19,7 +22,8 @@ export class UsersService implements OnModuleInit {
 
     constructor(
         @InjectRepository(User) private usersRepository: Repository<User>,
-        private readonly configService: ConfigService
+        private readonly configService: ConfigService,
+        private readonly securityService: SecurityService
     ) {
     }
 
@@ -129,9 +133,15 @@ export class UsersService implements OnModuleInit {
         return users;
     }
 
+    async existById(userId: string): Promise<boolean> {
+        return this.usersRepository.existsBy({
+            id: userId
+        });
+    }
+
     async existByEmail(email: string): Promise<boolean> {
-        return this.usersRepository.exist({
-            where: {email}
+        return this.usersRepository.existsBy({
+            email: email,
         });
     }
 
@@ -242,9 +252,11 @@ export class UsersService implements OnModuleInit {
      * Update the user's verified field.
      */
     async updateVerified(
+        request: any,
         id: string,
         verified: boolean
     ): Promise<User> {
+        this.securityService.isAuthorized(request, Action.Update, SubjectEnum.USER, {id: id});
         const user: User = await this.findById(id);
         user.verified = verified;
         return await this.usersRepository.save(user);
@@ -254,8 +266,10 @@ export class UsersService implements OnModuleInit {
      * Delete the user.
      */
     async delete(
+        request: any,
         id: string
     ): Promise<User> {
+        this.securityService.isAuthorized(request, Action.Delete, SubjectEnum.USER, {id: id});
         const user: User = await this.findById(id);
         if (user.email === this.configService.get("SUPER_ADMIN_EMAIL")) {
             throw new ForbiddenException("cannot delete super secure");

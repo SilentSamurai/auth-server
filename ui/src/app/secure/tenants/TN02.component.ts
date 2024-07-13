@@ -90,7 +90,7 @@ import {Location} from '@angular/common';
                             <td><span class="p-column-title">Name</span>{{ user.name }}</td>
                             <td><span class="p-column-title">Email</span>{{ user.email }}</td>
                             <td><span class="p-column-title">Roles</span>
-                                <a [routerLink]="['/TNRL01/', tenant_id, user.email]"
+                                <a [routerLink]="['/TNRL01/', tenant_id, user.id]"
                                    href="javascript:void(0)">View Role Assignments
                                 </a>
                             </td>

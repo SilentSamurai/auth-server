@@ -244,8 +244,7 @@ const UpdateGroupUser = yup.object().shape(
     });
 
 
-export const ValidationSchema =
-    {
+export const ValidationSchema = {
         SignUpSchema,
         SignDownSchema,
         LoginSchema,
@@ -280,5 +279,14 @@ export const ValidationSchema =
         CreateGroupSchema,
         UpdateGroupRole,
         UpdateGroupUser,
-        UpdateGroupSchema
-    };
+    UpdateGroupSchema,
+    AddMemberSchema: yup.object().shape({
+        emails: yup.array().of(
+            yup.string().max(20)
+        )
+    }),
+    verifyUser: yup.object().shape({
+        email: yup.string().required('Name is required').max(20),
+        verify: yup.boolean().required("boolean value is required"),
+    }),
+};

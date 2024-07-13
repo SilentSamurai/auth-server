@@ -53,30 +53,36 @@ export class TenantService {
     }
 
     async addMember(email: string, tenantId: string) {
-        return lastValueFrom(this.http.post(`${API_URL}/tenant/${tenantId}/member/${email}`, {}, this.getHttpOptions()))
+        return lastValueFrom(this.http.post(`${API_URL}/tenant/${tenantId}/members/add`, {
+            emails: [email]
+        }, this.getHttpOptions()))
     }
 
     async addRole(name: string, tenantId: string) {
         return lastValueFrom(this.http.post(`${API_URL}/tenant/${tenantId}/role/${name}`, {}, this.getHttpOptions()))
     }
 
-    async assignRole(selectedRoles: any[], tenantId: string, email: string) {
+    async assignRole(selectedRoles: any[], tenantId: string, userId: string) {
         const roles = selectedRoles.map(role => role.name);
-        return lastValueFrom(this.http.put(`${API_URL}/tenant/${tenantId}/member/${email}/roles`, {
+        return lastValueFrom(this.http.put(`${API_URL}/tenant/${tenantId}/member/${userId}/roles`, {
             roles: roles,
         }, this.getHttpOptions()))
     }
 
     async removeMember(email: string, tenantId: string) {
-        return lastValueFrom(this.http.delete(`${API_URL}/tenant/${tenantId}/member/${email}`, this.getHttpOptions()))
+        return lastValueFrom(this.http.delete(`${API_URL}/tenant/${tenantId}/member/delete`, {
+            body: {
+                email: email,
+            }
+        }))
     }
 
     async removeRole(name: string, tenantId: string) {
         return lastValueFrom(this.http.delete(`${API_URL}/tenant/${tenantId}/role/${name}`, this.getHttpOptions()))
     }
 
-    async getMemberDetails(tenantId: string, email: string) {
-        return lastValueFrom(this.http.get(`${API_URL}/tenant/${tenantId}/member/${email}`, this.getHttpOptions()))
+    async getMemberDetails(tenantId: string, userId: string) {
+        return lastValueFrom(this.http.get(`${API_URL}/tenant/${tenantId}/member/${userId}`, this.getHttpOptions()))
     }
 
     async getTenantRoles(tenantId: string): Promise<any> {

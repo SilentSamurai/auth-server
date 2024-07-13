@@ -108,7 +108,7 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
 export class TNRL01Component implements OnInit {
 
     tenantId: string = '';
-    email: string = '';
+    userId: string = '';
     member: any = {
         roles: []
     };
@@ -131,7 +131,7 @@ export class TNRL01Component implements OnInit {
         this.authDefaultService.setTitle("TNRL01: Role Assignment of User");
 
         this.tenantId = this.route.snapshot.params['tenantId'];
-        this.email = this.route.snapshot.params['email'];
+        this.userId = this.route.snapshot.params['userId'];
 
         // let params = this.route.snapshot.queryParamMap;
         // if (!params.has('email') || !params.has('tenantId')) {
@@ -139,12 +139,12 @@ export class TNRL01Component implements OnInit {
         // }
         // this.email = params.get('email') as string;
         // this.tenantId = params.get('tenantId') as string;
-        if (!this.email || !this.tenantId) {
-            await this.router.navigate(['/RL02']);
+        if (!this.userId || !this.tenantId) {
+            await this.router.navigate(['/home']);
         }
 
         this.tenant = await this.tenantService.getTenantDetails(this.tenantId);
-        this.user = await lastValueFrom(this.userService.getUser(this.email));
+        this.user = await lastValueFrom(this.userService.getUser(this.userId));
         try {
 
             await this.loadTable();
@@ -159,8 +159,8 @@ export class TNRL01Component implements OnInit {
     }
 
     async loadTable() {
-        if (this.tenantId && this.email) {
-            this.member = await this.tenantService.getMemberDetails(this.tenantId, this.email);
+        if (this.tenantId && this.userId) {
+            this.member = await this.tenantService.getMemberDetails(this.tenantId, this.userId);
         }
     }
 
@@ -177,7 +177,7 @@ export class TNRL01Component implements OnInit {
     }
 
     async onAddRole() {
-        await this.tenantService.assignRole(this.selectedRoles, this.tenantId, this.email);
+        await this.tenantService.assignRole(this.selectedRoles, this.tenantId, this.userId);
         await this.loadTable();
         this.selectedRoles = [];
     }

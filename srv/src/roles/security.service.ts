@@ -8,6 +8,8 @@ import {TenantService} from "../tenants/tenant.service";
 import {UsersService} from "../users/users.service";
 import {CaslAbilityFactory} from "./casl-ability.factory";
 import {AnyAbility} from "@casl/ability/dist/types/PureAbility";
+import {Action} from "./actions.enum";
+import {subject} from "@casl/ability";
 
 export enum GRANT_TYPES {
     PASSWORD = "password",
@@ -66,6 +68,10 @@ export class SecurityService implements OnModuleInit {
 
     getAbility(request: any): AnyAbility {
         return request["SCOPE_ABILITIES"];
+    }
+
+    isAuthorized(request: any, action: Action, object: string, obj: any): boolean {
+        return this.check(request, action, subject(object, obj));
     }
 
     check(request: any, ...args: any): boolean {

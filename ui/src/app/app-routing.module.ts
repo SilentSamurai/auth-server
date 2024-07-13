@@ -45,7 +45,7 @@ const routes: Routes = [
             {path: 'TN02', component: TN02SelectionComponent, canActivate: []},
             {path: 'TN02/:tenantId', component: TN02Component, canActivate: []},
             {path: 'TNRL01', component: TNRL01SelectionComponent, canActivate: []},
-            {path: 'TNRL01/:tenantId/:email', component: TNRL01Component, canActivate: []},
+            {path: 'TNRL01/:tenantId/:userId', component: TNRL01Component, canActivate: []},
 
             // roles
             {path: 'RL01', component: RL01Component, canActivate: []},
@@ -58,7 +58,7 @@ const routes: Routes = [
             // users
             {path: 'UR01', component: UR01Component, canActivate: []},
             {path: 'UR02', component: UR02SelectionComponent, canActivate: []},
-            {path: 'UR02/:email', component: UR02Component, canActivate: []},
+            {path: 'UR02/:userId', component: UR02Component, canActivate: []},
 
         ]
     },

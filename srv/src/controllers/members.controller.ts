@@ -55,63 +55,67 @@ export class MemberController {
         return members;
     }
 
-    @Post('/:tenantId/member/:email')
+    @Post('/:tenantId/members/add')
     @UseGuards(JwtAuthGuard)
     async addMember(
         @Request() request,
         @Param('tenantId') tenantId: string,
-        @Param('email') email: string
+        @Body(new ValidationPipe(ValidationSchema.AddMemberSchema)) body: { emails: string[] }
     ): Promise<Tenant> {
-        const isPresent = await this.usersService.existByEmail(email);
-        if (!isPresent) {
-            await this.usersService.createShadowUser(email, email);
-        }
-        const user = await this.usersService.findByEmail(email);
         const tenant = await this.tenantService.findById(tenantId);
         this.securityService.check(request, Action.Update, subject(SubjectEnum.TENANT, tenant));
-        await this.tenantService.addMember(tenantId, user);
+        for (const email of body.emails) {
+            const isPresent = await this.usersService.existByEmail(email);
+            if (!isPresent) {
+                await this.usersService.createShadowUser(email, email);
+            }
+            const user = await this.usersService.findByEmail(email);
+            await this.tenantService.addMember(tenant.id, user);
+        }
         return tenant;
     }
 
-    @Delete('/:tenantId/member/:email')
+    @Delete('/:tenantId/members/delete')
     @UseGuards(JwtAuthGuard)
     async removeMember(
         @Request() request,
         @Param('tenantId') tenantId: string,
-        @Param('email') email: string
+        @Body(new ValidationPipe(ValidationSchema.AddMemberSchema)) body: { emails: string[] }
     ): Promise<Tenant> {
-        const user = await this.usersService.findByEmail(email);
         let tenant = await this.tenantService.findById(tenantId);
         this.securityService.check(request, Action.Update, subject(SubjectEnum.TENANT, tenant));
-        let securityContext = this.securityService.getUserSecurityContext(request);
-        if (securityContext.email === email) {
-            throw new ForbiddenException("cannot remove self");
+        for (const email of body.emails) {
+            const user = await this.usersService.findByEmail(email);
+            let securityContext = this.securityService.getUserSecurityContext(request);
+            if (securityContext.email === email) {
+                throw new ForbiddenException("cannot remove self");
+            }
+            return this.tenantService.removeMember(tenantId, user);
         }
-        return this.tenantService.removeMember(tenantId, user);
     }
 
-    @Put('/:tenantId/member/:email/roles')
+    @Put('/:tenantId/member/:userId/roles')
     @UseGuards(JwtAuthGuard)
     async updateRole(
         @Request() request,
         @Param('tenantId') tenantId: string,
-        @Param('email') email: string,
+        @Param('userId') userId: string,
         @Body(new ValidationPipe(ValidationSchema.OperatingRoleSchema)) body: { roles: string[] }
     ): Promise<Role[]> {
-        const user = await this.usersService.findByEmail(email);
+        const user = await this.usersService.findById(userId);
         let tenant = await this.tenantService.findById(tenantId);
         this.securityService.check(request, Action.Update, subject(SubjectEnum.TENANT, tenant));
         return this.tenantService.updateRolesOfMember(body.roles, tenantId, user);
     }
 
-    @Get('/:tenantId/member/:email')
+    @Get('/:tenantId/member/:userId')
     @UseGuards(JwtAuthGuard)
     async getMember(
         @Request() request,
         @Param('tenantId') tenantId: string,
-        @Param('email') email: string
+        @Param('userId') userId: string
     ): Promise<any> {
-        const user = await this.usersService.findByEmail(email);
+        const user = await this.usersService.findById(userId);
         const tenant = await this.tenantService.findById(tenantId);
         this.securityService.check(request, Action.Read, subject(SubjectEnum.TENANT, tenant));
         let roles = await this.tenantService.getMemberRoles(tenantId, user);
@@ -122,14 +126,14 @@ export class MemberController {
         };
     }
 
-    @Get('/:tenantId/member/:email/roles')
+    @Get('/:tenantId/member/:userId/roles')
     @UseGuards(JwtAuthGuard)
     async getMemberRoles(
         @Request() request,
         @Param('tenantId') tenantId: string,
-        @Param('email') email: string
+        @Param('userId') userId: string
     ): Promise<any> {
-        const user = await this.usersService.findByEmail(email);
+        const user = await this.usersService.findByEmail(userId);
         const tenant = await this.tenantService.findById(tenantId);
         this.securityService.check(request, Action.Read, subject(SubjectEnum.TENANT, tenant));
         let roles = await this.tenantService.getMemberRoles(tenantId, user);

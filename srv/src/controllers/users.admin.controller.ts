@@ -7,6 +7,7 @@ import {
     Param,
     Post,
     Put,
+    Request,
     UseGuards,
     UseInterceptors
 } from '@nestjs/common';
@@ -24,6 +25,8 @@ import {TenantService} from "../tenants/tenant.service";
 import {Tenant} from "../tenants/tenant.entity";
 import {Action} from "../roles/actions.enum";
 import {SubjectEnum} from "../roles/subjectEnum";
+import {SecurityService} from "../roles/security.service";
+
 
 @Controller('api/users')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -32,7 +35,8 @@ export class UsersAdminController {
         private readonly usersService: UsersService,
         private readonly authService: AuthService,
         private readonly tenantService: TenantService,
-        private readonly mailService: MailService
+        private readonly mailService: MailService,
+        private readonly securityService: SecurityService
     ) {
     }
 
@@ -42,6 +46,7 @@ export class UsersAdminController {
         RoleRule.can(Action.Create, SubjectEnum.USER),
     )
     async createUser(
+        @Request() request,
         @Body(new ValidationPipe(ValidationSchema.CreateUserSchema)) body: {
             name: string,
             email: string,
@@ -55,7 +60,7 @@ export class UsersAdminController {
             body.name
         );
 
-        await this.usersService.updateVerified(user.id, true);
+        await this.usersService.updateVerified(request, user.id, true);
         return user;
     }
 
@@ -83,16 +88,23 @@ export class UsersAdminController {
     }
 
 
-    @Get('/:email')
+    @Get('/:userId')
     @UseGuards(JwtAuthGuard, RoleGuard)
     @Rules(
         RoleRule.can(Action.Read, SubjectEnum.USER),
     )
     async getUser(
-        @Param('email') email: string
-    ): Promise<User> {
-        const user: User = await this.usersService.findByEmail(email);
-        return this.usersService.findById(user.id);
+        @Param('userId') userId: string
+    ): Promise<any> {
+        const user: User = await this.usersService.findById(userId);
+
+        return {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            createdAt: user.createdAt,
+            verified: user.verified,
+        };
     }
 
     @Get('')
@@ -105,25 +117,38 @@ export class UsersAdminController {
     }
 
     @Delete('/:id')
-    @UseGuards(JwtAuthGuard, RoleGuard)
-    @Rules(
-        RoleRule.can(Action.Delete, SubjectEnum.USER),
-    )
+    @UseGuards(JwtAuthGuard)
     async deleteUser(
+        @Request() request,
         @Param('id') id: string
     ): Promise<User> {
-        return await this.usersService.delete(id);
+        return await this.usersService.delete(request, id);
     }
 
-    @Get('/:email/tenants')
+    @Get('/:userId/tenants')
     @UseGuards(JwtAuthGuard, RoleGuard)
     @Rules(
         RoleRule.can(Action.Read, SubjectEnum.USER),
     )
     async getTenants(
-        @Param('email') email: string
+        @Param('userId') userId: string
     ): Promise<Tenant[]> {
-        const user: User = await this.usersService.findByEmail(email);
+        const user: User = await this.usersService.findById(userId);
         return this.tenantService.findByMembership(user);
     }
+
+    @Put('/verify-user')
+    @UseGuards(JwtAuthGuard)
+    async updateVerification(
+        @Request() request,
+        @Body(new ValidationPipe(ValidationSchema.verifyUser)) body: {
+            email: string,
+            verify: boolean
+        }
+    ): Promise<User> {
+        let user: User = await this.usersService.findByEmail(body.email);
+
+        return await this.usersService.updateVerified(request, user.id, body.verify);
+    }
+
 }
