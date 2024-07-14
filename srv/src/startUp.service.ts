@@ -1,13 +1,14 @@
 import {Injectable, OnModuleInit} from "@nestjs/common";
 import {ConfigService} from "./config/config.service";
-import {UsersService} from "./users/users.service";
-import {RoleService} from "./roles/role.service";
-import {TenantService} from "./tenants/tenant.service";
-import {User} from "./users/user.entity";
+import {UsersService} from "./services/users.service";
+import {RoleService} from "./services/role.service";
+import {TenantService} from "./services/tenant.service";
+import {User} from "./entity/user.entity";
 import {readFile} from "fs";
-import {Tenant} from "./tenants/tenant.entity";
-import {RoleEnum} from "./roles/roleEnum";
+import {Tenant} from "./entity/tenant.entity";
+import {RoleEnum} from "./entity/roleEnum";
 import {DataSource} from "typeorm/data-source/DataSource";
+import {SecurityService} from "./casl/security.service";
 
 @Injectable()
 export class StartUpService implements OnModuleInit {
@@ -18,6 +19,7 @@ export class StartUpService implements OnModuleInit {
         private readonly usersService: UsersService,
         private readonly tenantService: TenantService,
         private readonly roleService: RoleService,
+        private readonly securityService: SecurityService,
         private dataSource: DataSource
     ) {
     }
@@ -35,6 +37,7 @@ export class StartUpService implements OnModuleInit {
 
     async createAdminUser() {
         try {
+            let adminContext = this.securityService.getAdminContextForInternalUse();
             if (!await this.usersService.existByEmail(this.configService.get("SUPER_ADMIN_EMAIL"))) {
                 let user: User = await this.usersService.create(
                     this.configService.get("SUPER_ADMIN_PASSWORD"),
@@ -42,10 +45,11 @@ export class StartUpService implements OnModuleInit {
                     this.configService.get("SUPER_ADMIN_NAME")
                 );
 
-                await this.usersService.updateVerified(user.id, true);
+                await this.usersService.updateVerified(adminContext, user.id, true);
             }
         } catch (exception: any) {
             // Catch user already created.
+            console.error(exception);
         }
     }
 
@@ -54,7 +58,7 @@ export class StartUpService implements OnModuleInit {
             if (error) {
                 return
             }
-
+            let adminContext = this.securityService.getAdminContextForInternalUse();
             const users: any = JSON.parse(data);
             users.records.forEach(async record => {
                 try {
@@ -64,9 +68,10 @@ export class StartUpService implements OnModuleInit {
                         record.name
                     );
 
-                    await this.usersService.updateVerified(user.id, true);
+                    await this.usersService.updateVerified(adminContext, user.id, true);
                 } catch (exception: any) {
                     // Catch user already created.
+                    console.error(exception);
                 }
             });
         });

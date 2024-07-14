@@ -1,6 +1,6 @@
 import {Injectable, Logger} from '@nestjs/common';
 import {ConfigService} from '../config/config.service';
-import {User} from '../users/user.entity';
+import {User} from '../entity/user.entity';
 import * as nodemailer from 'nodemailer';
 
 @Injectable()

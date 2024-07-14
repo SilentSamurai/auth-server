@@ -1,19 +1,19 @@
 import {Injectable, Logger, OnModuleInit} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {Repository} from 'typeorm';
-import {User} from './user.entity';
+import {User} from '../entity/user.entity';
 import {ConfigService} from '../config/config.service';
 import {UsernameTakenException} from '../exceptions/username-taken.exception';
 import {EmailTakenException} from '../exceptions/email-taken.exception';
 import {UserNotFoundException} from '../exceptions/user-not-found.exception';
 import {InvalidCredentialsException} from '../exceptions/invalid-credentials.exception';
 import * as argon2 from 'argon2';
-import {Role} from "../roles/role.entity";
-import {Tenant} from 'src/tenants/tenant.entity';
+import {Role} from "../entity/role.entity";
+import {Tenant} from 'src/entity/tenant.entity';
 import {ForbiddenException} from "../exceptions/forbidden.exception";
-import {Action} from "../roles/actions.enum";
-import {SubjectEnum} from "../roles/subjectEnum";
-import {SecurityService} from "../roles/security.service";
+import {Action} from "../entity/actions.enum";
+import {SubjectEnum} from "../entity/subjectEnum";
+import {SecurityService} from "../casl/security.service";
 
 @Injectable()
 export class UsersService implements OnModuleInit {
@@ -256,8 +256,10 @@ export class UsersService implements OnModuleInit {
         id: string,
         verified: boolean
     ): Promise<User> {
-        this.securityService.isAuthorized(request, Action.Update, SubjectEnum.USER, {id: id});
         const user: User = await this.findById(id);
+
+        this.securityService.isAuthorized(request, Action.Update, SubjectEnum.USER, {email: user.email});
+
         user.verified = verified;
         return await this.usersRepository.save(user);
     }
@@ -318,23 +320,7 @@ export class UsersService implements OnModuleInit {
     //     }
     // }
 
-    async countByRole(
-        role: Role
-    ): Promise<number> {
-        const count: number = await this.usersRepository.count({
-            where: {
-                roles: {id: role.id}
-            }, relations: {
-                roles: true
-            }
-        });
-        return count;
-    }
 
-    async isUserAssignedToRole(role: Role) {
-        let count = await this.countByRole(role);
-        return count > 0;
-    }
 
     async countByTenant(tenant: Tenant): Promise<number> {
         return this.usersRepository.count({

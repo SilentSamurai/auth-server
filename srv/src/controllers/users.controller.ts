@@ -11,17 +11,17 @@ import {
     UseInterceptors
 } from '@nestjs/common';
 
-import {User} from '../users/user.entity';
-import {UsersService} from '../users/users.service';
+import {User} from '../entity/user.entity';
+import {UsersService} from '../services/users.service';
 import {AuthService} from '../auth/auth.service';
 import {MailService} from '../mail/mail.service';
 import {JwtAuthGuard} from '../auth/jwt-auth.guard';
 import {ValidationPipe} from '../validation/validation.pipe';
 import {ValidationSchema} from '../validation/validation.schema';
 import {MailServiceErrorException} from '../exceptions/mail-service-error.exception';
-import {TenantService} from "../tenants/tenant.service";
-import {Tenant} from "../tenants/tenant.entity";
-import {SecurityService} from "../roles/security.service";
+import {TenantService} from "../services/tenant.service";
+import {Tenant} from "../entity/tenant.entity";
+import {SecurityService} from "../casl/security.service";
 
 @Controller('api/users')
 @UseInterceptors(ClassSerializerInterceptor)

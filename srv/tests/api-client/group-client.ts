@@ -83,7 +83,7 @@ export class GroupClient {
         expect(response.body.group.tenantId).toBeDefined();
         expect(response.body.roles).toBeDefined();
         expect(response.body.roles.length).toBeGreaterThanOrEqual(roles.length);
-        // for (let role of response.body.roles) {
+        // for (let role of response.body.casl) {
         //     expect(role.name).toContain(/ABC_ROLE|DEF_ROLE/);
         // }
         return response.body;

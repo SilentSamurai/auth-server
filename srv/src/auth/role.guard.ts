@@ -1,12 +1,12 @@
 import {CanActivate, ExecutionContext, Injectable} from '@nestjs/common';
 import {Reflector} from '@nestjs/core';
-import {UsersService} from '../users/users.service';
-import {RoleService} from "./role.service";
-import {SecurityService} from "./security.service";
-import {TenantService} from "../tenants/tenant.service";
-import {RoleRule} from "./roles.decorator";
-import {Action} from "./actions.enum";
-import {SubjectEnum} from "./subjectEnum";
+import {UsersService} from '../services/users.service';
+import {RoleService} from "../services/role.service";
+import {SecurityService} from "../casl/security.service";
+import {TenantService} from "../services/tenant.service";
+import {RoleRule} from "../casl/roles.decorator";
+import {Action} from "../entity/actions.enum";
+import {SubjectEnum} from "../entity/subjectEnum";
 import {subject} from "@casl/ability";
 
 @Injectable()

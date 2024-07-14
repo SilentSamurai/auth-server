@@ -1,20 +1,20 @@
 import {Injectable} from "@nestjs/common";
 import {ConfigService} from "../config/config.service";
-import {UsersService} from "../users/users.service";
+import {UsersService} from "./users.service";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
-import {Tenant} from "../tenants/tenant.entity";
+import {Tenant} from "../entity/tenant.entity";
 import {ValidationErrorException} from "../exceptions/validation-error.exception";
-import {Role} from "./role.entity";
-import {User} from "../users/user.entity";
-import {UserRole} from "./user.roles.entity";
+import {Role} from "../entity/role.entity";
+import {User} from "../entity/user.entity";
+import {UserRole} from "../entity/user.roles.entity";
 
 @Injectable()
 export class RoleService {
 
     constructor(
         private readonly configService: ConfigService,
-        private readonly usersService: UsersService,
+        @InjectRepository(User) private usersRepository: Repository<User>,
         @InjectRepository(Role) private roleRepository: Repository<Role>,
         @InjectRepository(UserRole) private userRoleRepository: Repository<UserRole>,
     ) {
@@ -50,9 +50,27 @@ export class RoleService {
         return deleteResult1.affected;
     }
 
+    async countByRole(
+        role: Role
+    ): Promise<number> {
+        const count: number = await this.usersRepository.count({
+            where: {
+                roles: {id: role.id}
+            }, relations: {
+                roles: true
+            }
+        });
+        return count;
+    }
+
+    async isUserAssignedToRole(role: Role) {
+        let count = await this.countByRole(role);
+        return count > 0;
+    }
+
     async deleteById(id: string): Promise<Role> {
         let role: Role = await this.findById(id);
-        const count = await this.usersService.countByRole(role);
+        const count = await this.countByRole(role);
         if (count > 0 || !role.removable) {
             throw new ValidationErrorException("role is assigned to members | role is protected");
         }

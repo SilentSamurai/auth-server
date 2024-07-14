@@ -10,15 +10,15 @@ import {
     UseInterceptors
 } from "@nestjs/common";
 import {ConfigService} from "../config/config.service";
-import {TenantService} from "../tenants/tenant.service";
+import {TenantService} from "../services/tenant.service";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
-import {RoleService} from "../roles/role.service";
-import {Role} from "../roles/role.entity";
-import {SecurityService} from "../roles/security.service";
-import {Action} from "../roles/actions.enum";
+import {RoleService} from "../services/role.service";
+import {Role} from "../entity/role.entity";
+import {SecurityService} from "../casl/security.service";
+import {Action} from "../entity/actions.enum";
 import {subject} from "@casl/ability";
-import {SubjectEnum} from "../roles/subjectEnum";
-import {UsersService} from "../users/users.service";
+import {SubjectEnum} from "../entity/subjectEnum";
+import {UsersService} from "../services/users.service";
 
 @Controller('api/tenant')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -61,7 +61,7 @@ export class RoleController {
         return await this.roleService.deleteById(roles.id);
     }
 
-    @Get('/:tenantId/roles')
+    @Get('/:tenantId/casl')
     @UseGuards(JwtAuthGuard)
     async getTenantRoles(
         @Request() request,

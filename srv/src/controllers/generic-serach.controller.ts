@@ -11,17 +11,17 @@ import {
 } from '@nestjs/common';
 import {Equal, ILike, In, IsNull, LessThan, LessThanOrEqual, MoreThan, MoreThanOrEqual, Not, Repository} from "typeorm";
 import {InjectRepository} from "@nestjs/typeorm";
-import {User} from "../users/user.entity";
-import {Tenant} from "../tenants/tenant.entity";
-import {TenantMember} from "../tenants/tenant.members.entity";
-import {Role} from "../roles/role.entity";
+import {User} from "../entity/user.entity";
+import {Tenant} from "../entity/tenant.entity";
+import {TenantMember} from "../entity/tenant.members.entity";
+import {Role} from "../entity/role.entity";
 import {NotFoundError} from "rxjs";
-import {Action} from "../roles/actions.enum";
+import {Action} from "../entity/actions.enum";
 import {subject} from "@casl/ability";
-import {SecurityService} from "../roles/security.service";
+import {SecurityService} from "../casl/security.service";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
 import {escapeRegExp} from "typeorm/util/escapeRegExp";
-import {Group} from "../groups/group.entity";
+import {Group} from "../entity/group.entity";
 import {FindOperator} from "typeorm/find-options/FindOperator";
 
 const logger = new Logger('GenericSearchController');

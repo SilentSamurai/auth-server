@@ -3,32 +3,31 @@ import {ConfigModule} from '../config/config.module';
 import {AuthModule} from '../auth/auth.module';
 import {MailModule} from '../mail/mail.module';
 import {UsersController} from './users.controller';
-import {TenantModule} from "../tenants/tenant.module";
 import {UsersAdminController} from "./users.admin.controller";
 import {TenantController} from "./tenant.controller";
 import {MemberController} from "./members.controller";
-import {UsersModule} from "../users/users.module";
-import {RolesModule} from "../roles/roles.module";
+import {CaslModule} from "../casl/casl.module";
 import {RoleController} from "./role.controller";
 import {MainController} from "./main.controller";
 import {GenericSearchController} from "./generic-serach.controller";
 import {TypeOrmModule} from "@nestjs/typeorm";
-import {User} from "../users/user.entity";
-import {Tenant} from "../tenants/tenant.entity";
-import {Role} from "../roles/role.entity";
-import {TenantMember} from "../tenants/tenant.members.entity";
-import {Group} from "../groups/group.entity";
+import {User} from "../entity/user.entity";
+import {Tenant} from "../entity/tenant.entity";
+import {Role} from "../entity/role.entity";
+import {TenantMember} from "../entity/tenant.members.entity";
+import {Group} from "../entity/group.entity";
+import {ServiceModule} from "../services/service.module";
+import {AuthController} from "./auth.controller";
 
 @Module(
     {
         imports:
             [
                 ConfigModule,
-                AuthModule, // Circular dependency resolved.
+                AuthModule,
                 MailModule,
-                TenantModule,
-                UsersModule,
-                RolesModule,
+                CaslModule,
+                ServiceModule,
                 TypeOrmModule.forFeature([User, Tenant, Role, TenantMember, Group])
             ],
         controllers: [
@@ -38,7 +37,8 @@ import {Group} from "../groups/group.entity";
             MemberController,
             RoleController,
             MainController,
-            GenericSearchController
+            GenericSearchController,
+            AuthController
         ],
         providers: [],
         exports: []

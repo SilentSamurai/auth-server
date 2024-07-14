@@ -13,8 +13,8 @@ import {
 import {ConfigService} from "../config/config.service";
 import {ValidationPipe} from "../validation/validation.pipe";
 import {ValidationSchema} from "../validation/validation.schema";
-import {TenantService} from "../tenants/tenant.service";
-import {GroupService} from "../groups/group.service";
+import {TenantService} from "../services/tenant.service";
+import {GroupService} from "../services/group.service";
 
 @Controller('/api')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -84,7 +84,7 @@ export class GroupController {
     }
 
 
-    @Post('/group/:groupId/add-roles')
+    @Post('/group/:groupId/add-casl')
     async addRole(
         @Request() request,
         @Param('groupId') groupId: string,
@@ -99,7 +99,7 @@ export class GroupController {
         };
     }
 
-    @Post('/group/:groupId/remove-roles')
+    @Post('/group/:groupId/remove-casl')
     async removeRole(
         @Request() request,
         @Param('groupId') groupId: string,

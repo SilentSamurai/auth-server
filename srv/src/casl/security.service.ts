@@ -1,14 +1,11 @@
-import {Injectable, OnModuleInit, UnauthorizedException} from '@nestjs/common';
-import {AuthService} from "../auth/auth.service";
-import {ExtractJwt} from 'passport-jwt';
-import {RoleEnum} from "./roleEnum";
+import {forwardRef, Inject, Injectable, OnModuleInit} from '@nestjs/common';
+
+import {RoleEnum} from "../entity/roleEnum";
 import {ConfigService} from "../config/config.service";
 import {ForbiddenException} from "../exceptions/forbidden.exception";
-import {TenantService} from "../tenants/tenant.service";
-import {UsersService} from "../users/users.service";
 import {CaslAbilityFactory} from "./casl-ability.factory";
 import {AnyAbility} from "@casl/ability/dist/types/PureAbility";
-import {Action} from "./actions.enum";
+import {Action} from "../entity/actions.enum";
 import {subject} from "@casl/ability";
 
 export enum GRANT_TYPES {
@@ -32,38 +29,15 @@ export class SecurityContext {
     grant_type: GRANT_TYPES
 }
 
-function extractTokenFromHeader(request: any) {
-    let extractor = ExtractJwt.fromAuthHeaderAsBearerToken();
-    return extractor(request)
-}
-
 @Injectable()
 export class SecurityService implements OnModuleInit {
-    constructor(private readonly configService: ConfigService,
-                private readonly tenantService: TenantService,
-                private readonly usersService: UsersService,
-                private readonly authService: AuthService,
-                private readonly caslAbilityFactory: CaslAbilityFactory) {
 
+    constructor(private readonly configService: ConfigService,
+                @Inject(forwardRef(() => CaslAbilityFactory)) private readonly caslAbilityFactory: CaslAbilityFactory
+    ) {
     }
 
     async onModuleInit() {
-    }
-
-
-    async setSecurityContextFromRequest(request: any) {
-        const token = extractTokenFromHeader(request);
-        if (!token) {
-            throw new UnauthorizedException("No token provided");
-        }
-        const payload: SecurityContext = await this.authService.validateAccessToken(token);
-        if (payload.grant_type === GRANT_TYPES.PASSWORD) {
-            request['user'] = payload;
-        }
-        const ability = await this.caslAbilityFactory.createForSecurityContext(payload);
-        request["SECURITY_CONTEXT"] = payload;
-        request["SCOPE_ABILITIES"] = ability;
-        return payload;
     }
 
     getAbility(request: any): AnyAbility {
@@ -116,4 +90,19 @@ export class SecurityService implements OnModuleInit {
             && securityContext.tenant.domain === this.configService.get("SUPER_TENANT_DOMAIN");
     }
 
+    getAdminContextForInternalUse() {
+        const request = {};
+        const payload = {
+            email: '',
+            tenant: {
+                id: '',
+                domain: this.configService.get("SUPER_TENANT_DOMAIN")
+            },
+            scopes: ["SUPER_ADMIN"]
+        } as SecurityContext;
+        const ability = this.caslAbilityFactory.createForSecurityContext(payload);
+        request["SECURITY_CONTEXT"] = payload;
+        request["SCOPE_ABILITIES"] = ability;
+        return request;
+    }
 }

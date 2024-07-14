@@ -8,8 +8,8 @@ import {
     ManyToOne,
     PrimaryGeneratedColumn
 } from "typeorm";
-import {Tenant} from "../tenants/tenant.entity";
-import {User} from "../users/user.entity"; // Used with ClassSerializerInterceptor to exclude from responses.
+import {Tenant} from "./tenant.entity";
+import {User} from "./user.entity"; // Used with ClassSerializerInterceptor to exclude from responses.
 
 
 @Entity({name: "roles"})

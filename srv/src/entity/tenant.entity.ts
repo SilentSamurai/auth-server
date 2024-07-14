@@ -1,8 +1,8 @@
 import {Column, CreateDateColumn, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn} from "typeorm";
-import {Role} from "../roles/role.entity";
+import {Role} from "./role.entity";
 import {Exclude} from "class-transformer";
-import {User} from "../users/user.entity";
-import {Group} from "../groups/group.entity"; // Used with ClassSerializerInterceptor to exclude from responses.
+import {User} from "./user.entity";
+import {Group} from "./group.entity"; // Used with ClassSerializerInterceptor to exclude from responses.
 
 @Entity({name: "tenants"})
 export class Tenant {

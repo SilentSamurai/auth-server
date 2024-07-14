@@ -12,20 +12,20 @@ import {
     UseInterceptors
 } from '@nestjs/common';
 
-import {User} from '../users/user.entity';
-import {UsersService} from '../users/users.service';
+import {User} from '../entity/user.entity';
+import {UsersService} from '../services/users.service';
 import {AuthService} from '../auth/auth.service';
 import {MailService} from '../mail/mail.service';
 import {JwtAuthGuard} from '../auth/jwt-auth.guard';
-import {RoleRule, Rules} from '../roles/roles.decorator';
-import {RoleGuard} from '../roles/role.guard';
+import {RoleRule, Rules} from '../casl/roles.decorator';
+import {RoleGuard} from '../auth/role.guard';
 import {ValidationPipe} from '../validation/validation.pipe';
 import {ValidationSchema} from '../validation/validation.schema';
-import {TenantService} from "../tenants/tenant.service";
-import {Tenant} from "../tenants/tenant.entity";
-import {Action} from "../roles/actions.enum";
-import {SubjectEnum} from "../roles/subjectEnum";
-import {SecurityService} from "../roles/security.service";
+import {TenantService} from "../services/tenant.service";
+import {Tenant} from "../entity/tenant.entity";
+import {Action} from "../entity/actions.enum";
+import {SubjectEnum} from "../entity/subjectEnum";
+import {SecurityService} from "../casl/security.service";
 
 
 @Controller('api/users')

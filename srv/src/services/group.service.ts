@@ -1,18 +1,18 @@
 import {BadRequestException, Injectable} from "@nestjs/common";
 import {ConfigService} from "../config/config.service";
-import {UsersService} from "../users/users.service";
+import {UsersService} from "./users.service";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
-import {Tenant} from "../tenants/tenant.entity";
+import {Tenant} from "../entity/tenant.entity";
 import {ValidationErrorException} from "../exceptions/validation-error.exception";
 
-import {Group} from "./group.entity";
-import {GroupUser} from "./group.users.entity";
-import {GroupRole} from "./group.roles.entity";
-import {RoleService} from "../roles/role.service";
-import {User} from "../users/user.entity";
-import {Role} from "../roles/role.entity";
-import {TenantService} from "../tenants/tenant.service";
+import {Group} from "../entity/group.entity";
+import {GroupUser} from "../entity/group.users.entity";
+import {GroupRole} from "../entity/group.roles.entity";
+import {RoleService} from "./role.service";
+import {User} from "../entity/user.entity";
+import {Role} from "../entity/role.entity";
+import {TenantService} from "./tenant.service";
 
 @Injectable()
 export class GroupService {

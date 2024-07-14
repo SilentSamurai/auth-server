@@ -1,11 +1,11 @@
 import {CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryColumn} from "typeorm";
-import {Tenant} from "../tenants/tenant.entity";
-import {Group} from "./group.entity";
-import {Role} from "../roles/role.entity"; // Used with ClassSerializerInterceptor to exclude from responses.
+import {Tenant} from "./tenant.entity";
+import {User} from "./user.entity";
+import {Group} from "./group.entity"; // Used with ClassSerializerInterceptor to exclude from responses.
 
 
-@Entity({name: "group_roles"})
-export class GroupRole {
+@Entity({name: "group_users"})
+export class GroupUser {
 
     @PrimaryColumn({name: "group_id"})
     groupId: string;
@@ -17,7 +17,6 @@ export class GroupRole {
     })
     group: Group;
 
-
     @PrimaryColumn({name: "tenant_id"})
     tenantId: string;
 
@@ -28,17 +27,15 @@ export class GroupRole {
     })
     tenant: Tenant;
 
+    @PrimaryColumn({name: "user_id"})
+    userId: string;
 
-    @PrimaryColumn({name: "role_id"})
-    roleId: string;
-
-    @ManyToOne(type => Role)
+    @ManyToOne(type => User)
     @JoinColumn({
-        name: "role_id",
+        name: "user_id",
         referencedColumnName: "id"
     })
-    role: Role;
-
+    user: User;
 
     @CreateDateColumn({name: "created_at"})
     createdAt: Date;

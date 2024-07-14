@@ -47,7 +47,7 @@ const routes: Routes = [
             {path: 'TNRL01', component: TNRL01SelectionComponent, canActivate: []},
             {path: 'TNRL01/:tenantId/:userId', component: TNRL01Component, canActivate: []},
 
-            // roles
+            // casl
             {path: 'RL01', component: RL01Component, canActivate: []},
             {path: 'RL02', component: RL02SelectionComponent, canActivate: []},
             {path: 'RL02/:tenantId/:roleName', component: RL02Component, canActivate: []},

@@ -6,22 +6,22 @@ import {
     Get,
     Headers,
     Param,
-    Post,
+    Post, Request,
     Response,
     UseInterceptors
 } from '@nestjs/common';
 
-import {User} from '../users/user.entity';
+import {User} from '../entity/user.entity';
 import {ConfigService} from '../config/config.service';
 import {AuthService} from '../auth/auth.service';
-import {UsersService} from '../users/users.service';
+import {UsersService} from '../services/users.service';
 import {MailService} from '../mail/mail.service';
 import {ValidationPipe} from '../validation/validation.pipe';
 import {ValidationSchema} from '../validation/validation.schema';
 import {MailServiceErrorException} from '../exceptions/mail-service-error.exception';
-import {TenantService} from "../tenants/tenant.service";
-import {Tenant} from "../tenants/tenant.entity";
-import {GRANT_TYPES} from "../roles/security.service";
+import {TenantService} from "../services/tenant.service";
+import {Tenant} from "../entity/tenant.entity";
+import {GRANT_TYPES} from "../casl/security.service";
 import {ForbiddenException} from "../exceptions/forbidden.exception";
 import {InvalidTokenException} from "../exceptions/invalid-token.exception";
 import {AuthCodeService} from "../auth/auth-code.service";
@@ -183,10 +183,11 @@ export class AuthController {
 
     @Get('/verify-email/:token')
     async verifyEmail(
+        @Request() request,
         @Param('token') token: string,
         @Response() response
     ): Promise<any> {
-        const verified: boolean = await this.authService.verifyEmail(token);
+        const verified: boolean = await this.authService.verifyEmail(request, token);
 
         let link: any = this.configService.get('VERIFY_EMAIL_LINK');
         if (!link || link === '') {

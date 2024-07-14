@@ -12,20 +12,20 @@ import {
     UseInterceptors
 } from "@nestjs/common";
 import {ConfigService} from "../config/config.service";
-import {UsersService} from "../users/users.service";
-import {TenantService} from "../tenants/tenant.service";
+import {UsersService} from "../services/users.service";
+import {TenantService} from "../services/tenant.service";
 import {ValidationPipe} from "../validation/validation.pipe";
 import {ValidationSchema} from "../validation/validation.schema";
-import {Tenant} from "../tenants/tenant.entity";
+import {Tenant} from "../entity/tenant.entity";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
-import {User} from "../users/user.entity";
-import {Role} from "../roles/role.entity";
-import {SecurityService} from "../roles/security.service";
-import {RoleService} from "../roles/role.service";
-import {Action} from "../roles/actions.enum";
+import {User} from "../entity/user.entity";
+import {Role} from "../entity/role.entity";
+import {SecurityService} from "../casl/security.service";
+import {RoleService} from "../services/role.service";
+import {Action} from "../entity/actions.enum";
 import {ForbiddenException} from "../exceptions/forbidden.exception";
 import {subject} from "@casl/ability";
-import {SubjectEnum} from "../roles/subjectEnum";
+import {SubjectEnum} from "../entity/subjectEnum";
 
 @Controller('api/tenant')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -94,7 +94,7 @@ export class MemberController {
         }
     }
 
-    @Put('/:tenantId/member/:userId/roles')
+    @Put('/:tenantId/member/:userId/casl')
     @UseGuards(JwtAuthGuard)
     async updateRole(
         @Request() request,
@@ -126,7 +126,7 @@ export class MemberController {
         };
     }
 
-    @Get('/:tenantId/member/:userId/roles')
+    @Get('/:tenantId/member/:userId/casl')
     @UseGuards(JwtAuthGuard)
     async getMemberRoles(
         @Request() request,

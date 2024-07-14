@@ -1,19 +1,19 @@
 import {Injectable, Logger} from '@nestjs/common';
 import {ConfigService} from '../config/config.service';
-import {UsersService} from '../users/users.service';
+import {UsersService} from '../services/users.service';
 import {JwtService} from '@nestjs/jwt';
-import {User} from '../users/user.entity';
+import {User} from '../entity/user.entity';
 import {UserNotFoundException} from '../exceptions/user-not-found.exception';
 import {InvalidCredentialsException} from '../exceptions/invalid-credentials.exception';
 import {EmailNotVerifiedException} from '../exceptions/email-not-verified.exception';
 import {InvalidTokenException} from '../exceptions/invalid-token.exception';
 import * as argon2 from 'argon2';
-import {Tenant} from "../tenants/tenant.entity";
-import {TenantService} from "../tenants/tenant.service";
+import {Tenant} from "../entity/tenant.entity";
+import {TenantService} from "../services/tenant.service";
 import {CryptUtil} from "../util/crypt.util";
-import {GRANT_TYPES, SecurityContext} from "../roles/security.service";
+import {GRANT_TYPES, SecurityContext} from "../casl/security.service";
 import {UnauthorizedException} from "../exceptions/unauthorized.exception";
-import {RoleEnum} from "../roles/roleEnum";
+import {RoleEnum} from "../entity/roleEnum";
 import {ValidationPipe} from "../validation/validation.pipe";
 import {ValidationSchema} from "../validation/validation.schema";
 
@@ -171,7 +171,7 @@ export class AuthService {
     /**
      * Verify the user's email.
      */
-    async verifyEmail(token: string): Promise<boolean> {
+    async verifyEmail(request, token: string): Promise<boolean> {
         let payload: any;
         try {
             let globalTenant = await this.tenantService.findGlobalTenant();
@@ -187,7 +187,7 @@ export class AuthService {
             return false;
         }
 
-        await this.usersService.updateVerified(user.id, true);
+        await this.usersService.updateVerified(request, user.id, true);
 
         return true;
     }

@@ -1,17 +1,17 @@
 import {Injectable, OnModuleInit} from "@nestjs/common";
 import {ConfigService} from "../config/config.service";
-import {UsersService} from "../users/users.service";
+import {UsersService} from "./users.service";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
-import {Tenant} from "./tenant.entity";
+import {Tenant} from "../entity/tenant.entity";
 import {ValidationErrorException} from "../exceptions/validation-error.exception";
-import {User} from "../users/user.entity";
-import {Role} from "../roles/role.entity";
+import {User} from "../entity/user.entity";
+import {Role} from "../entity/role.entity";
 import {ForbiddenException} from "../exceptions/forbidden.exception";
-import {RoleService} from "../roles/role.service";
-import {RoleEnum} from "../roles/roleEnum";
+import {RoleService} from "./role.service";
+import {RoleEnum} from "../entity/roleEnum";
 import {CryptUtil} from "../util/crypt.util";
-import {TenantMember} from "./tenant.members.entity";
+import {TenantMember} from "../entity/tenant.members.entity";
 import {NotFoundException} from "../exceptions/not-found.exception";
 
 @Injectable()
