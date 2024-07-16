@@ -46,11 +46,11 @@ export class MemberController {
         @Request() request,
         @Param('tenantId') tenantId: string
     ): Promise<User[]> {
-        let tenant = await this.tenantService.findById(tenantId);
+        let tenant = await this.tenantService.findById(request, tenantId);
         this.securityService.check(request, Action.Read, subject(SubjectEnum.TENANT, tenant));
-        let members = await this.usersService.findByTenant(tenant);
+        let members = await this.usersService.findByTenant(request, tenant);
         for (const member of members) {
-            member.roles = await this.roleService.getMemberRoles(tenant, member);
+            member.roles = await this.roleService.getMemberRoles(request, tenant, member);
         }
         return members;
     }
@@ -62,15 +62,15 @@ export class MemberController {
         @Param('tenantId') tenantId: string,
         @Body(new ValidationPipe(ValidationSchema.AddMemberSchema)) body: { emails: string[] }
     ): Promise<Tenant> {
-        const tenant = await this.tenantService.findById(tenantId);
+        const tenant = await this.tenantService.findById(request, tenantId);
         this.securityService.check(request, Action.Update, subject(SubjectEnum.TENANT, tenant));
         for (const email of body.emails) {
-            const isPresent = await this.usersService.existByEmail(email);
+            const isPresent = await this.usersService.existByEmail(request, email);
             if (!isPresent) {
-                await this.usersService.createShadowUser(email, email);
+                await this.usersService.createShadowUser(request, email, email);
             }
-            const user = await this.usersService.findByEmail(email);
-            await this.tenantService.addMember(tenant.id, user);
+            const user = await this.usersService.findByEmail(request, email);
+            await this.tenantService.addMember(request, tenant.id, user);
         }
         return tenant;
     }
@@ -82,15 +82,15 @@ export class MemberController {
         @Param('tenantId') tenantId: string,
         @Body(new ValidationPipe(ValidationSchema.AddMemberSchema)) body: { emails: string[] }
     ): Promise<Tenant> {
-        let tenant = await this.tenantService.findById(tenantId);
+        let tenant = await this.tenantService.findById(request, tenantId);
         this.securityService.check(request, Action.Update, subject(SubjectEnum.TENANT, tenant));
         for (const email of body.emails) {
-            const user = await this.usersService.findByEmail(email);
-            let securityContext = this.securityService.getUserSecurityContext(request);
+            const user = await this.usersService.findByEmail(request, email);
+            let securityContext = this.securityService.getUserToken(request);
             if (securityContext.email === email) {
                 throw new ForbiddenException("cannot remove self");
             }
-            return this.tenantService.removeMember(tenantId, user);
+            return this.tenantService.removeMember(request, tenantId, user);
         }
     }
 
@@ -102,10 +102,10 @@ export class MemberController {
         @Param('userId') userId: string,
         @Body(new ValidationPipe(ValidationSchema.OperatingRoleSchema)) body: { roles: string[] }
     ): Promise<Role[]> {
-        const user = await this.usersService.findById(userId);
-        let tenant = await this.tenantService.findById(tenantId);
+        const user = await this.usersService.findById(request, userId);
+        let tenant = await this.tenantService.findById(request, tenantId);
         this.securityService.check(request, Action.Update, subject(SubjectEnum.TENANT, tenant));
-        return this.tenantService.updateRolesOfMember(body.roles, tenantId, user);
+        return this.tenantService.updateRolesOfMember(request, body.roles, tenantId, user);
     }
 
     @Get('/:tenantId/member/:userId')
@@ -115,10 +115,10 @@ export class MemberController {
         @Param('tenantId') tenantId: string,
         @Param('userId') userId: string
     ): Promise<any> {
-        const user = await this.usersService.findById(userId);
-        const tenant = await this.tenantService.findById(tenantId);
+        const user = await this.usersService.findById(request, userId);
+        const tenant = await this.tenantService.findById(request, tenantId);
         this.securityService.check(request, Action.Read, subject(SubjectEnum.TENANT, tenant));
-        let roles = await this.tenantService.getMemberRoles(tenantId, user);
+        let roles = await this.tenantService.getMemberRoles(request, tenantId, user);
         return {
             tenantId: tenant.id,
             userId: user.id,
@@ -133,10 +133,10 @@ export class MemberController {
         @Param('tenantId') tenantId: string,
         @Param('userId') userId: string
     ): Promise<any> {
-        const user = await this.usersService.findByEmail(userId);
-        const tenant = await this.tenantService.findById(tenantId);
+        const user = await this.usersService.findByEmail(request, userId);
+        const tenant = await this.tenantService.findById(request, tenantId);
         this.securityService.check(request, Action.Read, subject(SubjectEnum.TENANT, tenant));
-        let roles = await this.tenantService.getMemberRoles(tenantId, user);
+        let roles = await this.tenantService.getMemberRoles(request, tenantId, user);
         return {
             roles: roles
         };

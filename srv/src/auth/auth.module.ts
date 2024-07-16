@@ -9,6 +9,7 @@ import {ServiceModule} from "../services/service.module";
 import {AuthService} from "./auth.service";
 import {AuthCodeService} from "./auth-code.service";
 import {CaslModule} from "../casl/casl.module";
+import {User} from "../entity/user.entity";
 
 @Module(
     {
@@ -17,7 +18,7 @@ import {CaslModule} from "../casl/casl.module";
                 CaslModule,
                 ServiceModule,
                 PassportModule,
-                TypeOrmModule.forFeature([AuthCode]),
+                TypeOrmModule.forFeature([AuthCode, User]),
                 JwtModule.registerAsync( // Get the configuration settings from the config service asynchronously.
                     {
                         inject: [ConfigService],

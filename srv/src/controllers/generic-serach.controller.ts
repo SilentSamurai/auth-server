@@ -17,12 +17,12 @@ import {TenantMember} from "../entity/tenant.members.entity";
 import {Role} from "../entity/role.entity";
 import {NotFoundError} from "rxjs";
 import {Action} from "../entity/actions.enum";
-import {subject} from "@casl/ability";
 import {SecurityService} from "../casl/security.service";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
 import {escapeRegExp} from "typeorm/util/escapeRegExp";
 import {Group} from "../entity/group.entity";
 import {FindOperator} from "typeorm/find-options/FindOperator";
+import {SubjectEnum} from "../entity/subjectEnum";
 
 const logger = new Logger('GenericSearchController');
 const RELATIONS = {
@@ -94,7 +94,7 @@ export class GenericSearchController {
             throw new NotFoundError(`Resource ${entity} not found`);
         }
 
-        this.securityService.check(request, Action.Read, subject(entity, {}));
+        this.securityService.isAuthorized(request, Action.Read, SubjectEnum.getSubject(entity));
 
         let pageNo = query.pageNo || 0;
         let pageSize = query.pageSize || 30;

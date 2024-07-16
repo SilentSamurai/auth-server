@@ -2,10 +2,10 @@ import {AbilityBuilder, createMongoAbility} from "@casl/ability";
 import {Action} from "../entity/actions.enum";
 import {Injectable} from "@nestjs/common";
 import {RoleEnum} from "../entity/roleEnum";
-import {GRANT_TYPES, SecurityContext} from "./security.service";
 import {AnyAbility} from "@casl/ability/dist/types/PureAbility";
 import {SubjectEnum} from "../entity/subjectEnum";
 import {ConfigService} from "../config/config.service";
+import {GRANT_TYPES, TenantToken} from "./contexts";
 
 
 @Injectable()
@@ -16,7 +16,7 @@ export class CaslAbilityFactory {
     ) {
     }
 
-    createForSecurityContext(securityContext: SecurityContext): AnyAbility {
+    createForSecurityContext(securityContext: TenantToken): AnyAbility {
         const {can, cannot, build} = new AbilityBuilder(createMongoAbility);
 
         let roles = securityContext.scopes;
@@ -32,6 +32,9 @@ export class CaslAbilityFactory {
             cannot(Action.Manage, SubjectEnum.USER);
             can(Action.Manage, SubjectEnum.USER, {
                 email: {$eq: securityContext.email}
+            });
+            can(Action.Manage, SubjectEnum.USER, {
+                id: {$eq: securityContext.userId}
             });
 
 

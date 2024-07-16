@@ -7,32 +7,16 @@ import {CaslAbilityFactory} from "./casl-ability.factory";
 import {AnyAbility} from "@casl/ability/dist/types/PureAbility";
 import {Action} from "../entity/actions.enum";
 import {subject} from "@casl/ability";
+import {AuthUserService} from "./authUser.service";
+import {AuthContext, GRANT_TYPES, OAuthToken, TenantToken, UserToken} from "./contexts";
+import {User} from "../entity/user.entity";
 
-export enum GRANT_TYPES {
-    PASSWORD = "password",
-    CLIENT_CREDENTIALS = "client_credentials",
-    CLIENT_CREDENTIAL = "client_credential",
-    REFRESH_TOKEN = "refresh_token",
-    CODE = "authorization_code"
-}
-
-export class SecurityContext {
-    sub: string;
-    email: string;
-    name: string;
-    tenant: {
-        id: string;
-        name: string;
-        domain: string;
-    };
-    scopes: string[];
-    grant_type: GRANT_TYPES
-}
 
 @Injectable()
 export class SecurityService implements OnModuleInit {
 
     constructor(private readonly configService: ConfigService,
+                private readonly authUserService: AuthUserService,
                 @Inject(forwardRef(() => CaslAbilityFactory)) private readonly caslAbilityFactory: CaslAbilityFactory
     ) {
     }
@@ -40,32 +24,35 @@ export class SecurityService implements OnModuleInit {
     async onModuleInit() {
     }
 
-    getAbility(request: any): AnyAbility {
-        return request["SCOPE_ABILITIES"];
+    getAbility(authContext: AuthContext): AnyAbility {
+        return authContext.SCOPE_ABILITIES;
     }
 
-    isAuthorized(request: any, action: Action, object: string, obj: any): boolean {
-        return this.check(request, action, subject(object, obj));
+    isAuthorized(authContext: AuthContext, action: Action, object: string, obj: any = null): boolean {
+        if (obj == null) {
+            return this.check(authContext, action, object);
+        }
+        return this.check(authContext, action, subject(object, obj));
     }
 
-    check(request: any, ...args: any): boolean {
-        let ability = this.getAbility(request);
+    check(authContext: AuthContext, ...args: any): boolean {
+        let ability = this.getAbility(authContext);
         if (!ability.can(...args)) {
             throw new ForbiddenException();
         }
         return true;
     }
 
-    getUserSecurityContext(request: any): SecurityContext {
-        let payload = request["SECURITY_CONTEXT"] as SecurityContext;
+    getUserToken(authContext: AuthContext): UserToken {
+        let payload = authContext.SECURITY_CONTEXT;
         if (payload.grant_type !== GRANT_TYPES.PASSWORD) {
             throw new ForbiddenException("");
         }
         return payload;
     }
 
-    getTechnicalSecurityContext(request: any): SecurityContext {
-        let payload = request["SECURITY_CONTEXT"] as SecurityContext;
+    getTechnicalSecurityContext(authContext: any): OAuthToken {
+        let payload = authContext.SECURITY_CONTEXT;
         if (payload.grant_type !== GRANT_TYPES.CLIENT_CREDENTIAL) {
             throw new ForbiddenException("");
         }
@@ -77,32 +64,87 @@ export class SecurityService implements OnModuleInit {
         return context.grant_type === GRANT_TYPES.CLIENT_CREDENTIAL
     }
 
-    getUserOrTechnicalSecurityContext(request: any): SecurityContext {
-        return request["SECURITY_CONTEXT"] as SecurityContext;
+    getUserOrTechnicalSecurityContext(request: any): TenantToken {
+        return request["SECURITY_CONTEXT"] as TenantToken;
     }
 
     isAuthenticated(request: any) {
         return request.hasOwnProperty("SECURITY_CONTEXT");
     }
 
-    isSuperAdmin(securityContext: SecurityContext) {
+    isSuperAdmin(securityContext: TenantToken) {
         return securityContext.scopes.some(scope => scope === RoleEnum.SUPER_ADMIN)
             && securityContext.tenant.domain === this.configService.get("SUPER_TENANT_DOMAIN");
     }
 
-    getAdminContextForInternalUse() {
-        const request = {};
-        const payload = {
-            email: '',
-            tenant: {
-                id: '',
-                domain: this.configService.get("SUPER_TENANT_DOMAIN")
-            },
-            scopes: ["SUPER_ADMIN"]
-        } as SecurityContext;
-        const ability = this.caslAbilityFactory.createForSecurityContext(payload);
-        request["SECURITY_CONTEXT"] = payload;
-        request["SCOPE_ABILITIES"] = ability;
-        return request;
+    getAdminContextForInternalUse(): AuthContext {
+        const authContext: AuthContext = {
+            SECURITY_CONTEXT: {
+                email: '',
+                sub: '',
+                userId: '',
+                name: '',
+                tenant: {
+                    id: '',
+                    name: "",
+                    domain: this.configService.get("SUPER_TENANT_DOMAIN")
+                },
+                scopes: ["SUPER_ADMIN"],
+                grant_type: GRANT_TYPES.PASSWORD
+            } as TenantToken,
+            SCOPE_ABILITIES: null
+        };
+        authContext.SCOPE_ABILITIES = this.caslAbilityFactory.createForSecurityContext(authContext.SECURITY_CONTEXT);
+        return authContext;
+    }
+
+    async getUserAuthContext(email: string): Promise<AuthContext> {
+        const user = await this.authUserService.findUserByEmail(email);
+        const authContext: AuthContext = {
+            SECURITY_CONTEXT: {
+                email: user.email,
+                sub: user.email,
+                userId: user.id,
+                name: user.name,
+                scopes: [],
+                grant_type: GRANT_TYPES.CODE
+            } as UserToken,
+            SCOPE_ABILITIES: null
+        };
+        authContext.SCOPE_ABILITIES = this.caslAbilityFactory.createForSecurityContext(authContext.SECURITY_CONTEXT);
+        return authContext;
+    }
+
+    async getUserTenantAuthContext(email: string, domain: string): Promise<AuthContext> {
+        const user = await this.authUserService.findUserByEmail(email);
+        const tenant = await this.authUserService.findTenantByDomain(domain);
+        const roles = await this.authUserService.findMemberRoles(tenant, user);
+        const authContext: AuthContext = {
+            SECURITY_CONTEXT: {
+                email: user.email,
+                sub: user.email,
+                userId: user.id,
+                name: user.name,
+                tenant: {
+                    id: tenant.id,
+                    name: tenant.name,
+                    domain: tenant.domain
+                },
+                scopes: roles.map(item => item.name),
+                grant_type: GRANT_TYPES.CODE
+            } as TenantToken,
+            SCOPE_ABILITIES: null
+        };
+        authContext.SCOPE_ABILITIES = this.caslAbilityFactory.createForSecurityContext(authContext.SECURITY_CONTEXT);
+        return authContext;
+    }
+
+    async getAuthContextFromSecurityContext(securityContext: TenantToken): Promise<AuthContext> {
+        const authContext: AuthContext = {
+            SECURITY_CONTEXT: securityContext,
+            SCOPE_ABILITIES: null
+        };
+        authContext.SCOPE_ABILITIES = this.caslAbilityFactory.createForSecurityContext(securityContext);
+        return authContext;
     }
 }

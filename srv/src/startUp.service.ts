@@ -38,8 +38,9 @@ export class StartUpService implements OnModuleInit {
     async createAdminUser() {
         try {
             let adminContext = this.securityService.getAdminContextForInternalUse();
-            if (!await this.usersService.existByEmail(this.configService.get("SUPER_ADMIN_EMAIL"))) {
+            if (!await this.usersService.existByEmail(adminContext, this.configService.get("SUPER_ADMIN_EMAIL"))) {
                 let user: User = await this.usersService.create(
+                    adminContext,
                     this.configService.get("SUPER_ADMIN_PASSWORD"),
                     this.configService.get("SUPER_ADMIN_EMAIL"),
                     this.configService.get("SUPER_ADMIN_NAME")
@@ -62,13 +63,19 @@ export class StartUpService implements OnModuleInit {
             const users: any = JSON.parse(data);
             users.records.forEach(async record => {
                 try {
-                    let user: User = await this.usersService.create(
-                        record.password,
-                        record.email,
-                        record.name
-                    );
 
-                    await this.usersService.updateVerified(adminContext, user.id, true);
+                    const isPresent = await this.usersService.existByEmail(adminContext, record.email);
+
+                    if (!isPresent) {
+                        let user: User = await this.usersService.create(
+                            adminContext,
+                            record.password,
+                            record.email,
+                            record.name
+                        );
+
+                        await this.usersService.updateVerified(adminContext, user.id, true);
+                    }
                 } catch (exception: any) {
                     // Catch user already created.
                     console.error(exception);
@@ -79,18 +86,20 @@ export class StartUpService implements OnModuleInit {
 
     async populateGlobalTenant() {
         try {
-            let globalTenantExists = await this.tenantService.existByDomain(this.configService.get("SUPER_TENANT_DOMAIN"));
+            let adminContext = this.securityService.getAdminContextForInternalUse();
+            let globalTenantExists = await this.tenantService.existByDomain(adminContext, this.configService.get("SUPER_TENANT_DOMAIN"));
             if (!globalTenantExists) {
-                const user = await this.usersService.findByEmail(this.configService.get("SUPER_ADMIN_EMAIL"));
+                const user = await this.usersService.findByEmail(adminContext, this.configService.get("SUPER_ADMIN_EMAIL"));
                 const tenant: Tenant = await this.tenantService.create(
+                    adminContext,
                     this.configService.get("SUPER_TENANT_NAME"),
                     this.configService.get("SUPER_TENANT_DOMAIN"),
                     user
                 );
-                const adminRole = await this.roleService.findByNameAndTenant(RoleEnum.TENANT_ADMIN, tenant);
-                const viewerRole = await this.roleService.findByNameAndTenant(RoleEnum.TENANT_VIEWER, tenant);
-                const superAdminRole = await this.roleService.create(RoleEnum.SUPER_ADMIN, tenant, false);
-                await this.roleService.updateUserRoles([adminRole.name, viewerRole.name, superAdminRole.name], tenant, user);
+                const adminRole = await this.roleService.findByNameAndTenant(adminContext, RoleEnum.TENANT_ADMIN, tenant);
+                const viewerRole = await this.roleService.findByNameAndTenant(adminContext, RoleEnum.TENANT_VIEWER, tenant);
+                const superAdminRole = await this.roleService.create(adminContext, RoleEnum.SUPER_ADMIN, tenant, false);
+                await this.roleService.updateUserRoles(adminContext, [adminRole.name, viewerRole.name, superAdminRole.name], tenant, user);
             }
         } catch (e) {
             console.error(e);

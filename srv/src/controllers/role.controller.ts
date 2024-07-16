@@ -40,9 +40,10 @@ export class RoleController {
         @Param('tenantId') tenantId: string,
         @Param('name') name: string,
     ): Promise<Role> {
-        let tenant = await this.tenantService.findById(tenantId);
+        let tenant = await this.tenantService.findById(request, tenantId);
         this.securityService.check(request, Action.Update, subject(SubjectEnum.TENANT, tenant));
         return this.roleService.create(
+            request,
             name,
             tenant
         );
@@ -55,10 +56,10 @@ export class RoleController {
         @Param('tenantId') tenantId: string,
         @Param('name') name: string,
     ): Promise<Role> {
-        let tenant = await this.tenantService.findById(tenantId);
+        let tenant = await this.tenantService.findById(request, tenantId);
         this.securityService.check(request, Action.Update, subject(SubjectEnum.TENANT, tenant));
-        let roles = await this.roleService.findByNameAndTenant(name, tenant);
-        return await this.roleService.deleteById(roles.id);
+        let roles = await this.roleService.findByNameAndTenant(request, name, tenant);
+        return await this.roleService.deleteById(request, roles.id);
     }
 
     @Get('/:tenantId/casl')
@@ -67,9 +68,9 @@ export class RoleController {
         @Request() request,
         @Param('tenantId') tenantId: string
     ): Promise<Role[]> {
-        const tenant = await this.tenantService.findById(tenantId);
+        const tenant = await this.tenantService.findById(request, tenantId);
         this.securityService.check(request, Action.Read, subject(SubjectEnum.TENANT, tenant));
-        return this.tenantService.getTenantRoles(tenant)
+        return this.tenantService.getTenantRoles(request, tenant)
     }
 
     @Get('/:tenantId/role/:name')
@@ -79,10 +80,10 @@ export class RoleController {
         @Param('tenantId') tenantId: string,
         @Param('name') name: string,
     ): Promise<any> {
-        const tenant = await this.tenantService.findById(tenantId);
+        const tenant = await this.tenantService.findById(request, tenantId);
         this.securityService.check(request, Action.Read, subject(SubjectEnum.TENANT, tenant));
-        let role = await this.roleService.findByNameAndTenant(name, tenant);
-        let users = await this.userService.findByRole(role);
+        let role = await this.roleService.findByNameAndTenant(request, name, tenant);
+        let users = await this.userService.findByRole(request, role);
         return {
             role: role,
             users: users

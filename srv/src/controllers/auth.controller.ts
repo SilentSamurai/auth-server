@@ -6,7 +6,8 @@ import {
     Get,
     Headers,
     Param,
-    Post, Request,
+    Post,
+    Request,
     Response,
     UseInterceptors
 } from '@nestjs/common';
@@ -21,10 +22,11 @@ import {ValidationSchema} from '../validation/validation.schema';
 import {MailServiceErrorException} from '../exceptions/mail-service-error.exception';
 import {TenantService} from "../services/tenant.service";
 import {Tenant} from "../entity/tenant.entity";
-import {GRANT_TYPES} from "../casl/security.service";
 import {ForbiddenException} from "../exceptions/forbidden.exception";
 import {InvalidTokenException} from "../exceptions/invalid-token.exception";
 import {AuthCodeService} from "../auth/auth-code.service";
+import {GRANT_TYPES, TenantToken} from "../casl/contexts";
+import {AuthUserService} from "../casl/authUser.service";
 
 @Controller('api/oauth')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -35,7 +37,8 @@ export class AuthController {
         private readonly usersService: UsersService,
         private readonly tenantService: TenantService,
         private readonly mailService: MailService,
-        private readonly authCodeService: AuthCodeService
+        private readonly authCodeService: AuthCodeService,
+        private readonly authUserService: AuthUserService
     ) {
     }
 
@@ -48,7 +51,7 @@ export class AuthController {
             code_challenge: string
         }) {
         const user: User = await this.authService.validate(body.email, body.password);
-        const tenant = await this.tenantService.findByDomain(body.domain);
+        const tenant = await this.authUserService.findTenantByDomain(body.domain);
         const auth_code = await this.authCodeService.createAuthToken(user, tenant, body.code_challenge);
         return {
             authentication_code: auth_code
@@ -88,7 +91,7 @@ export class AuthController {
                 let validationPipe = new ValidationPipe(ValidationSchema.PasswordGrantSchema);
                 await validationPipe.transform(body, null);
                 const user: User = await this.authService.validate(body.email, body.password);
-                const tenant = await this.tenantService.findByDomain(body.domain);
+                const tenant = await this.authUserService.findTenantByDomain(body.domain);
                 const {accessToken, refreshToken} = await this.authService.createUserAccessToken(user, tenant);
                 return {
                     access_token: accessToken,
@@ -132,7 +135,7 @@ export class AuthController {
             auth_code: string
         }) {
         const authCodeObj = await this.authCodeService.findByCode(body.auth_code);
-        const user = await this.usersService.findById(authCodeObj.userId);
+        const user = await this.authUserService.findUserById(authCodeObj.userId);
         return {
             authentication_code: body.auth_code,
             status: true,
@@ -149,7 +152,7 @@ export class AuthController {
         }
     ): Promise<object> {
         const tenant = await this.authService.validateClientCredentials(body.client_id, body.client_secret);
-        let securityContext = await this.authService.validateAccessToken(body.access_token);
+        let securityContext: TenantToken = await this.authService.validateAccessToken(body.access_token);
         if (securityContext.tenant.id !== tenant.id) {
             throw new InvalidTokenException("not a valid token");
         }
@@ -164,13 +167,13 @@ export class AuthController {
             client_secret: string
         }
     ): Promise<object> {
-        let securityContext = await this.authService.validateAccessToken(body.access_token);
-        if (securityContext.grant_type !== GRANT_TYPES.PASSWORD) {
+        let tenantToken = await this.authService.validateAccessToken(body.access_token);
+        if (tenantToken.grant_type !== GRANT_TYPES.PASSWORD) {
             throw new ForbiddenException("grant_type not allowed");
         }
         await this.authService.validateClientCredentials(body.client_id, body.client_secret);
-        const user = await this.usersService.findByEmail(securityContext.email);
-        const tenant = await this.tenantService.findByClientId(body.client_id);
+        const user = await this.authUserService.findUserByEmail(tenantToken.email);
+        const tenant = await this.authUserService.findTenantByClientId(body.client_id);
         const {accessToken, refreshToken} = await this.authService.createUserAccessToken(user, tenant);
         return {
             access_token: accessToken,
@@ -187,7 +190,7 @@ export class AuthController {
         @Param('token') token: string,
         @Response() response
     ): Promise<any> {
-        const verified: boolean = await this.authService.verifyEmail(request, token);
+        const verified: boolean = await this.authService.verifyEmail(token);
 
         let link: any = this.configService.get('VERIFY_EMAIL_LINK');
         if (!link || link === '') {
@@ -203,7 +206,7 @@ export class AuthController {
         @Headers() headers,
         @Body(new ValidationPipe(ValidationSchema.ForgotPasswordSchema)) body: any
     ): Promise<object> {
-        const user: User = await this.usersService.findByEmail(body.email);
+        const user: User = await this.authUserService.findUserByEmail(body.email);
         const token: string = await this.authService.createResetPasswordToken(user);
 
         let link: any = this.configService.get('RESET_PASSWORD_LINK');

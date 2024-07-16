@@ -23,7 +23,7 @@ import {MessageService} from "primeng/api";
                     <span class="h4"></span>
                     <button (click)="openCreateModal()"
                             id="CREATE_USER_DIALOG_BTN"
-                            class="btn btn-outline-success btn-sm"
+                            class="btn btn-success btn-sm"
                             type="button">
                         <i class="fa fa-solid fa-plus me-2"></i>Create User
                     </button>

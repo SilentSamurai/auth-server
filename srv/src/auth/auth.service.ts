@@ -11,11 +11,21 @@ import * as argon2 from 'argon2';
 import {Tenant} from "../entity/tenant.entity";
 import {TenantService} from "../services/tenant.service";
 import {CryptUtil} from "../util/crypt.util";
-import {GRANT_TYPES, SecurityContext} from "../casl/security.service";
 import {UnauthorizedException} from "../exceptions/unauthorized.exception";
 import {RoleEnum} from "../entity/roleEnum";
 import {ValidationPipe} from "../validation/validation.pipe";
 import {ValidationSchema} from "../validation/validation.schema";
+import {SecurityService} from "../casl/security.service";
+import {
+    ChangeEmailToken,
+    EmailVerificationToken,
+    GRANT_TYPES,
+    RefreshToken,
+    ResetPasswordToken,
+    TechnicalToken,
+    TenantToken
+} from "../casl/contexts";
+import {AuthUserService} from "../casl/authUser.service";
 
 
 @Injectable()
@@ -25,7 +35,9 @@ export class AuthService {
 
     constructor(
         private readonly configService: ConfigService,
-        private readonly usersService: UsersService,
+        private readonly securityService: SecurityService,
+        private readonly authUserService: AuthUserService,
+        private readonly userService: UsersService,
         private readonly tenantService: TenantService,
         private readonly jwtService: JwtService
     ) {
@@ -35,7 +47,7 @@ export class AuthService {
      * Validate the email and password.
      */
     async validate(email: string, password: string): Promise<User> {
-        const user: User = await this.usersService.findByEmail(email);
+        const user: User = await this.authUserService.findUserByEmail(email);
         const valid: boolean = await argon2.verify(user.password, password);
         if (!valid) {
             throw new InvalidCredentialsException();
@@ -43,27 +55,28 @@ export class AuthService {
         return user;
     }
 
-    async validateRefreshToken(refreshToken: string) {
+    async validateRefreshToken(refreshToken: string): Promise<{ tenant: Tenant, user: User }> {
         let validationPipe = new ValidationPipe(ValidationSchema.RefreshTokenSchema);
-        let payload = await validationPipe.transform(
+        let payload: RefreshToken = await validationPipe.transform(
             this.jwtService.decode(refreshToken, {json: true}),
-            null) as { email, domain };
+            null
+        ) as RefreshToken;
 
-        let tenant = await this.tenantService.findByDomain(payload.domain);
-        let user = await this.usersService.findByEmail(payload.email);
+        let tenant = await this.authUserService.findTenantByDomain(payload.domain);
+        let user = await this.authUserService.findUserByEmail(payload.email);
         await this.jwtService
             .verifyAsync(refreshToken, {publicKey: tenant.publicKey});
         return {tenant, user};
     }
 
-    async validateAccessToken(token: string): Promise<SecurityContext> {
+    async validateAccessToken(token: string): Promise<TenantToken> {
         try {
             let validationPipe = new ValidationPipe(ValidationSchema.SecurityContextSchema);
-            let payload: SecurityContext = await validationPipe.transform(
+            let payload: TenantToken = await validationPipe.transform(
                 this.jwtService.decode(token, {json: true}),
-                null) as SecurityContext;
+                null) as TenantToken;
 
-            let tenant = await this.tenantService.findById(payload.tenant.id);
+            let tenant = await this.authUserService.findTenantByDomain(payload.tenant.domain);
             payload = await this.jwtService.verifyAsync(token, {publicKey: tenant.publicKey});
             console.log("token verified with public Key");
             if (payload.grant_type === GRANT_TYPES.CLIENT_CREDENTIAL) {
@@ -71,7 +84,7 @@ export class AuthService {
                     throw new UnauthorizedException();
                 }
             } else {
-                let user = await this.usersService.findByEmail(payload.email);
+                let user = await this.authUserService.findUserByEmail(payload.email);
             }
             return payload;
         } catch (e) {
@@ -80,7 +93,7 @@ export class AuthService {
     }
 
     async validateClientCredentials(clientId: string, clientSecret: string): Promise<Tenant> {
-        const tenant: Tenant = await this.tenantService.findByClientId(clientId);
+        const tenant: Tenant = await this.authUserService.findTenantByClientId(clientId);
         let valid: boolean = CryptUtil.verifyClientId(tenant.clientSecret, clientId, tenant.secretSalt);
         if (!valid) {
             throw new InvalidCredentialsException();
@@ -94,17 +107,19 @@ export class AuthService {
 
     async createTechnicalAccessToken(tenant: Tenant, roles: string[]): Promise<string> {
         roles = roles instanceof Array ? roles : [];
-        const payload: SecurityContext = {
+        const payload: TechnicalToken = {
             sub: "oauth",
             email: "oauth@" + tenant.domain,
             name: "oauth",
+            userId: 'na',
             tenant: {
                 id: tenant.id,
                 name: tenant.name,
                 domain: tenant.domain,
             },
             scopes: [RoleEnum.TENANT_VIEWER, ...roles],
-            grant_type: GRANT_TYPES.CLIENT_CREDENTIAL
+            grant_type: GRANT_TYPES.CLIENT_CREDENTIAL,
+            isTechnical: true
         };
         return this.jwtService.sign(payload, {privateKey: tenant.privateKey,});
     }
@@ -118,12 +133,13 @@ export class AuthService {
             throw new EmailNotVerifiedException();
         }
 
-        let roles = await this.tenantService.getMemberRoles(tenant.id, user);
+        let roles = await this.authUserService.getMemberRoles(tenant, user);
 
-        const accessTokenPayload: SecurityContext = {
+        const accessTokenPayload: TenantToken = {
             sub: user.email,
             email: user.email,
             name: user.name,
+            userId: user.id,
             tenant: {
                 id: tenant.id,
                 name: tenant.name,
@@ -133,7 +149,7 @@ export class AuthService {
             grant_type: GRANT_TYPES.PASSWORD
         };
 
-        const refreshTokenPayload = {
+        const refreshTokenPayload: RefreshToken = {
             email: user.email,
             domain: tenant.domain
         }
@@ -158,10 +174,10 @@ export class AuthService {
      * Create a verification token for the user.
      */
     async createVerificationToken(user: User): Promise<string> {
-        const payload: object = {
-            sub: user.email
+        const payload: EmailVerificationToken = {
+            sub: user.email,
         };
-        let globalTenant = await this.tenantService.findGlobalTenant();
+        let globalTenant = await this.authUserService.findGlobalTenant();
         return this.jwtService.sign(payload, {
             privateKey: globalTenant.privateKey,
             expiresIn: this.configService.get('TOKEN_VERIFICATION_EXPIRATION_TIME')
@@ -171,23 +187,25 @@ export class AuthService {
     /**
      * Verify the user's email.
      */
-    async verifyEmail(request, token: string): Promise<boolean> {
-        let payload: any;
+    async verifyEmail(token: string): Promise<boolean> {
+        let payload: EmailVerificationToken;
         try {
-            let globalTenant = await this.tenantService.findGlobalTenant();
+            let globalTenant = await this.authUserService.findGlobalTenant();
             payload = this.jwtService.verify(token, {
                 publicKey: globalTenant.publicKey
-            });
+            }) as EmailVerificationToken;
         } catch (exception: any) {
             throw new InvalidTokenException();
         }
 
-        const user: User = await this.usersService.findByEmail(payload.sub);
+        const authContext = await this.securityService.getUserAuthContext(payload.sub);
+
+        const user: User = await this.userService.findByEmail(authContext, payload.sub);
         if (user.verified) {
             return false;
         }
 
-        await this.usersService.updateVerified(request, user.id, true);
+        await this.userService.updateVerified(authContext, user.id, true);
 
         return true;
     }
@@ -196,10 +214,9 @@ export class AuthService {
      * Create a reset password token for the user.
      */
     async createResetPasswordToken(user: User): Promise<string> {
-        const payload: object =
-            {
-                sub: user.email
-            };
+        const payload: ResetPasswordToken = {
+            sub: user.email
+        };
 
         // Use the user's current password's hash for signing the token.
         // All tokens generated before a successful password change would get invalidated.
@@ -215,8 +232,9 @@ export class AuthService {
      */
     async resetPassword(token: string, password: string): Promise<boolean> {
         // Get the user.
-        let payload: any = this.jwtService.decode(token);
-        const user: User = await this.usersService.findByEmail(payload.sub);
+        let payload: ResetPasswordToken = this.jwtService.decode(token) as ResetPasswordToken;
+
+        const user: User = await this.authUserService.findUserByEmail(payload.sub);
         if (!user) {
             throw new UserNotFoundException();
         }
@@ -230,11 +248,13 @@ export class AuthService {
             throw new InvalidTokenException();
         }
 
+        const authContext = await this.securityService.getUserAuthContext(payload.sub);
+
         if (!user.verified) {
             throw new EmailNotVerifiedException();
         }
 
-        await this.usersService.updatePassword(user.id, password);
+        await this.userService.updatePassword(authContext, user.id, password);
 
         return true;
     }
@@ -243,19 +263,18 @@ export class AuthService {
      * Create a change email token for the user.
      */
     async createChangeEmailToken(user: User, email: string): Promise<string> {
-        const payload: object =
-            {
-                sub: user.email,
-                email: email
-            };
+        const payload: ChangeEmailToken = {
+            sub: user.email,
+            updatedEmail: email,
+        };
 
+        let globalTenant = await this.authUserService.findGlobalTenant();
         // Use the user's current email for signing the token.
         // All tokens generated before a successful email change would get invalidated.
-        return this.jwtService.sign(payload,
-            {
-                secret: user.email,
-                expiresIn: this.configService.get('TOKEN_CHANGE_EMAIL_EXPIRATION_TIME')
-            });
+        return this.jwtService.sign(payload, {
+            secret: globalTenant.publicKey,
+            expiresIn: this.configService.get('TOKEN_CHANGE_EMAIL_EXPIRATION_TIME')
+        });
     }
 
     /**
@@ -263,22 +282,26 @@ export class AuthService {
      */
     async confirmEmailChange(token: string): Promise<boolean> {
         // Get the user.
-        let payload: any = this.jwtService.decode(token);
-        const user: User = await this.usersService.findByEmail(payload.sub);
+        let payload: ChangeEmailToken = this.jwtService.decode(token) as ChangeEmailToken;
+
+        const user: User = await this.authUserService.findUserByEmail(payload.sub);
         if (!user) {
             throw new UserNotFoundException();
         }
 
         // The token is signed with the user's current email.
         // A successful email change will invalidate the token.
+        let globalTenant = await this.authUserService.findGlobalTenant();
         payload = null;
         try {
-            payload = this.jwtService.verify(token, {secret: user.email});
+            payload = this.jwtService.verify(token, {secret: globalTenant.publicKey}) as ChangeEmailToken;
         } catch (exception: any) {
             throw new InvalidTokenException();
         }
 
-        await this.usersService.updateEmail(user.id, payload.email);
+        const authContext = await this.securityService.getUserAuthContext(payload.sub);
+
+        await this.userService.updateEmail(authContext, user.id, payload.sub);
 
         return true;
     }

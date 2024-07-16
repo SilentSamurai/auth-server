@@ -4,14 +4,14 @@ import {SubjectEnum} from "../entity/subjectEnum";
 
 export class RoleRule {
     action: Action;
-    subject: SubjectEnum;
+    subject: string;
 
-    constructor(action: Action, subject: SubjectEnum) {
+    constructor(action: Action, subject: string) {
         this.action = action;
         this.subject = subject;
     }
 
-    public static can(action: Action, subject: SubjectEnum) {
+    public static can(action: Action, subject: string) {
         return new RoleRule(action, subject);
     }
 

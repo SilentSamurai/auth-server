@@ -32,8 +32,8 @@ export class GroupController {
         @Request() request,
         @Param('tenantId') tenantId: string,
     ): Promise<any> {
-        let tenant = await this.tenantService.findById(tenantId);
-        return await this.groupService.findByTenantId(tenant.id);
+        let tenant = await this.tenantService.findById(request, tenantId);
+        return await this.groupService.findByTenantId(request, tenant.id);
     }
 
     @Post('/group/create')
@@ -41,8 +41,8 @@ export class GroupController {
         @Request() request,
         @Body(new ValidationPipe(ValidationSchema.CreateGroupSchema)) body: { name: string, tenantId: string }
     ): Promise<any> {
-        let tenant = await this.tenantService.findById(body.tenantId);
-        let group = await this.groupService.create(body.name, tenant);
+        let tenant = await this.tenantService.findById(request, body.tenantId);
+        let group = await this.groupService.create(request, body.name, tenant);
         return group;
     }
 
@@ -51,9 +51,9 @@ export class GroupController {
         @Request() request,
         @Param('groupId') groupId: string,
     ): Promise<any> {
-        let group = await this.groupService.findById(groupId);
-        let roles = await this.groupService.findGroupRoles(group);
-        let users = await this.groupService.findGroupUsers(group);
+        let group = await this.groupService.findById(request, groupId);
+        let roles = await this.groupService.findGroupRoles(request, group);
+        let users = await this.groupService.findGroupUsers(request, group);
         return {
             group: group,
             roles: roles,
@@ -68,8 +68,8 @@ export class GroupController {
         @Param('groupId') groupId: string,
         @Body(new ValidationPipe(ValidationSchema.UpdateGroupSchema)) body: { name: string }
     ): Promise<any> {
-        let group = await this.groupService.findById(groupId);
-        await this.groupService.updateGroup(group, body);
+        let group = await this.groupService.findById(request, groupId);
+        await this.groupService.updateGroup(request, group, body);
         return group;
     }
 
@@ -78,8 +78,8 @@ export class GroupController {
         @Request() request,
         @Param('groupId') groupId: string
     ): Promise<any> {
-        let group = await this.groupService.findById(groupId);
-        await this.groupService.deleteById(groupId);
+        let group = await this.groupService.findById(request, groupId);
+        await this.groupService.deleteById(request, groupId);
         return group;
     }
 
@@ -90,9 +90,9 @@ export class GroupController {
         @Param('groupId') groupId: string,
         @Body(new ValidationPipe(ValidationSchema.UpdateGroupRole)) body: { roles: string[] }
     ): Promise<any> {
-        let group = await this.groupService.findById(groupId);
-        await this.groupService.addRoles(group, body.roles);
-        let roles = await this.groupService.findGroupRoles(group);
+        let group = await this.groupService.findById(request, groupId);
+        await this.groupService.addRoles(request, group, body.roles);
+        let roles = await this.groupService.findGroupRoles(request, group);
         return {
             group: group,
             roles: roles,
@@ -105,9 +105,9 @@ export class GroupController {
         @Param('groupId') groupId: string,
         @Body(new ValidationPipe(ValidationSchema.UpdateGroupRole)) body: { roles: string[] }
     ): Promise<any> {
-        let group = await this.groupService.findById(groupId);
-        await this.groupService.removeRoles(group, body.roles);
-        let roles = await this.groupService.findGroupRoles(group);
+        let group = await this.groupService.findById(request, groupId);
+        await this.groupService.removeRoles(request, group, body.roles);
+        let roles = await this.groupService.findGroupRoles(request, group);
         return {
             group: group,
             roles: roles,
@@ -120,9 +120,9 @@ export class GroupController {
         @Param('groupId') groupId: string,
         @Body(new ValidationPipe(ValidationSchema.UpdateGroupUser)) body: { users: string[] }
     ): Promise<any> {
-        let group = await this.groupService.findById(groupId);
-        await this.groupService.addUser(group, body.users);
-        let users = await this.groupService.findGroupUsers(group);
+        let group = await this.groupService.findById(request, groupId);
+        await this.groupService.addUser(request, group, body.users);
+        let users = await this.groupService.findGroupUsers(request, group);
         return {
             group: group,
             users: users,
@@ -135,9 +135,9 @@ export class GroupController {
         @Param('groupId') groupId: string,
         @Body(new ValidationPipe(ValidationSchema.UpdateGroupUser)) body: { users: string[] }
     ): Promise<any> {
-        let group = await this.groupService.findById(groupId);
-        await this.groupService.removeUser(group, body.users);
-        let users = await this.groupService.findGroupUsers(group);
+        let group = await this.groupService.findById(request, groupId);
+        await this.groupService.removeUser(request, group, body.users);
+        let users = await this.groupService.findGroupUsers(request, group);
         return {
             group: group,
             users: users,

@@ -46,8 +46,9 @@ export class TenantController {
         @Request() request,
         @Body(new ValidationPipe(ValidationSchema.CreateTenantSchema)) body: any
     ): Promise<Tenant> {
-        const user = await this.usersService.findByEmail(request.user.email);
+        const user = await this.usersService.findByEmail(request, request.user.email);
         const tenant: Tenant = await this.tenantService.create(
+            request,
             body.name,
             body.domain,
             user
@@ -62,9 +63,10 @@ export class TenantController {
         @Param('tenantId') tenantId: string,
         @Body(new ValidationPipe(ValidationSchema.UpdateTenantSchema)) body: { name: string, domain: string }
     ): Promise<Tenant> {
-        let tenant = await this.tenantService.findById(tenantId);
+        let tenant = await this.tenantService.findById(request, tenantId);
         this.securityService.check(request, Action.Update, subject(SubjectEnum.TENANT, tenant));
         return this.tenantService.updateTenant(
+            request,
             tenantId,
             body.name,
             body.domain
@@ -74,24 +76,21 @@ export class TenantController {
 
 
     @Delete('/:tenantId')
-    @UseGuards(JwtAuthGuard, RoleGuard)
-    @Rules(
-        RoleRule.can(Action.Delete, SubjectEnum.TENANT),
-    )
+    @UseGuards(JwtAuthGuard)
     async deleteTenant(
+        @Request() request,
         @Param('tenantId') tenantId: string
     ): Promise<Tenant> {
-        return this.tenantService.deleteTenant(tenantId);
+        return this.tenantService.deleteTenant(request, tenantId);
     }
 
 
     @Get('')
-    @UseGuards(JwtAuthGuard, RoleGuard)
-    @Rules(
-        RoleRule.can(Action.Manage, SubjectEnum.TENANT),
-    )
-    async getTenants(): Promise<Tenant[]> {
-        return await this.tenantService.getAllTenants();
+    @UseGuards(JwtAuthGuard)
+    async getTenants(
+        @Request() request,
+    ): Promise<Tenant[]> {
+        return await this.tenantService.getAllTenants(request);
     }
 
 
@@ -101,7 +100,7 @@ export class TenantController {
         @Request() request
     ): Promise<any> {
         let securityContext = this.securityService.getUserOrTechnicalSecurityContext(request);
-        let tenant = await this.tenantService.findById(securityContext.tenant.id);
+        let tenant = await this.tenantService.findById(request, securityContext.tenant.id);
         this.securityService.check(request, Action.ReadCredentials, subject(SubjectEnum.TENANT, tenant));
         return {
             id: tenant.id,
@@ -118,7 +117,7 @@ export class TenantController {
         @Request() request,
         @Param('tenantId') tenantId: string
     ): Promise<any> {
-        let tenant = await this.tenantService.findById(tenantId);
+        let tenant = await this.tenantService.findById(request, tenantId);
         this.securityService.check(request, Action.ReadCredentials, subject(SubjectEnum.TENANT, tenant));
         return {
             id: tenant.id,
@@ -134,7 +133,7 @@ export class TenantController {
         @Request() request,
         @Param('tenantId') tenantId: string
     ): Promise<Tenant> {
-        let tenant = await this.tenantService.findById(tenantId);
+        let tenant = await this.tenantService.findById(request, tenantId);
         this.securityService.check(request, Action.Read, subject(SubjectEnum.TENANT, tenant));
         return tenant;
     }

@@ -42,6 +42,7 @@ export class UsersController {
         @Body(new ValidationPipe(ValidationSchema.SignUpSchema)) body: any
     ): Promise<User> {
         const user: User = await this.usersService.create(
+            request,
             body.password,
             body.email,
             body.name,
@@ -65,9 +66,9 @@ export class UsersController {
         @Request() request,
         @Body(new ValidationPipe(ValidationSchema.SignDownSchema)) body: { password: string }
     ): Promise<User> {
-        let securityContext = this.securityService.getUserSecurityContext(request);
-        let user = await this.usersService.findByEmail(securityContext.email);
-        user = await this.usersService.deleteSecure(user.id, body.password);
+        let securityContext = this.securityService.getUserToken(request);
+        let user = await this.usersService.findByEmail(request, securityContext.email);
+        user = await this.usersService.deleteSecure(request, user.id, body.password);
         return user;
     }
 
@@ -76,9 +77,9 @@ export class UsersController {
     async getMyUser(
         @Request() request
     ): Promise<User> {
-        const securityContext = this.securityService.getUserSecurityContext(request);
-        const user: User = await this.usersService.findByEmail(securityContext.email);
-        return this.usersService.findById(user.id);
+        const securityContext = this.securityService.getUserToken(request);
+        const user: User = await this.usersService.findByEmail(request, securityContext.email);
+        return this.usersService.findById(request, user.id);
     }
 
     @Patch('/me/email')
@@ -88,8 +89,8 @@ export class UsersController {
         @Headers() headers,
         @Body(new ValidationPipe(ValidationSchema.UpdateMyEmailSchema)) body: any
     ): Promise<object> {
-        const securityContext = this.securityService.getUserSecurityContext(request);
-        const user: User = await this.usersService.findByEmail(securityContext.email);
+        const securityContext = this.securityService.getUserToken(request);
+        const user: User = await this.usersService.findByEmail(request, securityContext.email);
         const token: string = await this.authService.createChangeEmailToken(user, body.email);
         const link: string = 'https://' + headers.host + '/change-email/' + token;
 
@@ -107,9 +108,9 @@ export class UsersController {
         @Request() request,
         @Body(new ValidationPipe(ValidationSchema.UpdateMyPasswordSchema)) body: any
     ): Promise<User> {
-        const securityContext = this.securityService.getUserSecurityContext(request);
-        const user: User = await this.usersService.findByEmail(securityContext.email);
-        return this.usersService.updatePasswordSecure(user.id, body.currentPassword, body.newPassword);
+        const securityContext = this.securityService.getUserToken(request);
+        const user: User = await this.usersService.findByEmail(request, securityContext.email);
+        return this.usersService.updatePasswordSecure(request, user.id, body.currentPassword, body.newPassword);
     }
 
     @Patch('/me/name')
@@ -118,9 +119,9 @@ export class UsersController {
         @Request() request,
         @Body(new ValidationPipe(ValidationSchema.UpdateMyNameSchema)) body: any
     ): Promise<User> {
-        const securityContext = this.securityService.getUserSecurityContext(request);
-        const user: User = await this.usersService.findByEmail(securityContext.email);
-        return this.usersService.updateName(user.id, body.name);
+        const securityContext = this.securityService.getUserToken(request);
+        const user: User = await this.usersService.findByEmail(request, securityContext.email);
+        return this.usersService.updateName(request, user.id, body.name);
     }
 
     @Get('/me/tenants')
@@ -128,9 +129,9 @@ export class UsersController {
     async getTenants(
         @Request() request,
     ): Promise<Tenant[]> {
-        const securityContext = this.securityService.getUserSecurityContext(request);
-        const user: User = await this.usersService.findByEmail(securityContext.email);
-        return this.tenantService.findByViewership(user);
+        const securityContext = this.securityService.getUserToken(request);
+        const user: User = await this.usersService.findByEmail(request, securityContext.email);
+        return this.tenantService.findByViewership(request, user);
     }
 
 

@@ -1,10 +1,9 @@
 import {CanActivate, ExecutionContext, Injectable, Logger} from '@nestjs/common';
 import {UnauthorizedException} from "../exceptions/unauthorized.exception";
-import {GRANT_TYPES, SecurityContext} from "../casl/security.service";
-
 import {ExtractJwt} from 'passport-jwt';
 import {AuthService} from "./auth.service";
 import {CaslAbilityFactory} from "../casl/casl-ability.factory";
+import {GRANT_TYPES} from "../casl/contexts";
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
@@ -36,7 +35,7 @@ export class JwtAuthGuard implements CanActivate {
         if (!token) {
             throw new UnauthorizedException("No token provided");
         }
-        const payload: SecurityContext = await this.authService.validateAccessToken(token);
+        const payload = await this.authService.validateAccessToken(token);
         if (payload.grant_type === GRANT_TYPES.PASSWORD) {
             request['user'] = payload;
         }

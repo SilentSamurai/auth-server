@@ -17,14 +17,10 @@ import {UsersService} from '../services/users.service';
 import {AuthService} from '../auth/auth.service';
 import {MailService} from '../mail/mail.service';
 import {JwtAuthGuard} from '../auth/jwt-auth.guard';
-import {RoleRule, Rules} from '../casl/roles.decorator';
-import {RoleGuard} from '../auth/role.guard';
 import {ValidationPipe} from '../validation/validation.pipe';
 import {ValidationSchema} from '../validation/validation.schema';
 import {TenantService} from "../services/tenant.service";
 import {Tenant} from "../entity/tenant.entity";
-import {Action} from "../entity/actions.enum";
-import {SubjectEnum} from "../entity/subjectEnum";
 import {SecurityService} from "../casl/security.service";
 
 
@@ -41,10 +37,7 @@ export class UsersAdminController {
     }
 
     @Post('/create')
-    @UseGuards(JwtAuthGuard, RoleGuard)
-    @Rules(
-        RoleRule.can(Action.Create, SubjectEnum.USER),
-    )
+    @UseGuards(JwtAuthGuard)
     async createUser(
         @Request() request,
         @Body(new ValidationPipe(ValidationSchema.CreateUserSchema)) body: {
@@ -55,6 +48,7 @@ export class UsersAdminController {
     ): Promise<User> {
 
         let user: User = await this.usersService.create(
+            request,
             body.password,
             body.email,
             body.name
@@ -65,11 +59,9 @@ export class UsersAdminController {
     }
 
     @Put('/update')
-    @UseGuards(JwtAuthGuard, RoleGuard)
-    @Rules(
-        RoleRule.can(Action.Update, SubjectEnum.USER),
-    )
+    @UseGuards(JwtAuthGuard)
     async updateUser(
+        @Request() request,
         @Body(new ValidationPipe(ValidationSchema.UpdateUserSchema)) body: {
             id: string,
             name: string,
@@ -78,6 +70,7 @@ export class UsersAdminController {
         }
     ): Promise<User> {
         let user: User = await this.usersService.update(
+            request,
             body.id,
             body.name,
             body.email,
@@ -89,14 +82,12 @@ export class UsersAdminController {
 
 
     @Get('/:userId')
-    @UseGuards(JwtAuthGuard, RoleGuard)
-    @Rules(
-        RoleRule.can(Action.Read, SubjectEnum.USER),
-    )
+    @UseGuards(JwtAuthGuard)
     async getUser(
+        @Request() request,
         @Param('userId') userId: string
     ): Promise<any> {
-        const user: User = await this.usersService.findById(userId);
+        const user: User = await this.usersService.findById(request, userId);
 
         return {
             id: user.id,
@@ -108,12 +99,11 @@ export class UsersAdminController {
     }
 
     @Get('')
-    @UseGuards(JwtAuthGuard, RoleGuard)
-    @Rules(
-        RoleRule.can(Action.Manage, SubjectEnum.USER),
-    )
-    async getUsers(): Promise<User[]> {
-        return await this.usersService.getAll();
+    @UseGuards(JwtAuthGuard)
+    async getUsers(
+        @Request() request,
+    ): Promise<User[]> {
+        return await this.usersService.getAll(request);
     }
 
     @Delete('/:id')
@@ -126,15 +116,13 @@ export class UsersAdminController {
     }
 
     @Get('/:userId/tenants')
-    @UseGuards(JwtAuthGuard, RoleGuard)
-    @Rules(
-        RoleRule.can(Action.Read, SubjectEnum.USER),
-    )
+    @UseGuards(JwtAuthGuard)
     async getTenants(
+        @Request() request,
         @Param('userId') userId: string
     ): Promise<Tenant[]> {
-        const user: User = await this.usersService.findById(userId);
-        return this.tenantService.findByMembership(user);
+        const user: User = await this.usersService.findById(request, userId);
+        return this.tenantService.findByMembership(request, user);
     }
 
     @Put('/verify-user')
@@ -146,7 +134,7 @@ export class UsersAdminController {
             verify: boolean
         }
     ): Promise<User> {
-        let user: User = await this.usersService.findByEmail(body.email);
+        let user: User = await this.usersService.findByEmail(request, body.email);
 
         return await this.usersService.updateVerified(request, user.id, body.verify);
     }
