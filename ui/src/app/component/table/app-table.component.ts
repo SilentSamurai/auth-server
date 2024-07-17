@@ -40,7 +40,7 @@ export class TableAsyncLoadEvent {
             [loading]="loading"
             [value]="actualRows"
             selectionMode="{{ multi ? 'multiple' : 'single' }}"
-            [virtualRowHeight]="20"
+            [virtualScrollItemSize]="20"
             [virtualScroll]="true"
             styleClass="p-datatable-striped p-datatable-sm"
         >
