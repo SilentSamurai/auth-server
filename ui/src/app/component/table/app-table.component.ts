@@ -12,7 +12,7 @@ import {
 } from '@angular/core';
 import {Filter, FilterBarComponent} from "../filter-bar/filter-bar.component";
 import {LazyLoadEvent} from "primeng/api";
-import {Table} from "primeng/table"
+import {Table, TableLazyLoadEvent} from "primeng/table"
 import {TableColumnComponent} from "./app-table-column.component";
 import {Util} from "../utils";
 
@@ -39,7 +39,7 @@ export class TableAsyncLoadEvent {
             [rowHover]="true"
             [loading]="loading"
             [value]="actualRows"
-            selectionMode="{{ multi ? 'multiple' : 'single' }}"
+            [selectionMode]="multi ? 'multiple' : 'single' "
             [virtualScrollItemSize]="20"
             [virtualScroll]="true"
             styleClass="p-datatable-striped p-datatable-sm"
@@ -204,7 +204,7 @@ export class AppTableComponent implements OnInit {
         this.onDataRequest.emit(eventObj);
     }
 
-    lazyLoad(event: LazyLoadEvent) {
+    lazyLoad(event: TableLazyLoadEvent) {
         console.log("lazy", event);
         if (!this.isLastPageReached && !this.loading) {
             this.requestForData({append: true})
