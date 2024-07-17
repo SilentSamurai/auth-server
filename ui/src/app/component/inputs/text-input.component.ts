@@ -1,5 +1,5 @@
 import {Component, ContentChildren, Input, OnInit, QueryList, TemplateRef, ViewChild} from "@angular/core";
-import {FormControl, FormGroup} from "@angular/forms";
+import {UntypedFormControl, UntypedFormGroup} from "@angular/forms";
 
 @Component({
     selector: 'app-input-error',
@@ -52,12 +52,12 @@ export class InputErrorComponent implements OnInit {
 export class TextInputComponent implements OnInit {
 
     @Input() formName: string = '';
-    @Input() form!: FormGroup;
+    @Input() form!: UntypedFormGroup;
     @Input() formField: string = '';
     @Input() label: string = '';
     @Input() value: string = '';
     @Input() type: string = 'text';
-    formControl!: FormControl;
+    formControl!: UntypedFormControl;
 
     @ContentChildren(InputErrorComponent)
     inputErrors!: QueryList<InputErrorComponent>;
@@ -67,7 +67,7 @@ export class TextInputComponent implements OnInit {
     }
 
     async ngOnInit(): Promise<void> {
-        this.formControl = this.form.get(this.formField) as FormControl;
+        this.formControl = this.form.get(this.formField) as UntypedFormControl;
         if (this.value && this.value.length > 0) {
             this.field.setValue(this.value);
         }

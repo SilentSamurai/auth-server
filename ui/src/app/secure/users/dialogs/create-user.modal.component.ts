@@ -2,7 +2,7 @@ import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {UserService} from '../../../_services/user.service';
 import {NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
 import {MessageService} from "primeng/api";
-import {FormBuilder, FormGroup, Validators} from "@angular/forms";
+import {UntypedFormBuilder, UntypedFormGroup, Validators} from "@angular/forms";
 
 @Component({
     selector: 'create-user-modal',
@@ -57,7 +57,7 @@ export class CreateUserModalComponent implements OnInit {
 
     constructor(private userService: UserService,
                 private messageService: MessageService,
-                private formBuilder: FormBuilder,
+                private formBuilder: UntypedFormBuilder,
                 public activeModal: NgbActiveModal) {
     }
 
@@ -78,7 +78,7 @@ export class CreateUserModalComponent implements OnInit {
     }
 
     ConfirmedValidator(controlName: string, matchingControlName: string) {
-        return (formGroup: FormGroup) => {
+        return (formGroup: UntypedFormGroup) => {
             const control = formGroup.controls[controlName];
             const matchingControl = formGroup.controls[matchingControlName];
             if (matchingControl.errors && !matchingControl.errors['confirmedValidator']) {
