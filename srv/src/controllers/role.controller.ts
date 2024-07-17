@@ -15,7 +15,7 @@ import {JwtAuthGuard} from "../auth/jwt-auth.guard";
 import {RoleService} from "../services/role.service";
 import {Role} from "../entity/role.entity";
 import {SecurityService} from "../casl/security.service";
-import {Action} from "../entity/actions.enum";
+import {Action} from "../casl/actions.enum";
 import {subject} from "@casl/ability";
 import {SubjectEnum} from "../entity/subjectEnum";
 import {UsersService} from "../services/users.service";

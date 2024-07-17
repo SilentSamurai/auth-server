@@ -1,5 +1,5 @@
 import {SetMetadata} from '@nestjs/common';
-import {Action} from "../entity/actions.enum";
+import {Action} from "./actions.enum";
 import {SubjectEnum} from "../entity/subjectEnum";
 
 export class RoleRule {

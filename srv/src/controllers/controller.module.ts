@@ -18,6 +18,7 @@ import {TenantMember} from "../entity/tenant.members.entity";
 import {Group} from "../entity/group.entity";
 import {ServiceModule} from "../services/service.module";
 import {AuthController} from "./auth.controller";
+import {PermissionsController} from "./permissions.controller";
 
 @Module(
     {
@@ -38,7 +39,8 @@ import {AuthController} from "./auth.controller";
             RoleController,
             MainController,
             GenericSearchController,
-            AuthController
+            AuthController,
+            PermissionsController
         ],
         providers: [],
         exports: []

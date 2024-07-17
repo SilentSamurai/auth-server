@@ -10,7 +10,7 @@ import * as argon2 from 'argon2';
 import {Role} from "../entity/role.entity";
 import {Tenant} from 'src/entity/tenant.entity';
 import {ForbiddenException} from "../exceptions/forbidden.exception";
-import {Action} from "../entity/actions.enum";
+import {Action} from "../casl/actions.enum";
 import {SubjectEnum} from "../entity/subjectEnum";
 import {SecurityService} from "../casl/security.service";
 import {AuthContext} from "../casl/contexts";

@@ -1,6 +1,7 @@
 import {Injectable} from '@angular/core';
 import jwt_decode from "jwt-decode";
 import {Router} from "@angular/router";
+import {MongoAbility, PureAbility} from "@casl/ability";
 
 const TOKEN_KEY = 'auth-token';
 const USER_KEY = 'auth-user';
@@ -11,7 +12,7 @@ const CODE_VERIFIER = 'code-verifier';
     providedIn: 'root'
 })
 export class TokenStorageService {
-    constructor(private router: Router) {
+    constructor(private router: Router, private ability: PureAbility) {
     }
 
     public clearSession(): void {
@@ -48,6 +49,13 @@ export class TokenStorageService {
         const token = window.localStorage.getItem(TOKEN_KEY);
         return token != null && tokenExpired(token);
 
+    }
+
+    public updatePermissions(rules: any[]): void {
+
+        // const rules = await defineRulesFor(user);
+        // return new AppAbility(rules);
+        this.ability.update(rules);
     }
 
     // public async getToken(): Promise<string | null> {

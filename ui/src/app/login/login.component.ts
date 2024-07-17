@@ -118,6 +118,8 @@ export class LoginComponent implements OnInit {
             let verifier = this.tokenStorage.getCodeVerifier();
             const data = await lastValueFrom(this.authService.getAccessToken(code, verifier));
             this.tokenStorage.saveToken(data.access_token);
+            const rules = await this.authService.getPermissions();
+            this.tokenStorage.updatePermissions(rules);
         } catch (e: any) {
             console.error(e);
         }

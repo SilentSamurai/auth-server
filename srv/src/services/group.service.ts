@@ -15,7 +15,7 @@ import {Role} from "../entity/role.entity";
 import {TenantService} from "./tenant.service";
 import {AuthContext} from "../casl/contexts";
 import {SecurityService} from "../casl/security.service";
-import {Action} from "../entity/actions.enum";
+import {Action} from "../casl/actions.enum";
 import {SubjectEnum} from "../entity/subjectEnum";
 
 @Injectable()

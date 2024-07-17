@@ -9,7 +9,7 @@ import {User} from "../entity/user.entity";
 import {UserRole} from "../entity/user.roles.entity";
 import {AuthContext} from "../casl/contexts";
 import {SecurityService} from "../casl/security.service";
-import {Action} from "../entity/actions.enum";
+import {Action} from "../casl/actions.enum";
 import {SubjectEnum} from "../entity/subjectEnum";
 
 @Injectable()

@@ -22,7 +22,7 @@ import {User} from "../entity/user.entity";
 import {Role} from "../entity/role.entity";
 import {SecurityService} from "../casl/security.service";
 import {RoleService} from "../services/role.service";
-import {Action} from "../entity/actions.enum";
+import {Action} from "../casl/actions.enum";
 import {ForbiddenException} from "../exceptions/forbidden.exception";
 import {subject} from "@casl/ability";
 import {SubjectEnum} from "../entity/subjectEnum";

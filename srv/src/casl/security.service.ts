@@ -5,7 +5,7 @@ import {ConfigService} from "../config/config.service";
 import {ForbiddenException} from "../exceptions/forbidden.exception";
 import {CaslAbilityFactory} from "./casl-ability.factory";
 import {AnyAbility} from "@casl/ability/dist/types/PureAbility";
-import {Action} from "../entity/actions.enum";
+import {Action} from "./actions.enum";
 import {subject} from "@casl/ability";
 import {AuthUserService} from "./authUser.service";
 import {AuthContext, GRANT_TYPES, OAuthToken, TenantToken, UserToken} from "./contexts";

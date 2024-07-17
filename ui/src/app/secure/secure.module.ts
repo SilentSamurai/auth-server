@@ -37,6 +37,7 @@ import {TN02SelectionComponent} from "./tenants/TN02-selection.component";
 import {TNRL01Component} from "./tenants/TNRL01.component";
 import {TNRL01SelectionComponent} from "./tenants/TNRL01-selection.component";
 import {UR02SelectionComponent} from "./users/UR02-selection.component";
+import {AbilityModule} from "@casl/angular";
 
 @NgModule({
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -82,7 +83,8 @@ import {UR02SelectionComponent} from "./users/UR02-selection.component";
         InputTextModule,
         MessagesModule,
         ConfirmDialogModule,
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        AbilityModule
     ],
     providers: [ConfirmationService, MessageService],
     exports: [

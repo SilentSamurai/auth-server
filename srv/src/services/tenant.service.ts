@@ -15,7 +15,7 @@ import {TenantMember} from "../entity/tenant.members.entity";
 import {NotFoundException} from "../exceptions/not-found.exception";
 import {AuthContext} from "../casl/contexts";
 import {SecurityService} from "../casl/security.service";
-import {Action} from "../entity/actions.enum";
+import {Action} from "../casl/actions.enum";
 import {SubjectEnum} from "../entity/subjectEnum";
 
 @Injectable()

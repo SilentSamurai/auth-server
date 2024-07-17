@@ -22,6 +22,8 @@
         "@angular/platform-browser": "^17.3.11",
         "@angular/platform-browser-dynamic": "^17.3.11",
         "@angular/router": "^17.3.11",
+        "@casl/ability": "^6.7.1",
+        "@casl/angular": "^8.2.7",
         "@ng-bootstrap/ng-bootstrap": "^16.0.0",
         "@popperjs/core": "^2.10.2",
         "bootstrap": "^5.1.3",

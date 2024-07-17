@@ -9,6 +9,7 @@ import {Filter} from "../../component/filter-bar/filter-bar.component";
 import {AuthDefaultService} from "../../_services/auth.default.service";
 import {ConfirmationService} from "../../component/dialogs/confirmation.service";
 import {MessageService} from "primeng/api";
+import {Actions, PermissionService, Subjects} from "../../_services/permission.service";
 
 @Component({
     selector: 'app-TN01',
@@ -24,7 +25,7 @@ import {MessageService} from "primeng/api";
                     </app-fb>
                     <div class="d-flex justify-content-between mt-2">
                         <div></div>
-                        <button (click)="openCreateModal()" [disabled]="!this.creationAllowed"
+                        <button (click)="openCreateModal()" [disabled]="!('create' | ablePure: 'Tenant') "
                                 class="btn btn-outline-success btn-sm" id="CREATE_TENANT_DIALOG_BTN"
                                 type="button">
                             <i class="fa fa-solid fa-plus me-2"></i> Create Tenant
@@ -89,13 +90,14 @@ export class TN01Component implements OnInit {
                 private authDefaultService: AuthDefaultService,
                 private confirmationService: ConfirmationService,
                 private messageService: MessageService,
+                private permissionService: PermissionService,
                 private modalService: NgbModal) {
     }
 
-    async ngOnInit(): Promise<void> {
-        // this.tenants = await lastValueFrom(this.tenantService.getAllTenants());
+    async ngOnInit() {
         this.authDefaultService.setTitle("TN01: Manage Tenants");
-        if (this.tokenStorageService.isSuperAdmin()) {
+
+        if (this.permissionService.isAuthorized(Actions.Create, Subjects.TENANT)) {
             this.creationAllowed = true;
         }
         if (this.tokenStorageService.isTenantAdmin()) {

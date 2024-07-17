@@ -5,7 +5,7 @@ import {RoleService} from "../services/role.service";
 import {SecurityService} from "../casl/security.service";
 import {TenantService} from "../services/tenant.service";
 import {RoleRule} from "../casl/roles.decorator";
-import {Action} from "../entity/actions.enum";
+import {Action} from "../casl/actions.enum";
 import {SubjectEnum} from "../entity/subjectEnum";
 import {subject} from "@casl/ability";
 

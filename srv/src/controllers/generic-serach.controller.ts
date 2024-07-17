@@ -16,7 +16,7 @@ import {Tenant} from "../entity/tenant.entity";
 import {TenantMember} from "../entity/tenant.members.entity";
 import {Role} from "../entity/role.entity";
 import {NotFoundError} from "rxjs";
-import {Action} from "../entity/actions.enum";
+import {Action} from "../casl/actions.enum";
 import {SecurityService} from "../casl/security.service";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
 import {escapeRegExp} from "typeorm/util/escapeRegExp";

@@ -22,7 +22,7 @@ import {RoleGuard} from "../auth/role.guard";
 import {RoleRule, Rules} from "../casl/roles.decorator";
 import {SecurityService} from "../casl/security.service";
 import {SubjectEnum} from "../entity/subjectEnum";
-import {Action} from "../entity/actions.enum";
+import {Action} from "../casl/actions.enum";
 import {subject} from "@casl/ability";
 
 @Controller('api/tenant')
@@ -38,10 +38,7 @@ export class TenantController {
     }
 
     @Post('/create')
-    @UseGuards(JwtAuthGuard, RoleGuard)
-    @Rules(
-        RoleRule.can(Action.Create, SubjectEnum.TENANT),
-    )
+    @UseGuards(JwtAuthGuard)
     async createTenant(
         @Request() request,
         @Body(new ValidationPipe(ValidationSchema.CreateTenantSchema)) body: any
