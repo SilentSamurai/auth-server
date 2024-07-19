@@ -23,6 +23,7 @@ import {GroupUser} from "./entity/group.users.entity";
 import {Group} from "./entity/group.entity";
 import {ServiceModule} from "./services/service.module";
 import {JwtModule} from "@nestjs/jwt";
+import {MongooseModule} from "@nestjs/mongoose";
 
 @Module({
     imports: [
@@ -55,6 +56,14 @@ import {JwtModule} from "@nestjs/jwt";
                     };
                 }
             }),
+        MongooseModule.forRootAsync({
+            imports: [ConfigModule],
+            useFactory: async (configService: ConfigService) => ({
+                uri: configService.get('MONGO_DB_URI'),
+                dbName: 'identity'
+            }),
+            inject: [ConfigService],
+        }),
         CaslModule,
         ServiceModule,
         AuthModule,

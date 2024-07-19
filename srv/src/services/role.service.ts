@@ -41,7 +41,10 @@ export class RoleService {
 
         this.securityService.isAuthorized(authContext, Action.Read, SubjectEnum.ROLE, {id: id});
 
-        let role: Role = await this.roleRepository.findOne({where: {id: id}});
+        let role: Role = await this.roleRepository.findOne({
+            where: {id: id},
+            relations: ['tenant']
+        });
         if (role === null) {
             throw new ValidationErrorException("role not found");
         }

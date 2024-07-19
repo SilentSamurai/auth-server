@@ -1,15 +1,15 @@
 import http from 'k6/http';
-
+import { check } from 'k6';
 
 export const options = {
     vus: 200,
-    duration: '10s',
+    duration: '5s',
     thresholds: {
         http_req_failed: ['rate<0.01'], // http errors should be less than 1%
     }
 };
 
-const BASE_URL = "http://127.0.0.1:50806";
+const BASE_URL = "http://localhost:9001";
 
 export default function () {
     const payload = JSON.stringify({
@@ -19,5 +19,14 @@ export default function () {
         "domain": "auth.server.com"
     });
     const headers = {'Content-Type': 'application/json'};
-    http.post(`${BASE_URL}/api/oauth/token`, payload, {headers});
+    const response = http.post(`${BASE_URL}/api/oauth/token`, payload, {headers});
+
+    check(response, {
+        'is status 200': (r) => r.status === 200 || r.status === 201,
+        'token is present': (r) => {
+            const res = r.json()
+            return res.access_token.length > 0
+        },
+
+    });
 }

@@ -1,0 +1,22 @@
+### GET Authorization
+GET http://localhost:9001/api/v1/authorization/byRole/1b7dce5d-8dc4-4f28-a6e3-150b0c7b4b66
+Authorization: Bearer {{auth_token}}
+
+### create authorization
+POST http://localhost:9001/api/v1/authorization/create
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+    "role_id": "1b7dce5d-8dc4-4f28-a6e3-150b0c7b4b66",
+    "action": "READ",
+    "subject": "ROLES",
+    "conditions": {
+        "id": "1b7dce5d-8dc4-4f28-a6e3-150b0c7b4b66"
+    }
+}
+
+### GET Authorization
+GET http://localhost:9001/api/v1/authorization/669a9b80783a05de146752b7
+Authorization: Bearer {{auth_token}}
+

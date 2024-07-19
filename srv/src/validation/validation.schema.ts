@@ -151,6 +151,7 @@ const PasswordGrantSchema = yup.object().shape({
     email: yup.string().email().required('Email is required'),
     password: yup.string().required('Password is required').matches(PASSWORD_REGEXP, PASSWORD_MESSAGE),
     domain: yup.string().required('Domain is required'),
+    // client_id: yup.string().required('client_id is required'),
     scopes: yup.array().of(
         yup.string().max(20)
     )
