@@ -14,7 +14,6 @@ import {Actions, PermissionService, Subjects} from "../../_services/permission.s
 @Component({
     selector: 'app-TN01',
     template: `
-        <nav-bar></nav-bar>
         <app-page-view>
             <app-page-view-header>
                 <div class="">

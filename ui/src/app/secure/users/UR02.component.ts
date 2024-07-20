@@ -12,7 +12,6 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
 @Component({
     selector: 'tenant-details',
     template: `
-        <nav-bar></nav-bar>
         <app-object-page>
             <app-object-page-header>
                 <app-object-page-title>

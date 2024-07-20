@@ -38,6 +38,7 @@ import {TNRL01Component} from "./tenants/TNRL01.component";
 import {TNRL01SelectionComponent} from "./tenants/TNRL01-selection.component";
 import {UR02SelectionComponent} from "./users/UR02-selection.component";
 import {AbilityModule} from "@casl/angular";
+import {AppViewComponent} from "./app-view.component";
 
 @NgModule({
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -65,7 +66,8 @@ import {AbilityModule} from "@casl/angular";
         CreateGroupComponent,
         GP02Component,
         UpdateGroupComponent,
-        RL02Component
+        RL02Component,
+        AppViewComponent
     ],
     imports: [
         TableModule,

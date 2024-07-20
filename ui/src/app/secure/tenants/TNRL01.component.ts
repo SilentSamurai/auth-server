@@ -12,7 +12,6 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
 @Component({
     selector: 'app-TNRL01',
     template: `
-        <nav-bar></nav-bar>
         <app-object-page *ngIf="!loading">
             <app-object-page-title>
                 {{ user.email }}

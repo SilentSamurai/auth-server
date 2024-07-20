@@ -11,7 +11,6 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
 @Component({
     selector: 'app-role-list',
     template: `
-        <nav-bar></nav-bar>
         <div class="container-fluid">
             <div class="row">
                 <div class="h4 py-2">

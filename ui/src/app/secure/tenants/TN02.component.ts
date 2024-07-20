@@ -14,7 +14,6 @@ import {Location} from '@angular/common';
 @Component({
     selector: 'view-tenant',
     template: `
-        <nav-bar></nav-bar>
         <app-object-page>
             <app-object-page-title>
                 {{ tenant.name }}

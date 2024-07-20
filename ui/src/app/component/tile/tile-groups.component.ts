@@ -17,7 +17,7 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
                     </a>
                 </ng-container>
                 <ng-container *ngIf="!tile.isCallbackThere">
-                    <a [routerLink]="tile.link"
+                    <a (click)="nav(tile)"
                        class="text-decoration-none">
                         <app-tile [tile]="tile">
                         </app-tile>
@@ -82,6 +82,16 @@ export class TileGroupsComponent implements OnInit {
                 size: tile.size || 'md',
             })
         }
-        console.log(this.tiles);
+        // console.log(this.tiles);
+    }
+
+    async nav(tile: any) {
+        console.log(tile);
+        await this.router.navigate(["/app-view", tile.link], {
+            queryParams: {
+                link: tile.link,
+                title: tile.title
+            }
+        });
     }
 }

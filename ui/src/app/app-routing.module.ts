@@ -22,6 +22,7 @@ import {TNRL01SelectionComponent} from "./secure/tenants/TNRL01-selection.compon
 import {UR02SelectionComponent} from "./secure/users/UR02-selection.component";
 import {UserAuthGuard} from "./shared/user-auth-guard.service";
 import {HttpErrorComponent} from "./error-pages/HttpError.component";
+import {AppViewComponent} from "./secure/app-view.component";
 
 const routes: Routes = [
     {path: 'session-confirm', component: SessionConfirmationComponent},
@@ -34,6 +35,7 @@ const routes: Routes = [
         canActivate: [UserAuthGuard],
         children: [
             {path: 'home', component: HomeComponent, canActivate: []},
+            {path: 'app-view', pathMatch: 'prefix', component: AppViewComponent, canActivate: []},
         ]
     },
     {

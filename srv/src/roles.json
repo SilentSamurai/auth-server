@@ -1,0 +1,79 @@
+{
+    "roles": [
+        {
+            "name": "TENANT_VIEWER",
+            "description": "",
+            "authority": [
+                {
+                    "action": "READ",
+                    "subject": "TENANT",
+                    "condition": {
+                        "id": "${context.tenant.id}"
+                    }
+                },
+                {
+                    "action": "READ",
+                    "subject": "MEMBER",
+                    "condition": {
+                        "tenantId": "${context.tenant.id}"
+                    }
+                },
+                {
+                    "action": "READ",
+                    "subject": "ROLE",
+                    "condition": {
+                        "tenantId": "${context.tenant.id}"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "TENANT_ADMIN",
+            "description": "",
+            "authority": [
+                {
+                    "action": "READ_CRED",
+                    "subject": "TENANT",
+                    "condition": {
+                        "id": "${context.tenant.id}"
+                    }
+                },
+                {
+                    "action": "MANAGE",
+                    "subject": "TENANT",
+                    "condition": {
+                        "id": "${context.tenant.id}"
+                    }
+                },
+                {
+                    "action": "MANAGE",
+                    "subject": "MEMBER",
+                    "condition": {
+                        "tenantId": "${context.tenant.id}"
+                    }
+                },
+                {
+                    "action": "MANAGE",
+                    "subject": "ROLE",
+                    "condition": {
+                        "tenantId": "${context.tenant.id}"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "SUPER_ADMIN",
+            "description": "",
+            "authority": [
+                {
+                    "action": "READ_CRED",
+                    "subject": "all"
+                },
+                {
+                    "action": "MANAGE",
+                    "subject": "all"
+                }
+            ]
+        }
+    ]
+}

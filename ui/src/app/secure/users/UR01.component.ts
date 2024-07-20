@@ -12,7 +12,6 @@ import {MessageService} from "primeng/api";
 @Component({
     selector: 'app-board-user',
     template: `
-        <nav-bar></nav-bar>
         <app-page-view>
             <app-page-view-header>
                 <app-fb (onFilter)="onFilter($event)">

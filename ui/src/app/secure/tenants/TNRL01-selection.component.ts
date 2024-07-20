@@ -11,7 +11,6 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
 @Component({
     selector: 'app-TNRL01-SEL',
     template: `
-        <nav-bar></nav-bar>
         <div class="container-fluid">
             <div class="row">
                 <div class="h5 py-2">
