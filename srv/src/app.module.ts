@@ -58,10 +58,23 @@ import {MongooseModule} from "@nestjs/mongoose";
             }),
         MongooseModule.forRootAsync({
             imports: [ConfigModule],
-            useFactory: async (configService: ConfigService) => ({
-                uri: configService.get('MONGO_DB_URI'),
-                dbName: 'identity'
-            }),
+            useFactory: async (configService: ConfigService) => {
+
+                if (configService.get('MONGO_DATABASE_TYPE') === 'IN_MEMORY') {
+                    const { MongoMemoryServer } = require('mongodb-memory-server');
+                    const mongod = await MongoMemoryServer.create();
+
+                    return {
+                        uri: mongod.getUri(),
+                        dbName: 'identity'
+                    }
+                }
+
+                return {
+                    uri: configService.get('MONGO_DB_URI'),
+                    dbName: 'identity'
+                }
+            },
             inject: [ConfigService],
         }),
         CaslModule,
