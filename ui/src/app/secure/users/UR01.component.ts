@@ -121,12 +121,11 @@ export class UR01Component implements OnInit {
     }
 
     async lazyLoad($event: TableAsyncLoadEvent) {
-
         this.users = await this.userService.queryUser({
             pageNo: $event.pageNo,
             where: $event.filters.filter(item => item.value != null && item.value.length > 0),
         });
-        $event.update(this.users.data);
+        $event.update(this.users.data, this.users.hasNextPage);
     }
 
     onFilter(filters: Filter[]) {

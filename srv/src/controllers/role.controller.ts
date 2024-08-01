@@ -62,7 +62,7 @@ export class RoleController {
         return await this.roleService.deleteById(request, roles.id);
     }
 
-    @Get('/:tenantId/casl')
+    @Get('/:tenantId/roles')
     @UseGuards(JwtAuthGuard)
     async getTenantRoles(
         @Request() request,

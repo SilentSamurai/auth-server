@@ -40,6 +40,7 @@ import {DialogFooterComponent} from "./dialogs/dialog-footer.component";
 import {ConfirmationDialogComponent, ConfirmationService} from "./dialogs/confirmation.service";
 import {InputErrorComponent, TextInputComponent} from "./inputs/text-input.component";
 import {ButtonLinkComponent} from "./button/button-link.component";
+import {AppTableButtonComponent} from "./table/app-table-button.component";
 
 @NgModule({
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -53,6 +54,7 @@ import {ButtonLinkComponent} from "./button/button-link.component";
         FilterFieldComponent,
         FilterValueHelpComponent,
         AppTableComponent,
+        AppTableButtonComponent,
         TableColumnComponent,
         TileGroupsComponent,
         LaunchPadComponent,
@@ -120,6 +122,7 @@ import {ButtonLinkComponent} from "./button/button-link.component";
         TextInputComponent,
         InputErrorComponent,
         ButtonLinkComponent,
+        AppTableButtonComponent,
     ]
 })
 export class ComponentModule {

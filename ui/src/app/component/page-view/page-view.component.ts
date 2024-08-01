@@ -20,7 +20,7 @@ import {PageViewBodyComponent} from "./page-view-body.component";
                 </div>
             </div>
 
-            <div class="{{containerClass}} px-4">
+            <div class="{{containerClass}}">
                 <div class="row my-2">
                     <div class="col-md-12 ">
                         <div class="card">

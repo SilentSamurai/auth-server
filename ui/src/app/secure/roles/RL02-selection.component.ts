@@ -99,7 +99,7 @@ export class RL02SelectionComponent implements OnInit {
             expand: ["Tenants"]
         });
         this.roles = roles.data;
-        event.update(this.roles);
+        event.update(this.roles, roles.hasNextPage);
     }
 
 }

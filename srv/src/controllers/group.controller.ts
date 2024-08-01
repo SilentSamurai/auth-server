@@ -7,7 +7,7 @@ import {
     Param,
     Patch,
     Post,
-    Request,
+    Request, UseGuards,
     UseInterceptors
 } from "@nestjs/common";
 import {ConfigService} from "../config/config.service";
@@ -15,6 +15,7 @@ import {ValidationPipe} from "../validation/validation.pipe";
 import {ValidationSchema} from "../validation/validation.schema";
 import {TenantService} from "../services/tenant.service";
 import {GroupService} from "../services/group.service";
+import {JwtAuthGuard} from "../auth/jwt-auth.guard";
 
 @Controller('/api')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -28,6 +29,7 @@ export class GroupController {
     }
 
     @Get('/tenant/:tenantId/groups')
+    @UseGuards(JwtAuthGuard)
     async getGroupsInTenant(
         @Request() request,
         @Param('tenantId') tenantId: string,
@@ -37,6 +39,7 @@ export class GroupController {
     }
 
     @Post('/group/create')
+    @UseGuards(JwtAuthGuard)
     async createGroup(
         @Request() request,
         @Body(new ValidationPipe(ValidationSchema.CreateGroupSchema)) body: { name: string, tenantId: string }
@@ -47,6 +50,7 @@ export class GroupController {
     }
 
     @Get('/group/:groupId')
+    @UseGuards(JwtAuthGuard)
     async getGroup(
         @Request() request,
         @Param('groupId') groupId: string,
@@ -63,6 +67,7 @@ export class GroupController {
 
 
     @Patch('/group/:groupId/update')
+    @UseGuards(JwtAuthGuard)
     async updateGroup(
         @Request() request,
         @Param('groupId') groupId: string,
@@ -74,6 +79,7 @@ export class GroupController {
     }
 
     @Delete('/group/:groupId/delete')
+    @UseGuards(JwtAuthGuard)
     async deleteGroup(
         @Request() request,
         @Param('groupId') groupId: string
@@ -84,7 +90,8 @@ export class GroupController {
     }
 
 
-    @Post('/group/:groupId/add-casl')
+    @Post('/group/:groupId/add-role')
+    @UseGuards(JwtAuthGuard)
     async addRole(
         @Request() request,
         @Param('groupId') groupId: string,
@@ -99,7 +106,8 @@ export class GroupController {
         };
     }
 
-    @Post('/group/:groupId/remove-casl')
+    @Post('/group/:groupId/remove-role')
+    @UseGuards(JwtAuthGuard)
     async removeRole(
         @Request() request,
         @Param('groupId') groupId: string,
@@ -115,6 +123,7 @@ export class GroupController {
     }
 
     @Post('/group/:groupId/add-users')
+    @UseGuards(JwtAuthGuard)
     async addUsers(
         @Request() request,
         @Param('groupId') groupId: string,
@@ -130,6 +139,7 @@ export class GroupController {
     }
 
     @Post('/group/:groupId/remove-users')
+    @UseGuards(JwtAuthGuard)
     async removeUsers(
         @Request() request,
         @Param('groupId') groupId: string,

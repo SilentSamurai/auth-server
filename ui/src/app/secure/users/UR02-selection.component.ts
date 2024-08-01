@@ -99,7 +99,7 @@ export class UR02SelectionComponent implements OnInit {
             where: event.filters.filter(item => item.value != null && item.value.length > 0),
         });
         this.users = response.data;
-        event.update(this.users);
+        event.update(this.users, response.hasNextPage);
     }
 
 }

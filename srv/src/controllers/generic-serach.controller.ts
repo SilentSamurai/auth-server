@@ -104,11 +104,16 @@ export class GenericSearchController {
             where: getWhere(entity, query.where),
             relations: this.getRelations(entity, query)
         };
-        let users = await repo.find(findOption)
+        let count = await repo.count({
+            where: findOption.where,
+        });
+        let enities = await repo.find(findOption);
         return {
             pageNo: pageNo,
             pageSize: pageSize,
-            data: users
+            data: enities,
+            totalCount: count,
+            hasNextPage: count / pageSize >= 1
         };
     }
 

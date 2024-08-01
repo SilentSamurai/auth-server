@@ -268,12 +268,12 @@ export class GP02Component implements OnInit {
 
     async provideUsers($event: TableAsyncLoadEvent) {
         let members = await this.tenantService.getMembers(this.group.tenantId);
-        $event.update(members);
+        $event.update(members, false);
     }
 
     async provideRoles($event: TableAsyncLoadEvent) {
         let roles = await this.tenantService.getTenantRoles(this.group.tenantId);
-        $event.update(roles);
+        $event.update(roles, false);
     }
 
     async onAddRole() {

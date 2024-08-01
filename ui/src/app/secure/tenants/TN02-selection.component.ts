@@ -104,7 +104,7 @@ export class TN02SelectionComponent implements OnInit {
             where: event.filters.filter(item => item.value != null && item.value.length > 0)
         });
         this.tenants = response.data;
-        event.update(this.tenants);
+        event.update(this.tenants, response.hasNextPage);
     }
 
 }

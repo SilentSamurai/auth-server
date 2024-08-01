@@ -93,7 +93,7 @@ export class RL01Component implements OnInit {
             where: $event.filters.filter(item => item.value != null && item.value.length > 0),
             expand: ["Tenants"]
         });
-        $event.update(this.roles.data);
+        $event.update(this.roles.data, this.roles.hasNextPage);
     }
 
     onFilter(filters: Filter[]) {

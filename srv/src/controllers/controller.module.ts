@@ -19,6 +19,7 @@ import {Group} from "../entity/group.entity";
 import {ServiceModule} from "../services/service.module";
 import {AuthController} from "./auth.controller";
 import {AuthorizationController} from "./authorization.controller";
+import {GroupController} from "./group.controller";
 
 @Module(
     {
@@ -40,7 +41,8 @@ import {AuthorizationController} from "./authorization.controller";
             MainController,
             GenericSearchController,
             AuthController,
-            AuthorizationController
+            AuthorizationController,
+            GroupController
         ],
         providers: [],
         exports: []

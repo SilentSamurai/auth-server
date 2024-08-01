@@ -11,10 +11,10 @@ import {
     ViewChild
 } from '@angular/core';
 import {Filter, FilterBarComponent} from "../filter-bar/filter-bar.component";
-import {LazyLoadEvent} from "primeng/api";
 import {Table, TableLazyLoadEvent} from "primeng/table"
 import {TableColumnComponent} from "./app-table-column.component";
 import {Util} from "../utils";
+import {AppTableButtonComponent} from "./app-table-button.component";
 
 
 export class TableAsyncLoadEvent {
@@ -22,7 +22,7 @@ export class TableAsyncLoadEvent {
     pageSize!: number;
     sortBy!: any[];
     filters!: any[];
-    update!: (data: any[]) => void;
+    update!: (data: any[], isNextPageAvailable: boolean) => void;
 }
 
 
@@ -50,6 +50,9 @@ export class TableAsyncLoadEvent {
                         {{ title }}
                     </div>
                     <div>
+                        <ng-container *ngFor="let btnTmpl of buttons">
+                            <ng-container [ngTemplateOutlet]="btnTmpl.template"></ng-container>
+                        </ng-container>
                         <button type="button" class="btn btn-sm " (click)="reset()" pRipple>
                             <i class="pi pi-refresh "></i>
                         </button>
@@ -61,7 +64,7 @@ export class TableAsyncLoadEvent {
 
             </ng-template>
             <ng-template pTemplate="header">
-                <tr style="height:40px">
+                <tr style="min-height:35px">
                     <th style="max-width:40px">
                         <p-tableHeaderCheckbox *ngIf="multi"></p-tableHeaderCheckbox>
                     </th>
@@ -77,7 +80,7 @@ export class TableAsyncLoadEvent {
                 </tr>
             </ng-template>
             <ng-template let-row let-rowIndex="rowIndex" pTemplate="body">
-                <tr [pSelectableRow]="row">
+                <tr style="height:35px">
                     <td style="max-width:40px">
                         <p-tableCheckbox [value]="row"></p-tableCheckbox>
 
@@ -125,6 +128,9 @@ export class AppTableComponent implements OnInit {
     @ContentChildren(TableColumnComponent)
     columns!: QueryList<TableColumnComponent>;
 
+    @ContentChildren(AppTableButtonComponent)
+    buttons!: QueryList<AppTableButtonComponent>;
+
     @ViewChild(FilterBarComponent)
     filterBar!: FilterBarComponent;
 
@@ -162,20 +168,27 @@ export class AppTableComponent implements OnInit {
         }
     }
 
-    setData(data: any[]) {
+    // getIdFieldData(row: any, index: any) {
+    //     if (this.idField) {
+    //         return row[this.idField];
+    //     } else {
+    //         return index;
+    //     }
+    // }
+
+    setData(data: any[], isNextPageAvailable: boolean) {
         this.pageNo = 0;
-        this.isLastPageReached = false;
+        this.isLastPageReached = !isNextPageAvailable;
         this.actualRows = data;
     }
 
-    appendData(data: any[]) {
+    appendData(data: any[], isNextPageAvailable: boolean) {
         if (data.length > 0) {
             // this.actualRows.push(...data);
             this.actualRows = [...this.actualRows, ...data];
             this.pageNo += 1;
-        } else {
-            this.isLastPageReached = true;
         }
+        this.isLastPageReached = !isNextPageAvailable;
     }
 
     requestForData(options: any) {
@@ -186,22 +199,24 @@ export class AppTableComponent implements OnInit {
             this.pageNo = 0;
             this.isLastPageReached = false;
         }
+        // const timeout = setTimeout(() => this.loading = false, 5 * 60 * 1000);
         const eventObj = {
             pageNo: options.append === true ? this.pageNo + 1 : this.pageNo,
             pageSize: 30,
             sortBy: this.sortBy,
             filters: this.filters,
-            update: (data: any[]) => {
+            update: (data: any[], isNextPageAvailable: boolean) => {
                 if (options.append === true) {
-                    this.appendData(data);
+                    this.appendData(data, isNextPageAvailable);
                 } else {
-                    this.setData(data);
+                    this.setData(data, isNextPageAvailable);
                 }
                 this.loading = false;
             }
         }
         this.loading = true;
         this.onDataRequest.emit(eventObj);
+
     }
 
     lazyLoad(event: TableLazyLoadEvent) {

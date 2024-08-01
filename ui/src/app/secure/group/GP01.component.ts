@@ -130,7 +130,7 @@ export class GP01Component implements OnInit {
             pageNo: $event.pageNo,
             where: $event.filters.filter(item => item.value != null && item.value.length > 0),
         });
-        $event.update(this.groups.data);
+        $event.update(this.groups.data, this.groups.hasNextPage);
     }
 
     onFilter(filters: Filter[]) {

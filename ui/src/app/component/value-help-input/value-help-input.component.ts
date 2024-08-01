@@ -25,11 +25,6 @@ function parseBoolean(value: string): boolean {
     return lowerCaseStr === 'true';
 }
 
-export class VHAsyncLoadEvent {
-    filters: any;
-    update!: (data: any[], selected: any[]) => void;
-}
-
 
 @Component({
     selector: 'app-value-help-input',

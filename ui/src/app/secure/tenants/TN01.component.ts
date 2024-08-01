@@ -145,7 +145,7 @@ export class TN01Component implements OnInit {
             pageNo: $event.pageNo,
             where: $event.filters.filter(item => item.value != null && item.value.length > 0),
         });
-        $event.update(this.tenants.data);
+        $event.update(this.tenants.data, this.tenants.hasNextPage);
     }
 
     onFilter(event: Filter[]) {

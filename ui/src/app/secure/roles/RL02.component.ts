@@ -198,7 +198,7 @@ export class RL02Component implements OnInit {
 
     async provideUsers($event: TableAsyncLoadEvent) {
         let members = await this.tenantService.getMembers(this.tenantId);
-        $event.update(members);
+        $event.update(members, false);
     }
 
 

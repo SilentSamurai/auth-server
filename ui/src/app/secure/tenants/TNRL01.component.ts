@@ -4,9 +4,9 @@ import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {ActivatedRoute, Router} from "@angular/router";
 import {TenantService} from "../../_services/tenant.service";
 import {lastValueFrom} from "rxjs";
-import {VHAsyncLoadEvent} from "../../component/value-help-input/value-help-input.component";
 import {MessageService} from "primeng/api";
 import {AuthDefaultService} from "../../_services/auth.default.service";
+import {TableAsyncLoadEvent} from "../../component/table/app-table.component";
 
 
 @Component({
@@ -186,8 +186,8 @@ export class TNRL01Component implements OnInit {
 
     }
 
-    provideRoles($event: VHAsyncLoadEvent) {
-        $event.update(this.tenantRoles, []);
+    provideRoles($event: TableAsyncLoadEvent) {
+        $event.update(this.tenantRoles, false);
     }
 
     onAddRoleSelection(selected: any[]) {

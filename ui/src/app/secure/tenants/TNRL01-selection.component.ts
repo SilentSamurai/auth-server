@@ -149,7 +149,7 @@ export class TNRL01SelectionComponent implements OnInit {
             where: event.filters.filter(item => item.value != null && item.value.length > 0),
         });
         this.users = response.data;
-        event.update(this.users);
+        event.update(this.users, response.hasNextPage);
     }
 
     async onTenantLoad(event: TableAsyncLoadEvent) {
@@ -158,7 +158,7 @@ export class TNRL01SelectionComponent implements OnInit {
             where: event.filters.filter(f => f.value != null && f.value.length > 0),
         });
         this.tenants = response.data;
-        event.update(this.tenants);
+        event.update(this.tenants, response.hasNextPage);
     }
 
 }

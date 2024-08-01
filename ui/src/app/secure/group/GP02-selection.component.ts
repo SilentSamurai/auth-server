@@ -106,7 +106,7 @@ export class GP02SelectionComponent implements OnInit {
                 expand: ["Tenants"]
             });
             this.groups = response.data;
-            event.update(this.groups);
+            event.update(this.groups, response.hasNextPage);
         }
     }
 

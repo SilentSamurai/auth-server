@@ -31,10 +31,10 @@ export class CaslAbilityFactory {
             // User Permissions
             cannot(Action.Manage, SubjectEnum.USER);
             can(Action.Manage, SubjectEnum.USER, {
-                email: {$eq: securityContext.email}
+                email: securityContext.email
             });
             can(Action.Manage, SubjectEnum.USER, {
-                id: {$eq: securityContext.userId}
+                id: securityContext.userId
             });
 
 

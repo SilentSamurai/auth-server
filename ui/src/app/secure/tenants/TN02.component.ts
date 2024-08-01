@@ -10,6 +10,7 @@ import {AddRoleComponent} from "./dialogs/add-role.component";
 import {AuthDefaultService} from "../../_services/auth.default.service";
 import {ConfirmationService} from "../../component/dialogs/confirmation.service";
 import {Location} from '@angular/common';
+import {TableAsyncLoadEvent} from "../../component/table/app-table.component";
 
 @Component({
     selector: 'view-tenant',
@@ -65,91 +66,82 @@ import {Location} from '@angular/common';
                 </div>
             </app-object-page-header>
             <app-object-page-section name="Members">
-                <p-table [value]="members" responsiveLayout="scroll">
-                    <ng-template pTemplate="caption">
-                        <div class="d-flex justify-content-between">
-                            <h5>Member List</h5>
-                            <button (click)="onAddMember()" [disabled]="!isTenantAdmin"
-                                    id="OPEN_ADD_MEMBER_DIALOG_BTN"
-                                    class="btn btn-primary btn-sm">
-                                Add Member
-                            </button>
-                        </div>
+                <app-table
+                    title="Member List"
+                    (onDataRequest)="onMemberDataLoad($event)">
 
+                    <app-table-col label="Name" name="name"></app-table-col>
+                    <app-table-col label="Email" name="email"></app-table-col>
+                    <app-table-col label="Assigned Roles" name="roles"></app-table-col>
+                    <app-table-col label="Actions" name="actions"></app-table-col>
+
+                    <app-table-btn>
+                        <button (click)="onAddMember()" [disabled]="!isTenantAdmin"
+                                id="OPEN_ADD_MEMBER_DIALOG_BTN"
+                                class="btn btn-primary btn-sm">
+                            Add
+                        </button>
+                    </app-table-btn>
+
+                    <ng-template let-user #table_body>
+                        <td>{{ user.name }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>
+                            <a [routerLink]="['/TNRL01/', tenant_id, user.id]"
+                               href="javascript:void(0)">View Role Assignments
+                            </a>
+                        </td>
+                        <td class="">
+                            <button (click)="removeMember(user)" [disabled]="!isTenantAdmin"
+                                    class="btn"
+                                    [attr.data-cy-id]="user.email"
+                                    type="button">
+                                <i class="fa fa-solid fa-trash"></i>
+                            </button>
+                        </td>
                     </ng-template>
-                    <ng-template let-columns pTemplate="header">
-                        <tr>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Assigned Roles</th>
-                            <th>Actions</th>
-                        </tr>
-                    </ng-template>
-                    <ng-template let-columns="columns" let-user pTemplate="body">
-                        <tr>
-                            <td><span class="p-column-title">Name</span>{{ user.name }}</td>
-                            <td><span class="p-column-title">Email</span>{{ user.email }}</td>
-                            <td><span class="p-column-title">Roles</span>
-                                <a [routerLink]="['/TNRL01/', tenant_id, user.id]"
-                                   href="javascript:void(0)">View Role Assignments
-                                </a>
-                            </td>
-                            <td class="">
-                                <button (click)="removeMember(user)" [disabled]="!isTenantAdmin"
-                                        class="btn"
-                                        [attr.data-cy-id]="user.email"
-                                        type="button">
-                                    <i class="fa fa-solid fa-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    </ng-template>
-                </p-table>
+                </app-table>
             </app-object-page-section>
 
             <app-object-page-section name="Roles">
-                <p-table [value]="tenant.roles" responsiveLayout="scroll">
-                    <ng-template pTemplate="caption">
-                        <div class="d-flex justify-content-between">
-                            <h5>Role List</h5>
-                            <button (click)="onAddRole()" [disabled]="!isTenantAdmin"
-                                    id="ADD_ROLE_DIALOG_BTN"
-                                    class="btn btn-primary btn-sm">
-                                Create Role
+                <app-table
+                    title="Role List"
+                    (onDataRequest)="onRoleDataLoad($event)"
+                >
+
+                    <app-table-col label="Name" name="name"></app-table-col>
+                    <app-table-col label="Description" name="description"></app-table-col>
+                    <app-table-col label="Actions" name="actions"></app-table-col>
+
+                    <app-table-btn>
+                        <button (click)="onAddRole()" [disabled]="!isTenantAdmin"
+                                id="ADD_ROLE_DIALOG_BTN"
+                                class="btn btn-primary btn-sm">
+                            Create
+                        </button>
+                    </app-table-btn>
+
+                    <ng-template let-role #table_body>
+                        <td>
+                            <a [routerLink]="['/RL02', tenant.id, role.name]"
+                               href="javascript:void(0)">{{ role.name }}
+                            </a>
+                        </td>
+                        <td>{{ role.description }}</td>
+                        <td>
+                            <button (click)="onRemoveRole(role)"
+                                    *ngIf="role.removable"
+                                    [disabled]="!isTenantAdmin"
+                                    class="btn btn-sm"
+                                    [attr.data-cy-id]="role.name"
+                                    type="button">
+                                <i class="fa fa-solid fa-trash"></i>
                             </button>
-                        </div>
+                        </td>
+                    </ng-template>
 
-                    </ng-template>
-                    <ng-template let-columns pTemplate="header">
-                        <tr>
-                            <th>Name</th>
-                            <th>Description</th>
-                            <th>Actions</th>
-                        </tr>
-                    </ng-template>
-                    <ng-template let-columns="columns" let-role pTemplate="body">
-                        <tr>
-                            <td>
-                                <a [routerLink]="['/RL02', tenant.id, role.name]"
-                                   href="javascript:void(0)">{{ role.name }}
-                                </a>
-                            </td>
-                            <td>
+                </app-table>
 
-                            </td>
-                            <td>
-                                <button (click)="onRemoveRole(role)"
-                                        *ngIf="role.removable"
-                                        [disabled]="!isTenantAdmin"
-                                        class="btn btn-sm"
-                                        [attr.data-cy-id]="role.name"
-                                        type="button">
-                                    <i class="fa fa-solid fa-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    </ng-template>
-                </p-table>
             </app-object-page-section>
         </app-object-page>
     `,
@@ -166,6 +158,7 @@ export class TN02Component implements OnInit {
     };
     members: any = []
     isTenantAdmin = false;
+    roles: any = [];
 
     constructor(private tenantService: TenantService,
                 private tokenStorageService: TokenStorageService,
@@ -179,7 +172,6 @@ export class TN02Component implements OnInit {
     }
 
     async ngOnInit() {
-
         this.tenant_id = this.actRoute.snapshot.params['tenantId'];
         if (this.tokenStorageService.isTenantAdmin()) {
             this.isTenantAdmin = true;
@@ -187,9 +179,18 @@ export class TN02Component implements OnInit {
         }
         console.log(this.tenant_id);
         this.tenant = await this.tenantService.getTenantDetails(this.tenant_id);
-        this.members = await this.tenantService.getMembers(this.tenant_id);
 
         this.authDefaultService.setTitle("TN02: " + this.tenant.name);
+    }
+
+    async onMemberDataLoad(event: TableAsyncLoadEvent) {
+        this.members = await this.tenantService.getMembers(this.tenant_id);
+        event.update(this.members, false);
+    }
+
+    async onRoleDataLoad(event: TableAsyncLoadEvent) {
+        this.roles = await this.tenantService.getTenantRoles(this.tenant_id);
+        event.update(this.roles, false);
     }
 
     async onUpdateTenant() {
