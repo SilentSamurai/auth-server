@@ -27,37 +27,37 @@ import {ConfirmationService} from "../../component/dialogs/confirmation.service"
                 </app-fb>
             </app-page-view-header>
             <app-page-view-body>
-                <app-table
-                    (onDataRequest)="loadTable($event)"
-                    idField="id"
-                    isFilterAsync="true"
-                    multi="true"
-                    scrollHeight="75vh">
+<!--                <app-table-->
+<!--                    (onDataRequest)="loadTable($event)"-->
+<!--                    idField="id"-->
+<!--                    isFilterAsync="true"-->
+<!--                    multi="true"-->
+<!--                    scrollHeight="75vh">-->
 
-                    <app-table-col label="Role Name" name="name"></app-table-col>
-                    <app-table-col label="Tenant Domain" name="tenants/domain"></app-table-col>
-                    <app-table-col label="Tenant Name" name="tenants/name"></app-table-col>
-                    <app-table-col label="Create At" name="createdAt"></app-table-col>
-                    <app-table-col label="Action" name="action"></app-table-col>
+<!--                    <app-table-col label="Role Name" name="name"></app-table-col>-->
+<!--                    <app-table-col label="Tenant Domain" name="tenants/domain"></app-table-col>-->
+<!--                    <app-table-col label="Tenant Name" name="tenants/name"></app-table-col>-->
+<!--                    <app-table-col label="Create At" name="createdAt"></app-table-col>-->
+<!--                    <app-table-col label="Action" name="action"></app-table-col>-->
 
-                    <ng-template #table_body let-role>
-                        <td>
-                            <a [routerLink]="['/RL02/', role.tenant.id, role.name]"
-                               href="javascript:void(0)">{{ role.name }}</a>
-                        </td>
-                        <td>
-                            <a [routerLink]="['/TN02/', role.tenant.id]"
-                               href="javascript:void(0)">{{ role.tenant.domain }}</a>
-                        </td>
-                        <td>{{ role.tenant.name }}</td>
-                        <td>{{ role.createdAt | date:'medium' }}</td>
-                        <td class="d-flex ">
-                            <button (click)="openDeleteModal(role)" class="btn " type="button" *ngIf="role.removable">
-                                <i class="fa fa-solid fa-trash"></i>
-                            </button>
-                        </td>
-                    </ng-template>
-                </app-table>
+<!--                    <ng-template #table_body let-role>-->
+<!--                        <td>-->
+<!--                            <a [routerLink]="['/RL02/', role.tenant.id, role.name]"-->
+<!--                               href="javascript:void(0)">{{ role.name }}</a>-->
+<!--                        </td>-->
+<!--                        <td>-->
+<!--                            <a [routerLink]="['/TN02/', role.tenant.id]"-->
+<!--                               href="javascript:void(0)">{{ role.tenant.domain }}</a>-->
+<!--                        </td>-->
+<!--                        <td>{{ role.tenant.name }}</td>-->
+<!--                        <td>{{ role.createdAt | date:'medium' }}</td>-->
+<!--                        <td class="d-flex ">-->
+<!--                            <button (click)="openDeleteModal(role)" class="btn " type="button" *ngIf="role.removable">-->
+<!--                                <i class="fa fa-solid fa-trash"></i>-->
+<!--                            </button>-->
+<!--                        </td>-->
+<!--                    </ng-template>-->
+<!--                </app-table>-->
             </app-page-view-body>
         </app-page-view>
 
@@ -87,14 +87,14 @@ export class RL01Component implements OnInit {
 
     }
 
-    async loadTable($event: TableAsyncLoadEvent) {
-        this.roles = await this.roleService.queryRoles({
-            pageNo: $event.pageNo,
-            where: $event.filters.filter(item => item.value != null && item.value.length > 0),
-            expand: ["Tenants"]
-        });
-        $event.update(this.roles.data, this.roles.hasNextPage);
-    }
+    // async loadTable($event: TableAsyncLoadEvent) {
+    //     this.roles = await this.roleService.queryRoles({
+    //         pageNo: $event.pageNo,
+    //         where: $event.filters.filter(item => item.value != null && item.value.length > 0),
+    //         expand: ["Tenants"]
+    //     });
+    //     $event.update(this.roles.data, this.roles.hasNextPage);
+    // }
 
     onFilter(filters: Filter[]) {
         this.table.filter(filters);

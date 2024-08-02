@@ -17,7 +17,6 @@ export class GroupService {
         return {
             headers: new HttpHeaders({
                 'Content-Type': 'application/json',
-                // 'Authorization': 'Bearer ' + this.tokenService.getToken()
             })
         };
     }

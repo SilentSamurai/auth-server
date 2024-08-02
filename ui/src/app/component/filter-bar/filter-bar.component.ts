@@ -11,7 +11,7 @@ import {
 } from '@angular/core';
 
 import {Operators} from "./operator";
-import {Util} from "../utils";
+import {Util} from "../util/utils";
 import {FilterFieldComponent} from "./filter-field.component";
 
 export class Filter {

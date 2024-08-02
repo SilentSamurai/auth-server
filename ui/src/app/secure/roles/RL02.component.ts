@@ -58,22 +58,22 @@ import {ConfirmationService} from "../../component/dialogs/confirmation.service"
                         <div class="d-flex justify-content-between">
                             <h5>Users </h5>
                             <div style="min-width:15rem">
-                                <app-value-help-input
-                                    (dataProvider)="provideUsers($event)"
-                                    [(selection)]="selectedUsers"
-                                    class="col-3"
-                                    idField="id"
-                                    labelField="name"
-                                    multi="true"
-                                    name="Users">
+<!--                                <app-value-help-input-->
+<!--                                    (dataProvider)="provideUsers($event)"-->
+<!--                                    [(selection)]="selectedUsers"-->
+<!--                                    class="col-3"-->
+<!--                                    idField="id"-->
+<!--                                    labelField="name"-->
+<!--                                    multi="true"-->
+<!--                                    name="Users">-->
 
-                                    <app-vh-col label="Email" name="email"></app-vh-col>
+<!--                                    <app-vh-col label="Email" name="email"></app-vh-col>-->
 
-                                    <ng-template #vh_body let-row>
-                                        <td>{{ row.email }}</td>
-                                    </ng-template>
+<!--                                    <ng-template #vh_body let-row>-->
+<!--                                        <td>{{ row.email }}</td>-->
+<!--                                    </ng-template>-->
 
-                                </app-value-help-input>
+<!--                                </app-value-help-input>-->
 
                                 <button (click)="onAddUsers()"
                                         class="btn btn-primary btn-sm mt-2">
@@ -196,10 +196,10 @@ export class RL02Component implements OnInit {
         }
     }
 
-    async provideUsers($event: TableAsyncLoadEvent) {
-        let members = await this.tenantService.getMembers(this.tenantId);
-        $event.update(members, false);
-    }
+    // async provideUsers($event: TableAsyncLoadEvent) {
+    //     let members = await this.tenantService.getMembers(this.tenantId);
+    //     $event.update(members, false);
+    // }
 
 
 }

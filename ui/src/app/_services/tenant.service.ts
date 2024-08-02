@@ -2,6 +2,8 @@ import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {lastValueFrom} from 'rxjs';
 import {TokenStorageService} from "./token-storage.service";
+import {RestApiModel} from "../component/model/RestApiModel";
+import {DataModel} from "../component/model/DataModel";
 
 const API_URL = '/api';
 
@@ -94,4 +96,12 @@ export class TenantService {
     }
 
 
+    createDataModel(initialData: any[]): DataModel {
+        return new RestApiModel(
+            this.http,
+            `${API_URL}/search/Tenants`,
+            "id",
+            initialData
+        );
+    }
 }

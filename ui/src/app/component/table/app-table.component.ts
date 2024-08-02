@@ -13,16 +13,13 @@ import {
 import {Filter, FilterBarComponent} from "../filter-bar/filter-bar.component";
 import {Table, TableLazyLoadEvent} from "primeng/table"
 import {TableColumnComponent} from "./app-table-column.component";
-import {Util} from "../utils";
+import {Util} from "../util/utils";
 import {AppTableButtonComponent} from "./app-table-button.component";
+import {DataModel, DataPushEvent, DataPushEvents, Query} from "../model/DataModel";
 
 
-export class TableAsyncLoadEvent {
-    pageNo!: number;
-    pageSize!: number;
-    sortBy!: any[];
-    filters!: any[];
-    update!: (data: any[], isNextPageAvailable: boolean) => void;
+export class TableAsyncLoadEvent extends Query {
+
 }
 
 
@@ -39,14 +36,14 @@ export class TableAsyncLoadEvent {
             [rowHover]="true"
             [loading]="loading"
             [value]="actualRows"
-            [selectionMode]="multi ? 'multiple' : 'single' "
+            selectionMode="single"
             [virtualScrollItemSize]="20"
             [virtualScroll]="true"
             styleClass="p-datatable-striped p-datatable-sm"
         >
             <ng-template pTemplate="caption">
                 <div class="d-flex align-items-center justify-content-between">
-                    <div>
+                    <div class="app-table-body">
                         {{ title }}
                     </div>
                     <div>
@@ -108,17 +105,24 @@ export class AppTableComponent implements OnInit {
 
     loading: boolean = false;
 
+    _dataModel!: DataModel;
+
+    @Input({required: true})
+    set dataModel(dataModel: DataModel) {
+        this._dataModel = dataModel;
+        this._dataModel.dataPusher().subscribe(this.dataPushEventHandler.bind(this))
+    }
+
+    get dataModel(): DataModel {
+        return this._dataModel
+    }
+
     @Input() title: string = "";
     @Input() scrollHeight: string = "65vh";
-    @Input() idField!: string;
     @Input() multi: string | boolean = true;
-    @Input() isFilterAsync: string | boolean = false;
-    @Input() filters: Filter[] = [];
 
     @Input() selection: any[] = [];
     @Output() selectionChange: EventEmitter<any[]> = new EventEmitter();
-
-    @Output() onDataRequest: EventEmitter<TableAsyncLoadEvent> = new EventEmitter();
 
     @ContentChild('table_body')
     body: TemplateRef<any> | null = null;
@@ -137,13 +141,18 @@ export class AppTableComponent implements OnInit {
     @ViewChild(Table)
     pTable!: Table;
 
-    pageNo: number = -1;
-    isLastPageReached: boolean = false;
+    pageNo: number = 0;
     private sortBy: any[] = [];
+    idField: string = "";
+
+    pagesLoaded = new Set();
+    pagesInProgress = new Set();
 
 
     constructor() {
+
     }
+
 
     get selectedItem() {
         return this.selection;
@@ -160,89 +169,82 @@ export class AppTableComponent implements OnInit {
     }
 
     async ngOnInit(): Promise<void> {
-        if (typeof this.isFilterAsync === 'string') {
-            this.isFilterAsync = Util.parseBoolean(this.isFilterAsync);
-        }
         if (typeof this.multi === 'string') {
             this.multi = Util.parseBoolean(this.multi);
         }
+        this.idField = this.dataModel.getKeyField();
+
     }
 
-    // getIdFieldData(row: any, index: any) {
-    //     if (this.idField) {
-    //         return row[this.idField];
-    //     } else {
-    //         return index;
-    //     }
-    // }
+    dataPushEventHandler(event: DataPushEvent) {
+        this.pagesInProgress.delete(event.pageNo);
+        switch (event.operation) {
+            case DataPushEvents.UPDATED_DATA:
+                if (event.srcOptions.append === true && !this.pagesLoaded.has(event.pageNo)) {
+                    this.appendData(event.data!);
+                }
+                if (event.srcOptions.append === false) {
+                    this.setData(event.data!);
+                }
+                this.pagesLoaded.add(event.pageNo);
+                break;
+            case DataPushEvents.START_FETCH:
+                this.loading = true;
+                break;
+            default:
+                this.loading = false;
+        }
+    }
 
-    setData(data: any[], isNextPageAvailable: boolean) {
+    setData(data: any[]) {
         this.pageNo = 0;
-        this.isLastPageReached = !isNextPageAvailable;
+        this.pagesInProgress.clear();
+        this.pagesLoaded.clear();
+        // this.isLastPageReached = !isNextPageAvailable;
         this.actualRows = data;
     }
 
-    appendData(data: any[], isNextPageAvailable: boolean) {
+    appendData(data: any[]) {
         if (data.length > 0) {
             // this.actualRows.push(...data);
             this.actualRows = [...this.actualRows, ...data];
             this.pageNo += 1;
         }
-        this.isLastPageReached = !isNextPageAvailable;
+        // this.isLastPageReached = !isNextPageAvailable;
     }
 
-    requestForData(options: any) {
-        this.filters = options.filters || this.filters;
+    async requestForData(options: any) {
         this.sortBy = options.sortBy || this.sortBy;
         this.pageNo = options.pageNo || this.pageNo;
         if (options.append === false) {
             this.pageNo = 0;
-            this.isLastPageReached = false;
         }
-        // const timeout = setTimeout(() => this.loading = false, 5 * 60 * 1000);
-        const eventObj = {
-            pageNo: options.append === true ? this.pageNo + 1 : this.pageNo,
-            pageSize: 30,
-            sortBy: this.sortBy,
-            filters: this.filters,
-            update: (data: any[], isNextPageAvailable: boolean) => {
-                if (options.append === true) {
-                    this.appendData(data, isNextPageAvailable);
-                } else {
-                    this.setData(data, isNextPageAvailable);
-                }
-                this.loading = false;
+        if (this.dataModel.hasPage(this.pageNo) && !this.pagesLoaded.has(this.pageNo)) {
+            this.dataModel.pageNo(this.pageNo)
+            this.dataModel.orderBy(this.sortBy);
+            if (options.filters && options.filters.length > 0) {
+                this.dataModel.filter(options.filters)
             }
+            this.dataModel.apply(options);
+            this.pagesInProgress.add(this.pageNo);
         }
-        this.loading = true;
-        this.onDataRequest.emit(eventObj);
 
     }
 
     lazyLoad(event: TableLazyLoadEvent) {
         console.log("lazy", event);
-        if (!this.isLastPageReached && !this.loading) {
-            this.requestForData({append: true})
-        }
+        this.requestForData({append: true})
     }
 
     filter(filters: Filter[]) {
-        if (this.isFilterAsync) {
-            this.requestForData({pageNo: 0, filters, append: false});
-        } else {
-            // if (filters.length > 0) {
-            //     console.log(filters);
-            //     this.pTable.clearState();
-            //     for (let filter of filters) {
-            //         let value = filter.value;
-            //         this.pTable.filter(value, filter.name, FilterMatchMode.CONTAINS);
-            //     }
-            // }
-        }
-
+        this.pagesInProgress.clear();
+        this.pagesLoaded.clear();
+        this.requestForData({pageNo: 0, filters, append: false});
     }
 
     reset() {
+        this.pagesInProgress.clear();
+        this.pagesLoaded.clear();
         this.requestForData({pageNo: 0, append: false});
     }
 }

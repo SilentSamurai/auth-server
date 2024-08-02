@@ -31,30 +31,30 @@ import {TenantService} from "../../../_services/tenant.service";
                     </div>
                     <div class="mb-3 form-group">
                         <label class="form-label" for="create.group.domain">Tenant</label>
-                        <app-value-help-input
-                            (dataProvider)="onTenantLoad($event)"
-                            [(selection)]="form.tenantId"
-                            class=""
-                            id="create.group.tenantId"
-                            idField="id"
-                            labelField="name"
-                            name="tenantId">
+<!--                        <app-value-help-input-->
+<!--                            (dataProvider)="onTenantLoad($event)"-->
+<!--                            [(selection)]="form.tenantId"-->
+<!--                            class=""-->
+<!--                            id="create.group.tenantId"-->
+<!--                            idField="id"-->
+<!--                            labelField="name"-->
+<!--                            name="tenantId">-->
 
-                            <app-fb-col name="name" label="Name"></app-fb-col>
-                            <app-fb-col name="domain" label="Domain"></app-fb-col>
+<!--                            <app-fb-col name="name" label="Name"></app-fb-col>-->
+<!--                            <app-fb-col name="domain" label="Domain"></app-fb-col>-->
 
-                            <app-vh-col name="name" label="Name"></app-vh-col>
-                            <app-vh-col name="domain" label="Domain"></app-vh-col>
+<!--                            <app-vh-col name="name" label="Name"></app-vh-col>-->
+<!--                            <app-vh-col name="domain" label="Domain"></app-vh-col>-->
 
 
-                            <ng-template #vh_body let-row>
-                                <td>{{ row.name }}</td>
-                                <td>
-                                    {{ row.domain }}
-                                </td>
-                            </ng-template>
+<!--                            <ng-template #vh_body let-row>-->
+<!--                                <td>{{ row.name }}</td>-->
+<!--                                <td>-->
+<!--                                    {{ row.domain }}-->
+<!--                                </td>-->
+<!--                            </ng-template>-->
 
-                        </app-value-help-input>
+<!--                        </app-value-help-input>-->
                     </div>
                 </form>
             </app-dialog-tab>
@@ -96,12 +96,12 @@ export class CreateGroupComponent implements OnInit {
         }
     }
 
-    async onTenantLoad(event: TableAsyncLoadEvent) {
-        let response = await this.tenantService.queryTenant({
-            pageNo: event.pageNo,
-            where: event.filters.filter(f => f.value != null && f.value.length > 0),
-        });
-        this.tenants = response.data;
-        event.update(this.tenants, response.hasNextPage);
-    }
+    // async onTenantLoad(event: TableAsyncLoadEvent) {
+    //     let response = await this.tenantService.queryTenant({
+    //         pageNo: event.pageNo,
+    //         where: event.filters.filter(f => f.value != null && f.value.length > 0),
+    //     });
+    //     this.tenants = response.data;
+    //     event.update(this.tenants, response.hasNextPage);
+    // }
 }

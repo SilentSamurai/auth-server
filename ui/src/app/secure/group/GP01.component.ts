@@ -32,39 +32,39 @@ import {UpdateGroupComponent} from "./dialogs/update-group.component";
 
             </app-page-view-header>
             <app-page-view-body>
-                <app-table
-                    title="Groups"
-                    (onDataRequest)="lazyLoad($event)"
-                    idField="id"
-                    isFilterAsync="true"
-                    multi="true"
-                    scrollHeight="75vh">
+<!--                <app-table-->
+<!--                    title="Groups"-->
+<!--                    (onDataRequest)="lazyLoad($event)"-->
+<!--                    idField="id"-->
+<!--                    isFilterAsync="true"-->
+<!--                    multi="true"-->
+<!--                    scrollHeight="75vh">-->
 
-                    <app-table-col label="Name" name="name"></app-table-col>
-                    <app-table-col label="Tenant" name="tenantId"></app-table-col>
-                    <app-table-col label="Create At" name="createdAt"></app-table-col>
-                    <app-table-col label="Action" name="action"></app-table-col>
+<!--                    <app-table-col label="Name" name="name"></app-table-col>-->
+<!--                    <app-table-col label="Tenant" name="tenantId"></app-table-col>-->
+<!--                    <app-table-col label="Create At" name="createdAt"></app-table-col>-->
+<!--                    <app-table-col label="Action" name="action"></app-table-col>-->
 
-                    <ng-template #table_body let-group>
-                        <td>
-                            <a [routerLink]="['/GP02/', group.id]"
-                               href="javascript:void(0)">{{ group.name }}</a>
-                        </td>
-                        <td>
-                            <a [routerLink]="['/TN02/', group.tenantId]"
-                               href="javascript:void(0)">{{ group.tenantId }}</a>
-                        </td>
-                        <td><span class="p-column-title">Created At</span>{{ group.createdAt | date }}</td>
-                        <td class="d-flex ">
-                            <button (click)="openUpdateModal(group)" class="btn " type="button">
-                                <i class="fa fa-edit"></i>
-                            </button>
-                            <button (click)="openDeleteModal(group)" class="btn " type="button">
-                                <i class="fa fa-solid fa-trash"></i>
-                            </button>
-                        </td>
-                    </ng-template>
-                </app-table>
+<!--                    <ng-template #table_body let-group>-->
+<!--                        <td>-->
+<!--                            <a [routerLink]="['/GP02/', group.id]"-->
+<!--                               href="javascript:void(0)">{{ group.name }}</a>-->
+<!--                        </td>-->
+<!--                        <td>-->
+<!--                            <a [routerLink]="['/TN02/', group.tenantId]"-->
+<!--                               href="javascript:void(0)">{{ group.tenantId }}</a>-->
+<!--                        </td>-->
+<!--                        <td><span class="p-column-title">Created At</span>{{ group.createdAt | date }}</td>-->
+<!--                        <td class="d-flex ">-->
+<!--                            <button (click)="openUpdateModal(group)" class="btn " type="button">-->
+<!--                                <i class="fa fa-edit"></i>-->
+<!--                            </button>-->
+<!--                            <button (click)="openDeleteModal(group)" class="btn " type="button">-->
+<!--                                <i class="fa fa-solid fa-trash"></i>-->
+<!--                            </button>-->
+<!--                        </td>-->
+<!--                    </ng-template>-->
+<!--                </app-table>-->
             </app-page-view-body>
         </app-page-view>
     `,
@@ -125,13 +125,13 @@ export class GP01Component implements OnInit {
         this.ngOnInit();
     }
 
-    async lazyLoad($event: TableAsyncLoadEvent) {
-        this.groups = await this.groupService.queryGroup({
-            pageNo: $event.pageNo,
-            where: $event.filters.filter(item => item.value != null && item.value.length > 0),
-        });
-        $event.update(this.groups.data, this.groups.hasNextPage);
-    }
+    // async lazyLoad($event: TableAsyncLoadEvent) {
+    //     this.groups = await this.groupService.queryGroup({
+    //         pageNo: $event.pageNo,
+    //         where: $event.filters.filter(item => item.value != null && item.value.length > 0),
+    //     });
+    //     $event.update(this.groups.data, this.groups.hasNextPage);
+    // }
 
     onFilter(filters: Filter[]) {
         this.table.filter(filters);

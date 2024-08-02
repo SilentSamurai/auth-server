@@ -8,6 +8,9 @@ import {ConfirmationService} from "../../component/dialogs/confirmation.service"
 import {MessageService} from "primeng/api";
 import {Location} from "@angular/common";
 import {AuthDefaultService} from "../../_services/auth.default.service";
+import {TableAsyncLoadEvent} from "../../component/table/app-table.component";
+import {DataModel} from "../../component/model/DataModel";
+import {StaticModel} from "../../component/model/StaticModel";
 
 @Component({
     selector: 'tenant-details',
@@ -63,37 +66,28 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
                 </button>
             </app-object-page-actions>
             <app-object-page-section name="Tenants">
-                <p-table [value]="tenants" responsiveLayout="scroll">
-                    <ng-template pTemplate="caption">
-                        <div class="d-flex justify-content-between">
-                            <h5>Tenant List</h5>
-                        </div>
+                <app-table
+                    title="Tenant List"
+                    [dataModel]="tenantsDM">
 
+                    <app-table-col label="Name" name="name"></app-table-col>
+                    <app-table-col label="Domain" name="domain"></app-table-col>
+                    <app-table-col label="Roles" name="roles"></app-table-col>
+
+                    <ng-template let-tenant #table_body>
+                        <td>{{ tenant.name }}</td>
+                        <td>
+                            <a [routerLink]="['/TN02/', tenant.id]"
+                               href="javascript:void(0)">{{ tenant.domain }}</a>
+                        </td>
+                        <td>
+                            <a [routerLink]="['/TNRL01/', tenant.id, user.id]"
+                               href="javascript:void(0)">View Role Assignments
+                            </a>
+                        </td>
                     </ng-template>
-                    <ng-template let-columns pTemplate="header">
-                        <tr>
-                            <th>Tenant Id</th>
-                            <th>Name</th>
-                            <th>Domain</th>
-                            <th>Roles</th>
-                        </tr>
-                    </ng-template>
-                    <ng-template let-columns="columns" let-tenant pTemplate="body">
-                        <tr>
-                            <td><span class="p-column-title">Tenant Id</span>
-                                <a [routerLink]="['/TN02/', tenant.id]"
-                                   href="javascript:void(0)">{{ tenant.id }}</a>
-                            </td>
-                            <td><span class="p-column-title">Name</span>{{ tenant.name }}</td>
-                            <td><span class="p-column-title">Domain</span>{{ tenant.domain }}</td>
-                            <td><span class="p-column-title">Roles</span>
-                                <a [routerLink]="['/TNRL01/', tenant.id, user.id]"
-                                   href="javascript:void(0)">View Role Assignments
-                                </a>
-                            </td>
-                        </tr>
-                    </ng-template>
-                </p-table>
+
+                </app-table>
             </app-object-page-section>
         </app-object-page>
     `,
@@ -107,6 +101,7 @@ export class UR02Component implements OnInit {
         createdAt: ""
     };
     tenants: any = [];
+    tenantsDM = new StaticModel("id");
 
     constructor(private userService: UserService,
                 private actRoute: ActivatedRoute,
@@ -122,7 +117,8 @@ export class UR02Component implements OnInit {
         this.userId = this.actRoute.snapshot.params['userId'];
         console.log(this.userId)
         this.user = await lastValueFrom(this.userService.getUser(this.userId));
-        this.tenants = await lastValueFrom(this.userService.getUserTenants(this.userId))
+        this.tenants = await lastValueFrom(this.userService.getUserTenants(this.userId));
+        this.tenantsDM.setData(this.tenants);
     }
 
     openUpdateModal() {
@@ -155,4 +151,9 @@ export class UR02Component implements OnInit {
         await this.userService.verifyUser(this.user.email, true);
         await this.ngOnInit();
     }
+
+    // async onTenantLoad($event: TableAsyncLoadEvent) {
+    //     this.tenants = await lastValueFrom(this.userService.getUserTenants(this.userId));
+    //     $event.update(this.tenants, false);
+    // }
 }

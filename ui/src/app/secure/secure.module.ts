@@ -38,6 +38,7 @@ import {TNRL01Component} from "./tenants/TNRL01.component";
 import {TNRL01SelectionComponent} from "./tenants/TNRL01-selection.component";
 import {UR02SelectionComponent} from "./users/UR02-selection.component";
 import {AbilityModule} from "@casl/angular";
+import {SkeletonModule} from "primeng/skeleton";
 
 @NgModule({
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -84,7 +85,8 @@ import {AbilityModule} from "@casl/angular";
         MessagesModule,
         ConfirmDialogModule,
         ReactiveFormsModule,
-        AbilityModule
+        AbilityModule,
+        SkeletonModule
     ],
     providers: [ConfirmationService, MessageService],
     exports: [

@@ -4,12 +4,13 @@ import {CreateTenantComponent} from "./dialogs/create-tenant.component";
 import {UpdateTenantComponent} from "./dialogs/update-tenant.component";
 import {TenantService} from "../../_services/tenant.service";
 import {TokenStorageService} from "../../_services/token-storage.service";
-import {AppTableComponent, TableAsyncLoadEvent} from "../../component/table/app-table.component";
+import {AppTableComponent} from "../../component/table/app-table.component";
 import {Filter} from "../../component/filter-bar/filter-bar.component";
 import {AuthDefaultService} from "../../_services/auth.default.service";
 import {ConfirmationService} from "../../component/dialogs/confirmation.service";
 import {MessageService} from "primeng/api";
 import {Actions, PermissionService, Subjects} from "../../_services/permission.service";
+import {DataModel} from "../../component/model/DataModel";
 
 @Component({
     selector: 'app-TN01',
@@ -38,11 +39,9 @@ import {Actions, PermissionService, Subjects} from "../../_services/permission.s
             <app-page-view-body>
                 <app-table
                     title="Tenant List"
-                    (onDataRequest)="lazyLoad($event)"
-                    idField="id"
-                    isFilterAsync="true"
                     multi="true"
-                    scrollHeight="75vh">
+                    scrollHeight="75vh"
+                    [dataModel]="dataModel">
 
                     <app-table-col label="Domain" name="domain"></app-table-col>
                     <app-table-col label="Name" name="name"></app-table-col>
@@ -84,6 +83,7 @@ export class TN01Component implements OnInit {
     tenants: any = [];
     creationAllowed = false;
     isTenantAdmin = false;
+    dataModel: DataModel;
 
     constructor(private tokenStorageService: TokenStorageService,
                 private tenantService: TenantService,
@@ -92,6 +92,8 @@ export class TN01Component implements OnInit {
                 private messageService: MessageService,
                 private permissionService: PermissionService,
                 private modalService: NgbModal) {
+
+        this.dataModel = this.tenantService.createDataModel([]);
     }
 
     async ngOnInit() {
@@ -103,6 +105,7 @@ export class TN01Component implements OnInit {
         if (this.tokenStorageService.isTenantAdmin()) {
             this.isTenantAdmin = true;
         }
+
     }
 
     async openCreateModal() {
@@ -138,14 +141,6 @@ export class TN01Component implements OnInit {
         });
         console.log(deletedTenant);
         await this.ngOnInit();
-    }
-
-    async lazyLoad($event: TableAsyncLoadEvent) {
-        this.tenants = await this.tenantService.queryTenant({
-            pageNo: $event.pageNo,
-            where: $event.filters.filter(item => item.value != null && item.value.length > 0),
-        });
-        $event.update(this.tenants.data, this.tenants.hasNextPage);
     }
 
     onFilter(event: Filter[]) {

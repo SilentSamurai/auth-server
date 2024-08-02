@@ -24,29 +24,29 @@ import {GroupService} from "../../_services/group.service";
                         <label class="col-3 col-form-label control-label-required" for="Group">
                             Group
                         </label>
-                        <app-value-help-input
-                            (dataProvider)="groupDataProvider($event)"
-                            [(selection)]="selectedGroup"
-                            class="col-3"
-                            idField="id"
-                            labelField="name"
-                            multi="false"
-                            name="Group">
+<!--                        <app-value-help-input-->
+<!--                            (dataProvider)="groupDataProvider($event)"-->
+<!--                            [(selection)]="selectedGroup"-->
+<!--                            class="col-3"-->
+<!--                            idField="id"-->
+<!--                            labelField="name"-->
+<!--                            multi="false"-->
+<!--                            name="Group">-->
 
-                            <app-fb-col name="name" label="Name"></app-fb-col>
-                            <app-fb-col name="tenant/name" label="Tenant"></app-fb-col>
+<!--                            <app-fb-col name="name" label="Name"></app-fb-col>-->
+<!--                            <app-fb-col name="tenant/name" label="Tenant"></app-fb-col>-->
 
-                            <app-vh-col name="name" label="Name"></app-vh-col>
-                            <app-vh-col name="tenant" label="Tenant"></app-vh-col>
+<!--                            <app-vh-col name="name" label="Name"></app-vh-col>-->
+<!--                            <app-vh-col name="tenant" label="Tenant"></app-vh-col>-->
 
-                            <ng-template #vh_body let-row>
-                                <td>{{ row.name }}</td>
-                                <td>
-                                    {{ row.tenant.name }}
-                                </td>
-                            </ng-template>
+<!--                            <ng-template #vh_body let-row>-->
+<!--                                <td>{{ row.name }}</td>-->
+<!--                                <td>-->
+<!--                                    {{ row.tenant.name }}-->
+<!--                                </td>-->
+<!--                            </ng-template>-->
 
-                        </app-value-help-input>
+<!--                        </app-value-help-input>-->
 
 
                         <div class=" d-grid gap-2 py-3 d-flex justify-content-end ">
@@ -98,16 +98,16 @@ export class GP02SelectionComponent implements OnInit {
         }
     }
 
-    async groupDataProvider(event: TableAsyncLoadEvent) {
-        if (event.pageNo == 0) {
-            let response = await this.groupService.queryGroup({
-                pageNo: event.pageNo,
-                where: event.filters.filter(f => f.value != null && f.value.length > 0),
-                expand: ["Tenants"]
-            });
-            this.groups = response.data;
-            event.update(this.groups, response.hasNextPage);
-        }
-    }
+    // async groupDataProvider(event: TableAsyncLoadEvent) {
+    //     if (event.pageNo == 0) {
+    //         let response = await this.groupService.queryGroup({
+    //             pageNo: event.pageNo,
+    //             where: event.filters.filter(f => f.value != null && f.value.length > 0),
+    //             expand: ["Tenants"]
+    //         });
+    //         this.groups = response.data;
+    //         event.update(this.groups, response.hasNextPage);
+    //     }
+    // }
 
 }

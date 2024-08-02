@@ -1,5 +1,5 @@
 import {Component, Input, OnInit, TemplateRef, ViewChild} from "@angular/core";
-import {Util} from "../utils";
+import {Util} from "../util/utils";
 
 
 @Component({

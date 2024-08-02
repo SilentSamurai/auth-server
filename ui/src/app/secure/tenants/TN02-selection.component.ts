@@ -6,6 +6,7 @@ import {TenantService} from "../../_services/tenant.service";
 import {TableAsyncLoadEvent} from "../../component/table/app-table.component";
 import {MessageService} from "primeng/api";
 import {AuthDefaultService} from "../../_services/auth.default.service";
+import {DataModel} from "../../component/model/DataModel";
 
 
 @Component({
@@ -25,12 +26,11 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
                         </label>
 
                         <app-value-help-input id="select-tenant"
-                            (dataProvider)="onTenantLoad($event)"
-                            [(selection)]="selectedTenant"
-                            class="col-3"
-                            idField="id"
-                            labelField="name"
-                            name="Tenant">
+                                              [dataModel]="tenantsDM"
+                                              [(selection)]="selectedTenant"
+                                              class="col-3"
+                                              labelField="name"
+                                              name="Tenant">
 
                             <app-fb-col name="name" label="Name"></app-fb-col>
                             <app-fb-col name="domain" label="Domain"></app-fb-col>
@@ -67,13 +67,9 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
 })
 export class TN02SelectionComponent implements OnInit {
 
-    tenantId: any | null = null;
-    email: string | null = '';
-    roles = [];
-    users: any[] = [];
     tenants: [] = [];
     selectedTenant: any[] = [];
-    selectedUser: any[] = [];
+    tenantsDM!: DataModel;
 
     constructor(private userService: UserService,
                 private tenantService: TenantService,
@@ -86,6 +82,7 @@ export class TN02SelectionComponent implements OnInit {
 
     async ngOnInit(): Promise<void> {
         this.authDefaultService.setTitle("TN02: Select Tenant");
+        this.tenantsDM = this.tenantService.createDataModel([]);
     }
 
     async continue() {
@@ -98,13 +95,13 @@ export class TN02SelectionComponent implements OnInit {
     }
 
 
-    async onTenantLoad(event: TableAsyncLoadEvent) {
-        let response = await this.tenantService.queryTenant({
-            pageNo: event.pageNo,
-            where: event.filters.filter(item => item.value != null && item.value.length > 0)
-        });
-        this.tenants = response.data;
-        event.update(this.tenants, response.hasNextPage);
-    }
+    // async onTenantLoad(event: TableAsyncLoadEvent) {
+    //     let response = await this.tenantService.queryTenant({
+    //         pageNo: event.pageNo,
+    //         where: event.filters.filter(item => item.value != null && item.value.length > 0)
+    //     });
+    //     this.tenants = response.data;
+    //     event.update(this.tenants, response.hasNextPage);
+    // }
 
 }

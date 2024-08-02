@@ -11,6 +11,8 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
 import {ConfirmationService} from "../../component/dialogs/confirmation.service";
 import {Location} from '@angular/common';
 import {TableAsyncLoadEvent} from "../../component/table/app-table.component";
+import {DataModel} from "../../component/model/DataModel";
+import {StaticModel} from "../../component/model/StaticModel";
 
 @Component({
     selector: 'view-tenant',
@@ -68,7 +70,7 @@ import {TableAsyncLoadEvent} from "../../component/table/app-table.component";
             <app-object-page-section name="Members">
                 <app-table
                     title="Member List"
-                    (onDataRequest)="onMemberDataLoad($event)">
+                    [dataModel]="memberDataModel">
 
                     <app-table-col label="Name" name="name"></app-table-col>
                     <app-table-col label="Email" name="email"></app-table-col>
@@ -106,8 +108,7 @@ import {TableAsyncLoadEvent} from "../../component/table/app-table.component";
             <app-object-page-section name="Roles">
                 <app-table
                     title="Role List"
-                    (onDataRequest)="onRoleDataLoad($event)"
-                >
+                    [dataModel]="rolesDataModel">
 
                     <app-table-col label="Name" name="name"></app-table-col>
                     <app-table-col label="Description" name="description"></app-table-col>
@@ -159,6 +160,8 @@ export class TN02Component implements OnInit {
     members: any = []
     isTenantAdmin = false;
     roles: any = [];
+    memberDataModel: StaticModel;
+    rolesDataModel: StaticModel;
 
     constructor(private tenantService: TenantService,
                 private tokenStorageService: TokenStorageService,
@@ -169,6 +172,9 @@ export class TN02Component implements OnInit {
                 private confirmationService: ConfirmationService,
                 private authDefaultService: AuthDefaultService,
                 private modalService: NgbModal) {
+
+        this.memberDataModel = new StaticModel("id");
+        this.rolesDataModel = new StaticModel("id");
     }
 
     async ngOnInit() {
@@ -179,18 +185,13 @@ export class TN02Component implements OnInit {
         }
         console.log(this.tenant_id);
         this.tenant = await this.tenantService.getTenantDetails(this.tenant_id);
+        this.members = await this.tenantService.getMembers(this.tenant_id);
+        this.roles = await this.tenantService.getTenantRoles(this.tenant_id);
+
+        this.memberDataModel.setData(this.members);
+        this.rolesDataModel.setData(this.roles);
 
         this.authDefaultService.setTitle("TN02: " + this.tenant.name);
-    }
-
-    async onMemberDataLoad(event: TableAsyncLoadEvent) {
-        this.members = await this.tenantService.getMembers(this.tenant_id);
-        event.update(this.members, false);
-    }
-
-    async onRoleDataLoad(event: TableAsyncLoadEvent) {
-        this.roles = await this.tenantService.getTenantRoles(this.tenant_id);
-        event.update(this.roles, false);
     }
 
     async onUpdateTenant() {

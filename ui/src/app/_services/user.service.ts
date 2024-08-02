@@ -2,6 +2,8 @@ import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {lastValueFrom} from 'rxjs';
 import {TokenStorageService} from "./token-storage.service";
+import {DataModel} from "../component/model/DataModel";
+import {RestApiModel} from "../component/model/RestApiModel";
 
 const API_URL = '/api';
 
@@ -60,5 +62,14 @@ export class UserService {
             verify: verify,
             email: email,
         }, this.getHttpOptions()))
+    }
+
+    createDataModel(initialData: any[]): DataModel {
+        return new RestApiModel(
+            this.http,
+            `${API_URL}/search/Users`,
+            "id",
+            initialData
+        );
     }
 }

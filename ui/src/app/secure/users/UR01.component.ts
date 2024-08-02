@@ -8,6 +8,7 @@ import {Filter} from "../../component/filter-bar/filter-bar.component";
 import {AuthDefaultService} from "../../_services/auth.default.service";
 import {ConfirmationService} from "../../component/dialogs/confirmation.service";
 import {MessageService} from "primeng/api";
+import {DataModel} from "../../component/model/DataModel";
 
 @Component({
     selector: 'app-board-user',
@@ -31,10 +32,8 @@ import {MessageService} from "primeng/api";
             </app-page-view-header>
             <app-page-view-body>
                 <app-table
+                    [dataModel]="usersDM"
                     title="Users"
-                    (onDataRequest)="lazyLoad($event)"
-                    idField="email"
-                    isFilterAsync="true"
                     multi="true"
                     scrollHeight="65vh">
 
@@ -72,12 +71,14 @@ export class UR01Component implements OnInit {
     table!: AppTableComponent;
 
     users: any = [];
+    usersDM!: DataModel;
 
     constructor(private userService: UserService,
                 private authDefaultService: AuthDefaultService,
                 private confirmationService: ConfirmationService,
                 private messageService: MessageService,
                 private modalService: NgbModal) {
+        this.usersDM = this.userService.createDataModel([]);
     }
 
     async ngOnInit(): Promise<void> {
@@ -118,14 +119,6 @@ export class UR01Component implements OnInit {
         })
         console.log(deletedUser);
         this.ngOnInit();
-    }
-
-    async lazyLoad($event: TableAsyncLoadEvent) {
-        this.users = await this.userService.queryUser({
-            pageNo: $event.pageNo,
-            where: $event.filters.filter(item => item.value != null && item.value.length > 0),
-        });
-        $event.update(this.users.data, this.users.hasNextPage);
     }
 
     onFilter(filters: Filter[]) {

@@ -21,30 +21,30 @@ import {RoleService} from "../../_services/role.service";
                         <label class="col-3 col-form-label control-label-required" for="Role">
                             Role:
                         </label>
-                        <app-value-help-input
-                            (dataProvider)="onRoleLoad($event)"
-                            [(selection)]="selectedRole"
-                            class="col-3"
-                            idField="id"
-                            labelField="name"
-                            multi="false"
-                            name="Role">
+<!--                        <app-value-help-input-->
+<!--                            (dataProvider)="onRoleLoad($event)"-->
+<!--                            [(selection)]="selectedRole"-->
+<!--                            class="col-3"-->
+<!--                            idField="id"-->
+<!--                            labelField="name"-->
+<!--                            multi="false"-->
+<!--                            name="Role">-->
 
-                            <app-fb-col name="name" label="Name"></app-fb-col>
-                            <app-fb-col name="tenant/domain" label="Tenant Domain"></app-fb-col>
+<!--                            <app-fb-col name="name" label="Name"></app-fb-col>-->
+<!--                            <app-fb-col name="tenant/domain" label="Tenant Domain"></app-fb-col>-->
 
-                            <app-vh-col name="name" label="Role Name"></app-vh-col>
-                            <app-vh-col name="tenant/domain" label="Tenant Domain"></app-vh-col>
-                            <app-vh-col name="tenant/name" label="Tenant Name"></app-vh-col>
+<!--                            <app-vh-col name="name" label="Role Name"></app-vh-col>-->
+<!--                            <app-vh-col name="tenant/domain" label="Tenant Domain"></app-vh-col>-->
+<!--                            <app-vh-col name="tenant/name" label="Tenant Name"></app-vh-col>-->
 
 
-                            <ng-template #vh_body let-row>
-                                <td>{{ row.name }}</td>
-                                <td>{{ row.tenant.domain }}</td>
-                                <td>{{ row.tenant.name }}</td>
-                            </ng-template>
+<!--                            <ng-template #vh_body let-row>-->
+<!--                                <td>{{ row.name }}</td>-->
+<!--                                <td>{{ row.tenant.domain }}</td>-->
+<!--                                <td>{{ row.tenant.name }}</td>-->
+<!--                            </ng-template>-->
 
-                        </app-value-help-input>
+<!--                        </app-value-help-input>-->
 
 
                         <div class=" d-grid gap-2 py-3 d-flex justify-content-end ">
@@ -92,14 +92,14 @@ export class RL02SelectionComponent implements OnInit {
         }
     }
 
-    async onRoleLoad(event: TableAsyncLoadEvent) {
-        let roles = await this.roleService.queryRoles({
-            pageNo: event.pageNo,
-            where: event.filters.filter(item => item.value != null && item.value.length > 0),
-            expand: ["Tenants"]
-        });
-        this.roles = roles.data;
-        event.update(this.roles, roles.hasNextPage);
-    }
+    // async onRoleLoad(event: TableAsyncLoadEvent) {
+    //     let roles = await this.roleService.queryRoles({
+    //         pageNo: event.pageNo,
+    //         where: event.filters.filter(item => item.value != null && item.value.length > 0),
+    //         expand: ["Tenants"]
+    //     });
+    //     this.roles = roles.data;
+    //     event.update(this.roles, roles.hasNextPage);
+    // }
 
 }

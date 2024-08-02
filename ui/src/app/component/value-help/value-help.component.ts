@@ -5,6 +5,7 @@ import {ActivatedRoute} from "@angular/router";
 import {ValueHelpColumnComponent} from "../value-help-input/value-help-column.component";
 import {AppTableComponent, TableAsyncLoadEvent} from "../table/app-table.component";
 import {Filter, FilterBarColumnComponent} from "../filter-bar/filter-bar.component";
+import {DataModel} from "../model/DataModel";
 
 @Component({
     selector: 'app-value-help',
@@ -36,11 +37,8 @@ import {Filter, FilterBarColumnComponent} from "../filter-bar/filter-bar.compone
         </div>
         <div class="modal-body p-0 ">
             <app-table
-                [title]="name"
-                [idField]="idField"
+                [dataModel]="dataModel"
                 [multi]="multi"
-                [isFilterAsync]="isFilterAsync"
-                (onDataRequest)="lazyLoad($event)"
                 [(selection)]="selectedItem">
                 <app-table-col *ngFor="let col of columns"
                                label="{{col.label}}"
@@ -70,9 +68,9 @@ import {Filter, FilterBarColumnComponent} from "../filter-bar/filter-bar.compone
 })
 export class ValueHelpComponent implements OnInit {
 
-    idField!: string;
     name: string = "";
     multi: boolean = true;
+    dataModel!: DataModel;
 
     body: TemplateRef<any> | null = null;
 
@@ -81,11 +79,6 @@ export class ValueHelpComponent implements OnInit {
 
     columns!: QueryList<ValueHelpColumnComponent>;
     filters!: QueryList<FilterBarColumnComponent>;
-
-
-    onLoad!: EventEmitter<TableAsyncLoadEvent>;
-
-    isFilterAsync: boolean = false;
 
     @ViewChild(AppTableComponent)
     table!: AppTableComponent;
@@ -102,12 +95,10 @@ export class ValueHelpComponent implements OnInit {
     }
 
     async startUp(params: {
-        idField: string;
         selectedItem: any[];
         name: string;
         multi: boolean
     }): Promise<any> {
-        this.idField = params.idField;
         this.name = params.name;
         this.multi = params.multi
         this.previousSelectedRows = Array.from(params.selectedItem);
@@ -124,11 +115,6 @@ export class ValueHelpComponent implements OnInit {
 
     clear() {
         this.activeModal.close([]);
-    }
-
-    lazyLoad($event: TableAsyncLoadEvent) {
-        console.log("lazy", $event);
-        this.onLoad.emit($event)
     }
 
     onFilter(filters: Filter[]) {

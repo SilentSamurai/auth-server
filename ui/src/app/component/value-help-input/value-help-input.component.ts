@@ -16,8 +16,8 @@ import {ActivatedRoute} from "@angular/router";
 import {UserService} from "../../_services/user.service";
 import {ValueHelpComponent} from "../value-help/value-help.component";
 import {ValueHelpColumnComponent} from "./value-help-column.component";
-import {TableAsyncLoadEvent} from "../table/app-table.component";
 import {FilterBarColumnComponent} from "../filter-bar/filter-bar.component";
+import {DataModel} from "../model/DataModel";
 
 
 function parseBoolean(value: string): boolean {
@@ -61,16 +61,17 @@ function parseBoolean(value: string): boolean {
 })
 export class ValueHelpInputComponent implements OnInit, AfterViewInit {
 
+    @Input({required: true}) dataModel!: DataModel;
+
     @Input() required = false;
     @Input() name: string = '';
     @Input() multi: string | boolean = false;
     @Input() labelField!: string;
-    @Input() idField!: string;
-    @Input() isFilterAsync: string | boolean = true;
     @Input() placeholder: string = '';
+
     @Input() selection: any[] = [];
     @Output() selectionChange = new EventEmitter<any[]>();
-    @Output() dataProvider = new EventEmitter<TableAsyncLoadEvent>();
+
 
     @ContentChild('vh_body')
     body: TemplateRef<any> | null = null;
@@ -91,9 +92,6 @@ export class ValueHelpInputComponent implements OnInit, AfterViewInit {
     async ngOnInit(): Promise<void> {
         if (typeof this.multi === 'string') {
             this.multi = parseBoolean(this.multi);
-        }
-        if (typeof this.isFilterAsync === 'string') {
-            this.isFilterAsync = parseBoolean(this.isFilterAsync);
         }
     }
 
@@ -118,15 +116,13 @@ export class ValueHelpInputComponent implements OnInit, AfterViewInit {
         const modalRef = this.modalService.open(ValueHelpComponent, {size: 'lg', backdrop: 'static'});
         this.modalInstance = modalRef.componentInstance as ValueHelpComponent;
         this.modalInstance.body = this.body;
-        this.modalInstance.onLoad = this.dataProvider;
         this.modalInstance.columns = this.columns;
         this.modalInstance.filters = this.filters;
-        this.modalInstance.isFilterAsync = this.isFilterAsync as boolean;
+        this.modalInstance.dataModel = this.dataModel;
         await this.modalInstance.startUp({
             name: this.name,
             selectedItem: this.selection,
             multi: this.multi as boolean,
-            idField: this.idField
         })
 
         const row = await modalRef.result;

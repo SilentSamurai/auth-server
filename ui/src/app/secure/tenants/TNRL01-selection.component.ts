@@ -6,6 +6,7 @@ import {TenantService} from "../../_services/tenant.service";
 import {TableAsyncLoadEvent} from "../../component/table/app-table.component";
 import {MessageService} from "primeng/api";
 import {AuthDefaultService} from "../../_services/auth.default.service";
+import {DataModel} from "../../component/model/DataModel";
 
 
 @Component({
@@ -25,10 +26,9 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
                         </label>
 
                         <app-value-help-input
-                            (dataProvider)="onTenantLoad($event)"
+                            [dataModel]="tenantsDM"
                             [(selection)]="selectedTenant"
                             class="col-3"
-                            idField="id"
                             labelField="name"
                             name="Tenant">
 
@@ -52,10 +52,9 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
                             Email:
                         </label>
                         <app-value-help-input
-                            (dataProvider)="userDataProvider($event)"
+                            [dataModel]="usersDM"
                             [(selection)]="selectedUser"
                             class="col-3"
-                            idField="email"
                             labelField="email"
                             multi="false"
                             name="Email">
@@ -102,6 +101,8 @@ export class TNRL01SelectionComponent implements OnInit {
     tenants: [] = [];
     selectedTenant: any[] = [];
     selectedUser: any[] = [];
+    tenantsDM!: DataModel;
+    usersDM!: DataModel;
 
     constructor(private userService: UserService,
                 private tenantService: TenantService,
@@ -114,6 +115,8 @@ export class TNRL01SelectionComponent implements OnInit {
 
     async ngOnInit(): Promise<void> {
         this.authDefaultService.setTitle("TNRL01: Manage Role Assignments of Tenant");
+        this.tenantsDM = this.tenantService.createDataModel([]);
+        this.usersDM = this.userService.createDataModel([]);
     }
 
     async continue() {
@@ -143,22 +146,22 @@ export class TNRL01SelectionComponent implements OnInit {
         return true;
     }
 
-    async userDataProvider(event: TableAsyncLoadEvent) {
-        let response = await this.userService.queryUser({
-            pageNo: event.pageNo,
-            where: event.filters.filter(item => item.value != null && item.value.length > 0),
-        });
-        this.users = response.data;
-        event.update(this.users, response.hasNextPage);
-    }
-
-    async onTenantLoad(event: TableAsyncLoadEvent) {
-        let response = await this.tenantService.queryTenant({
-            pageNo: event.pageNo,
-            where: event.filters.filter(f => f.value != null && f.value.length > 0),
-        });
-        this.tenants = response.data;
-        event.update(this.tenants, response.hasNextPage);
-    }
+    // async userDataProvider(event: TableAsyncLoadEvent) {
+    //     let response = await this.userService.queryUser({
+    //         pageNo: event.pageNo,
+    //         where: event.filters.filter(item => item.value != null && item.value.length > 0),
+    //     });
+    //     this.users = response.data;
+    //     event.update(this.users, response.hasNextPage);
+    // }
+    //
+    // async onTenantLoad(event: TableAsyncLoadEvent) {
+    //     let response = await this.tenantService.queryTenant({
+    //         pageNo: event.pageNo,
+    //         where: event.filters.filter(f => f.value != null && f.value.length > 0),
+    //     });
+    //     this.tenants = response.data;
+    //     event.update(this.tenants, response.hasNextPage);
+    // }
 
 }
