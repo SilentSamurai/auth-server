@@ -2,6 +2,8 @@ import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {lastValueFrom, Observable} from 'rxjs';
 import {TokenStorageService} from "./token-storage.service";
+import {DataModel} from "../component/model/DataModel";
+import {RestApiModel} from "../component/model/RestApiModel";
 
 const API_URL = '/api';
 
@@ -44,5 +46,16 @@ export class RoleService {
 
     async queryRoles(query: any): Promise<any> {
         return await lastValueFrom(this.http.post(`${API_URL}/search/Roles`, query, this.getHttpOptions())) as any;
+    }
+
+    createDataModel(initialData: any[]): DataModel {
+        let restApiModel = new RestApiModel(
+            this.http,
+            `${API_URL}/search/Roles`,
+            "id",
+            initialData
+        );
+        restApiModel.expands(['Tenants'])
+        return restApiModel;
     }
 }

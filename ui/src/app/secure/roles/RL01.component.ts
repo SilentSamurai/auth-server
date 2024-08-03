@@ -9,6 +9,7 @@ import {Filter} from "../../component/filter-bar/filter-bar.component";
 import {AppTableComponent, TableAsyncLoadEvent} from "../../component/table/app-table.component";
 import {RoleService} from "../../_services/role.service";
 import {ConfirmationService} from "../../component/dialogs/confirmation.service";
+import {DataModel} from "../../component/model/DataModel";
 
 
 @Component({
@@ -27,37 +28,34 @@ import {ConfirmationService} from "../../component/dialogs/confirmation.service"
                 </app-fb>
             </app-page-view-header>
             <app-page-view-body>
-<!--                <app-table-->
-<!--                    (onDataRequest)="loadTable($event)"-->
-<!--                    idField="id"-->
-<!--                    isFilterAsync="true"-->
-<!--                    multi="true"-->
-<!--                    scrollHeight="75vh">-->
+                <app-table
+                    [dataModel]="rolesDM"
+                    title="Roles"
+                    multi="true"
+                    scrollHeight="75vh">
 
-<!--                    <app-table-col label="Role Name" name="name"></app-table-col>-->
-<!--                    <app-table-col label="Tenant Domain" name="tenants/domain"></app-table-col>-->
-<!--                    <app-table-col label="Tenant Name" name="tenants/name"></app-table-col>-->
-<!--                    <app-table-col label="Create At" name="createdAt"></app-table-col>-->
-<!--                    <app-table-col label="Action" name="action"></app-table-col>-->
+                    <app-table-col label="Role Name" name="name"></app-table-col>
+                    <app-table-col label="Tenant Domain" name="tenants/domain"></app-table-col>
+                    <app-table-col label="Tenant Name" name="tenants/name"></app-table-col>
+                    <app-table-col label="Action" name="action"></app-table-col>
 
-<!--                    <ng-template #table_body let-role>-->
-<!--                        <td>-->
-<!--                            <a [routerLink]="['/RL02/', role.tenant.id, role.name]"-->
-<!--                               href="javascript:void(0)">{{ role.name }}</a>-->
-<!--                        </td>-->
-<!--                        <td>-->
-<!--                            <a [routerLink]="['/TN02/', role.tenant.id]"-->
-<!--                               href="javascript:void(0)">{{ role.tenant.domain }}</a>-->
-<!--                        </td>-->
-<!--                        <td>{{ role.tenant.name }}</td>-->
-<!--                        <td>{{ role.createdAt | date:'medium' }}</td>-->
-<!--                        <td class="d-flex ">-->
-<!--                            <button (click)="openDeleteModal(role)" class="btn " type="button" *ngIf="role.removable">-->
-<!--                                <i class="fa fa-solid fa-trash"></i>-->
-<!--                            </button>-->
-<!--                        </td>-->
-<!--                    </ng-template>-->
-<!--                </app-table>-->
+                    <ng-template #table_body let-role>
+                        <td>
+                            <a [routerLink]="['/RL02/', role.tenant.id, role.name]"
+                               href="javascript:void(0)">{{ role.name }}</a>
+                        </td>
+                        <td>
+                            <a [routerLink]="['/TN02/', role.tenant.id]"
+                               href="javascript:void(0)">{{ role.tenant.domain }}</a>
+                        </td>
+                        <td>{{ role.tenant.name }}</td>
+                        <td class="d-flex ">
+                            <button (click)="openDeleteModal(role)" class="btn " type="button" *ngIf="role.removable">
+                                <i class="fa fa-solid fa-trash"></i>
+                            </button>
+                        </td>
+                    </ng-template>
+                </app-table>
             </app-page-view-body>
         </app-page-view>
 
@@ -70,6 +68,7 @@ export class RL01Component implements OnInit {
     table!: AppTableComponent;
 
     roles: any;
+    rolesDM: DataModel;
 
     constructor(private userService: UserService,
                 private tenantService: TenantService,
@@ -80,6 +79,7 @@ export class RL01Component implements OnInit {
                 private authDefaultService: AuthDefaultService,
                 private confirmationService: ConfirmationService,
                 private modalService: NgbModal) {
+        this.rolesDM = this.roleService.createDataModel([]);
     }
 
     async ngOnInit(): Promise<void> {

@@ -9,6 +9,7 @@ import {TableAsyncLoadEvent} from "../../component/table/app-table.component";
 import {UpdateGroupComponent} from "./dialogs/update-group.component";
 import {MessageService} from "primeng/api";
 import {ConfirmationService} from "../../component/dialogs/confirmation.service";
+import {StaticModel} from "../../component/model/StaticModel";
 
 @Component({
     selector: 'app-group-object',
@@ -60,22 +61,21 @@ import {ConfirmationService} from "../../component/dialogs/confirmation.service"
                             <h5>Roles </h5>
 
                             <div style="min-width:15rem">
-<!--                                <app-value-help-input-->
-<!--                                    (dataProvider)="provideRoles($event)"-->
-<!--                                    [(selection)]="selectedRoles"-->
-<!--                                    class="col-3"-->
-<!--                                    idField="id"-->
-<!--                                    labelField="name"-->
-<!--                                    multi="true"-->
-<!--                                    name="Roles">-->
+                                <app-value-help-input
+                                    [dataModel]="rolesDM"
+                                    [(selection)]="selectedRoles"
+                                    class="col-3"
+                                    labelField="name"
+                                    multi="true"
+                                    name="Roles">
 
-<!--                                    <app-vh-col label="Name" name="name"></app-vh-col>-->
+                                    <app-vh-col label="Name" name="name"></app-vh-col>
 
-<!--                                    <ng-template #vh_body let-row>-->
-<!--                                        <td>{{ row.name }}</td>-->
-<!--                                    </ng-template>-->
+                                    <ng-template #vh_body let-row>
+                                        <td>{{ row.name }}</td>
+                                    </ng-template>
 
-<!--                                </app-value-help-input>-->
+                                </app-value-help-input>
 
                                 <button (click)="onAddRole()"
                                         class="btn btn-primary btn-sm mt-2">
@@ -116,22 +116,21 @@ import {ConfirmationService} from "../../component/dialogs/confirmation.service"
                         <div class="d-flex justify-content-between">
                             <h5>Users </h5>
                             <div style="min-width:15rem">
-<!--                                <app-value-help-input-->
-<!--                                    (dataProvider)="provideUsers($event)"-->
-<!--                                    [(selection)]="selectedUsers"-->
-<!--                                    class="col-3"-->
-<!--                                    idField="id"-->
-<!--                                    labelField="name"-->
-<!--                                    multi="true"-->
-<!--                                    name="Users">-->
+                                <app-value-help-input
+                                    [dataModel]="usersDM"
+                                    [(selection)]="selectedUsers"
+                                    class="col-3"
+                                    labelField="name"
+                                    multi="true"
+                                    name="Users">
 
-<!--                                    <app-vh-col label="Email" name="email"></app-vh-col>-->
+                                    <app-vh-col label="Email" name="email"></app-vh-col>
 
-<!--                                    <ng-template #vh_body let-row>-->
-<!--                                        <td>{{ row.email }}</td>-->
-<!--                                    </ng-template>-->
+                                    <ng-template #vh_body let-row>
+                                        <td>{{ row.email }}</td>
+                                    </ng-template>
 
-<!--                                </app-value-help-input>-->
+                                </app-value-help-input>
 
                                 <button (click)="onAddUsers()"
                                         class="btn btn-primary btn-sm mt-2">
@@ -187,7 +186,9 @@ export class GP02Component implements OnInit {
     loading = true;
     group: any;
     users: any[] = [];
+    usersDM = new StaticModel('id');
     roles: any[] = [];
+    rolesDM = new StaticModel('id');
     selectedRoles: any[] = [];
     selectedUsers: any[] = [];
     private group_id: any;
@@ -217,6 +218,10 @@ export class GP02Component implements OnInit {
         this.group = response.group;
         this.users = response.users;
         this.roles = response.roles;
+        let members = await this.tenantService.getMembers(this.group.tenantId);
+        this.usersDM.setData(members);
+        let tenantRoles = await this.tenantService.getTenantRoles(this.group.tenantId);
+        this.rolesDM.setData(tenantRoles);
 
         this.authDefaultService.setTitle("Group: " + this.group.name);
 

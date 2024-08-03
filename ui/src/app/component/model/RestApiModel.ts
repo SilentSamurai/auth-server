@@ -36,7 +36,7 @@ export class RestApiModel implements DataModel {
         if (this.totalCount == null || isNaN(this.totalCount)) {
             return true;
         }
-        const pageCount = this.totalCount / this.query.pageSize + 1;
+        const pageCount = this.totalCount / this.query.pageSize;
         return pageNo < pageCount;
     }
 
@@ -96,6 +96,10 @@ export class RestApiModel implements DataModel {
 
     pageSize(pageSize: number): void {
         this.query.pageSize = pageSize;
+    }
+
+    expands(options: string[]): void {
+        this.query.expand = options;
     }
 
     getKeyField(): string {

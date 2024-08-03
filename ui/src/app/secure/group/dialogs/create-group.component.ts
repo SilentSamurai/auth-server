@@ -2,8 +2,8 @@ import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
 import {MessageService} from "primeng/api";
 import {GroupService} from "../../../_services/group.service";
-import {TableAsyncLoadEvent} from "../../../component/table/app-table.component";
 import {TenantService} from "../../../_services/tenant.service";
+import {DataModel} from "../../../component/model/DataModel";
 
 @Component({
     selector: 'app-create-group',
@@ -31,30 +31,29 @@ import {TenantService} from "../../../_services/tenant.service";
                     </div>
                     <div class="mb-3 form-group">
                         <label class="form-label" for="create.group.domain">Tenant</label>
-<!--                        <app-value-help-input-->
-<!--                            (dataProvider)="onTenantLoad($event)"-->
-<!--                            [(selection)]="form.tenantId"-->
-<!--                            class=""-->
-<!--                            id="create.group.tenantId"-->
-<!--                            idField="id"-->
-<!--                            labelField="name"-->
-<!--                            name="tenantId">-->
+                        <app-value-help-input
+                            [dataModel]="tenantsDM"
+                            [(selection)]="form.tenantId"
+                            class=""
+                            id="create.group.tenantId"
+                            labelField="name"
+                            name="tenantId">
 
-<!--                            <app-fb-col name="name" label="Name"></app-fb-col>-->
-<!--                            <app-fb-col name="domain" label="Domain"></app-fb-col>-->
+                            <app-fb-col name="name" label="Name"></app-fb-col>
+                            <app-fb-col name="domain" label="Domain"></app-fb-col>
 
-<!--                            <app-vh-col name="name" label="Name"></app-vh-col>-->
-<!--                            <app-vh-col name="domain" label="Domain"></app-vh-col>-->
+                            <app-vh-col name="name" label="Name"></app-vh-col>
+                            <app-vh-col name="domain" label="Domain"></app-vh-col>
 
 
-<!--                            <ng-template #vh_body let-row>-->
-<!--                                <td>{{ row.name }}</td>-->
-<!--                                <td>-->
-<!--                                    {{ row.domain }}-->
-<!--                                </td>-->
-<!--                            </ng-template>-->
+                            <ng-template #vh_body let-row>
+                                <td>{{ row.name }}</td>
+                                <td>
+                                    {{ row.domain }}
+                                </td>
+                            </ng-template>
 
-<!--                        </app-value-help-input>-->
+                        </app-value-help-input>
                     </div>
                 </form>
             </app-dialog-tab>
@@ -74,12 +73,14 @@ export class CreateGroupComponent implements OnInit {
         tenantId: [] as any[]
     }
     private tenants: any[] = [];
+    tenantsDM: DataModel;
     krishna: any;
 
     constructor(private groupService: GroupService,
                 private tenantService: TenantService,
                 private messageService: MessageService,
                 public activeModal: NgbActiveModal) {
+        this.tenantsDM = this.tenantService.createDataModel([]);
     }
 
     ngOnInit(): void {

@@ -4,10 +4,10 @@ import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {TenantService} from "../../_services/tenant.service";
 import {TokenStorageService} from "../../_services/token-storage.service";
 import {AuthDefaultService} from "../../_services/auth.default.service";
-import {TableAsyncLoadEvent} from "../../component/table/app-table.component";
 import {RoleService} from "../../_services/role.service";
 import {MessageService} from "primeng/api";
 import {ConfirmationService} from "../../component/dialogs/confirmation.service";
+import {StaticModel} from "../../component/model/StaticModel";
 
 @Component({
     selector: 'app-group-object',
@@ -58,22 +58,21 @@ import {ConfirmationService} from "../../component/dialogs/confirmation.service"
                         <div class="d-flex justify-content-between">
                             <h5>Users </h5>
                             <div style="min-width:15rem">
-<!--                                <app-value-help-input-->
-<!--                                    (dataProvider)="provideUsers($event)"-->
-<!--                                    [(selection)]="selectedUsers"-->
-<!--                                    class="col-3"-->
-<!--                                    idField="id"-->
-<!--                                    labelField="name"-->
-<!--                                    multi="true"-->
-<!--                                    name="Users">-->
+                                <app-value-help-input
+                                    [dataModel]="usersDM"
+                                    [(selection)]="selectedUsers"
+                                    class="col-3"
+                                    labelField="name"
+                                    multi="true"
+                                    name="Users">
 
-<!--                                    <app-vh-col label="Email" name="email"></app-vh-col>-->
+                                    <app-vh-col label="Email" name="email"></app-vh-col>
 
-<!--                                    <ng-template #vh_body let-row>-->
-<!--                                        <td>{{ row.email }}</td>-->
-<!--                                    </ng-template>-->
+                                    <ng-template #vh_body let-row>
+                                        <td>{{ row.email }}</td>
+                                    </ng-template>
 
-<!--                                </app-value-help-input>-->
+                                </app-value-help-input>
 
                                 <button (click)="onAddUsers()"
                                         class="btn btn-primary btn-sm mt-2">
@@ -123,6 +122,7 @@ export class RL02Component implements OnInit {
     loading = true;
     role: any;
     users: any[] = [];
+    usersDM = new StaticModel('id');
     selectedUsers: any[] = [];
     private roleName: string = "";
     private tenantId: string = "";
@@ -152,6 +152,7 @@ export class RL02Component implements OnInit {
 
         this.role = response.role;
         this.users = response.users;
+        this.usersDM.setData(this.users);
 
         this.authDefaultService.setTitle("RL02: " + this.role.name);
 

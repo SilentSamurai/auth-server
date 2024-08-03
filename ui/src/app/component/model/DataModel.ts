@@ -7,6 +7,7 @@ export class Query {
     pageSize: number = 30;
     filters: Filter[] = [];
     orderBy: any[] = [];
+    expand: string[] = [];
 }
 
 export enum DataPushEvents {
