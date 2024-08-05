@@ -2,7 +2,7 @@ import {Component, OnInit, ViewChild} from '@angular/core';
 import {UserService} from '../../_services/user.service';
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {AppTableComponent, TableAsyncLoadEvent} from "../../component/table/app-table.component";
-import {Filter} from "../../component/filter-bar/filter-bar.component";
+
 import {AuthDefaultService} from "../../_services/auth.default.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {GroupService} from "../../_services/group.service";
@@ -11,6 +11,7 @@ import {ConfirmationService} from "../../component/dialogs/confirmation.service"
 import {MessageService} from "primeng/api";
 import {UpdateGroupComponent} from "./dialogs/update-group.component";
 import {DataModel} from "../../component/model/DataModel";
+import {Filter} from "../../component/model/Filters";
 
 @Component({
     selector: 'app-board-user',

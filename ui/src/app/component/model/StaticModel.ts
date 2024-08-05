@@ -1,7 +1,7 @@
 import {DataModel, DataPushEvent, DataPushEvents, Query} from "./DataModel";
-import {Filter} from "../filter-bar/filter-bar.component";
+
 import {EventEmitter} from "@angular/core";
-import {query} from "@angular/animations";
+import {Filter} from "./Filters";
 
 
 export class StaticModel implements DataModel {
@@ -26,12 +26,13 @@ export class StaticModel implements DataModel {
     }
 
     async apply(srcOptions: any): Promise<boolean> {
-        this._dataPusher.emit({
+        const event: DataPushEvent = {
             srcOptions: srcOptions,
             operation: DataPushEvents.UPDATED_DATA,
             data: this.data,
             pageNo: this.query.pageNo
-        })
+        };
+        this._dataPusher.emit(event)
         return true;
         // this.query = query;
     }
@@ -45,7 +46,7 @@ export class StaticModel implements DataModel {
     }
 
     getPageSize(): number {
-        return 0;
+        return this.query.pageSize;
     }
 
     orderBy(orderBy: any[]): void {
@@ -65,13 +66,25 @@ export class StaticModel implements DataModel {
     }
 
     appendData(data: any[]): void {
-        this.data.push(data);
-        this.apply({append: true})
+        this.data.push(...data);
+        this.apply({append: true});
     }
 
     setData(data: any[]): void {
-        this.data = data;
+        this.data = [...data];
         this.apply({append: false})
+    }
+
+    getFilters(): Filter[] {
+        return this.query.filters;
+    }
+
+    getOrderBy(): any[] {
+        return this.query.orderBy;
+    }
+
+    getPageNo(): number {
+        return this.query.pageNo;
     }
 
 

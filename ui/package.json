@@ -7,7 +7,7 @@
         "build": "ng build",
         "UI:SERVE:WATCH": "ng serve --watch --configuration development",
         "UI:BUILD:WATCH": "ng build --watch --configuration development",
-        "test": "ng test",
+        "test": "ng test Angular13JwtAuth --karma-config karma.conf.js --code-coverage=true",
         "update": "ng update @angular/core@17 @angular/cli@17"
     },
     "private": true,

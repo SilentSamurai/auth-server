@@ -1,8 +1,8 @@
 import {DataModel, DataPushEvent, DataPushEvents, Query} from "./DataModel";
-import {Filter} from "../filter-bar/filter-bar.component";
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {lastValueFrom} from "rxjs";
 import {EventEmitter} from "@angular/core";
+import {Filter} from "./Filters";
 
 
 export class RestApiModel implements DataModel {
@@ -57,7 +57,14 @@ export class RestApiModel implements DataModel {
                 'Content-Type': 'application/json',
             })
         }
-        let objectObservable = this.http.post(this.path, this.query, options);
+        const body = {
+            "pageNo": this.query.pageNo,
+            "pageSize": this.query.pageSize,
+            "filters": this.query.filters,
+            "orderBy": this.query.orderBy,
+            "expand": this.query.expand
+        }
+        let objectObservable = this.http.post(this.path, body, options);
         let response = await lastValueFrom(objectObservable) as any;
         this.data = response.data;
         this.totalCount = response.totalCount;
@@ -83,7 +90,7 @@ export class RestApiModel implements DataModel {
     }
 
     getPageSize(): number {
-        return 0;
+        return this.query.pageSize;
     }
 
     orderBy(orderBy: any[]): void {
@@ -102,8 +109,24 @@ export class RestApiModel implements DataModel {
         this.query.expand = options;
     }
 
+    getExpand(): string[] {
+        return this.query.expand;
+    }
+
     getKeyField(): string {
         return this.keyField;
+    }
+
+    getFilters(): Filter[] {
+        return this.query.filters;
+    }
+
+    getOrderBy(): any[] {
+        return this.query.orderBy;
+    }
+
+    getPageNo(): number {
+        return this.query.pageNo;
     }
 
 

@@ -5,11 +5,11 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {TenantService} from "../../_services/tenant.service";
 import {MessageService} from "primeng/api";
 import {AuthDefaultService} from "../../_services/auth.default.service";
-import {Filter} from "../../component/filter-bar/filter-bar.component";
 import {AppTableComponent, TableAsyncLoadEvent} from "../../component/table/app-table.component";
 import {RoleService} from "../../_services/role.service";
 import {ConfirmationService} from "../../component/dialogs/confirmation.service";
 import {DataModel} from "../../component/model/DataModel";
+import {Filter} from "../../component/model/Filters";
 
 
 @Component({

@@ -10,12 +10,13 @@ import {
     TemplateRef,
     ViewChild
 } from '@angular/core';
-import {Filter, FilterBarComponent} from "../filter-bar/filter-bar.component";
+import {FilterBarComponent} from "../filter-bar/filter-bar.component";
 import {Table, TableLazyLoadEvent} from "primeng/table"
 import {TableColumnComponent} from "./app-table-column.component";
 import {Util} from "../util/utils";
 import {AppTableButtonComponent} from "./app-table-button.component";
 import {DataModel, DataPushEvent, DataPushEvents, Query} from "../model/DataModel";
+import {Filter} from "../model/Filters";
 
 
 export class TableAsyncLoadEvent extends Query {
@@ -101,6 +102,7 @@ export class TableAsyncLoadEvent extends Query {
     `,
     styles: [''],
 })
+// Table for reuse
 export class AppTableComponent implements OnInit {
 
     loading: boolean = false;
@@ -141,12 +143,12 @@ export class AppTableComponent implements OnInit {
     @ViewChild(Table)
     pTable!: Table;
 
-    pageNo: number = 0;
+    protected nextPageNo: number = 0;
     private sortBy: any[] = [];
-    idField: string = "";
+    protected idField: string = "";
 
-    pagesLoaded = new Set();
-    pagesInProgress = new Set();
+    protected pagesLoaded = new Set();
+    protected pagesInProgress = new Set();
 
 
     constructor() {
@@ -177,16 +179,14 @@ export class AppTableComponent implements OnInit {
     }
 
     dataPushEventHandler(event: DataPushEvent) {
-        this.pagesInProgress.delete(event.pageNo);
         switch (event.operation) {
             case DataPushEvents.UPDATED_DATA:
-                if (event.srcOptions.append === true && !this.pagesLoaded.has(event.pageNo)) {
-                    this.appendData(event.data!);
+                if (event.srcOptions.append === true) {
+                    this.appendData(event.data!, event.pageNo!);
                 }
                 if (event.srcOptions.append === false) {
                     this.setData(event.data!);
                 }
-                this.pagesLoaded.add(event.pageNo);
                 break;
             case DataPushEvents.START_FETCH:
                 this.loading = true;
@@ -196,37 +196,43 @@ export class AppTableComponent implements OnInit {
         }
     }
 
-    setData(data: any[]) {
-        this.pageNo = 0;
+    protected setData(data: any[]) {
+        this.nextPageNo = 1;
         this.pagesInProgress.clear();
         this.pagesLoaded.clear();
         // this.isLastPageReached = !isNextPageAvailable;
+        this.pagesLoaded.add(0);
         this.actualRows = data;
     }
 
-    appendData(data: any[]) {
-        if (data.length > 0) {
-            // this.actualRows.push(...data);
-            this.actualRows = [...this.actualRows, ...data];
-            this.pageNo += 1;
+    protected appendData(data: any[], pageNo: number) {
+        this.pagesInProgress.delete(pageNo);
+        if (!this.pagesLoaded.has(pageNo)) {
+            this.pagesLoaded.add(pageNo);
+            if (data.length > 0) {
+                // this.actualRows.push(...data);
+                this.actualRows = [...this.actualRows, ...data];
+                this.nextPageNo += 1;
+            }
         }
         // this.isLastPageReached = !isNextPageAvailable;
     }
 
-    async requestForData(options: any) {
+    protected async requestForData(options: any) {
         this.sortBy = options.sortBy || this.sortBy;
-        this.pageNo = options.pageNo || this.pageNo;
+        this.nextPageNo = options.pageNo || this.nextPageNo;
         if (options.append === false) {
-            this.pageNo = 0;
+            // reset next page no
+            this.nextPageNo = 0;
         }
-        if (this.dataModel.hasPage(this.pageNo) && !this.pagesLoaded.has(this.pageNo)) {
-            this.dataModel.pageNo(this.pageNo)
+        if (this.dataModel.hasPage(this.nextPageNo) && !this.pagesLoaded.has(this.nextPageNo)) {
+            this.dataModel.pageNo(this.nextPageNo)
             this.dataModel.orderBy(this.sortBy);
             if (options.filters && options.filters.length > 0) {
                 this.dataModel.filter(options.filters)
             }
-            this.dataModel.apply(options);
-            this.pagesInProgress.add(this.pageNo);
+            await this.dataModel.apply(options);
+            this.pagesInProgress.add(this.nextPageNo);
         }
 
     }

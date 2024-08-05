@@ -5,12 +5,12 @@ import {UpdateTenantComponent} from "./dialogs/update-tenant.component";
 import {TenantService} from "../../_services/tenant.service";
 import {TokenStorageService} from "../../_services/token-storage.service";
 import {AppTableComponent} from "../../component/table/app-table.component";
-import {Filter} from "../../component/filter-bar/filter-bar.component";
 import {AuthDefaultService} from "../../_services/auth.default.service";
 import {ConfirmationService} from "../../component/dialogs/confirmation.service";
 import {MessageService} from "primeng/api";
 import {Actions, PermissionService, Subjects} from "../../_services/permission.service";
 import {DataModel} from "../../component/model/DataModel";
+import {Filter} from "../../component/model/Filters";
 
 @Component({
     selector: 'app-TN01',

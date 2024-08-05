@@ -4,8 +4,9 @@ import {NgbActiveModal, NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {ActivatedRoute} from "@angular/router";
 import {ValueHelpColumnComponent} from "../value-help-input/value-help-column.component";
 import {AppTableComponent, TableAsyncLoadEvent} from "../table/app-table.component";
-import {Filter, FilterBarColumnComponent} from "../filter-bar/filter-bar.component";
+import {FilterBarColumnComponent} from "../filter-bar/filter-bar.component";
 import {DataModel} from "../model/DataModel";
+import {Filter} from "../model/Filters";
 
 @Component({
     selector: 'app-value-help',
