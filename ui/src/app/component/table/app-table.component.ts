@@ -45,7 +45,7 @@ export class TableAsyncLoadEvent extends Query {
             <ng-template pTemplate="caption">
                 <div class="d-flex align-items-center justify-content-between">
                     <div class="app-table-body">
-                        {{ title }}
+                        {{ title }} <span>({{ dataModel.totalRowCount() }})</span>
                     </div>
                     <div>
                         <ng-container *ngFor="let btnTmpl of buttons">
@@ -225,14 +225,15 @@ export class AppTableComponent implements OnInit {
             // reset next page no
             this.nextPageNo = 0;
         }
-        if (this.dataModel.hasPage(this.nextPageNo) && !this.pagesLoaded.has(this.nextPageNo)) {
+        if (this.dataModel.hasPage(this.nextPageNo) &&
+            !this.pagesLoaded.has(this.nextPageNo) && !this.pagesInProgress.has(this.nextPageNo)) {
             this.dataModel.pageNo(this.nextPageNo)
             this.dataModel.orderBy(this.sortBy);
             if (options.filters && options.filters.length > 0) {
                 this.dataModel.filter(options.filters)
             }
-            await this.dataModel.apply(options);
             this.pagesInProgress.add(this.nextPageNo);
+            await this.dataModel.apply(options);
         }
 
     }

@@ -1,24 +1,13 @@
-import {DataModel, DataPushEvent, DataPushEvents, Query} from "./DataModel";
-
-import {EventEmitter} from "@angular/core";
-import {Filter} from "./Filters";
+import { DataPushEvent, DataPushEvents} from "./DataModel";
+import {BaseDataModel} from "./BaseDataModel";
 
 
-export class StaticModel implements DataModel {
+export class StaticModel extends BaseDataModel {
 
     data: any[] = []
-    query: Query = new Query();
-    _dataPusher = new EventEmitter<DataPushEvent>();
 
-    constructor(private keyField: string) {
-    }
-
-    dataPusher(): EventEmitter<DataPushEvent> {
-        return this._dataPusher;
-    }
-
-    hasNextPage(pageNo: number): boolean {
-        return this.hasPage(pageNo + 1);
+    constructor(keyField: string) {
+        super(keyField);
     }
 
     hasPage(pageNo: number): boolean {
@@ -37,32 +26,8 @@ export class StaticModel implements DataModel {
         // this.query = query;
     }
 
-    filter(filters: Filter[]): void {
-        this.query.filters = filters;
-    }
-
     getData(): any[] {
         return this.data;
-    }
-
-    getPageSize(): number {
-        return this.query.pageSize;
-    }
-
-    orderBy(orderBy: any[]): void {
-        this.query.orderBy = orderBy;
-    }
-
-    pageNo(pageNo: number): void {
-        this.query.pageNo = pageNo;
-    }
-
-    pageSize(pageSize: number): void {
-        this.query.pageSize = pageSize;
-    }
-
-    getKeyField(): string {
-        return this.keyField;
     }
 
     appendData(data: any[]): void {
@@ -75,16 +40,8 @@ export class StaticModel implements DataModel {
         this.apply({append: false})
     }
 
-    getFilters(): Filter[] {
-        return this.query.filters;
-    }
-
-    getOrderBy(): any[] {
-        return this.query.orderBy;
-    }
-
-    getPageNo(): number {
-        return this.query.pageNo;
+    totalRowCount(): number {
+        return this.data.length;
     }
 
 

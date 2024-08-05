@@ -1,32 +1,19 @@
-import {DataModel, DataPushEvent, DataPushEvents, Query} from "./DataModel";
+import {DataPushEvents} from "./DataModel";
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {lastValueFrom} from "rxjs";
-import {EventEmitter} from "@angular/core";
-import {Filter} from "./Filters";
+import {BaseDataModel} from "./BaseDataModel";
 
 
-export class RestApiModel implements DataModel {
+export class RestApiModel extends BaseDataModel {
 
-    query: Query = new Query();
     totalCount: number | null = null;
-
-    _dataPusher = new EventEmitter<DataPushEvent>();
 
     constructor(private http: HttpClient,
                 private path: string,
-                private keyField: string,
+                keyField: string,
                 private data: any[]) {
+        super(keyField);
 
-
-    }
-
-
-    dataPusher(): EventEmitter<DataPushEvent> {
-        return this._dataPusher;
-    }
-
-    hasNextPage(pageNo: number): boolean {
-        return this.hasPage(pageNo + 1);
     }
 
     hasPage(pageNo: number): boolean {
@@ -85,48 +72,11 @@ export class RestApiModel implements DataModel {
         return true;
     }
 
-    filter(filters: Filter[]): void {
-        this.query.filters = filters;
-    }
-
-    getPageSize(): number {
-        return this.query.pageSize;
-    }
-
-    orderBy(orderBy: any[]): void {
-        this.query.orderBy = orderBy;
-    }
-
-    pageNo(pageNo: number): void {
-        this.query.pageNo = pageNo;
-    }
-
-    pageSize(pageSize: number): void {
-        this.query.pageSize = pageSize;
-    }
-
-    expands(options: string[]): void {
-        this.query.expand = options;
-    }
-
-    getExpand(): string[] {
-        return this.query.expand;
-    }
-
-    getKeyField(): string {
-        return this.keyField;
-    }
-
-    getFilters(): Filter[] {
-        return this.query.filters;
-    }
-
-    getOrderBy(): any[] {
-        return this.query.orderBy;
-    }
-
-    getPageNo(): number {
-        return this.query.pageNo;
+    totalRowCount(): number {
+        if (this.totalCount == null || isNaN(this.totalCount)) {
+            return 0;
+        }
+        return this.totalCount;
     }
 
 

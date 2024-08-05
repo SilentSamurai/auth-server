@@ -4,7 +4,7 @@ import {Filter} from "./Filters";
 
 export class Query {
     private _pageNo: number = 0;
-    private _pageSize: number = 30;
+    private _pageSize: number = 50;
     private _filters: Filter[] = [];
     private _orderBy: any[] = [];
     private _expand: string[] = [];
@@ -94,4 +94,9 @@ export interface DataModel {
     hasPage(pageNo: number): boolean;
 
 
+    totalRowCount(): number;
+
+    getPageNoFromRow(first: number): number;
 }
+
+
