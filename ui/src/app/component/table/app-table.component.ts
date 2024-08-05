@@ -11,7 +11,6 @@ import {
     ViewChild
 } from '@angular/core';
 import {FilterBarComponent} from "../filter-bar/filter-bar.component";
-import {Table, TableLazyLoadEvent} from "primeng/table"
 import {TableColumnComponent} from "./app-table-column.component";
 import {Util} from "../util/utils";
 import {AppTableButtonComponent} from "./app-table-button.component";
@@ -27,80 +26,63 @@ export class TableAsyncLoadEvent extends Query {
 @Component({
     selector: 'app-table',
     template: `
-        <p-table
-            [(selection)]="selectedItem"
-            [scrollable]="true"
-            scrollHeight="{{scrollHeight}}"
-            [lazy]="true"
-            (onLazyLoad)="lazyLoad($event)"
-            [dataKey]="idField"
-            [rowHover]="true"
-            [loading]="loading"
-            [value]="actualRows"
-            selectionMode="single"
-            [virtualScrollItemSize]="20"
-            [virtualScroll]="true"
-            styleClass="p-datatable-striped p-datatable-sm"
-        >
-            <ng-template pTemplate="caption">
-                <div class="d-flex align-items-center justify-content-between">
-                    <div class="app-table-body">
-                        {{ title }} <span>({{ dataModel.totalRowCount() }})</span>
-                    </div>
-                    <div>
-                        <ng-container *ngFor="let btnTmpl of buttons">
-                            <ng-container [ngTemplateOutlet]="btnTmpl.template"></ng-container>
-                        </ng-container>
-                        <button type="button" class="btn btn-sm " (click)="reset()" pRipple>
-                            <i class="pi pi-refresh "></i>
-                        </button>
-                        <button type="button" class="btn btn-sm ps-2" (click)="reset()" pRipple>
-                            <i class="pi pi-sort-alt "></i>
-                        </button>
-                    </div>
+        <div class="a-table-caption h6 pt-2 px-2">
+            <div class="d-flex align-items-center justify-content-between">
+                <div class="app-table-body">
+                    {{ title }} <span>({{ dataModel.totalRowCount() }})</span>
                 </div>
-
-            </ng-template>
-            <ng-template pTemplate="header">
-                <tr style="min-height:35px">
-                    <th style="max-width:40px">
-                        <p-tableHeaderCheckbox *ngIf="multi"></p-tableHeaderCheckbox>
+                <div>
+                    <ng-container *ngFor="let btnTmpl of buttons">
+                        <ng-container [ngTemplateOutlet]="btnTmpl.template"></ng-container>
+                    </ng-container>
+                    <button type="button" class="btn btn-sm " (click)="reset()" pRipple>
+                        <i class="pi pi-refresh "></i>
+                    </button>
+                    <button type="button" class="btn btn-sm ps-2" (click)="reset()" pRipple>
+                        <i class="pi pi-sort-alt "></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="table-responsive" style="max-height: {{scrollHeight}}" (scroll)="lazyLoad($event)">
+            <table class="table a-table">
+                <thead class="sticky-top top-0">
+                <tr style="min-height:35px" >
+                    <th style="width:40px">
+                        <p-checkbox *ngIf="multi"></p-checkbox>
                     </th>
                     <ng-container *ngFor="let col of columns">
                         <ng-container *ngIf="col.isTemplateProvided" [ngTemplateOutlet]="col.template"></ng-container>
                         <ng-container *ngIf="!col.isTemplateProvided">
-                            <th>
+                            <th scope="col">
                                 {{ col.label }}
                             </th>
                         </ng-container>
 
                     </ng-container>
                 </tr>
-            </ng-template>
-            <ng-template let-row let-rowIndex="rowIndex" pTemplate="body">
-                <tr style="height:35px">
-                    <td style="max-width:40px">
-                        <p-tableCheckbox [value]="row"></p-tableCheckbox>
-
-                        <!--                        <p-tableRadioButton *ngIf="!multi" [value]="row" ></p-tableRadioButton>-->
+                </thead>
+                <tbody>
+                <tr class="a-table-row" style="height:35px" *ngFor="let row of actualRows" >
+                    <td style="width:40px">
+                        <p-checkbox *ngIf="multi"></p-checkbox>
                     </td>
                     <ng-container *ngTemplateOutlet="body; context: {$implicit: row}"></ng-container>
                 </tr>
-            </ng-template>
-            <ng-template pTemplate="loadingbody">
-                <tr style="height:40px">
+                <tr style="height:40px" *ngIf="loading">
                     <td *ngFor="let col of columns">
                         <div class="loading-text"></div>
                         <p-skeleton [ngStyle]="{'width': '100%'}"></p-skeleton>
                     </td>
                 </tr>
-            </ng-template>
-            <ng-template pTemplate="footer">
+                </tbody>
+            </table>
+        </div>
 
-            </ng-template>
-        </p-table>
     `,
-    styles: [''],
+    styles: [`
+
+    `],
 })
 // Table for reuse
 export class AppTableComponent implements OnInit {
@@ -140,9 +122,6 @@ export class AppTableComponent implements OnInit {
     @ViewChild(FilterBarComponent)
     filterBar!: FilterBarComponent;
 
-    @ViewChild(Table)
-    pTable!: Table;
-
     protected nextPageNo: number = 0;
     private sortBy: any[] = [];
     protected idField: string = "";
@@ -175,7 +154,7 @@ export class AppTableComponent implements OnInit {
             this.multi = Util.parseBoolean(this.multi);
         }
         this.idField = this.dataModel.getKeyField();
-
+        this.reset();
     }
 
     dataPushEventHandler(event: DataPushEvent) {
@@ -238,9 +217,13 @@ export class AppTableComponent implements OnInit {
 
     }
 
-    lazyLoad(event: TableLazyLoadEvent) {
-        console.log("lazy", event);
-        this.requestForData({append: true})
+    lazyLoad(event: any) {
+        // console.log("lazy", event);
+        if (event.target.offsetHeight + event.target.scrollTop >= event.target.scrollHeight) {
+            console.log("lazy", event);
+            this.requestForData({append: true})
+        }
+
     }
 
     filter(filters: Filter[]) {

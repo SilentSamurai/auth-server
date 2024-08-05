@@ -89,3 +89,8 @@ div.modal-body .p-datatable.p-datatable-sm .p-datatable-tbody > tr > td {
     border-bottom-width: medium !important;
 }
 
+td , tr.a-table-row > td{
+    vertical-align: middle;
+    padding-top: 0;
+    padding-bottom: 0;
+}

@@ -43,13 +43,12 @@ import {Filter} from "../../component/model/Filters";
                     <app-table-col label="Action" name="action"></app-table-col>
 
                     <ng-template #table_body let-user>
-                        <td><span class="p-column-title">Name</span>{{ user.name }} {{ user.surname }}</td>
+                        <td>{{ user.name }} {{ user.surname }}</td>
                         <td>
-                            <span class="p-column-title">Email</span>
                             <a [routerLink]="['/UR02/', user.id]"
                                href="javascript:void(0)">{{ user.email }}</a>
                         </td>
-                        <td><span class="p-column-title">Created At</span>{{ user.createdAt | date }}</td>
+                        <td>{{ user.createdAt | date }}</td>
                         <td class="d-flex ">
                             <button (click)="openUpdateModal(user)" class="btn " type="button">
                                 <i class="fa fa-edit"></i>

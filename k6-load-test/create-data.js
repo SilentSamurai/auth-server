@@ -3,7 +3,7 @@ const {faker} = require('@faker-js/faker');
 // const { fakerDE: faker } = require('@faker-js/faker');
 
 
-const token = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBhdXRoLnNlcnZlci5jb20iLCJlbWFpbCI6ImFkbWluQGF1dGguc2VydmVyLmNvbSIsIm5hbWUiOiJTdXBlciBBZG1pbiIsInVzZXJJZCI6IjliNTc0YmVhLWY1ZTQtNDcxMS04Y2U1LWRkMjZkMzhiOTVlOCIsInRlbmFudCI6eyJpZCI6IjQ3M2NjZjkxLTFkZWEtNDhkNi04OTU0LTc0ODgyMmRlZDk4NCIsIm5hbWUiOiJHbG9iYWwgRGVmYXVsdCBUZW5hbnQiLCJkb21haW4iOiJhdXRoLnNlcnZlci5jb20ifSwic2NvcGVzIjpbIlNVUEVSX0FETUlOIiwiVEVOQU5UX0FETUlOIiwiVEVOQU5UX1ZJRVdFUiJdLCJncmFudF90eXBlIjoicGFzc3dvcmQiLCJpYXQiOjE3MjI4NDA1NzksImV4cCI6MTcyMjg0NDE3OSwiaXNzIjoiYXV0aC5zZXJ2ZXIuY29tIn0.VSb_hVnbAULW3jnwxCsda749lJq2hrT3MDU_KXnwWHa2v1roR6dyEB5qiNcIe7_9vdlys-UwT9ig9BJx-4K8uoacFVexdOftHTPJ7eHbU1slCn7k384tN87kp_W4MUwxS43kYgfkHbk99scrvGX53aooOCPHs2rgYz6k6jryGPVQ2RzZMSb_DxG_-rKqfXq56I7eDxp8LoImq8DNS4C02-zNLf6wnsadtKXh2X_WHYk-pJP6uwryPfgQaHQSe5griD-Lv7shubE5SkGxddxCz70hFuo7sj1qHv3e5A7w0izfTPA3egI8dmEXPMfk_wdvbmGgdGi7cnATym3rhewcCw"
+const token = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBhdXRoLnNlcnZlci5jb20iLCJlbWFpbCI6ImFkbWluQGF1dGguc2VydmVyLmNvbSIsIm5hbWUiOiJTdXBlciBBZG1pbiIsInVzZXJJZCI6IjMzYTE1M2FmLWIzMTItNDQ0NS05YTQ0LWJiNjM0MzU3ZTczMiIsInRlbmFudCI6eyJpZCI6ImUxMDUzODM3LTYyMzYtNDg2Yi04OTgxLTU5NWE5NzBiYjZjYSIsIm5hbWUiOiJHbG9iYWwgRGVmYXVsdCBUZW5hbnQiLCJkb21haW4iOiJhdXRoLnNlcnZlci5jb20ifSwic2NvcGVzIjpbIlNVUEVSX0FETUlOIiwiVEVOQU5UX0FETUlOIiwiVEVOQU5UX1ZJRVdFUiJdLCJncmFudF90eXBlIjoicGFzc3dvcmQiLCJpYXQiOjE3MjI4NTg0MDcsImV4cCI6MTcyMjg2MjAwNywiaXNzIjoiYXV0aC5zZXJ2ZXIuY29tIn0.hZOrX-JVL9Qav3rbyiLnttUROCvb2x1uU5M6yACy9UYhJUxfw7vEJ9gGy5_dZIOR59vY-PlyV97jw27GsdY3piY-30SqxPpT6et-1SfcznkondUZukcIN4DWbZn9sw_a880Ph9CMhFXiAjcoi9DsTqgmK40BwoPp4PvlMhlMAL8XRa8pzIolm08POeKPedpw7qoHCzowLPhPBOWZ_r959P3SYApQAUetn7s-VbHLzDeTKC5GX2hNeTeaWoclC666A6_iXzXfZl4xUh4LID__5wlvTTL-IrPjxC03hoLXBjTC0lVjz0iBugDF0civNE-vlHyUGzRZObTqu0cAc2N68Q"
 
 async function createUser(name, email) {
     await fetch("http://localhost:9001/api/users/create", {
@@ -37,7 +37,7 @@ async function main() {
         const firstName = faker.person.firstName();
         const lastName = faker.person.lastName();
         const name = faker.person.fullName({firstName, lastName});
-        const randomEmail = faker.internet.email({firstName, lastName, allowSpecialCharacters: true}); // Kassandra.Haley@erich.biz
+        const randomEmail = faker.internet.email({firstName, lastName, allowSpecialCharacters: false}); // Kassandra.Haley@erich.biz
 
         await createUser(name, randomEmail);
     }

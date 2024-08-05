@@ -41,6 +41,7 @@ import {ConfirmationDialogComponent, ConfirmationService} from "./dialogs/confir
 import {InputErrorComponent, TextInputComponent} from "./inputs/text-input.component";
 import {ButtonLinkComponent} from "./button/button-link.component";
 import {AppTableButtonComponent} from "./table/app-table-button.component";
+import {CheckboxModule} from "primeng/checkbox";
 
 @NgModule({
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -93,7 +94,8 @@ import {AppTableButtonComponent} from "./table/app-table-button.component";
         SkeletonModule,
         ButtonModule,
         RippleModule,
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        CheckboxModule
     ],
     providers: [ConfirmationService],
     exports: [
