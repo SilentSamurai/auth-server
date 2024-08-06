@@ -162,9 +162,6 @@ export class AppTableComponent implements OnInit {
     }
 
     getKeyValue(row: any) {
-        if (!this) {
-            console.log("")
-        }
         return this.idFields.map(kf => row[kf].toString())
             .reduce((a, b) => a + b, "");
     }

@@ -45,9 +45,12 @@ envs:
     DATABASE_TYPE: postgres
     DATABASE_HOST: postgres-postgresql.database.svc.cluster.local
     DATABASE_PORT: 5432
-    DATABASE_USERNAME: uaa_db_adm
-    DATABASE_PASSWORD: root@1234
+    DATABASE_USERNAME: postgres
+    DATABASE_PASSWORD: PuI4V5sOrS
     DATABASE_NAME: UAA_MASTER
+    MONGO_DATABASE_TYPE: "IN_MEMORY"
+    MONGO_DB_URI: "mongodb://root:example@localhost:27017"
+
 
 service:
     type: LoadBalancer

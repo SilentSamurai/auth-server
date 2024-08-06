@@ -57,6 +57,8 @@ spec:
                 value: {{ .Values.envs.DATABASE_PASSWORD | quote }}
             -   name: DATABASE_NAME
                 value: {{ .Values.envs.DATABASE_NAME | quote }}
+            -   name: MONGO_DATABASE_TYPE
+                value: {{ .Values.envs.MONGO_DATABASE_TYPE | quote }}
           livenessProbe:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
           readinessProbe:
