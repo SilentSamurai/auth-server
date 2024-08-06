@@ -1,4 +1,4 @@
-import { DataPushEvent, DataPushEvents} from "./DataModel";
+import { DataPushEvent, DataPushEventStatus} from "./DataModel";
 import {BaseDataModel} from "./BaseDataModel";
 
 
@@ -6,8 +6,8 @@ export class StaticModel extends BaseDataModel {
 
     data: any[] = []
 
-    constructor(keyField: string) {
-        super(keyField);
+    constructor(keyFields: string[]) {
+        super(keyFields);
     }
 
     hasPage(pageNo: number): boolean {
@@ -17,7 +17,7 @@ export class StaticModel extends BaseDataModel {
     async apply(srcOptions: any): Promise<boolean> {
         const event: DataPushEvent = {
             srcOptions: srcOptions,
-            operation: DataPushEvents.UPDATED_DATA,
+            operation: DataPushEventStatus.UPDATED_DATA,
             data: this.data,
             pageNo: this.query.pageNo
         };

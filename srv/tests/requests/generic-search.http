@@ -1,0 +1,17 @@
+
+
+### search users
+POST http://localhost:9001/api/search/Users
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+    "pageNo": 0,
+    "pageSize": 1,
+    "filters": [],
+    "orderBy": [],
+    "expand": [],
+    "select": "count"
+}
+
+

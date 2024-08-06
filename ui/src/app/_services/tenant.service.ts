@@ -100,7 +100,7 @@ export class TenantService {
         return new RestApiModel(
             this.http,
             `${API_URL}/search/Tenants`,
-            "id",
+            ["id"],
             initialData
         );
     }

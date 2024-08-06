@@ -1,5 +1,5 @@
 import {StaticModel} from './StaticModel';
-import {DataPushEvents} from './DataModel';
+import {DataPushEventStatus} from './DataModel';
 import {EventEmitter} from '@angular/core';
 import {Operators} from "./Operator";
 import {Filter} from "./Filters";
@@ -8,7 +8,7 @@ describe('StaticModel', () => {
     let staticModel: StaticModel;
 
     beforeEach(() => {
-        staticModel = new StaticModel('id');
+        staticModel = new StaticModel(['id']);
     });
 
     it('should create an instance', () => {
@@ -20,7 +20,7 @@ describe('StaticModel', () => {
     });
 
     it('should correctly set and get key field', () => {
-        expect(staticModel.getKeyField()).toBe('id');
+        expect(staticModel.getKeyFields()).toBe('id');
     });
 
     it('should correctly filter data', () => {
@@ -69,7 +69,7 @@ describe('StaticModel', () => {
         await staticModel.apply(srcOptions);
         expect(spy).toHaveBeenCalledWith({
             srcOptions,
-            operation: DataPushEvents.UPDATED_DATA,
+            operation: DataPushEventStatus.UPDATED_DATA,
             data: staticModel.data,
             pageNo: staticModel.getPageNo()
         });
@@ -107,7 +107,7 @@ describe('StaticModel', () => {
         await staticModel.apply({});
         expect(spy).toHaveBeenCalledWith({
             srcOptions: {},
-            operation: DataPushEvents.UPDATED_DATA,
+            operation: DataPushEventStatus.UPDATED_DATA,
             data: staticModel.getData(),
             pageNo: staticModel.getPageNo()
         });
@@ -120,7 +120,7 @@ describe('StaticModel', () => {
         await staticModel.apply({});
         expect(spy).toHaveBeenCalledWith({
             srcOptions: {},
-            operation: DataPushEvents.UPDATED_DATA,
+            operation: DataPushEventStatus.UPDATED_DATA,
             data: newData,
             pageNo: staticModel.getPageNo()
         });
@@ -135,7 +135,7 @@ describe('StaticModel', () => {
         await staticModel.apply({append: true});
         expect(spy).toHaveBeenCalledWith({
             srcOptions: {append: true},
-            operation: DataPushEvents.UPDATED_DATA,
+            operation: DataPushEventStatus.UPDATED_DATA,
             data: [...initialData, ...newData],
             pageNo: staticModel.getPageNo()
         });
@@ -146,7 +146,7 @@ describe('StaticModel', () => {
         staticModel['apply'] = async (srcOptions: any) => {
             staticModel._dataPusher.emit({
                 srcOptions: srcOptions,
-                operation: DataPushEvents.START_FETCH,
+                operation: DataPushEventStatus.START_FETCH,
                 data: staticModel.getData(),
                 pageNo: staticModel.getPageNo()
             });
@@ -155,7 +155,7 @@ describe('StaticModel', () => {
         await staticModel.apply({});
         expect(spy).toHaveBeenCalledWith({
             srcOptions: {},
-            operation: DataPushEvents.START_FETCH,
+            operation: DataPushEventStatus.START_FETCH,
             data: staticModel.getData(),
             pageNo: staticModel.getPageNo()
         });

@@ -186,9 +186,9 @@ export class GP02Component implements OnInit {
     loading = true;
     group: any;
     users: any[] = [];
-    usersDM = new StaticModel('id');
+    usersDM = new StaticModel(['id']);
     roles: any[] = [];
-    rolesDM = new StaticModel('id');
+    rolesDM = new StaticModel(['id']);
     selectedRoles: any[] = [];
     selectedUsers: any[] = [];
     private group_id: any;

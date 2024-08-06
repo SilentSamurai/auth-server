@@ -68,7 +68,7 @@ export class UserService {
         return new RestApiModel(
             this.http,
             `${API_URL}/search/Users`,
-            "id",
+            ["id"],
             initialData
         );
     }

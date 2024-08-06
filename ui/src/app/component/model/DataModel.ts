@@ -34,7 +34,7 @@ export class Query {
     }
 
     set filters(value: Filter[]) {
-        this._filters = value;
+        this._filters = value.filter(item => item.value != null && item.value.length > 0);
     }
 
     get orderBy(): any[] {
@@ -55,7 +55,7 @@ export class Query {
 }
 
 
-export enum DataPushEvents {
+export enum DataPushEventStatus {
     UPDATED_DATA,
     START_FETCH,
     END_FETCH
@@ -63,7 +63,7 @@ export enum DataPushEvents {
 
 export class DataPushEvent {
     srcOptions: any;
-    operation: DataPushEvents = DataPushEvents.UPDATED_DATA;
+    operation: DataPushEventStatus = DataPushEventStatus.UPDATED_DATA;
     data: any[] | null = [];
     pageNo: number | null = null;
 }
@@ -72,18 +72,22 @@ export interface DataModel {
 
     dataPusher(): EventEmitter<DataPushEvent>;
 
-    getKeyField(): string;
+    getKeyFields(): string[];
 
     filter(filters: Filter[]): void;
+
     getFilters(): Filter[];
 
     orderBy(sortBy: any[]): void;
+
     getOrderBy(): any[];
 
     getPageSize(): number;
+
     pageSize(pageSize: number): void;
 
     pageNo(pageNo: number): void;
+
     getPageNo(): number;
 
     apply(srcOptions: any): Promise<boolean>;
@@ -91,8 +95,8 @@ export interface DataModel {
     getData(): any[];
 
     hasNextPage(pageNo: number): boolean;
-    hasPage(pageNo: number): boolean;
 
+    hasPage(pageNo: number): boolean;
 
     totalRowCount(): number;
 

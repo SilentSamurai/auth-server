@@ -173,8 +173,8 @@ export class TN02Component implements OnInit {
                 private authDefaultService: AuthDefaultService,
                 private modalService: NgbModal) {
 
-        this.memberDataModel = new StaticModel("id");
-        this.rolesDataModel = new StaticModel("id");
+        this.memberDataModel = new StaticModel(["id"]);
+        this.rolesDataModel = new StaticModel(["id"]);
     }
 
     async ngOnInit() {

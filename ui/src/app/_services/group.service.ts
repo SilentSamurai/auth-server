@@ -80,7 +80,7 @@ export class GroupService {
         let restApiModel = new RestApiModel(
             this.http,
             `${API_URL}/search/Groups`,
-            "id",
+            ["id"],
             initialData
         );
         restApiModel.expands(['Tenants'])

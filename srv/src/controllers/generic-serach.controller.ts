@@ -54,6 +54,7 @@ class QueryBody {
     pageSize?: number;
     where?: Filter[];
     expand?: string[];
+    select?: string[] | string | null;
 }
 
 
@@ -104,17 +105,23 @@ export class GenericSearchController {
             where: getWhere(entity, query.where),
             relations: this.getRelations(entity, query)
         };
-        let count = await repo.count({
-            where: findOption.where,
-        });
-        let enities = await repo.find(findOption);
-        return {
-            pageNo: pageNo,
-            pageSize: pageSize,
-            data: enities,
-            totalCount: count,
-            hasNextPage: count / pageSize >= 1
-        };
+        if (query.select && query.select === "count") {
+            let count = await repo.count({
+                where: findOption.where,
+            });
+            return {
+                count: count,
+            };
+        } else {
+            let enities = await repo.find(findOption);
+            return {
+                pageNo: pageNo,
+                pageSize: pageSize,
+                data: enities,
+            };
+        }
+
+
     }
 
     getRelations(entity: string, query: QueryBody) {

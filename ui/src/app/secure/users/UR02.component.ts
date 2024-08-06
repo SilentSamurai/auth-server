@@ -101,7 +101,7 @@ export class UR02Component implements OnInit {
         createdAt: ""
     };
     tenants: any = [];
-    tenantsDM = new StaticModel("id");
+    tenantsDM = new StaticModel(["id"]);
 
     constructor(private userService: UserService,
                 private actRoute: ActivatedRoute,

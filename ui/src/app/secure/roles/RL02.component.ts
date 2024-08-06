@@ -122,7 +122,7 @@ export class RL02Component implements OnInit {
     loading = true;
     role: any;
     users: any[] = [];
-    usersDM = new StaticModel('id');
+    usersDM = new StaticModel(['id']);
     selectedUsers: any[] = [];
     private roleName: string = "";
     private tenantId: string = "";

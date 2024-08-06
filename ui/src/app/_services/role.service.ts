@@ -52,7 +52,7 @@ export class RoleService {
         let restApiModel = new RestApiModel(
             this.http,
             `${API_URL}/search/Roles`,
-            "id",
+            ["id"],
             initialData
         );
         restApiModel.expands(['Tenants'])

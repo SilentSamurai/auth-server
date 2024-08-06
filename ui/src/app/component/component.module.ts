@@ -42,6 +42,7 @@ import {InputErrorComponent, TextInputComponent} from "./inputs/text-input.compo
 import {ButtonLinkComponent} from "./button/button-link.component";
 import {AppTableButtonComponent} from "./table/app-table-button.component";
 import {CheckboxModule} from "primeng/checkbox";
+import {RadioButtonModule} from "primeng/radiobutton";
 
 @NgModule({
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -95,7 +96,8 @@ import {CheckboxModule} from "primeng/checkbox";
         ButtonModule,
         RippleModule,
         ReactiveFormsModule,
-        CheckboxModule
+        CheckboxModule,
+        RadioButtonModule
     ],
     providers: [ConfirmationService],
     exports: [

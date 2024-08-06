@@ -114,8 +114,8 @@ export class TNRL01Component implements AfterContentInit {
     loading = true;
     tenantRoles: any;
     selectedRoles: any[] = [];
-    rolesDataModel = new StaticModel("id");
-    tenantRolesDM = new StaticModel("id");
+    rolesDataModel = new StaticModel(["id"]);
+    tenantRolesDM = new StaticModel(["id"]);
 
     constructor(private userService: UserService,
                 private tenantService: TenantService,

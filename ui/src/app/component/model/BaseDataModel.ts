@@ -7,7 +7,7 @@ export abstract class BaseDataModel implements DataModel {
     query: Query = new Query();
     _dataPusher = new EventEmitter<DataPushEvent>();
 
-    protected constructor(private keyField: string) {
+    protected constructor(private keyFields: string[]) {
     }
 
     dataPusher(): EventEmitter<DataPushEvent> {
@@ -46,8 +46,8 @@ export abstract class BaseDataModel implements DataModel {
         return this.query.expand;
     }
 
-    getKeyField(): string {
-        return this.keyField;
+    getKeyFields(): string[] {
+        return this.keyFields;
     }
 
     getFilters(): Filter[] {

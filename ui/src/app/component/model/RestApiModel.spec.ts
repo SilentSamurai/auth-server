@@ -1,7 +1,7 @@
 import {RestApiModel} from './RestApiModel';
 import {HttpClient} from '@angular/common/http';
 import {of} from 'rxjs';
-import {DataPushEvents} from './DataModel';
+import {DataPushEventStatus} from './DataModel';
 import {Filter} from './Filters';
 import {Operators} from './Operator'; // Assuming Operator is imported from a module
 
@@ -11,7 +11,7 @@ describe('RestApiModel', () => {
 
     beforeEach(() => {
         httpClientSpy = jasmine.createSpyObj('HttpClient', ['post']);
-        restApiModel = new RestApiModel(httpClientSpy, '/api/data', 'id', []);
+        restApiModel = new RestApiModel(httpClientSpy, '/api/data', ['id'], []);
     });
 
     it('should create an instance', () => {
@@ -27,19 +27,19 @@ describe('RestApiModel', () => {
         expect(spy.calls.allArgs()).toEqual([
             [{
                 srcOptions: {},
-                operation: DataPushEvents.START_FETCH,
+                operation: DataPushEventStatus.START_FETCH,
                 data: null,
                 pageNo: null
             }],
             [{
                 srcOptions: {},
-                operation: DataPushEvents.UPDATED_DATA,
+                operation: DataPushEventStatus.UPDATED_DATA,
                 data: [],
                 pageNo: 0
             }],
             [{
                 srcOptions: {},
-                operation: DataPushEvents.END_FETCH,
+                operation: DataPushEventStatus.END_FETCH,
                 data: null,
                 pageNo: null
             }]
@@ -129,7 +129,7 @@ describe('RestApiModel', () => {
         }), jasmine.any(Object))
 
         expect(spy).toHaveBeenCalledWith(jasmine.objectContaining({
-            operation: DataPushEvents.UPDATED_DATA,
+            operation: DataPushEventStatus.UPDATED_DATA,
             data: newData
         }));
     });
@@ -150,7 +150,7 @@ describe('RestApiModel', () => {
 
 
         expect(spy).toHaveBeenCalledWith(jasmine.objectContaining({
-            operation: DataPushEvents.UPDATED_DATA,
+            operation: DataPushEventStatus.UPDATED_DATA,
             data: newData
         }));
     });

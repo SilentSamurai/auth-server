@@ -1,6 +1,6 @@
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {AppTableComponent} from './app-table.component';
-import {DataModel, DataPushEvent, DataPushEvents} from '../model/DataModel';
+import {DataModel, DataPushEvent, DataPushEventStatus} from '../model/DataModel';
 import {Filter} from '../model/Filters';
 import {EventEmitter} from '@angular/core';
 import {Table, TableModule} from 'primeng/table';
@@ -20,7 +20,7 @@ describe('AppTableComponent', () => {
             'dataPusher', 'getKeyField', 'filter', 'orderBy', 'pageNo', 'pageSize', 'apply', 'hasPage'
         ]);
         mockDataModel.dataPusher.and.returnValue(new EventEmitter<DataPushEvent>());
-        mockDataModel.getKeyField.and.returnValue('id');
+        mockDataModel.getKeyFields.and.returnValue('id');
         mockDataModel.hasPage.and.returnValue(true);
 
         mockFilterBar = jasmine.createSpyObj('FilterBarComponent', ['filters']);
@@ -72,7 +72,7 @@ describe('AppTableComponent', () => {
     it('should handle DataPushEvent with UPDATED_DATA operation', () => {
         const event: DataPushEvent = {
             srcOptions: {append: false},
-            operation: DataPushEvents.UPDATED_DATA,
+            operation: DataPushEventStatus.UPDATED_DATA,
             data: [{id: 1, name: 'test'}],
             pageNo: 0
         };
@@ -84,7 +84,7 @@ describe('AppTableComponent', () => {
     it('should handle DataPushEvent with START_FETCH operation', () => {
         const event: DataPushEvent = {
             srcOptions: {},
-            operation: DataPushEvents.START_FETCH,
+            operation: DataPushEventStatus.START_FETCH,
             data: null,
             pageNo: null
         };
@@ -96,7 +96,7 @@ describe('AppTableComponent', () => {
     it('should handle DataPushEvent with END_FETCH operation', () => {
         const event: DataPushEvent = {
             srcOptions: {},
-            operation: DataPushEvents.END_FETCH,
+            operation: DataPushEventStatus.END_FETCH,
             data: null,
             pageNo: null
         };
@@ -130,7 +130,7 @@ describe('AppTableComponent', () => {
 
         let setDataEvent: DataPushEvent = {
             srcOptions: {append: false},
-            operation: DataPushEvents.UPDATED_DATA,
+            operation: DataPushEventStatus.UPDATED_DATA,
             data: [{id: 1, name: 'test'}],
             pageNo: 0
         };
@@ -199,7 +199,7 @@ describe('AppTableComponent', () => {
 
         let setDataEvent: DataPushEvent = {
             srcOptions: {append: true},
-            operation: DataPushEvents.UPDATED_DATA,
+            operation: DataPushEventStatus.UPDATED_DATA,
             data: [{id: 1, name: 'test'}],
             pageNo: 0
         };
@@ -216,7 +216,7 @@ describe('AppTableComponent', () => {
 
         let appDataEvent: DataPushEvent = {
             srcOptions: {append: true},
-            operation: DataPushEvents.UPDATED_DATA,
+            operation: DataPushEventStatus.UPDATED_DATA,
             data: [{id: 2, name: 'test2'}],
             pageNo: 1
         };
@@ -245,7 +245,7 @@ describe('AppTableComponent', () => {
 
         let setDataEvent: DataPushEvent = {
             srcOptions: {append: false},
-            operation: DataPushEvents.UPDATED_DATA,
+            operation: DataPushEventStatus.UPDATED_DATA,
             data: [{id: 1, name: 'test'}],
             pageNo: 0
         };
@@ -262,7 +262,7 @@ describe('AppTableComponent', () => {
 
         let appDataEvent: DataPushEvent = {
             srcOptions: {append: true},
-            operation: DataPushEvents.UPDATED_DATA,
+            operation: DataPushEventStatus.UPDATED_DATA,
             data: [{id: 2, name: 'test2'}],
             pageNo: 1
         };
@@ -294,7 +294,7 @@ describe('AppTableComponent', () => {
 
         let setDataEvent: DataPushEvent = {
             srcOptions: {append: false},
-            operation: DataPushEvents.UPDATED_DATA,
+            operation: DataPushEventStatus.UPDATED_DATA,
             data: [{id: 1, name: 'test'}],
             pageNo: 0
         };
@@ -312,7 +312,7 @@ describe('AppTableComponent', () => {
 
         let appDataEvent: DataPushEvent = {
             srcOptions: {append: true},
-            operation: DataPushEvents.UPDATED_DATA,
+            operation: DataPushEventStatus.UPDATED_DATA,
             data: [{id: 2, name: 'test2'}],
             pageNo: 1
         };
