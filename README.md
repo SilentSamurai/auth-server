@@ -14,3 +14,12 @@ and [Nest.js](https://nestjs.com/).
 - API [documentation](https://silentsamurai.github.io/Speedy-API) available.
 
 
+# minikube 
+docker context use default
+minikube start
+minikube addons enable metrics-server
+minikube dashboard --url
+
+minikube service <service-name> --url
+minikube image build -t is-auth-server -f ./Dockerfile .
+minikube image load your-image-name
