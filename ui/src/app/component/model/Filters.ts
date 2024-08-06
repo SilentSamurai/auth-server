@@ -13,4 +13,13 @@ export class Filter {
         this.value = value;
         this.operator = operator;
     }
+
+    toJSON() {
+        return {
+            name: this.name,
+            label: this.label,
+            value: this.value,
+            operator: this.operator.label,
+        }
+    }
 }

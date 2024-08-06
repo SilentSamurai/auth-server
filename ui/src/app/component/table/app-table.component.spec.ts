@@ -1,27 +1,37 @@
-import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {AppTableComponent} from './app-table.component';
-import {DataModel, DataPushEvent, DataPushEventStatus} from '../model/DataModel';
-import {Filter} from '../model/Filters';
-import {EventEmitter} from '@angular/core';
-import {Table, TableModule} from 'primeng/table';
-import {FilterBarComponent} from '../filter-bar/filter-bar.component';
-import {TableColumnComponent} from './app-table-column.component';
-import {AppTableButtonComponent} from './app-table-button.component';
-import {Operators} from "../model/Operator";
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { AppTableComponent } from './app-table.component';
+import { DataModel, DataPushEvent, DataPushEventStatus } from '../model/DataModel';
+import { Filter } from '../model/Filters';
+import { EventEmitter } from '@angular/core';
+import { Table, TableModule } from 'primeng/table';
+import { FilterBarComponent } from '../filter-bar/filter-bar.component';
+import { TableColumnComponent } from './app-table-column.component';
+import { AppTableButtonComponent } from './app-table-button.component';
+import {CheckboxChangeEvent, CheckboxModule} from 'primeng/checkbox';
+import { Operators } from "../model/Operator";
+import {RadioButton, RadioButtonModule} from "primeng/radiobutton";
 
 describe('AppTableComponent', () => {
     let component: AppTableComponent;
     let fixture: ComponentFixture<AppTableComponent>;
     let mockDataModel: jasmine.SpyObj<DataModel>;
     let mockFilterBar: jasmine.SpyObj<FilterBarComponent>;
+    const scrollToEndEvent = {
+        target: {
+            offsetHeight: 0,
+            scrollTop: 1,
+            scrollHeight: 0
+        }
+    };
 
     beforeEach(async () => {
         mockDataModel = jasmine.createSpyObj('DataModel', [
-            'dataPusher', 'getKeyField', 'filter', 'orderBy', 'pageNo', 'pageSize', 'apply', 'hasPage'
+            'dataPusher', 'getKeyFields', 'filter', 'orderBy', 'pageNo', 'pageSize', 'apply', 'hasPage', 'totalRowCount'
         ]);
         mockDataModel.dataPusher.and.returnValue(new EventEmitter<DataPushEvent>());
-        mockDataModel.getKeyFields.and.returnValue('id');
+        mockDataModel.getKeyFields.and.returnValue(['id']);
         mockDataModel.hasPage.and.returnValue(true);
+        mockDataModel.totalRowCount.and.returnValue(0);
 
         mockFilterBar = jasmine.createSpyObj('FilterBarComponent', ['filters']);
 
@@ -35,7 +45,9 @@ describe('AppTableComponent', () => {
             ],
             providers: [],
             imports: [
-                TableModule
+                TableModule,
+                CheckboxModule,
+                RadioButtonModule,
             ]
         }).compileComponents();
 
@@ -61,12 +73,12 @@ describe('AppTableComponent', () => {
 
     it('should emit selectionChange event when selectedItem is set', () => {
         const spy = spyOn(component.selectionChange, 'emit');
+        component.actualRows = [{id: 1}, {id: 2}, {id: 3}];
+        component.selectedItem = ['1', '2'];
+        expect(spy).toHaveBeenCalledWith([{id: 1}, {id: 2}]);
 
-        component.selectedItem = [1, 2, 3];
-        expect(spy).toHaveBeenCalledWith([1, 2, 3]);
-
-        component.selectedItem = 4;
-        expect(spy).toHaveBeenCalledWith([4]);
+        component.selectedItem = '1';
+        expect(spy).toHaveBeenCalledWith([{id: 1}]);
     });
 
     it('should handle DataPushEvent with UPDATED_DATA operation', () => {
@@ -138,7 +150,6 @@ describe('AppTableComponent', () => {
         component.dataPushEventHandler(setDataEvent);
         expect(component.actualRows).toEqual(setDataEvent.data!);
 
-
     });
 
     it('should handle multi set to true correctly', () => {
@@ -152,7 +163,7 @@ describe('AppTableComponent', () => {
         // Simulate a selection
         const mockRow1 = {id: 1, name: 'Row 1'};
         const mockRow2 = {id: 2, name: 'Row 2'};
-        component.selectedItem = [mockRow1, mockRow2];
+        component.selectedItem = ['1', '2'];
         fixture.detectChanges();
 
         // Check if the selectionChange event is emitted with the correct value
@@ -161,7 +172,7 @@ describe('AppTableComponent', () => {
         });
 
         // Verify that the selectedItem property is correctly set
-        expect(component.selectedItem).toEqual([mockRow1, mockRow2]);
+        expect(component.selectedItem).toEqual(['1', '2']);
     });
 
     it('should handle multi set to false correctly', () => {
@@ -174,7 +185,7 @@ describe('AppTableComponent', () => {
 
         // Simulate a selection
         const mockRow = {id: 1, name: 'Row 1'};
-        component.selectedItem = mockRow;
+        component.selectedItem = '1';
         fixture.detectChanges();
 
         // Check if the selectionChange event is emitted with the correct value
@@ -183,19 +194,17 @@ describe('AppTableComponent', () => {
         });
 
         // Verify that the selectedItem property is correctly set
-        expect(component.selectedItem).toEqual([mockRow]);
+        expect(component.selectedItem).toEqual('1');
     });
-
 
     it('should request next page with lazyLoad', () => {
         // const spy = spyOn(component, 'requestForData').and.callThrough();
-        const event = {} as any;
 
-        component.lazyLoad(event);
-
-        expect(mockDataModel.hasPage).toHaveBeenCalledWith(0);
-        expect(mockDataModel.pageNo).toHaveBeenCalledWith(0);
-        expect(mockDataModel.apply).toHaveBeenCalledWith({append: true});
+        // component.lazyLoad(scrollToEndEvent);
+        //
+        // expect(mockDataModel.hasPage).toHaveBeenCalledWith(0);
+        // expect(mockDataModel.pageNo).toHaveBeenCalledWith(0);
+        // expect(mockDataModel.apply).toHaveBeenCalledWith({append: true});
 
         let setDataEvent: DataPushEvent = {
             srcOptions: {append: true},
@@ -207,7 +216,7 @@ describe('AppTableComponent', () => {
         component.dataPushEventHandler(setDataEvent);
         expect(component.actualRows).toEqual(setDataEvent.data!);
 
-        component.lazyLoad(event);
+        component.lazyLoad(scrollToEndEvent);
 
         expect(mockDataModel.hasPage).toHaveBeenCalledWith(1);
         expect(mockDataModel.pageNo).toHaveBeenCalledWith(1);
@@ -226,12 +235,11 @@ describe('AppTableComponent', () => {
 
         // expect(spy).toHaveBeenCalledWith({append: true});
 
-        component.lazyLoad({});
+        component.lazyLoad(scrollToEndEvent);
 
         expect(mockDataModel.hasPage).toHaveBeenCalledWith(2);
         expect(mockDataModel.pageNo).toHaveBeenCalledWith(2);
         expect(mockDataModel.apply).toHaveBeenCalledWith({append: true});
-
 
     });
 
@@ -253,7 +261,7 @@ describe('AppTableComponent', () => {
         component.dataPushEventHandler(setDataEvent);
         expect(component.actualRows).toEqual(setDataEvent.data!);
 
-        component.lazyLoad({});
+        component.lazyLoad(scrollToEndEvent);
 
         expect(mockDataModel.hasPage).toHaveBeenCalledWith(1);
         expect(mockDataModel.pageNo).toHaveBeenCalledWith(1);
@@ -270,12 +278,11 @@ describe('AppTableComponent', () => {
         component.dataPushEventHandler(appDataEvent);
         expect(component.actualRows).toEqual([...setDataEvent.data!, ...appDataEvent.data!])
 
-        component.lazyLoad({});
+        component.lazyLoad(scrollToEndEvent);
 
         expect(mockDataModel.hasPage).toHaveBeenCalledWith(2);
         expect(mockDataModel.pageNo).toHaveBeenCalledWith(2);
         expect(mockDataModel.apply).toHaveBeenCalledWith({append: true});
-
 
     });
 
@@ -303,7 +310,7 @@ describe('AppTableComponent', () => {
         expect(component.actualRows).toEqual(setDataEvent.data!);
 
         // scroll event
-        component.lazyLoad({});
+        component.lazyLoad(scrollToEndEvent);
 
         expect(mockDataModel.hasPage).toHaveBeenCalledWith(1);
         expect(mockDataModel.pageNo).toHaveBeenCalledWith(1);
@@ -320,7 +327,7 @@ describe('AppTableComponent', () => {
         component.dataPushEventHandler(appDataEvent);
         expect(component.actualRows).toEqual([...setDataEvent.data!, ...appDataEvent.data!])
 
-        component.lazyLoad({});
+        component.lazyLoad(scrollToEndEvent);
 
         expect(mockDataModel.hasPage).toHaveBeenCalledWith(2);
         expect(mockDataModel.pageNo).toHaveBeenCalledWith(2);

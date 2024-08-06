@@ -47,13 +47,14 @@ describe('RestApiModel', () => {
     });
 
     it('should set data and totalCount when apply is called', async () => {
-        const mockResponse = {data: [{id: 1, name: 'test'}], totalCount: 1};
-        httpClientSpy.post.and.returnValue(of(mockResponse));
+        const mockResponse = {data: [{id: 1, name: 'test'}]};
+        const countResponse = {count: 1};
+        httpClientSpy.post.and.returnValues(of(countResponse), of(mockResponse) );
 
         await restApiModel.apply({});
 
         expect(restApiModel.getData()).toEqual(mockResponse.data);
-        expect(restApiModel.totalCount).toBe(mockResponse.totalCount);
+        expect(restApiModel.totalCount).toBe(countResponse.count);
     });
 
     it('should update filters correctly', () => {
@@ -125,7 +126,7 @@ describe('RestApiModel', () => {
         await restApiModel.apply({});
 
         expect(httpClientSpy.post).toHaveBeenCalledWith("/api/data", jasmine.objectContaining({
-            filters: filters
+            where: filters.map(i => i.toJSON())
         }), jasmine.any(Object))
 
         expect(spy).toHaveBeenCalledWith(jasmine.objectContaining({

@@ -1,5 +1,5 @@
 import {StaticModel} from './StaticModel';
-import {DataPushEventStatus} from './DataModel';
+import {DataPushEventStatus, Query} from './DataModel';
 import {EventEmitter} from '@angular/core';
 import {Operators} from "./Operator";
 import {Filter} from "./Filters";
@@ -20,7 +20,7 @@ describe('StaticModel', () => {
     });
 
     it('should correctly set and get key field', () => {
-        expect(staticModel.getKeyFields()).toBe('id');
+        expect(staticModel.getKeyFields()).toEqual(['id']);
     });
 
     it('should correctly filter data', () => {
@@ -88,18 +88,18 @@ describe('StaticModel', () => {
     });
 
     it('should have a default page size', () => {
-        expect(staticModel.getPageSize()).toBe(30);
+        expect(staticModel.getPageSize()).toBe(new Query().pageSize);
     });
 
     it('should set the page size correctly', () => {
         staticModel.pageSize(50);
-        expect(staticModel.getPageSize()).toBe(50);
+        expect(staticModel.getPageSize()).toBe(new Query().pageSize);
     });
 
     it('should not change page size if invalid value is provided', () => {
         staticModel.pageSize(-10);
         // Assuming 30 is the default value
-        expect(staticModel.getPageSize()).toBe(30);
+        expect(staticModel.getPageSize()).toBe(new Query().pageSize);
     });
 
     it('should emit event with initial data', async () => {

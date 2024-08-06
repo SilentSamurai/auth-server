@@ -50,14 +50,7 @@ export class RestApiModel extends BaseDataModel {
                 'Content-Type': 'application/json',
             })
         }
-        const filters = this.query.filters.map(f => {
-            return {
-                label: f.label,
-                value: f.value,
-                name: f.name,
-                operator: f.operator.label,
-            }
-        });
+        const filters = this.query.filters.map(f => f.toJSON());
 
         if (this.totalCount == null || isNaN(this.totalCount)) {
             await this.getTotalCount(filters);
