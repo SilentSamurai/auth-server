@@ -1,0 +1,9 @@
+CREATE USER uaa_db_adm WITH PASSWORD 'root@1234';
+
+CREATE DATABASE "UAA_MASTER"
+    WITH
+    OWNER = uaa_db_adm
+    ENCODING = 'UTF8'
+    LOCALE_PROVIDER = 'libc'
+    CONNECTION LIMIT = -1
+    IS_TEMPLATE = False;

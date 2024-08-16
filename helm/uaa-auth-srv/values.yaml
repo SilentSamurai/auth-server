@@ -35,18 +35,18 @@ securityContext: { }
   # capabilities:
   #   drop:
   #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
+# readOnlyRootFilesystem: true
+# runAsNonRoot: true
 # runAsUser: 1000
 
 envs:
-    envFile:  "/home/app/dist/envs/.env.aws"
+    envFile: "/home/app/dist/envs/.env.aws"
     port: 80
     DATABASE_TYPE: postgres
     DATABASE_HOST: postgres-postgresql.database.svc.cluster.local
     DATABASE_PORT: 5432
-    DATABASE_USERNAME: postgres
-    DATABASE_PASSWORD: PuI4V5sOrS
+    DATABASE_USERNAME: uaa_db_adm
+    DATABASE_PASSWORD: root@1234
     DATABASE_NAME: UAA_MASTER
     MONGO_DATABASE_TYPE: "IN_MEMORY"
     MONGO_DB_URI: "mongodb://root:example@localhost:27017"
@@ -54,13 +54,13 @@ envs:
 
 service:
     type: LoadBalancer
-    port: 80
+    port: 9001
 
 ingress:
     enabled: false
     className: ""
     annotations: { }
-      # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
     hosts:
         -   host: chart-example.local
@@ -72,17 +72,15 @@ ingress:
     #    hosts:
     #      - chart-example.local
 
-resources: { }
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-#   memory: 128Mi
+resources:
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    limits:
+        memory: 512M
+    requests:
+        memory: 256M
 
 livenessProbe:
     httpGet:
@@ -94,11 +92,12 @@ readinessProbe:
         port: http
 
 autoscaling:
-    enabled: false
+    enabled: true
     minReplicas: 1
-    maxReplicas: 1
-    targetCPUUtilizationPercentage: 80
-    # targetMemoryUtilizationPercentage: 80
+    maxReplicas: 5
+    targetMemoryUtilizationPercentage: 80
+#    targetCPUUtilizationPercentage: 80
+
 
 # Additional volumes on the output Deployment definition.
 volumes: [ ]

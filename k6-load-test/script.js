@@ -1,9 +1,12 @@
 import http from 'k6/http';
 import { check } from 'k6';
+import { randomItem } from 'https://jslib.k6.io/k6-utils/1.2.0/index.js';
+
+const users = JSON.parse(open("./users.json"));
 
 export const options = {
-    vus: 200,
-    duration: '100s',
+    vus: 100,
+    duration: '1s',
     thresholds: {
         http_req_failed: ['rate<0.01'], // http errors should be less than 1%
     }
@@ -12,10 +15,13 @@ export const options = {
 const BASE_URL = "http://localhost:9001";
 
 export default function () {
+
+    const user = randomItem(users);
+
     const payload = JSON.stringify({
         "grant_type": "password",
-        "email": "admin@auth.server.com",
-        "password": "admin9000",
+        "email": user.email,
+        "password": "Train9000",
         "domain": "auth.server.com"
     });
     const headers = {'Content-Type': 'application/json'};

@@ -12,7 +12,7 @@
         "prebuild": "rimraf dist",
         "build": "nest build",
         "backend:start": "nest start",
-        "backend:start:dev": "nest start --watch",
+        "backend:start:dev": "D --watch",
         "start:debug": "nest start --debug --watch",
         "start:prod": "node dist/src/main",
         "test": "jest --coverage",
