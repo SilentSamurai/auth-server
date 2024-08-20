@@ -1,12 +1,13 @@
 import http from 'k6/http';
 import { check } from 'k6';
 import { randomItem } from 'https://jslib.k6.io/k6-utils/1.2.0/index.js';
+import { sleep } from 'k6';
 
 const users = JSON.parse(open("./users.json"));
 
 export const options = {
-    vus: 100,
-    duration: '1s',
+    vus: 50,
+    duration: '60s',
     thresholds: {
         http_req_failed: ['rate<0.01'], // http errors should be less than 1%
     }
@@ -31,8 +32,10 @@ export default function () {
         'is status 200': (r) => r.status === 200 || r.status === 201,
         'token is present': (r) => {
             const res = r.json()
-            return res.access_token.length > 0
+            return res.access_token && res.access_token.length > 0
         },
 
     });
+
+    sleep(2);
 }
