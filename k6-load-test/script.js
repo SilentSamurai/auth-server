@@ -6,8 +6,8 @@ import { sleep } from 'k6';
 const users = JSON.parse(open("./users.json"));
 
 export const options = {
-    vus: 50,
-    duration: '60s',
+    vus: 200,
+    duration: '30s',
     thresholds: {
         http_req_failed: ['rate<0.01'], // http errors should be less than 1%
     }
@@ -37,5 +37,5 @@ export default function () {
 
     });
 
-    sleep(2);
+    // sleep(2);
 }
