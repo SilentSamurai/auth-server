@@ -148,7 +148,7 @@ const LoginSchema = yup.object().shape({
 
 const PasswordGrantSchema = yup.object().shape({
     grant_type: yup.string().required().matches(/^password$/g, {message: "grant type not recognised"}),
-    email: yup.string().email().required('Email is required'),
+    username: yup.string().email().required('Username is required'),
     password: yup.string().required('Password is required').matches(PASSWORD_REGEXP, PASSWORD_MESSAGE),
     domain: yup.string().required('Domain is required'),
     // client_id: yup.string().required('client_id is required'),

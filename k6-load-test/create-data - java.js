@@ -4,15 +4,13 @@ const {faker, fa} = require('@faker-js/faker');
 const fs = require('node:fs');
 
 
-const token = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBhdXRoLnNlcnZlci5jb20iLCJlbWFpbCI6ImFkbWluQGF1dGguc2VydmVyLmNvbSIsIm5hbWUiOiJTdXBlciBBZG1pbiIsInVzZXJJZCI6IjBlNDQ0NzljLTNkOTktNGZiNS1iODBmLTZkN2M2ZmU2MDgwZCIsInRlbmFudCI6eyJpZCI6ImM5MzA4MTVkLTZjZTUtNGNjOS04MjNmLWE4YzBhOTZiZjNiNiIsIm5hbWUiOiJHbG9iYWwgRGVmYXVsdCBUZW5hbnQiLCJkb21haW4iOiJhdXRoLnNlcnZlci5jb20ifSwic2NvcGVzIjpbIlRFTkFOVF9WSUVXRVIiLCJURU5BTlRfQURNSU4iLCJTVVBFUl9BRE1JTiJdLCJncmFudF90eXBlIjoicGFzc3dvcmQiLCJpYXQiOjE3MjQ3Mzk2OTEsImV4cCI6MTcyNDc0MzI5MSwiaXNzIjoiYXV0aC5zZXJ2ZXIuY29tIn0.cUhTIqY9EzcjBcAme96HBh14eUnpLmf75hC0dUb1aDDJ4zQ0rRtaYRxHtvl_d9P_b74NsZ1VpXIcyWpJjIqQPsmzoWT8zl62MBF7UHKAMGf8UF7-UN1pKjsRSLX56eAIMF2yz8PIV6jzGIz8CnzJ3VIUjlpP4gIZ6t3d273Si9IHSpv4Bq5wWBc_jaeFyGRo-b0f2Jk1w4edQs05knPLPBUN8gbj7UPFbZYIJetlw4XoizTcbBE8faqP8-WGSQr2s_97H5EIUhL8OGJvGkV95aiTBHyVRvTtLm9d6nvbUSQdyltKiG3ZLmAqoPEgG3iMb7i51aBUouYdGqyxCI2i7g"
-
-const BASE_URL = 'http://localhost:9001'
+const BASE_URL = 'http://localhost:8080'
 
 async function createUser(name, email) {
-    await fetch(`${BASE_URL}/api/users/create`, {
+    await fetch(`${BASE_URL}/api/signUp`, {
         "headers": {
             "accept": "application/json, text/plain, */*",
-            "authorization": "Bearer " + token,
+            // "authorization": "Bearer " + token,
             "content-type": "application/json",
         },
         "body": JSON.stringify({
@@ -29,7 +27,9 @@ async function createUser(name, email) {
 USERS = []
 
 async function main() {
-		
+	
+	console.log("starting");
+	
 	for (let j = 0; j < 20 ; j++) {
 		let promises = []
 		for (let i = 0; i < 50; i++) {

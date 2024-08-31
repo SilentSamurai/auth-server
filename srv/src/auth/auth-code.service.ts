@@ -1,6 +1,5 @@
 import {Injectable, Logger} from '@nestjs/common';
 import {ConfigService} from '../config/config.service';
-import {UsersService} from '../services/users.service';
 import {JwtService} from '@nestjs/jwt';
 import {TenantService} from "../services/tenant.service";
 import {NotFoundException} from "../exceptions/not-found.exception";
@@ -13,7 +12,6 @@ import {CryptUtil} from "../util/crypt.util";
 import {InvalidCredentialsException} from "../exceptions/invalid-credentials.exception";
 import {Cron} from "@nestjs/schedule";
 import * as ms from 'ms';
-import {UserNotFoundException} from "../exceptions/user-not-found.exception";
 import {AuthUserService} from "../casl/authUser.service";
 
 

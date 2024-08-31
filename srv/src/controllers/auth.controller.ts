@@ -65,7 +65,7 @@ export class AuthController {
             client_secret: string,
             domain: string,
             password: string,
-            email: string,
+            username: string,
             refresh_token: string,
             code: string,
             code_verifier: string,
@@ -90,7 +90,7 @@ export class AuthController {
             case GRANT_TYPES.PASSWORD: {
                 let validationPipe = new ValidationPipe(ValidationSchema.PasswordGrantSchema);
                 await validationPipe.transform(body, null);
-                const user: User = await this.authService.validate(body.email, body.password);
+                const user: User = await this.authService.validate(body.username, body.password);
                 const tenant = await this.authUserService.findTenantByDomain(body.domain);
                 const {accessToken, refreshToken} = await this.authService.createUserAccessToken(user, tenant);
                 return {

@@ -53,6 +53,12 @@ import {MongooseModule} from "@nestjs/mongoose";
                         synchronize: false,
                         ssl: configService.get('DATABASE_SSL'),
                         logging: configService.get('DATABASE_LOGGING'),
+                        schema: configService.get('DATABASE_SCHEMA'),
+                        "extra": {
+                            "ssl": {
+                                "rejectUnauthorized": false
+                            }
+                        }
                     };
                 }
             }),
