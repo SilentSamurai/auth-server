@@ -49,6 +49,15 @@ export class AuthUserService {
         return user;
     }
 
+    async tenantExistsByDomain(domain: string): Promise<boolean> {
+        return await this.tenantRepository.exists({
+            where: {domain: domain}, relations: {
+                members: true,
+                roles: true
+            }
+        });
+    }
+
     async findTenantByDomain(domain: string) {
         let tenant = await this.tenantRepository.findOne({
             where: {domain: domain}, relations: {
@@ -85,6 +94,15 @@ export class AuthUserService {
                 tenant: {id: tenant.id},
                 users: {id: user.id}
             },
+        });
+    }
+
+    async tenantExistsByClientId(clientId: string): Promise<boolean> {
+        return await this.tenantRepository.exists({
+            where: {clientId}, relations: {
+                members: true,
+                roles: true
+            }
         });
     }
 

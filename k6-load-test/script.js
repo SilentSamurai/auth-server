@@ -29,13 +29,17 @@ export default function () {
         'Content-Type': 'application/json',
         // "authorization": "Bearer " + token,
     };
+    let url = `${BASE_URL}/api/v1/cpu-bound`
+    if (__ENV.TEST_TYPE === "IO") {
+        url = `${BASE_URL}/api/v1/io-bound`
+    }
     const response = http.post(`${BASE_URL}/api/v1/io-bound`, {}, {headers});
 
     check(response, {
         'is status 200': (r) => r.status === 200 || r.status === 201,
         'OK': (r) => {
             const res = r.json()
-             return res.status && res.status.length > 0 && res.status === 'ok'
+            return res.status && res.status.length > 0 && res.status === 'ok'
         },
 
     });

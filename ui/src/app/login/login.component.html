@@ -15,7 +15,7 @@
                 <form
                     #f="ngForm"
                     (ngSubmit)="f.form.valid && onSubmit()"
-                    *ngIf="!isLoggedIn && freezeDomain"
+                    *ngIf="!isLoggedIn && freezeClientId"
                     name="form"
                     novalidate
                 >
@@ -71,25 +71,25 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="domain">Domain</label>
+                        <label for="client_id">Client Id</label>
                         <input
-                            #domain="ngModel"
-                            [(ngModel)]="form.domain"
-                            [disabled]="freezeDomain"
+                            #client_id="ngModel"
+                            [(ngModel)]="form.client_id"
+                            [disabled]="freezeClientId"
                             class="form-control"
-                            id="domain"
+                            id="client_id"
                             minlength="6"
-                            name="domain"
+                            name="client_id"
                             required
                             type="text"/>
                     </div>
                     <div
-                        *ngIf="domain.errors && f.submitted"
+                        *ngIf="client_id.errors && f.submitted"
                         class="alert alert-danger"
                         role="alert"
                     >
-                        <div *ngIf="domain.errors['required']">Domain is required</div>
-                        <div *ngIf="domain.errors['minlength']">
+                        <div *ngIf="client_id.errors['required']">Client Id is required</div>
+                        <div *ngIf="client_id.errors['minlength']">
                             Password must be at least 6 characters
                         </div>
                     </div>
@@ -110,17 +110,17 @@
                     </div>
                 </form>
 
-                <form *ngIf="!freezeDomain">
+                <form *ngIf="!freezeClientId">
                     <div class="form-group">
-                        <label for="domain">Domain</label>
+                        <label for="client_id">Client Id</label>
                         <input
-                            #domain_pre="ngModel"
-                            [(ngModel)]="form.domain"
-                            [disabled]="freezeDomain"
+                            #client_id_pre="ngModel"
+                            [(ngModel)]="form.client_id"
+                            [disabled]="freezeClientId"
                             class="form-control"
-                            id="domain-pre"
+                            id="client_id-pre"
                             minlength="6"
-                            name="domain"
+                            name="client_id"
                             required
                             type="text"/>
                     </div>

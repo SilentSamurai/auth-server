@@ -8,6 +8,9 @@ export class AuthCode {
     @Column({name: "code_challenge", unique: true, nullable: false})
     codeChallenge: string;
 
+    @Column({name: "method", nullable: false})
+    method: string;
+
     @Column({name: "user_id", nullable: false})
     userId: string;
 

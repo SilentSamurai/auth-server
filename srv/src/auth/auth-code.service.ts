@@ -50,7 +50,7 @@ export class AuthCodeService {
     /**
      * Create a verification token for the user.
      */
-    async createAuthToken(user: User, tenant: Tenant, code_challenge: string): Promise<string> {
+    async createAuthToken(user: User, tenant: Tenant, code_challenge: string, method: string): Promise<string> {
         let roles = await this.authUserService.getMemberRoles(tenant, user);
 
         let code = CryptUtil.generateOTP(6);
@@ -62,6 +62,7 @@ export class AuthCodeService {
         let session = this.authCodeRepository.create({
             codeChallenge: code_challenge,
             code: code,
+            method: method,
             tenantId: tenant.id,
             userId: user.id,
         });
@@ -74,8 +75,8 @@ export class AuthCodeService {
         let session = await this.findByCode(code);
         let tenant = await this.authUserService.findTenantById(session.tenantId);
         let user = await this.authUserService.findUserById(session.userId);
-        let genChallenge = CryptUtil.generateCodeChallenge(codeVerifier);
-        if (genChallenge !== session.codeChallenge && codeVerifier !== session.codeChallenge) {
+        let generateCodeChallenge = CryptUtil.generateCodeChallenge(codeVerifier, session.method);
+        if (generateCodeChallenge !== session.codeChallenge) {
             throw new InvalidCredentialsException();
         }
         return {tenant, user};

@@ -13,18 +13,19 @@ export class LoginComponent implements OnInit {
     form: any = {
         email: null,
         password: null,
-        domain: null
+        client_id: null
     };
     loading = true;
     isLoggedIn = false;
     isLoginFailed = false;
     errorMessage = '';
     roles: string[] = [];
-    freezeDomain = false;
+    freezeClientId = false;
     redirectUri = "";
     code_challenge = "";
 
     isPasswordVisible = false;
+    code_challenge_method: string = "plain";
 
     constructor(private authService: AuthService,
                 private router: Router,
@@ -36,18 +37,23 @@ export class LoginComponent implements OnInit {
 
         let params = this.route.snapshot.queryParamMap;
 
+        // code_challenge_method
         if (!params.has("code_challenge")) {
             alert("Invalid challenge");
             return;
         }
-        if (params.has("domain")) {
-            this.form.domain = params.get("domain");
-            if (this.form.domain && this.form.domain.length > 0) {
-                this.freezeDomain = true;
+        if (params.has("client_id")) {
+            this.form.client_id = params.get("client_id");
+            if (this.form.client_id && this.form.client_id.length > 0) {
+                this.freezeClientId = true;
             }
         }
 
-        this.redirectUri = params.get("redirect")!;
+        if (params.has("code_challenge_method")) {
+            this.code_challenge_method = params.get("code_challenge_method")!;
+        }
+
+        this.redirectUri = params.get("redirect_uri")!;
         this.code_challenge = params.get("code_challenge")!;
 
         // if auth code is present, then redirect
@@ -59,8 +65,8 @@ export class LoginComponent implements OnInit {
                 if (data.status) {
                     await this.router.navigate(['session-confirm'], {
                         queryParams: {
-                            redirect: this.redirectUri,
-                            domain: this.form.domain,
+                            redirect_uri: this.redirectUri,
+                            client_id: this.form.client_id,
                             code_challenge: this.code_challenge
                         }
                     });
@@ -76,15 +82,21 @@ export class LoginComponent implements OnInit {
     }
 
     onContinue() {
-        this.freezeDomain = true;
+        this.freezeClientId = true;
     }
 
     // redirection to home page might not work sometime,
     // check if internally anything is nav-ing to login page again
     async onSubmit(): Promise<void> {
-        const {email, password, domain} = this.form;
+        const {email, password, client_id} = this.form;
         try {
-            const data = await lastValueFrom(this.authService.login(email, password, domain, this.code_challenge));
+            const data = await this.authService.login(
+                email,
+                password,
+                client_id,
+                this.code_challenge,
+                this.code_challenge_method
+            );
             let authenticationCode = data.authentication_code;
             this.isLoginFailed = false;
             this.isLoggedIn = true;
