@@ -42,6 +42,14 @@ export class LoginComponent implements OnInit {
             alert("Invalid challenge");
             return;
         }
+        this.code_challenge = params.get("code_challenge")!;
+
+        if (!params.has("redirect_uri")) {
+            alert("Invalid redirect_uri");
+            return;
+        }
+        this.redirectUri = params.get("redirect_uri")!;
+
         if (params.has("client_id")) {
             this.form.client_id = params.get("client_id");
             if (this.form.client_id && this.form.client_id.length > 0) {
@@ -52,9 +60,6 @@ export class LoginComponent implements OnInit {
         if (params.has("code_challenge_method")) {
             this.code_challenge_method = params.get("code_challenge_method")!;
         }
-
-        this.redirectUri = params.get("redirect_uri")!;
-        this.code_challenge = params.get("code_challenge")!;
 
         // if auth code is present, then redirect
         // verify auth-code
