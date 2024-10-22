@@ -1,4 +1,4 @@
-import {generateKeyPairSync, randomBytes, scryptSync, timingSafeEqual} from "crypto";
+import {createHash, generateKeyPairSync, randomBytes, scryptSync, timingSafeEqual} from "crypto";
 import {generate} from 'otp-generator';
 
 function base64UrlEncode(input: Buffer | string): string {
@@ -57,13 +57,16 @@ export class CryptUtil {
         return base64UrlEncode(verifier).substring(0, length);
     }
 
-    public static generateCodeChallenge(verifier: string): string {
-        // commenting as cannot use in http context only https allowed.
-        // const hash = createHash('sha256').update(verifier).digest();
-        // return base64UrlEncode(hash).replace(/=+$/, '');
-
-
-        return this.oneWayHash(verifier);
+    public static generateCodeChallenge(verifier: string, method: string): string {
+        if (method === 'S256') {
+            // commenting as cannot use in http context only https allowed.
+            const hash = createHash('sha256').update(verifier).digest();
+            return base64UrlEncode(hash).replace(/=+$/, '');
+        }
+        if (method === 'OWH32') {
+            return this.oneWayHash(verifier);
+        }
+        return verifier;
     }
 
     public static oneWayHash(plain: string) {

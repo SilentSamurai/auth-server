@@ -39,11 +39,81 @@ const dirSize = async dir => {
 }
 
 
+const { Console } = require('console');
+const { Transform } = require('stream');
+
+function table(input) {
+    // @see https://stackoverflow.com/a/67859384
+    const ts = new Transform({ transform(chunk, enc, cb) { cb(null, chunk) } })
+    const logger = new Console({ stdout: ts })
+    logger.table(input)
+    const table = (ts.read() || '').toString()
+    let result = '';
+    for (let row of table.split(/[\r\n]+/)) {
+        let r = row.replace(/[^┬]*┬/, '┌');
+        r = r.replace(/^├─*┼/, '├');
+        r = r.replace(/│[^│]*/, '');
+        r = r.replace(/^└─*┴/, '└');
+        r = r.replace(/'/g, ' ');
+        result += `${r}\n`;
+    }
+    console.log(result);
+}
+
 async function main() {
-    const size = await dirSize('C:\\Users\\P1360072\\AppData\\Local');
-    console.log(size / (1024 * 1024 * 1024));
+    // const size = await dirSize('C:\\Users\\P1360072\\AppData\\Local');
+    // console.log(size / (1024 * 1024 * 1024));
 
-
+    table([
+        {
+            Context: "CPU Bound Task",
+            metric: "http req",
+            Java: "18 r/s",
+            NodeJS: "1 r/s",
+            "NodeJS (Clustered)": "8 r/s",
+            comments: ""
+        },
+        {
+            Context: "    - 150 vus for 30s ",
+            metric: "cpu",
+            Java: "100%",
+            NodeJS: "100%",
+            "NodeJS (Clustered)": "100%",
+            comments: ""
+        },
+        {
+            Context: "",
+            metric: "memory",
+            Java: "~ 2 GB",
+            NodeJS: "~ 1 GB",
+            "NodeJS (Clustered)": "~ 2 GB",
+            comments: ""
+        },
+        {
+            Context: "IO Bound Task",
+            metric: "http req",
+            Java: "190 r/s",
+            NodeJS: "804 r/s",
+            "NodeJS (Clustered)": "951 r/s",
+            comments: ""
+        },
+        {
+            Context: "    - 1000 vus for 10s ",
+            metric: "cpu",
+            Java: "60 - 70%",
+            NodeJS: "45%",
+            "NodeJS (Clustered)": "70%",
+            comments: ""
+        },
+        {
+            Context: "",
+            metric: "memory",
+            Java: "~ 4 GB",
+            NodeJS: "~ 2 GB",
+            "NodeJS (Clustered)": "~ 2 GB",
+            comments: ""
+        }
+    ])
 }
 
 main();

@@ -64,11 +64,11 @@
     const code_verifier = "abcd-asfasf";
 
     async function refer() {
-        const redirect = window.location.origin + window.location.pathname
+        const redirect_uri = window.location.origin + window.location.pathname
         const code_challenge = code_verifier
         const domain = "dummy.com";
-        window.location.href =
-            `http://localhost:9001/login?redirect=${redirect}&code_challenge=${code_challenge}&domain=${domain}`;
+        const code_challenge_method = "plain";
+        window.location.href = `http://localhost:9001/login?redirect_uri=${redirect_uri}&code_challenge=${code_challenge}&client_id=${domain}&code_challenge_method=${code_challenge_method}`;
     }
 
     async function getAuthToken(code) {
@@ -88,7 +88,7 @@
             const data = await response.json();
             console.log(`data => ${data.access_token}`)
             const username = decodeToken(data.access_token);
-            element = document.getElementById('login-btn');
+            let element = document.getElementById('login-btn');
             element.innerText = "Logout " + username;
         }
     }

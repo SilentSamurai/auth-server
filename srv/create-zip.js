@@ -11,7 +11,7 @@ archive.glob('dist/**', {
     ignore: ['*/node_modules/**', '**/**.zip']
 });
 
-// archive.directory('dist/envs', 'dist/envs');
+archive.directory('dist/envs', 'dist/envs');
 
 archive.file('package.json', {});
 

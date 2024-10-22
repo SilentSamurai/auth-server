@@ -142,7 +142,8 @@ const UpdateUserSchema = yup.object().shape(
 const LoginSchema = yup.object().shape({
     email: yup.string().email().required('Email is required'),
     password: yup.string().required('Password is required').matches(PASSWORD_REGEXP, PASSWORD_MESSAGE),
-    domain: yup.string().required('Domain is required'),
+    client_id: yup.string().required('client_id is required'),
+    code_challenge_method: yup.string().matches(/^plain|S256|OWH32$/, "method is required").default('plain'),
     code_challenge: yup.string().required('code_challenge is required')
 });
 
@@ -150,8 +151,7 @@ const PasswordGrantSchema = yup.object().shape({
     grant_type: yup.string().required().matches(/^password$/g, {message: "grant type not recognised"}),
     username: yup.string().email().required('Username is required'),
     password: yup.string().required('Password is required').matches(PASSWORD_REGEXP, PASSWORD_MESSAGE),
-    domain: yup.string().required('Domain is required'),
-    // client_id: yup.string().required('client_id is required'),
+    client_id: yup.string().required('client_id is required'),
     scopes: yup.array().of(
         yup.string().max(20)
     )

@@ -51,7 +51,6 @@ import {Filter} from "../../component/model/Filters";
 
                     <ng-template #table_body let-tenant>
                         <td>
-                            <span class="p-column-title">Name</span>
                             <a [routerLink]="['/TN02/', tenant.id]"
                                href="javascript:void(0)">{{ tenant.domain }}</a>
                         </td>

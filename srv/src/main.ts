@@ -52,22 +52,23 @@ async function bootstrap() {
 
 async function main() {
     const numCPUs = os.cpus().length;
+    console.log(`${numCPUs} vCpu cores found`);
     if (cluster.isPrimary) {
-        console.log(`Primary ${process.pid} is running`);
-        // Fork workers.
+        console.log(`Primary process(${process.pid}) started`);
+        // start 1 process per cpu core using fork
         for (let i = 0; i < numCPUs; i++) {
             const worker = cluster.fork();
         }
         cluster.on('exit', (worker, code, signal) => {
-            console.log(`worker ${worker.process.pid} exited with code ${code} and ${signal}`);
+            console.log(`worker process(${worker.process.pid}) exited with code ${code} and ${signal}`);
         });
     } else {
         // Workers can share any TCP connection
         // In this case it is an HTTP server
         bootstrap()
 
-        console.log(`Worker ${process.pid} started`);
+        console.log(`Worker process(${process.pid}) started`);
     }
 }
 
-bootstrap();
+main();

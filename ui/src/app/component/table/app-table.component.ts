@@ -261,7 +261,8 @@ export class AppTableComponent implements OnInit {
 
     lazyLoad(event: any) {
         // console.log("lazy", event);
-        const reachedEnd = event.target.offsetHeight + event.target.scrollTop >= event.target.scrollHeight;
+        const reachedEnd = event.target.offsetHeight + event.target.scrollTop >= event.target.scrollHeight - 1;
+        // console.log(reachedEnd, event.target.offsetHeight + event.target.scrollTop, event.target.scrollHeight);
         if (reachedEnd && this.pagesInProgress.size < 1) {
             console.log("lazy", event);
             this.requestForData({append: true})
