@@ -5,6 +5,7 @@ import {HttpExceptionFilter} from './exceptions/http-exception.filter';
 import {ConfigService} from './config/config.service';
 import * as express from 'express';
 import * as fs from 'fs';
+import * as process from "node:process";
 
 const os = require('os');
 const cluster = require('cluster');
@@ -51,7 +52,9 @@ async function bootstrap() {
 
 
 async function main() {
-    const numCPUs = os.cpus().length;
+    const envCores = process.env['USE_CORES'];
+    const numCPUs = envCores == "-1" ? os.cpus().length:  1;
+
     console.log(`${numCPUs} vCpu cores found`);
     if (cluster.isPrimary) {
         console.log(`Primary process(${process.pid}) started`);

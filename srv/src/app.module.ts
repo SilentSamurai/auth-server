@@ -22,7 +22,6 @@ import {GroupRole} from "./entity/group.roles.entity";
 import {GroupUser} from "./entity/group.users.entity";
 import {Group} from "./entity/group.entity";
 import {ServiceModule} from "./services/service.module";
-import {JwtModule} from "@nestjs/jwt";
 import {MongooseModule} from "@nestjs/mongoose";
 
 @Module({
@@ -41,6 +40,8 @@ import {MongooseModule} from "@nestjs/mongoose";
                 imports: undefined,
                 inject: [ConfigService],
                 useFactory: (configService: ConfigService) => {
+                    const sslEnvEnabled: boolean = configService.get('DATABASE_SSL', false);
+                    console.log(`db ssl value found: ${sslEnvEnabled}`);
                     return {
                         type: configService.get('DATABASE_TYPE'),
                         host: configService.get('DATABASE_HOST'),
@@ -51,13 +52,11 @@ import {MongooseModule} from "@nestjs/mongoose";
                         entities: [Tenant, User, TenantMember, Role, UserRole, AuthCode, Group, GroupRole, GroupUser],
                         migrations: [CreateInitialTables1681147242561, SessionMigration1684308185392, Migrations1718012430697],
                         synchronize: false,
-                        ssl: configService.get('DATABASE_SSL'),
+                        ssl: sslEnvEnabled ? {rejectUnauthorized: false} : false,
                         logging: configService.get('DATABASE_LOGGING'),
                         schema: configService.get('DATABASE_SCHEMA'),
-                        "extra": {
-                            "ssl": {
-                                "rejectUnauthorized": false
-                            }
+                        extra: {
+                            ssl: sslEnvEnabled ? {rejectUnauthorized: false} : false
                         }
                     };
                 }

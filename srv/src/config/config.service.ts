@@ -51,19 +51,17 @@ export class ConfigService {
         if (key in process.env) {
             let value: string = process.env[key];
             switch (value) {
+                // case '1':
                 case 'true':
                     return true;
+                // case '0':
                 case 'false':
                     return false;
                 default:
                     return value;
             }
         } else {
-            if (defaultValue) {
-                return defaultValue;
-            } else {
-                return null;
-            }
+            return defaultValue;
         }
     }
 
