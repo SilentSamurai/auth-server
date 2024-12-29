@@ -39,13 +39,13 @@ export class LoginComponent implements OnInit {
 
         // code_challenge_method
         if (!params.has("code_challenge")) {
-            alert("Invalid challenge");
+            alert("Invalid challenge || challenge not found!");
             return;
         }
         this.code_challenge = params.get("code_challenge")!;
 
         if (!params.has("redirect_uri")) {
-            alert("Invalid redirect_uri");
+            alert("Invalid redirect_uri || redirect_uri not found");
             return;
         }
         this.redirectUri = params.get("redirect_uri")!;
