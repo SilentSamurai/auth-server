@@ -27,13 +27,13 @@ import {MongooseModule} from "@nestjs/mongoose";
 @Module({
     imports: [
         ConfigModule,
-        ServeStaticModule.forRootAsync(
-            {
-                inject: [ConfigService],
-                useFactory: (configService: ConfigService) => {
-                    return [{rootPath: configService.getStaticPath()}];
-                }
-            }),
+        // ServeStaticModule.forRootAsync(
+        //     {
+        //         inject: [ConfigService],
+        //         useFactory: (configService: ConfigService) => {
+        //             return [{rootPath: configService.getStaticPath()}];
+        //         }
+        //     }),
         ScheduleModule.forRoot(), // Initializes the scheduler and registers any declarative cron jobs, timeouts and intervals that exist within the app.
         TypeOrmModule.forRootAsync( // Get the configuration settings from the config service asynchronously.
             {

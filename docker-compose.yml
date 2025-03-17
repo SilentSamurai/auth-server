@@ -30,12 +30,15 @@ services:
             DATABASE_USERNAME: root
             DATABASE_PASSWORD: root
             DATABASE_SSL: false
-        #            STATIC_PATH: "/home/app/dist/static"
+            MONGO_DATABASE_TYPE: REAL
+            MONGO_DB_URI: mongodb://root:example@mongo:27017
+#            STATIC_PATH: "/home/app/dist/static"
         #        entrypoint: ["tail", "-f","/dev/null"]
 #        ports:
 #            - '8080:8080'
         depends_on:
             - db
+            - mongo
 
     db:
         container_name: myidentity_db
@@ -60,14 +63,14 @@ services:
 #            PGADMIN_DEFAULT_EMAIL: postgres@mail.com
 #            PGADMIN_DEFAULT_PASSWORD: password@1234
 
-#    mongo:
-#        image: mongo
-#        restart: always
-#        environment:
-#            MONGO_INITDB_ROOT_USERNAME: root
-#            MONGO_INITDB_ROOT_PASSWORD: example
-#        ports:
-#            - 27017:27017
+    mongo:
+        image: mongo
+        restart: always
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: root
+            MONGO_INITDB_ROOT_PASSWORD: example
+        ports:
+            - 27017:27017
 #
 #    mongo-express:
 #        image: mongo-express
