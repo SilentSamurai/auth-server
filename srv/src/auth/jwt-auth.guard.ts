@@ -3,7 +3,7 @@ import {UnauthorizedException} from "../exceptions/unauthorized.exception";
 import {ExtractJwt} from 'passport-jwt';
 import {AuthService} from "./auth.service";
 import {CaslAbilityFactory} from "../casl/casl-ability.factory";
-import {GRANT_TYPES} from "../casl/contexts";
+import {GRANT_TYPES, TenantToken} from "../casl/contexts";
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
@@ -24,18 +24,47 @@ export class JwtAuthGuard implements CanActivate {
             // so that we can access it in our route handlers
             const payload = await this.setSecurityContextFromRequest(request);
         } catch (e) {
-            JwtAuthGuard.LOGGER.error("Error occurred in Security Context", e)
+            JwtAuthGuard.LOGGER.error("Error occurred in Security Context", e.message, e.stack);
             throw new UnauthorizedException(e);
         }
         return true;
     }
 
     async setSecurityContextFromRequest(request: any) {
-        const token = extractTokenFromHeader(request);
-        if (!token) {
-            throw new UnauthorizedException("No token provided");
+        const authHeader = request.headers.authorization;
+
+        if (!authHeader) {
+            throw new UnauthorizedException("No authentication credentials provided");
         }
-        const payload = await this.authService.validateAccessToken(token);
+
+        let payload: TenantToken;
+        if (authHeader.startsWith("Bearer ")) {
+            const token = extractTokenFromHeader(request);
+            if (!token) {
+                throw new UnauthorizedException("Invalid Bearer token");
+            }
+
+            try {
+                payload = await this.authService.validateAccessToken(token);
+            } catch (error) {
+                throw new UnauthorizedException("Invalid or expired JWT token");
+            }
+        } else if (authHeader.startsWith("Basic ")) {
+            const credentials = extractBasicAuthCredentials(authHeader);
+            if (!credentials) {
+                throw new UnauthorizedException("Invalid Basic Authentication credentials");
+            }
+
+            try {
+                payload = await this.validateBasicAuth(credentials.username, credentials.password);
+                JwtAuthGuard.LOGGER.log("basic authentication credentials in");
+            } catch (error) {
+                throw new UnauthorizedException("Invalid Basic Authentication credentials");
+            }
+        } else {
+            throw new UnauthorizedException("Unsupported authentication type");
+        }
+
         if (payload.grant_type === GRANT_TYPES.PASSWORD) {
             request['user'] = payload;
         }
@@ -45,9 +74,35 @@ export class JwtAuthGuard implements CanActivate {
         return payload;
     }
 
+    private async validateBasicAuth(id: string, secret: string): Promise<TenantToken> {
+        if (!id || !secret) {
+            throw new UnauthorizedException("Invalid Basic Auth format");
+        }
+
+        if (id.includes('@')) {
+            // Email-based authentication (Username/Password)
+            throw new UnauthorizedException("basic auth not supported for user login");
+        } else {
+            // Client ID/Secret authentication
+            const tenant = await this.authService.validateClientCredentials(id, secret);
+
+            return this.authService.createTechnicalToken(tenant, []);
+        }
+    }
+
 }
 
 function extractTokenFromHeader(request: any) {
     let extractor = ExtractJwt.fromAuthHeaderAsBearerToken();
     return extractor(request)
+}
+
+function extractBasicAuthCredentials(authHeader: string): { username: string; password: string } | null {
+    const base64Credentials = authHeader.split(" ")[1];
+    const decoded = Buffer.from(base64Credentials, "base64").toString("utf-8");
+    const [username, password] = decoded.split(":");
+    if (!username || !password) {
+        return null;
+    }
+    return {username, password};
 }

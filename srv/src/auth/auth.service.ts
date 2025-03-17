@@ -105,7 +105,7 @@ export class AuthService {
         return tenant;
     }
 
-    async createTechnicalAccessToken(tenant: Tenant, roles: string[]): Promise<string> {
+    createTechnicalToken(tenant: Tenant, roles: string[]): TechnicalToken {
         roles = roles instanceof Array ? roles : [];
         const payload: TechnicalToken = {
             sub: "oauth",
@@ -121,6 +121,12 @@ export class AuthService {
             grant_type: GRANT_TYPES.CLIENT_CREDENTIAL,
             isTechnical: true
         };
+        return payload;
+    }
+
+    async createTechnicalAccessToken(tenant: Tenant, roles: string[]): Promise<string> {
+        roles = roles instanceof Array ? roles : [];
+        const payload: TechnicalToken = this.createTechnicalToken(tenant, roles);
         return this.jwtService.sign(payload, {privateKey: tenant.privateKey,});
     }
 

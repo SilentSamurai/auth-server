@@ -3,9 +3,9 @@
     "version": "0.0.0",
     "scripts": {
         "ng": "ng",
-        "ui:serve": "ng serve",
+        "ui:serve": "ng serve --proxy-config proxy.conf.js",
         "build": "ng build",
-        "UI:SERVE:WATCH": "ng serve --watch --configuration development",
+        "UI:SERVE:WATCH": "ng serve --watch --configuration development --proxy-config proxy.conf.js",
         "UI:BUILD:WATCH": "ng build --watch --configuration development",
         "test": "ng test Angular13JwtAuth --karma-config karma.conf.js --code-coverage=true",
         "update": "ng update @angular/core@17 @angular/cli@17"

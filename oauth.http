@@ -1,0 +1,27 @@
+### GET request to example server
+GET https://examples.http-client.intellij.net/get
+    ?generated-in=WebStorm
+
+###
+
+POST http://localhost:9001/api/oauth/token
+Content-Type: application/json
+
+{
+    "grant_type": "client_credential",
+    "client_id" :  "71f24a0ceadd8006a8054e5ff33b2664",
+    "client_secret": "3d4d70129f3cdcf892a6ba2f0c2f275e1e4102381188d3b5945a616a871dedad0f573c0351269def527cbbfd52e1b42f783412eb1756ce4237111fe6f7e49467"
+}
+
+> {% client.global.set("access_token", response.body.access_token) %}
+
+###
+
+GET http://localhost:9001/api/tenant/my/credentials
+Content-Type: application/json
+Authorization: Basic 71f24a0ceadd8006a8054e5ff33b2664 3d4d70129f3cdcf892a6ba2f0c2f275e1e4102381188d3b5945a616a871dedad0f573c0351269def527cbbfd52e1b42f783412eb1756ce4237111fe6f7e49467
+
+
+
+
+###

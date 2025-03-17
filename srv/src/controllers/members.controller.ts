@@ -94,7 +94,7 @@ export class MemberController {
         }
     }
 
-    @Put('/:tenantId/member/:userId/casl')
+    @Put('/:tenantId/member/:userId/roles')
     @UseGuards(JwtAuthGuard)
     async updateRole(
         @Request() request,
@@ -126,7 +126,7 @@ export class MemberController {
         };
     }
 
-    @Get('/:tenantId/member/:userId/casl')
+    @Get('/:tenantId/member/:userId/roles')
     @UseGuards(JwtAuthGuard)
     async getMemberRoles(
         @Request() request,
