@@ -18,7 +18,7 @@ metadata:
 spec:
     type: {{ .Values.web.service.type }}
     selector:
-        app: auth-server
+        app: auth-server-ui
     ports:
         -   protocol: "TCP"
             port: {{ .Values.web.service.port }}

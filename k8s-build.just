@@ -22,7 +22,7 @@ build-image-backend:
     podman save -o auth-server.tar auth-server:latest
     sudo k3s ctr images rm localhost/auth-server:latest
     sudo k3s ctr images import auth-server.tar
-    sudo k3s ctr images ls | grep ims-3
+    sudo k3s ctr images ls | grep auth-server
 
 [group('k8s')]
 [working-directory: 'helm']
