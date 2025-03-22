@@ -108,10 +108,11 @@ dist
 .idea
 
 db
-/*/package-lock.json
 
 keys
 
 nginx/static
 nginx/logs
 nginx/temp
+
+.qodo

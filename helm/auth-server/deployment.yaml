@@ -40,6 +40,10 @@ spec:
                             value: "secret"
                         -   name: DATABASE_SSL
                             value: "false"
+                        -   name: MONGO_DATABASE_TYPE
+                            value: "REAL"
+                        -   name: MONGO_DB_URI
+                            value: "mongodb://root:secret@mongo-mongodb.mongo.svc.cluster.local:27017/"
                     readinessProbe:
                         initialDelaySeconds: 5
                         periodSeconds: 5
