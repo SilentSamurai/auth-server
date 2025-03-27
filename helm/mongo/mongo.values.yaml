@@ -12,10 +12,10 @@ tls:
     resourcesPreset: "nano"
     resources:
         requests:
-            cpu: "250m" # Request 250 millicores (0.25 CPU)
+            cpu: "50m" # Request 250 millicores (0.25 CPU)
             memory: "512Mi" # Request 256MB RAM
         limits:
-            cpu: "250m" # Request 250 millicores (0.25 CPU)
+            cpu: "50m" # Request 250 millicores (0.25 CPU)
             memory: "512Mi" # Request 256MB RAM
 
 persistence:

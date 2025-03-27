@@ -2,7 +2,7 @@ import {Injectable, Logger, OnModuleInit} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {Repository} from 'typeorm';
 import {User} from '../entity/user.entity';
-import {ConfigService} from '../config/config.service';
+import {Environment} from '../config/environment.service';
 import {EmailTakenException} from '../exceptions/email-taken.exception';
 import {UserNotFoundException} from '../exceptions/user-not-found.exception';
 import {InvalidCredentialsException} from '../exceptions/invalid-credentials.exception';
@@ -22,7 +22,7 @@ export class UsersService implements OnModuleInit {
 
     constructor(
         @InjectRepository(User) private usersRepository: Repository<User>,
-        private readonly configService: ConfigService,
+        private readonly configService: Environment,
         private readonly securityService: SecurityService
     ) {
     }

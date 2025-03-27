@@ -8,14 +8,14 @@ import {NotFoundException} from "../exceptions/not-found.exception";
 import {Role} from "../entity/role.entity";
 import {ForbiddenException} from "../exceptions/forbidden.exception";
 import {TenantMember} from "../entity/tenant.members.entity";
-import {ConfigService} from "../config/config.service";
+import {Environment} from "../config/environment.service";
 
 
 @Injectable()
 export class AuthUserService {
 
     constructor(
-        private readonly configService: ConfigService,
+        private readonly configService: Environment,
         @InjectRepository(User) private usersRepository: Repository<User>,
         @InjectRepository(Tenant) private tenantRepository: Repository<Tenant>,
         @InjectRepository(TenantMember) private tenantMemberRepository: Repository<TenantMember>,

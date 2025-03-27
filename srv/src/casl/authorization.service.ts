@@ -1,6 +1,6 @@
 import {Injectable} from "@nestjs/common";
 import {Role} from "../entity/role.entity";
-import {ConfigService} from "../config/config.service";
+import {Environment} from "../config/environment.service";
 import {Model} from "mongoose";
 import {Authorization} from "../entity/authorization.schema";
 import {InjectModel} from "@nestjs/mongoose";
@@ -11,7 +11,7 @@ import {AuthContext} from "./contexts";
 export class AuthorizationService {
 
     constructor(
-        private readonly configService: ConfigService,
+        private readonly configService: Environment,
         @InjectModel(Authorization.name) private authorizationModel: Model<Authorization>
     ) {
     }

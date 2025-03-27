@@ -1,5 +1,5 @@
 import {Injectable, Logger} from '@nestjs/common';
-import {ConfigService} from '../config/config.service';
+import {Environment} from '../config/environment.service';
 import {JwtService} from '@nestjs/jwt';
 import {TenantService} from "../services/tenant.service";
 import {NotFoundException} from "../exceptions/not-found.exception";
@@ -21,7 +21,7 @@ export class AuthCodeService {
     private readonly LOGGER = new Logger("AuthCodeService");
 
     constructor(
-        private readonly configService: ConfigService,
+        private readonly configService: Environment,
         private readonly authUserService: AuthUserService,
         private readonly tenantService: TenantService,
         private readonly jwtService: JwtService,

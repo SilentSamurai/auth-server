@@ -13,7 +13,7 @@ import {
 } from '@nestjs/common';
 
 import {User} from '../entity/user.entity';
-import {ConfigService} from '../config/config.service';
+import {Environment} from '../config/environment.service';
 import {AuthService} from '../auth/auth.service';
 import {UsersService} from '../services/users.service';
 import {MailService} from '../mail/mail.service';
@@ -32,7 +32,7 @@ import {AuthUserService} from "../casl/authUser.service";
 @UseInterceptors(ClassSerializerInterceptor)
 export class AuthController {
     constructor(
-        private readonly configService: ConfigService,
+        private readonly configService: Environment,
         private readonly authService: AuthService,
         private readonly usersService: UsersService,
         private readonly tenantService: TenantService,

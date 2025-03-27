@@ -1,5 +1,5 @@
 import {ClassSerializerInterceptor, Controller, Get, Request, UseGuards, UseInterceptors} from "@nestjs/common";
-import {ConfigService} from "../config/config.service";
+import {Environment} from "../config/environment.service";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
 
 @Controller('api/v1')
@@ -7,7 +7,7 @@ import {JwtAuthGuard} from "../auth/jwt-auth.guard";
 export class MainController {
 
     constructor(
-        private readonly configService: ConfigService
+        private readonly configService: Environment
     ) {
     }
 

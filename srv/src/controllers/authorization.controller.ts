@@ -11,7 +11,7 @@ import {
     UseGuards,
     UseInterceptors
 } from "@nestjs/common";
-import {ConfigService} from "../config/config.service";
+import {Environment} from "../config/environment.service";
 import {SecurityService} from "../casl/security.service";
 import {AuthContext} from "../casl/contexts";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
@@ -24,7 +24,7 @@ import {NotFoundException} from "../exceptions/not-found.exception";
 export class AuthorizationController {
 
     constructor(
-        private readonly configService: ConfigService,
+        private readonly configService: Environment,
         private readonly securityService: SecurityService,
         private readonly authorizationService: AuthorizationService,
         private readonly roleService: RoleService,

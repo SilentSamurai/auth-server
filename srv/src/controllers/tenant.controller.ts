@@ -11,7 +11,7 @@ import {
     UseGuards,
     UseInterceptors
 } from "@nestjs/common";
-import {ConfigService} from "../config/config.service";
+import {Environment} from "../config/environment.service";
 import {UsersService} from "../services/users.service";
 import {TenantService} from "../services/tenant.service";
 import {ValidationPipe} from "../validation/validation.pipe";
@@ -28,7 +28,7 @@ import {subject} from "@casl/ability";
 export class TenantController {
 
     constructor(
-        private readonly configService: ConfigService,
+        private readonly configService: Environment,
         private readonly tenantService: TenantService,
         private readonly usersService: UsersService,
         private readonly securityService: SecurityService

@@ -6,11 +6,11 @@ import * as process from "node:process";
 import * as fs from "node:fs";
 
 @Injectable()
-export class ConfigService {
+export class Environment {
     constructor() {
     }
 
-    static config(): any {
+    static setup(): any {
         const envFile = process.env.ENV_FILE || './envs/.env.development';
         let envPath = path.resolve(process.cwd(), envFile);
         if (!fs.existsSync(envPath)) {
@@ -69,7 +69,7 @@ export class ConfigService {
      * Get a configuration value.
      */
     get(key: string, defaultValue: any = null): any {
-        return ConfigService.get(key, defaultValue);
+        return Environment.get(key, defaultValue);
     }
 
     /**
@@ -99,6 +99,6 @@ export class ConfigService {
     }
 
     isProduction() {
-        return ConfigService.isProduction();
+        return Environment.isProduction();
     }
 }

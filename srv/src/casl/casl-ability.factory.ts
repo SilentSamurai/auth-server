@@ -4,7 +4,7 @@ import {Injectable} from "@nestjs/common";
 import {RoleEnum} from "../entity/roleEnum";
 import {AnyAbility} from "@casl/ability/dist/types/PureAbility";
 import {SubjectEnum} from "../entity/subjectEnum";
-import {ConfigService} from "../config/config.service";
+import {Environment} from "../config/environment.service";
 import {GRANT_TYPES, TenantToken} from "./contexts";
 
 
@@ -12,7 +12,7 @@ import {GRANT_TYPES, TenantToken} from "./contexts";
 export class CaslAbilityFactory {
 
     constructor(
-        private readonly configService: ConfigService,
+        private readonly configService: Environment,
     ) {
     }
 

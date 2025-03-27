@@ -1,5 +1,5 @@
 import {Injectable} from "@nestjs/common";
-import {ConfigService} from "../config/config.service";
+import {Environment} from "../config/environment.service";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 import {Tenant} from "../entity/tenant.entity";
@@ -16,7 +16,7 @@ import {SubjectEnum} from "../entity/subjectEnum";
 export class RoleService {
 
     constructor(
-        private readonly configService: ConfigService,
+        private readonly configService: Environment,
         private readonly securityService: SecurityService,
         @InjectRepository(User) private usersRepository: Repository<User>,
         @InjectRepository(Role) private roleRepository: Repository<Role>,

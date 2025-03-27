@@ -1,5 +1,5 @@
 import {Injectable, OnModuleInit} from "@nestjs/common";
-import {ConfigService} from "./config/config.service";
+import {Environment} from "./config/environment.service";
 import {UsersService} from "./services/users.service";
 import {RoleService} from "./services/role.service";
 import {TenantService} from "./services/tenant.service";
@@ -15,7 +15,7 @@ export class StartUpService implements OnModuleInit {
 
 
     constructor(
-        private readonly configService: ConfigService,
+        private readonly configService: Environment,
         private readonly usersService: UsersService,
         private readonly tenantService: TenantService,
         private readonly roleService: RoleService,

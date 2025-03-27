@@ -5,7 +5,7 @@ import {ScheduleModule} from '@nestjs/schedule';
 import {TypeOrmModule} from '@nestjs/typeorm';
 import {CaslModule} from './casl/casl.module';
 import {AuthModule} from './auth/auth.module';
-import {ConfigService} from './config/config.service';
+import {Environment} from './config/environment.service';
 import {LoggerMiddleware} from './log/logger.middleware';
 import {StartUpService} from "./startUp.service";
 import {ControllersModule} from "./controllers/controller.module";
@@ -38,8 +38,8 @@ import {MongooseModule} from "@nestjs/mongoose";
         TypeOrmModule.forRootAsync( // Get the configuration settings from the config service asynchronously.
             {
                 imports: undefined,
-                inject: [ConfigService],
-                useFactory: (configService: ConfigService) => {
+                inject: [Environment],
+                useFactory: (configService: Environment) => {
                     const sslEnvEnabled: boolean = configService.get('DATABASE_SSL', false);
                     console.log(`db ssl value found: ${sslEnvEnabled}`);
                     return {
@@ -63,7 +63,7 @@ import {MongooseModule} from "@nestjs/mongoose";
             }),
         MongooseModule.forRootAsync({
             imports: [ConfigModule],
-            useFactory: async (configService: ConfigService) => {
+            useFactory: async (configService: Environment) => {
 
                 if (configService.get('MONGO_DATABASE_TYPE') === 'IN_MEMORY') {
                     const { MongoMemoryServer } = require('mongodb-memory-server');
@@ -80,7 +80,7 @@ import {MongooseModule} from "@nestjs/mongoose";
                     dbName: 'identity'
                 }
             },
-            inject: [ConfigService],
+            inject: [Environment],
         }),
         CaslModule,
         ServiceModule,

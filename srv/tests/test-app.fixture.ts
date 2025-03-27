@@ -1,5 +1,5 @@
 import {INestApplication} from "@nestjs/common";
-import {ConfigService} from "../src/config/config.service";
+import {Environment} from "../src/config/environment.service";
 import {Test, TestingModule} from "@nestjs/testing";
 import {AppModule} from "../src/app.module";
 import {JwtService} from "@nestjs/jwt";
@@ -25,7 +25,7 @@ export class TestAppFixture {
         global.console = console;
 
         process.env.ENV_FILE = './envs/.env.testing';
-        ConfigService.config();
+        Environment.setup();
         this.moduleRef = await Test.createTestingModule({
             imports: [AppModule],
         }).compile()

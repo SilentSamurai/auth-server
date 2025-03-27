@@ -1,5 +1,5 @@
 import {BadRequestException, Injectable} from "@nestjs/common";
-import {ConfigService} from "../config/config.service";
+import {Environment} from "../config/environment.service";
 import {UsersService} from "./users.service";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
@@ -22,7 +22,7 @@ import {SubjectEnum} from "../entity/subjectEnum";
 export class GroupService {
 
     constructor(
-        private readonly configService: ConfigService,
+        private readonly configService: Environment,
         private readonly usersService: UsersService,
         private readonly roleService: RoleService,
         private readonly tenantService: TenantService,

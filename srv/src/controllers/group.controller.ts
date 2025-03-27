@@ -10,7 +10,7 @@ import {
     Request, UseGuards,
     UseInterceptors
 } from "@nestjs/common";
-import {ConfigService} from "../config/config.service";
+import {Environment} from "../config/environment.service";
 import {ValidationPipe} from "../validation/validation.pipe";
 import {ValidationSchema} from "../validation/validation.schema";
 import {TenantService} from "../services/tenant.service";
@@ -22,7 +22,7 @@ import {JwtAuthGuard} from "../auth/jwt-auth.guard";
 export class GroupController {
 
     constructor(
-        private readonly configService: ConfigService,
+        private readonly configService: Environment,
         private readonly groupService: GroupService,
         private readonly tenantService: TenantService,
     ) {

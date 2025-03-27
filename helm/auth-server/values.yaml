@@ -22,11 +22,11 @@ backend:
         MONGO_DB_URI: "mongodb://root:secret@mongo-mongodb.mongo.svc.cluster.local:27017/"
     resources:
         requests:
-            cpu: "250m"
+            cpu: "50m"
             memory: "512Mi"
         limits:
-            cpu: "500m"
-            memory: "1024Mi"
+            cpu: "50m"
+            memory: "512Mi"
 
 
 web:
@@ -42,11 +42,11 @@ web:
         AUTH_SERVER: "http://auth-server-api.auth-server.svc.cluster.local:8080/api"
     resources:
         requests:
-            cpu: "250m"
+            cpu: "50m"
             memory: "512Mi"
         limits:
-            cpu: "500m"
-            memory: "1024Mi"
+            cpu: "50m"
+            memory: "512Mi"
 
 ingress:
     enabled: true

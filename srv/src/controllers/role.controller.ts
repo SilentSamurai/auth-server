@@ -9,7 +9,7 @@ import {
     UseGuards,
     UseInterceptors
 } from "@nestjs/common";
-import {ConfigService} from "../config/config.service";
+import {Environment} from "../config/environment.service";
 import {TenantService} from "../services/tenant.service";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
 import {RoleService} from "../services/role.service";
@@ -25,7 +25,7 @@ import {UsersService} from "../services/users.service";
 export class RoleController {
 
     constructor(
-        private readonly configService: ConfigService,
+        private readonly configService: Environment,
         private readonly tenantService: TenantService,
         private readonly userService: UsersService,
         private readonly roleService: RoleService,

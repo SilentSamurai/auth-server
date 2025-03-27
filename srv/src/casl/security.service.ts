@@ -1,7 +1,7 @@
 import {forwardRef, Inject, Injectable, OnModuleInit} from '@nestjs/common';
 
 import {RoleEnum} from "../entity/roleEnum";
-import {ConfigService} from "../config/config.service";
+import {Environment} from "../config/environment.service";
 import {ForbiddenException} from "../exceptions/forbidden.exception";
 import {CaslAbilityFactory} from "./casl-ability.factory";
 import {AnyAbility} from "@casl/ability/dist/types/PureAbility";
@@ -15,7 +15,7 @@ import {User} from "../entity/user.entity";
 @Injectable()
 export class SecurityService implements OnModuleInit {
 
-    constructor(private readonly configService: ConfigService,
+    constructor(private readonly configService: Environment,
                 private readonly authUserService: AuthUserService,
                 @Inject(forwardRef(() => CaslAbilityFactory)) private readonly caslAbilityFactory: CaslAbilityFactory
     ) {

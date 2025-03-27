@@ -1,5 +1,5 @@
 import {Injectable, Logger} from '@nestjs/common';
-import {ConfigService} from '../config/config.service';
+import {Environment} from '../config/environment.service';
 import {User} from '../entity/user.entity';
 import * as nodemailer from 'nodemailer';
 
@@ -9,7 +9,7 @@ export class MailService {
 
     private transporter: any;
 
-    constructor(private readonly configService: ConfigService) {
+    constructor(private readonly configService: Environment) {
         this.transporter = nodemailer.createTransport(
             {
                 host: configService.get('MAIL_HOST'),

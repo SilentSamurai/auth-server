@@ -24,10 +24,10 @@ describe('e2e positive auth code flow', () => {
                 "code_challenge": challenge,
                 "email": "admin@auth.server.com",
                 "password": "admin9000",
-                "domain": "auth.server.com"
+                "client_id": "auth.server.com"
             })
             .set('Accept', 'application/json');
-
+        console.log(JSON.stringify(response));
         expect(response.status).toEqual(201);
         expect(response.body.authentication_code).toBeDefined();
         authentication_code = response.body.authentication_code;
