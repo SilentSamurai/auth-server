@@ -1,7 +1,19 @@
-import {TestAppFixture} from "../test-app.fixture";
+function is2xx(response: { status: number }): boolean {
+    return response.status >= 200 && response.status < 300;
+}
+
+function expect2xx(response: { status: number; body: any }) {
+    if (!is2xx(response)) {
+        throw {
+            status: response.status,
+            body: response.body
+        };
+    }
+}
+
+import { TestAppFixture } from "../test-app.fixture";
 
 export class GroupClient {
-
     private readonly app: TestAppFixture;
     private accessToken: string;
 
@@ -13,19 +25,17 @@ export class GroupClient {
     public async createGroup(name: string, tenantId: string) {
         const response = await this.app.getHttpServer()
             .post('/api/group/create')
-            .send({
-                "name": name,
-                "tenantId": tenantId
-            })
             .set('Authorization', `Bearer ${this.accessToken}`)
-            .set('Accept', 'application/json');
+            .set('Accept', 'application/json')
+            .send({ name, tenantId });
 
-        console.log("Response: ", response.body);
-
+        console.log("Response (createGroup): ", response.body);
+        expect2xx(response);
         expect(response.status).toEqual(201);
         expect(response.body.id).toBeDefined();
         expect(response.body.name).toEqual(name);
         expect(response.body.tenantId).toEqual(tenantId);
+
         return response.body;
     }
 
@@ -35,11 +45,12 @@ export class GroupClient {
             .set('Authorization', `Bearer ${this.accessToken}`)
             .set('Accept', 'application/json');
 
-        console.log("Response: ", response.body);
-
+        console.log("Response (getAllTenantGroups): ", response.body);
+        expect2xx(response);
         expect(response.status).toEqual(200);
         expect(Array.isArray(response.body)).toBeTruthy();
         expect(response.body.length).toBeGreaterThanOrEqual(0);
+
         for (const group of response.body) {
             expect(group.tenantId).toBeDefined();
             expect(group.tenantId).toEqual(tenantId);
@@ -53,9 +64,10 @@ export class GroupClient {
             .set('Authorization', `Bearer ${this.accessToken}`)
             .set('Accept', 'application/json');
 
-        console.log("Response: ", response.body);
-
+        console.log("Response (getGroup): ", response.body);
+        expect2xx(response);
         expect(response.status).toEqual(200);
+
         expect(response.body.group).toBeDefined();
         expect(response.body.group.id).toBeDefined();
         expect(response.body.group.name).toBeDefined();
@@ -68,59 +80,54 @@ export class GroupClient {
 
     public async addRole(groupId: string, roles: string[]) {
         const response = await this.app.getHttpServer()
-            .post(`/api/group/${groupId}/add-roles`)
-            .send({
-                "roles": roles
-            })
+            .post(`/api/group/${groupId}/add-role`)
             .set('Authorization', `Bearer ${this.accessToken}`)
-            .set('Accept', 'application/json');
+            .set('Accept', 'application/json')
+            .send({ roles });
 
-        console.log("Response: ", response.body);
-
+        console.log("Response (addRole): ", response.body);
+        expect2xx(response);
         expect(response.status).toEqual(201);
+
         expect(response.body.group).toBeDefined();
         expect(response.body.group.name).toBeDefined();
         expect(response.body.group.tenantId).toBeDefined();
         expect(response.body.roles).toBeDefined();
         expect(response.body.roles.length).toBeGreaterThanOrEqual(roles.length);
-        // for (let role of response.body.casl) {
-        //     expect(role.name).toContain(/ABC_ROLE|DEF_ROLE/);
-        // }
+
         return response.body;
     }
 
     public async removeRoles(groupId: string, roles: string[]) {
         const response = await this.app.getHttpServer()
-            .post(`/api/group/${groupId}/remove-roles`)
-            .send({
-                "roles": roles
-            })
+            .post(`/api/group/${groupId}/remove-role`)
             .set('Authorization', `Bearer ${this.accessToken}`)
-            .set('Accept', 'application/json');
+            .set('Accept', 'application/json')
+            .send({ roles });
 
-        console.log("Response: ", response.body);
-
+        console.log("Response (removeRoles): ", response.body);
+        expect2xx(response);
         expect(response.status).toEqual(201);
+
         expect(response.body.group).toBeDefined();
         expect(response.body.group.name).toBeDefined();
         expect(response.body.group.tenantId).toBeDefined();
         expect(response.body.roles).toBeDefined();
-        return response.body
-    }
 
+        return response.body;
+    }
 
     public async addUser(groupId: string, users: string[]) {
         const response = await this.app.getHttpServer()
             .post(`/api/group/${groupId}/add-users`)
-            .send({
-                "users": ["legolas@mail.com"]
-            })
             .set('Authorization', `Bearer ${this.accessToken}`)
-            .set('Accept', 'application/json');
+            .set('Accept', 'application/json')
+            .send({ users });
 
-        console.log("Response: ", response.body);
-
+        console.log("Response (addUser): ", response.body);
+        expect2xx(response);
         expect(response.status).toEqual(201);
+
         expect(response.body.group).toBeDefined();
         expect(response.body.group.name).toBeDefined();
         expect(response.body.group.tenantId).toBeDefined();
@@ -128,22 +135,19 @@ export class GroupClient {
         expect(response.body.users.length).toBeGreaterThanOrEqual(users.length);
 
         return response.body;
-
-
     }
 
     public async removeUser(groupId: string, users: string[]) {
         const response = await this.app.getHttpServer()
             .post(`/api/group/${groupId}/remove-users`)
-            .send({
-                "users": ["legolas@mail.com"]
-            })
             .set('Authorization', `Bearer ${this.accessToken}`)
-            .set('Accept', 'application/json');
+            .set('Accept', 'application/json')
+            .send({ users });
 
-        console.log("Response: ", response.body);
-
+        console.log("Response (removeUser): ", response.body);
+        expect2xx(response);
         expect(response.status).toEqual(201);
+
         expect(response.body.group).toBeDefined();
         expect(response.body.group.name).toBeDefined();
         expect(response.body.group.tenantId).toBeDefined();

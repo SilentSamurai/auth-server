@@ -15,9 +15,10 @@
         "backend:start:dev": "nest start --watch",
         "start:debug": "nest start --debug --watch",
         "start:prod": "node dist/src/main",
-        "test": "jest --coverage",
-        "test:watch": "jest --watch",
-        "package": "node create-zip.js"
+        "test": "jest --coverage --silent=true --detectOpenHandles ",
+        "test:watch": "jest --watch --verbose",
+        "package": "node create-zip.js",
+        "release": "npm run test && npm run build"
     },
     "dependencies": {
         "@casl/ability": "^6.4.0",
@@ -56,6 +57,7 @@
         "@types/jest": "^29.5.0",
         "@types/node": "^18.11.15",
         "@types/nodemailer": "^6.4.6",
+        "@types/supertest": "^6.0.3",
         "archiver": "^7.0.1",
         "jest": "^29.5.0",
         "mongodb-memory-server": "^10.0.0",

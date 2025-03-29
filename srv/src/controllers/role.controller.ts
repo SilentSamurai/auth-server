@@ -69,7 +69,6 @@ export class RoleController {
         @Param('tenantId') tenantId: string
     ): Promise<Role[]> {
         const tenant = await this.tenantService.findById(request, tenantId);
-        this.securityService.check(request, Action.Read, subject(SubjectEnum.TENANT, tenant));
         return this.tenantService.getTenantRoles(request, tenant)
     }
 

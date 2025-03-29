@@ -38,9 +38,6 @@ export class RoleService {
     }
 
     async findById(authContext: AuthContext, id: string) {
-
-        this.securityService.isAuthorized(authContext, Action.Read, SubjectEnum.ROLE, {id: id});
-
         let role: Role = await this.roleRepository.findOne({
             where: {id: id},
             relations: ['tenant']
@@ -48,6 +45,7 @@ export class RoleService {
         if (role === null) {
             throw new ValidationErrorException("role not found");
         }
+        this.securityService.isAuthorized(authContext, Action.Read, SubjectEnum.ROLE, {tenantId: role.tenant.id});
         return role;
     }
 
@@ -72,7 +70,7 @@ export class RoleService {
         role: Role
     ): Promise<number> {
 
-        this.securityService.isAuthorized(authContext, Action.Read, SubjectEnum.ROLE, {id: role.id});
+        this.securityService.isAuthorized(authContext, Action.Read, SubjectEnum.ROLE, {tenantId: role.tenant.id});
 
         const count: number = await this.usersRepository.count({
             where: {
@@ -92,6 +90,8 @@ export class RoleService {
     async deleteById(authContext: AuthContext, id: string): Promise<Role> {
         let role: Role = await this.findById(authContext, id);
         const count = await this.countByRole(authContext, role);
+        this.securityService.isAuthorized(authContext, Action.Delete, SubjectEnum.ROLE, {tenantId: role.tenant.id});
+
         if (count > 0 || !role.removable) {
             throw new ValidationErrorException("role is assigned to members | role is protected");
         }
@@ -120,7 +120,7 @@ export class RoleService {
 
     async getTenantRoles(authContext: AuthContext, tenant: Tenant): Promise<Role[]> {
 
-        this.securityService.isAuthorized(authContext, Action.Read, SubjectEnum.TENANT, {id: tenant.id});
+        this.securityService.isAuthorized(authContext, Action.Read, SubjectEnum.ROLE, {tenantId: tenant.id});
 
         return this.roleRepository.find({
             where: {
@@ -130,9 +130,7 @@ export class RoleService {
     }
 
     async getMemberRoles(authContext: AuthContext, tenant: Tenant, user: User): Promise<Role[]> {
-
-        this.securityService.isAuthorized(authContext, Action.Read, SubjectEnum.TENANT, {id: tenant.id});
-
+        this.securityService.isAuthorized(authContext, Action.Read, SubjectEnum.ROLE, {tenantId: tenant.id});
         return this.roleRepository.find({
             where: {
                 tenant: {id: tenant.id},

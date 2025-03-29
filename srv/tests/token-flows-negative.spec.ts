@@ -20,9 +20,9 @@ describe('e2e negative token flow', () => {
             .post('/api/oauth/token')
             .send({
                 "grant_type": "password",
-                "email": "admin@auth.server.com",
+                "username": "admin@auth.server.com",
                 "password": "wrong-password",
-                "domain": "auth.server.com"
+                "client_id": "auth.server.com"
             })
             .set('Accept', 'application/json');
 
@@ -34,9 +34,9 @@ describe('e2e negative token flow', () => {
             .post('/api/oauth/token')
             .send({
                 // "grant_type": "password",
-                "email": "admin@auth.server.com",
+                "username": "admin@auth.server.com",
                 "password": "wrong-password",
-                "domain": "auth.server.com"
+                "client_id": "auth.server.com"
             })
             .set('Accept', 'application/json');
 
@@ -48,9 +48,9 @@ describe('e2e negative token flow', () => {
             .post('/api/oauth/token')
             .send({
                 "grant_type": "missing-Grant",
-                "email": "admin@auth.server.com",
+                "username": "admin@auth.server.com",
                 "password": "wrong-password",
-                "domain": "auth.server.com"
+                "client_id": "auth.server.com"
             })
             .set('Accept', 'application/json');
 
@@ -62,9 +62,9 @@ describe('e2e negative token flow', () => {
             .post('/api/oauth/token')
             .send({
                 "grant_type": "password",
-                "email": "wrong-email@sada.cas",
+                "username": "wrong-email@sada.cas",
                 "password": "wrong-password",
-                "domain": "auth.server.com"
+                "client_id": "auth.server.com"
             })
             .set('Accept', 'application/json');
 
@@ -76,14 +76,14 @@ describe('e2e negative token flow', () => {
             .post('/api/oauth/token')
             .send({
                 "grant_type": "password",
-                "email": "admin@auth.server.com",
+                "username": "admin@auth.server.com",
                 "password": "admin9000",
-                "domain": "auth.server.comasda"
+                "client_id": "auth.server.comasda"
             })
             .set('Accept', 'application/json');
 
         console.log(response.body);
-        expect(response.status).toEqual(404);
+        expect(response.status).toEqual(400);
     });
 
     it(`/POST Refresh Token Missing Grant Type `, async () => {
@@ -190,9 +190,9 @@ describe('e2e negative token flow', () => {
             .post('/api/oauth/token')
             .send({
                 "grant_type": "password",
-                "email": "sdgsdah@safasf.asfasfa",
+                "username": "sdgsdah@safasf.asfasfa",
                 "password": "asfasfasf",
-                "domain": "tracko.com"
+                "client_id": "tracko.com"
             })
             .set('Accept', 'application/json');
 
@@ -244,9 +244,9 @@ describe('e2e negative token flow', () => {
             .post('/api/oauth/token')
             .send({
                 "grant_type": "password",
-                "email": "sdgsdah@safasf.asfasfa",
+                "username": "sdgsdah@safasf.asfasfa",
                 "password": null,
-                "domain": "tracko.com"
+                "client_id": "tracko.com"
             })
             .set('Accept', 'application/json');
 
@@ -259,9 +259,9 @@ describe('e2e negative token flow', () => {
             .post('/api/oauth/token')
             .send({
                 "grant_type": "password",
-                "email": null,
+                "username": null,
                 "password": "asfasf",
-                "domain": "tracko.com"
+                "client_id": "tracko.com"
             })
             .set('Accept', 'application/json');
 
@@ -269,14 +269,14 @@ describe('e2e negative token flow', () => {
         expect(response.status).toEqual(400);
     });
 
-    it(`/POST domain is null `, async () => {
+    it(`/POST client_id is null `, async () => {
         const response = await app.getHttpServer()
             .post('/api/oauth/token')
             .send({
                 "grant_type": "password",
-                "email": "asgasgasg@fsaf.asf",
+                "username": "asgasgasg@fsaf.asf",
                 "password": "asfasf",
-                "domain": null
+                "client_id": null
             })
             .set('Accept', 'application/json');
 
@@ -289,9 +289,9 @@ describe('e2e negative token flow', () => {
             .post('/api/oauth/token')
             .send({
                 "grant_type": null,
-                "email": "asgasgasg@fsaf.asf",
+                "username": "asgasgasg@fsaf.asf",
                 "password": "asfasf",
-                "domain": "dasdasd"
+                "client_id": "dasdasd"
             })
             .set('Accept', 'application/json');
 

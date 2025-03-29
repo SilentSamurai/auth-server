@@ -3,8 +3,9 @@ import {Environment} from "../src/config/environment.service";
 import {Test, TestingModule} from "@nestjs/testing";
 import {AppModule} from "../src/app.module";
 import {JwtService} from "@nestjs/jwt";
-import * as request from 'supertest';
+import * as superTest from 'supertest';
 import * as process from "node:process";
+import TestAgent from "supertest/lib/agent";
 
 let console = require('console');
 
@@ -35,8 +36,8 @@ export class TestAppFixture {
         return this;
     }
 
-    public getHttpServer(): request.SuperTest<request.Test> {
-        return request(this.app.getHttpServer());
+    public getHttpServer(): TestAgent<superTest.Test> {
+        return superTest(this.app.getHttpServer());
     }
 
     public async close(): Promise<void> {

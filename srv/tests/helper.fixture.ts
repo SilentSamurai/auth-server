@@ -2,6 +2,7 @@ import {TestAppFixture} from "./test-app.fixture";
 import {TenantClient} from "./api-client/tenant-client";
 import {RoleClient} from "./api-client/role-client";
 import {GroupClient} from "./api-client/group-client";
+import {UsersClient} from "./api-client/user-client";
 
 export class HelperFixture {
 
@@ -11,6 +12,7 @@ export class HelperFixture {
     public tenant: TenantClient;
     public role: RoleClient;
     public group: GroupClient;
+    public user: UsersClient;
 
     constructor(app: TestAppFixture, accessToken: string) {
         this.app = app;
@@ -18,6 +20,7 @@ export class HelperFixture {
         this.tenant = new TenantClient(app, accessToken);
         this.role = new RoleClient(app, accessToken);
         this.group = new GroupClient(app, accessToken);
+        this.user = new UsersClient(app, accessToken);
     }
 
 }

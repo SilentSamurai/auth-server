@@ -56,15 +56,14 @@ export class TenantController {
     async updateTenant(
         @Request() request,
         @Param('tenantId') tenantId: string,
-        @Body(new ValidationPipe(ValidationSchema.UpdateTenantSchema)) body: { name: string, domain: string }
+        @Body(new ValidationPipe(ValidationSchema.UpdateTenantSchema)) body: { name: string }
     ): Promise<Tenant> {
         let tenant = await this.tenantService.findById(request, tenantId);
         this.securityService.check(request, Action.Update, subject(SubjectEnum.TENANT, tenant));
         return this.tenantService.updateTenant(
             request,
             tenantId,
-            body.name,
-            body.domain
+            body.name
         );
 
     }

@@ -1,6 +1,5 @@
 import {MiddlewareConsumer, Module, NestModule} from '@nestjs/common';
 import {ConfigModule} from './config/config.module';
-import {ServeStaticModule} from '@nestjs/serve-static';
 import {ScheduleModule} from '@nestjs/schedule';
 import {TypeOrmModule} from '@nestjs/typeorm';
 import {CaslModule} from './casl/casl.module';
@@ -68,11 +67,13 @@ import {MongooseModule} from "@nestjs/mongoose";
                 if (configService.get('MONGO_DATABASE_TYPE') === 'IN_MEMORY') {
                     const { MongoMemoryServer } = require('mongodb-memory-server');
                     const mongod = await MongoMemoryServer.create();
-
+                    // setTimeout(async () => await mongod.cleanup(), 2000);
                     return {
                         uri: mongod.getUri(),
                         dbName: 'identity'
                     }
+
+
                 }
 
                 return {

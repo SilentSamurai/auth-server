@@ -1,13 +1,12 @@
-import {TestAppFixture} from "./test-app.fixture";
+import { TestAppFixture } from "./test-app.fixture";
+import { UsersClient } from "./api-client/user-client";
+import { TokenFixture } from "./token.fixture";
 
 describe('e2e users', () => {
     let app: TestAppFixture;
     let refreshToken = "";
     let accessToken = "";
-    let user = {
-        email: "",
-        id: ""
-    };
+    let user = { email: "", id: "" };
 
     beforeAll(async () => {
         app = await new TestAppFixture().init();
@@ -17,126 +16,64 @@ describe('e2e users', () => {
         await app.close();
     });
 
-    it(`/POST Fetch Access Token`, async () => {
-        const response = await app.getHttpServer()
-            .post('/api/oauth/token')
-            .send({
-                "grant_type": "password",
-                "email": "admin@auth.server.com",
-                "password": "admin9000",
-                "domain": "auth.server.com"
-            })
-            .set('Accept', 'application/json');
+    it('User Operation all', async () => {
+        // STEP 1: Fetch Access Token
+        const tokenFixture = new TokenFixture(app);
+        let response = await tokenFixture.fetchAccessToken(
+            "admin@auth.server.com",
+            "admin9000",
+            "auth.server.com"
+        );
+        accessToken = response.accessToken;
+        refreshToken = response.refreshToken;
+        expect(accessToken).toBeDefined();
 
-        expect(response.status).toEqual(201);
-        console.log(response.body);
+        // Create a UsersClient instance
+        const usersClient = new UsersClient(app, accessToken);
 
-        expect(response.body.access_token).toBeDefined();
-        expect(response.body.expires_in).toBeDefined();
-        expect(response.body.token_type).toEqual('Bearer');
-        expect(response.body.refresh_token).toBeDefined();
-        refreshToken = response.body.refresh_token;
-        accessToken = response.body.access_token;
+        // STEP 2: Create User
+        const createdUser = await usersClient.createUser("TestUser", "TestUser@test-wesite.com", "TestUser9000");
+        expect(createdUser.id).toBeDefined();
+        expect(createdUser.name).toEqual("TestUser");
+        expect(createdUser.email).toEqual("TestUser@test-wesite.com");
+
+        user = createdUser;
+
+        // STEP 3: Get User Details
+        const userDetailsResponse = await usersClient.getUser(user.id);
+        expect(userDetailsResponse.id).toBeDefined();
+        expect(userDetailsResponse.name).toEqual("TestUser");
+        expect(userDetailsResponse.email).toEqual("TestUser@test-wesite.com");
+
+        // STEP 4: Update User
+        const updatedUser = await usersClient.updateUser(
+            user.id,
+            "UpdateTestUser",
+            "UpdatedTestUser@test-wesite.com",
+            "TestUser9000"
+        );
+        expect(updatedUser.id).toBeDefined();
+        expect(updatedUser.name).toEqual("UpdateTestUser");
+        expect(updatedUser.email).toEqual("UpdatedTestUser@test-wesite.com");
+        user = updatedUser;
+
+        // STEP 5: Get All Users
+        const allUsers = await usersClient.getAllUsers();
+        expect(Array.isArray(allUsers)).toBe(true);
+        expect(allUsers.length).toBeGreaterThanOrEqual(1);
+        expect(
+            allUsers.find(u => u.email === "UpdatedTestUser@test-wesite.com")
+        ).toBeDefined();
+
+        // STEP 6: Get User Tenants
+        const userTenants = await usersClient.getUserTenants(user.id);
+        expect(Array.isArray(userTenants)).toBe(true);
+        // May be zero or more. Just check if array is returned
+        expect(userTenants.length).toBeGreaterThanOrEqual(0);
+
+        // STEP 7: Delete User
+        const deleteResponse = await usersClient.deleteUser(user.id);
+        // Typically returns the deleted user or an object. We just check that it doesn't throw
+        expect(deleteResponse.status).toEqual(200);
     });
-
-    it(`/POST Create User`, async () => {
-        const response = await app.getHttpServer()
-            .post('/api/users/create')
-            .send({
-                "name": "TestUser",
-                "email": "TestUser@test-wesite.com",
-                "password": "TestUser9000"
-            })
-            .set('Authorization', `Bearer ${accessToken}`)
-            .set('Accept', 'application/json');
-
-        console.log(response.body);
-        expect(response.status).toEqual(201);
-
-
-        expect(response.body.id).toBeDefined();
-        expect(response.body.name).toEqual("TestUser");
-        expect(response.body.email).toEqual("TestUser@test-wesite.com");
-        user = response.body;
-    });
-
-    it(`/GET User Details`, async () => {
-        const response = await app.getHttpServer()
-            .get(`/api/users/${user.email}`)
-            .set('Authorization', `Bearer ${accessToken}`)
-            .set('Accept', 'application/json');
-
-        console.log(response.body);
-        expect(response.status).toEqual(200);
-
-
-        expect(response.body.id).toBeDefined();
-        expect(response.body.name).toEqual("TestUser");
-        expect(response.body.email).toEqual("TestUser@test-wesite.com");
-    });
-
-    it(`/PUT Update User`, async () => {
-        const response = await app.getHttpServer()
-            .put('/api/users/update')
-            .send({
-                id: user.id,
-                "name": "UpdateTestUser",
-                "email": "UpdatedTestUser@test-wesite.com",
-                "password": "TestUser9000"
-            })
-            .set('Authorization', `Bearer ${accessToken}`)
-            .set('Accept', 'application/json');
-
-        console.log(response.body);
-        expect(response.status).toEqual(200);
-
-
-        expect(response.body.id).toBeDefined();
-        expect(response.body.name).toEqual("UpdateTestUser");
-        expect(response.body.email).toEqual("UpdatedTestUser@test-wesite.com");
-        user = response.body;
-    });
-
-    it(`/GET All Users`, async () => {
-        const response = await app.getHttpServer()
-            .get(`/api/users`)
-            .set('Authorization', `Bearer ${accessToken}`)
-            .set('Accept', 'application/json');
-
-        console.log(response.body);
-        expect(response.status).toEqual(200);
-
-
-        expect(response.body).toBeInstanceOf(Array);
-        expect(response.body.length).toBeGreaterThanOrEqual(1);
-        expect(response.body.find(user => user.email === "UpdatedTestUser@test-wesite.com")).toBeDefined();
-    });
-
-    it(`/GET User Tenants`, async () => {
-        const response = await app.getHttpServer()
-            .get(`/api/users/${user.email}/tenants`)
-            .set('Authorization', `Bearer ${accessToken}`)
-            .set('Accept', 'application/json');
-
-        console.log(response.body);
-        expect(response.status).toEqual(200);
-
-
-        expect(response.body).toBeInstanceOf(Array);
-        expect(response.body.length).toBeGreaterThanOrEqual(0);
-    });
-
-
-    it(`/DELETE User`, async () => {
-        const response = await app.getHttpServer()
-            .delete(`/api/users/${user.id}`)
-            .set('Authorization', `Bearer ${accessToken}`)
-            .set('Accept', 'application/json');
-
-        console.log(response.body);
-        expect(response.status).toEqual(200);
-    });
-
-
-});
-
+})

@@ -39,9 +39,9 @@ describe('e2e tenant technical credential', () => {
             .set('Authorization', `Bearer ${adminAccessToken}`)
             .set('Accept', 'application/json');
 
-        expect(response.status).toEqual(201);
         console.log(response.body);
 
+        expect(response.status).toEqual(201);
         expect(response.body.id).toBeDefined();
         expect(response.body.name).toEqual("tenant-1");
         expect(response.body.domain).toEqual("test-wesite.com");
@@ -116,8 +116,10 @@ describe('e2e tenant technical credential', () => {
             .set('Authorization', `Bearer ${technicalAccessToken}`)
             .set('Accept', 'application/json');
 
+        if (response.status !== 200) {
+            console.log(response);
+        }
         expect(response.status).toEqual(200);
-        console.log(response.body);
 
         expect(response.body.id).toBeDefined();
         expect(response.body.name).toEqual("tenant-1");
@@ -131,7 +133,9 @@ describe('e2e tenant technical credential', () => {
             .set('Authorization', `Bearer ${technicalAccessToken}`)
             .set('Accept', 'application/json');
 
-        console.log(response.body);
+        if (response.status !== 200) {
+            console.log(response);
+        }
         expect(response.status).toEqual(200);
 
 
@@ -148,8 +152,11 @@ describe('e2e tenant technical credential', () => {
             .set('Authorization', `Bearer ${technicalAccessToken}`)
             .set('Accept', 'application/json');
 
+        if (response.status !== 200) {
+            console.log(response);
+        }
+
         expect(response.status).toEqual(200);
-        console.log(response.body);
 
         expect(response.body).toBeInstanceOf(Array);
         expect(response.body.length).toBeGreaterThanOrEqual(2);
@@ -184,11 +191,15 @@ describe('e2e tenant technical credential', () => {
     });
 
     it(`/POST Add Members`, async () => {
-        const email = "legolas@mail.com";
         const response = await app.getHttpServer()
-            .post(`/api/tenant/${tenant.id}/member/${email}`)
+            .post(`/api/tenant/${tenant.id}/members/add`)
             .set('Authorization', `Bearer ${technicalAccessToken}`)
-            .set('Accept', 'application/json');
+            .set('Accept', 'application/json')
+            .send({
+                emails: [
+                    'legolas@mail.com',
+                ]
+            });
 
         console.log(response.body);
         expect(response.status).toEqual(403);
@@ -211,11 +222,15 @@ describe('e2e tenant technical credential', () => {
 
 
     it(`/DELETE Remove Members`, async () => {
-        const email = "legolas@mail.com";
         const response = await app.getHttpServer()
-            .delete(`/api/tenant/${tenant.id}/member/${email}`)
+            .delete(`/api/tenant/${tenant.id}/members/delete`)
             .set('Authorization', `Bearer ${technicalAccessToken}`)
-            .set('Accept', 'application/json');
+            .set('Accept', 'application/json')
+            .send({
+                emails: [
+                    'legolas@mail.com',
+                ]
+            });
 
         console.log(response.body);
         expect(response.status).toEqual(403);

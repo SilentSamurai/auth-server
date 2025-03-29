@@ -26,8 +26,7 @@ describe('e2e Groups Check', () => {
         tenant = await helper.tenant.createTenant("tenant-1", "test-web.com");
         role = await helper.role.createRole("ABC_ROLE", tenant.id);
         role = await helper.role.createRole("DEF_ROLE", tenant.id);
-        await helper.tenant.addMembers("legolas@mail.com", tenant.id);
-        await helper.tenant.addMembers("frodo@mail.com", tenant.id);
+        await helper.tenant.addMembers(tenant.id, ["legolas@mail.com", "frodo@mail.com"]);
     });
 
     afterAll(async () => {
@@ -68,24 +67,30 @@ describe('e2e Groups Check', () => {
     });
 
     it(`Add User to Group`, async () => {
-        await helper.group.addUser(group.id, ["legolas@mail.com"])
-        let roles = await helper.tenant.getMemberRoles("legolas@mail.com", tenant.id);
+        let user = await helper.user.getUserByEmail("legolas@mail.com");
+
+        await helper.group.addUser(group.id, [user.email])
+        let roles = await helper.tenant.getMemberRoles(tenant.id, user.id);
         for (let role of roles) {
             expect(role.name).toMatch(/ABC_ROLE|DEF_ROLE/);
         }
     });
 
     it(`Remove User from Group`, async () => {
+        let user = await helper.user.getUserByEmail("legolas@mail.com");
+
         await helper.group.removeUser(group.id, ["legolas@mail.com"]);
-        let roles = await helper.tenant.getMemberRoles("legolas@mail.com", tenant.id);
+        let roles = await helper.tenant.getMemberRoles(tenant.id, user.id);
         for (let role of roles) {
             expect(role.name).not.toMatch(/ABC_ROLE|DEF_ROLE/);
         }
     });
 
     it(`Add User to Group`, async () => {
+        let user = await helper.user.getUserByEmail("frodo@mail.com");
+
         await helper.group.addUser(group.id, ["frodo@mail.com"])
-        let roles = await helper.tenant.getMemberRoles("frodo@mail.com", tenant.id);
+        let roles = await helper.tenant.getMemberRoles( tenant.id, user.id);
         for (let role of roles) {
             expect(role.name).toMatch(/ABC_ROLE|DEF_ROLE/);
         }
@@ -100,8 +105,9 @@ describe('e2e Groups Check', () => {
         for (let role of response.roles) {
             expect(role.name).toMatch(/DEF_ROLE/);
         }
+        let user = await helper.user.getUserByEmail("frodo@mail.com");
 
-        let roles = await helper.tenant.getMemberRoles("frodo@mail.com", tenant.id);
+        let roles = await helper.tenant.getMemberRoles(tenant.id, user.id );
 
         for (let role of roles) {
             expect(role.name).toMatch(/DEF_ROLE/);

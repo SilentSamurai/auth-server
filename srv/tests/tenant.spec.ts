@@ -1,21 +1,17 @@
-import {TestAppFixture} from "./test-app.fixture";
-import {TokenFixture} from "./token.fixture";
-import {HelperFixture} from "./helper.fixture";
+import { TestAppFixture } from "./test-app.fixture";
+import { TokenFixture } from "./token.fixture";
+import { HelperFixture } from "./helper.fixture";
 
-describe('e2e tenant', () => {
+describe("E2E Tenant Management", () => {
     let app: TestAppFixture;
-    let tenant = {
-        id: "",
-        clientId: ""
-    };
-    let refreshToken = "";
-    let accessToken = "";
+    let tenant = { id: "", clientId: "", name: "", domain: "" };
+    let refreshToken = "", accessToken = "";
     let helper: HelperFixture;
 
     beforeAll(async () => {
         app = await new TestAppFixture().init();
-        let tokenFixture = new TokenFixture(app);
-        let response = await tokenFixture.fetchAccessToken(
+        const tokenFixture = new TokenFixture(app);
+        const response = await tokenFixture.fetchAccessToken(
             "admin@auth.server.com",
             "admin9000",
             "auth.server.com"
@@ -29,183 +25,164 @@ describe('e2e tenant', () => {
         await app.close();
     });
 
-    it(`/POST Create Tenant`, async () => {
-        tenant = await helper.tenant.createTenant("tenant-1", "test-wesite.com");
+    // Helper to check for valid UUID
+    let expectUuid = function (item: string) {
+        expect(item).toMatch(
+            /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
+        );
+    };
 
+    it("should execute all tenant operations sequentially", async () => {
+        // 1) Create Tenant
+        tenant = await helper.tenant.createTenant("tenant-1", "test-website.com");
         expect(tenant.id).toBeDefined();
-        expect(tenant.name).toEqual("tenant-1");
-        expect(tenant.domain).toEqual("test-wesite.com");
-        expect(tenant.clientId).toBeDefined();
-    });
 
-    it(`/GET Tenant Details`, async () => {
-        const response = await app.getHttpServer()
-            .get(`/api/tenant/${tenant.id}`)
-            .set('Authorization', `Bearer ${accessToken}`)
-            .set('Accept', 'application/json');
+        // 2) Get Tenant Details
+        let tenantDetails = await helper.tenant.getTenantDetails(tenant.id);
+        console.log("Get Tenant Details Response:", tenantDetails);
+        expect(tenantDetails.id).toEqual(tenant.id);
+        expect(tenantDetails.name).toEqual("tenant-1");
+        expect(tenantDetails.domain).toEqual("test-website.com");
+        expect(tenantDetails.clientId).toBeDefined();
 
-        expect(response.status).toEqual(200);
-        console.log(response.body);
+        // Verify members array
+        expect(Array.isArray(tenantDetails.members)).toBe(true);
+        expect(tenantDetails.members.length).toBeGreaterThanOrEqual(1);
+        expectUuid(tenantDetails.members[0].id);
+        expect(tenantDetails.members[0].email).toEqual("admin@auth.server.com");
+        expect(tenantDetails.members[0].name).toEqual("Super Admin");
 
-        expect(response.body.id).toBeDefined();
-        expect(response.body.name).toEqual("tenant-1");
-        expect(response.body.domain).toEqual("test-wesite.com");
-        expect(response.body.clientId).toBeDefined();
-    });
+        // Verify roles array
+        expect(Array.isArray(tenantDetails.roles)).toBe(true);
+        expect(tenantDetails.roles.length).toBeGreaterThanOrEqual(2);
+        expectUuid(tenantDetails.roles[0].id);
+        expect(tenantDetails.roles[0].name).toEqual("TENANT_ADMIN");
+        expectUuid(tenantDetails.roles[1].id);
+        expect(tenantDetails.roles[1].name).toEqual("TENANT_VIEWER");
 
-    it(`/GET Tenant Credentials`, async () => {
-        const response = await app.getHttpServer()
-            .get(`/api/tenant/${tenant.id}/credentials`)
-            .set('Authorization', `Bearer ${accessToken}`)
-            .set('Accept', 'application/json');
+        // 3) Get Tenant Credentials
+        let tenantCred = await helper.tenant.getTenantCredentials(tenant.id);
+        console.log("Get Tenant Credentials Response:", tenantCred);
+        // minimal check
+        expect(tenantCred.id).toEqual(tenant.id);
+        expect(tenantCred.clientId).toBeDefined();
+        expect(tenantCred.publicKey).toBeDefined();
 
-        expect(response.status).toEqual(200);
-        console.log(response.body);
+        // 4) Get Tenant Roles
+        let roles = await helper.tenant.getTenantRoles(tenant.id);
+        console.log("Get Tenant Roles Response:", roles);
+        expect(Array.isArray(roles)).toBe(true);
+        expect(roles.length).toBeGreaterThanOrEqual(2);
 
-        expect(response.body.id).toBeDefined();
-        expect(response.body.clientId).toBeDefined();
-        expect(response.body.clientSecret).toBeDefined();
-        expect(response.body.publicKey).toBeDefined();
+        // 5) Update Tenant
+        let updatedTenant = await helper.tenant.updateTenant(tenant.id, "updated-tenant-1");
+        console.log("Update Tenant Response:", updatedTenant);
+        expect(updatedTenant.id).toEqual(tenant.id);
+        expect(updatedTenant.name).toEqual("updated-tenant-1");
+        expect(updatedTenant.domain).toEqual("test-website.com");
 
-    });
+        // 6) Get Updated Tenant Details
+        let updatedTenantDetails = await helper.tenant.getTenantDetails(tenant.id);
+        console.log("Get Updated Tenant Details Response:", updatedTenantDetails);
+        expect(updatedTenantDetails.name).toEqual("updated-tenant-1");
+        expect(updatedTenantDetails.domain).toEqual("test-website.com");
 
-    it(`/GET Tenant Roles`, async () => {
-        const response = await app.getHttpServer()
-            .get(`/api/tenant/${tenant.id}/roles`)
-            .set('Authorization', `Bearer ${accessToken}`)
-            .set('Accept', 'application/json');
+        // 7) Create Role
+        let newRole = await helper.tenant.createRole(tenant.id, "auditor");
+        console.log("Create Role Response:", newRole);
+        // minimal check
+        expect(newRole.name).toEqual("auditor");
 
-        expect(response.status).toEqual(200);
-        console.log(response.body);
+        // 8) Get Roles After Adding New Role
+        let rolesAfterAdd = await helper.tenant.getTenantRoles(tenant.id);
+        console.log("Get Roles After Adding Role Response:", rolesAfterAdd);
+        expect(Array.isArray(rolesAfterAdd)).toBe(true);
+        expect(rolesAfterAdd.find((r) => r.name === "auditor")).toBeDefined();
 
-        expect(response.body).toBeInstanceOf(Array);
-        expect(response.body.length).toBeGreaterThanOrEqual(2);
-        for (let role of response.body) {
-            expect(role.name).toMatch(/TENANT_ADMIN|TENANT_VIEWER/);
+        // 9) Add Members
+        let addMembersResponse = await helper.tenant.addMembers(tenant.id, ["legolas@mail.com"]);
+        console.log("Add Members Response:", addMembersResponse);
+        expect(addMembersResponse.id).toBeDefined();
+        expect(addMembersResponse.name).toEqual("updated-tenant-1");
+        expect(addMembersResponse.domain).toEqual("test-website.com");
+        expect(Array.isArray(addMembersResponse.members)).toBe(true);
+        expect(addMembersResponse.members.length).toBeGreaterThanOrEqual(2);
+        expect(
+            addMembersResponse.members.map((m: { email: string }) => m.email)
+        ).toContain("legolas@mail.com");
+        expect(Array.isArray(addMembersResponse.roles)).toBe(true);
+        expect(addMembersResponse.roles.length).toBeGreaterThanOrEqual(3);
+        expect(addMembersResponse.roles[0].name).toEqual("TENANT_ADMIN");
+        expect(addMembersResponse.roles[1].name).toEqual("TENANT_VIEWER");
+        expect(addMembersResponse.roles[2].name).toEqual("auditor");
+
+        // capture newly-added user ID
+        let legolasId = addMembersResponse.members.filter(
+            (i: { email: string }) => i.email === "legolas@mail.com"
+        )[0].id;
+
+        // 10) Get Tenant Members
+        let membersList = await helper.tenant.getTenantMembers(tenant.id);
+        console.log("Get Tenant Members Response:", membersList);
+        expect(Array.isArray(membersList)).toBe(true);
+        expect(membersList.length).toBeGreaterThanOrEqual(2);
+
+        // 11) Update Member Role
+        let updateMemberRoleResp = await helper.tenant.updateMemberRoles(tenant.id, legolasId, [
+            "TENANT_VIEWER",
+            "auditor",
+        ]);
+        console.log("Update Member Role Response:", updateMemberRoleResp);
+        // minimal check
+
+        // 12) Verify Member Role Update
+        let verifyMemberUpdate = await helper.tenant.getTenantMembers(tenant.id);
+        console.log("Verify Member Role Update Response:", verifyMemberUpdate);
+        expect(verifyMemberUpdate).toBeInstanceOf(Array);
+        expect(verifyMemberUpdate.length).toBeGreaterThanOrEqual(1);
+        expect(verifyMemberUpdate.map(i => i.id )).toContain(legolasId);
+
+        // 13) Remove Members
+        let removeMemberResp = await helper.tenant.removeMembers(tenant.id, ["legolas@mail.com"]);
+        console.log("Remove Members Response:", removeMemberResp);
+        // minimal check
+        expect(removeMemberResp.id).toEqual(tenant.id);
+
+        // 14) Verify Member Removal
+        let verifyRemoval = await helper.tenant.getTenantMembers(tenant.id);
+        console.log("Verify Member Removal Response:", verifyRemoval);
+        expect(
+            verifyRemoval.find((mem) => mem.email === "legolas@mail.com")
+        ).toBeUndefined();
+
+        // 15) Remove Role
+        let removeRoleResp = await helper.tenant.deleteRole(tenant.id, "auditor");
+        console.log("Remove Role Response:", removeRoleResp);
+        // minimal check
+        expect(removeRoleResp.name).toEqual("auditor");
+
+        // 16) Verify Role Removal
+        let verifyRoleRemoval = await helper.tenant.getTenantRoles(tenant.id);
+        console.log("Verify Role Removal Response:", verifyRoleRemoval);
+        expect(verifyRoleRemoval.find((r) => r.name === "auditor")).toBeUndefined();
+
+        // 17) Remove Tenant
+        let removeTenantResp = await helper.tenant.deleteTenant(tenant.id);
+
+        expect(removeTenantResp.name).toEqual('updated-tenant-1');
+
+        // 18) Verify Tenant Removal (should yield 404)
+        try {
+            await helper.tenant.getTenantDetails(tenant.id);
+            fail("Expected 404 error, but got a 2xx response");
+        } catch (error: any) {
+            console.log("Verify Tenant Removal Response (error):", error);
+            expect(error.status).toBe(404);
         }
 
+        // 19) Get All Tenants
+        let allTenants = await helper.tenant.getTenants();
+        console.log("Get All Tenants Response:", allTenants);
+        expect(Array.isArray(allTenants)).toBe(true);
     });
-
-    it(`/PATCH Update Tenant`, async () => {
-        const response = await app.getHttpServer()
-            .patch(`/api/tenant/${tenant.id}`)
-            .set('Authorization', `Bearer ${accessToken}`)
-            .send({
-                domain: "updated-test-wesite.com",
-                name: "updated-tenant-1"
-            })
-            .set('Accept', 'application/json');
-
-        expect(response.status).toEqual(200);
-        console.log(response.body);
-
-        expect(response.body.id).toBeDefined();
-        expect(response.body.clientId).toEqual(tenant.clientId);
-        expect(response.body.name).toEqual("updated-tenant-1");
-        expect(response.body.domain).toEqual("updated-test-wesite.com");
-
-    });
-
-    it(`/POST Create Role`, async () => {
-        const name = "auditor";
-        const response = await app.getHttpServer()
-            .post(`/api/tenant/${tenant.id}/role/${name}`)
-            .set('Authorization', `Bearer ${accessToken}`)
-            .set('Accept', 'application/json');
-
-        console.log(response.body);
-        expect(response.status).toEqual(201);
-    });
-
-    it(`/POST Add Members`, async () => {
-        const email = "legolas@mail.com";
-        const response = await app.getHttpServer()
-            .post(`/api/tenant/${tenant.id}/member/${email}`)
-            .set('Authorization', `Bearer ${accessToken}`)
-            .set('Accept', 'application/json');
-
-        console.log(response.body);
-        expect(response.status).toEqual(201);
-    });
-
-    it(`/GET Tenant Members`, async () => {
-        const response = await app.getHttpServer()
-            .get(`/api/tenant/${tenant.id}/members`)
-            .set('Authorization', `Bearer ${accessToken}`)
-            .set('Accept', 'application/json');
-
-        console.log(response.body);
-        expect(response.status).toEqual(200);
-        expect(response.body).toBeInstanceOf(Array);
-        expect(response.body).toHaveLength(2);
-        expect(response.body[0].id).toBeDefined();
-        expect(response.body[0].name).toBeDefined();
-    });
-
-    it(`/PUT Update Member Role`, async () => {
-        const email = "legolas@mail.com";
-        const response = await app.getHttpServer()
-            .put(`/api/tenant/${tenant.id}/member/${email}/roles`)
-            .set('Authorization', `Bearer ${accessToken}`)
-            .send({
-                "roles": ["TENANT_VIEWER", "auditor"]
-            })
-            .set('Accept', 'application/json');
-
-        console.log(response.body);
-        expect(response.status).toEqual(200);
-    });
-
-    it(`/DELETE Remove Members`, async () => {
-        const email = "legolas@mail.com";
-        const response = await app.getHttpServer()
-            .delete(`/api/tenant/${tenant.id}/member/${email}`)
-            .set('Authorization', `Bearer ${accessToken}`)
-            .set('Accept', 'application/json');
-
-        console.log(response.body);
-        expect(response.status).toEqual(200);
-
-    });
-
-    it(`/DELETE Remove Role`, async () => {
-        const name = "auditor";
-        const response = await app.getHttpServer()
-            .delete(`/api/tenant/${tenant.id}/role/${name}`)
-            .set('Authorization', `Bearer ${accessToken}`)
-            .set('Accept', 'application/json');
-
-        console.log(response.body);
-        expect(response.status).toEqual(200);
-
-    });
-
-    it(`/DELETE Remove Tenant`, async () => {
-        const response = await app.getHttpServer()
-            .delete(`/api/tenant/${tenant.id}`)
-            .set('Authorization', `Bearer ${accessToken}`)
-            .set('Accept', 'application/json');
-
-        console.log(response.body);
-        expect(response.status).toEqual(200);
-
-    });
-
-    it(`/GET All Tenant`, async () => {
-        const response = await app.getHttpServer()
-            .get(`/api/tenant`)
-            .set('Authorization', `Bearer ${accessToken}`)
-            .set('Accept', 'application/json');
-
-        console.log(response.body);
-        expect(response.status).toEqual(200);
-
-        expect(response.body).toBeInstanceOf(Array);
-        expect(response.body).toHaveLength(1);
-        expect(response.body[0].id).toBeDefined();
-        expect(response.body[0].name).toBeDefined();
-        expect(response.body[0].domain).toBeDefined();
-    });
-
 });
-

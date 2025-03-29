@@ -26,6 +26,7 @@ import {
     TenantToken
 } from "../casl/contexts";
 import {AuthUserService} from "../casl/authUser.service";
+import {Error} from "mongoose";
 
 
 @Injectable()
@@ -78,16 +79,17 @@ export class AuthService {
 
             let tenant = await this.authUserService.findTenantByDomain(payload.tenant.domain);
             payload = await this.jwtService.verifyAsync(token, {publicKey: tenant.publicKey});
-            console.log("token verified with public Key");
+            this.LOGGER.log("token verified with public Key");
             if (payload.grant_type === GRANT_TYPES.CLIENT_CREDENTIAL) {
                 if (payload.sub !== "oauth") {
-                    throw new UnauthorizedException();
+                    throw "Invalid Token";
                 }
             } else {
                 let user = await this.authUserService.findUserByEmail(payload.email);
             }
             return payload;
         } catch (e) {
+            this.LOGGER.error("Token Validation Failed: ", e.stack);
             throw new UnauthorizedException(e);
         }
     }

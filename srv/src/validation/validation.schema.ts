@@ -101,8 +101,7 @@ const CreateTenantSchema = yup.object().shape(
 
 const UpdateTenantSchema = yup.object().shape(
     {
-        name: yup.string().max(20).nullable(),
-        domain: yup.string().max(100).nullable(),
+        name: yup.string().max(20).required(),
     });
 
 const CreateRoleSchema = yup.object().shape(
@@ -143,7 +142,7 @@ const LoginSchema = yup.object().shape({
     email: yup.string().email().required('Email is required'),
     password: yup.string().required('Password is required').matches(PASSWORD_REGEXP, PASSWORD_MESSAGE),
     client_id: yup.string().required('client_id is required'),
-    code_challenge_method: yup.string().matches(/^plain|S256|OWH32$/, "method is required").default('plain'),
+    code_challenge_method: yup.string().required().matches(/^(plain|S256|OWH32)$/, "method is required").default('plain'),
     code_challenge: yup.string().required('code_challenge is required')
 });
 
@@ -281,7 +280,7 @@ export const ValidationSchema = {
         UpdateGroupRole,
         UpdateGroupUser,
     UpdateGroupSchema,
-    AddMemberSchema: yup.object().shape({
+    MemberOperationSchema: yup.object().shape({
         emails: yup.array().of(
             yup.string().max(20)
         )
