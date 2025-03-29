@@ -9,10 +9,9 @@ set windows-shell := ["powershell.exe", "-c"]
 
 default: help
 
-dev-server:
-    Start-Job -ScriptBlock { just web-dev-start }
-    just api-dev-start
-    Get-Job | Remove-Job
+start:
+    Start-Process powershell -ArgumentList "-NoExit", "-Command just start-srv"
+    Start-Process powershell -ArgumentList "-NoExit", "-Command just start-ui"
 
 
 help:

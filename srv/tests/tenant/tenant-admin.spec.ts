@@ -1,6 +1,6 @@
-import {TestAppFixture} from "./test-app.fixture";
-import {TokenFixture} from "./token.fixture";
-import {TenantClient} from "./api-client/tenant-client";
+import {TestAppFixture} from "../test-app.fixture";
+import {TokenFixture} from "../token.fixture";
+import {TenantClient} from "../api-client/tenant-client";
 
 describe('e2e tenant admin', () => {
     let app: TestAppFixture;

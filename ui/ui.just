@@ -3,5 +3,11 @@
 
 [group('ui')]
 [working-directory: 'ui']
-web-dev-start:
+start-ui:
     npm run UI:SERVE:WATCH
+
+
+[group('ui')]
+[working-directory: 'ui']
+build-ui:
+    npm run build

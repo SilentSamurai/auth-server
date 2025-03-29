@@ -22,6 +22,10 @@ import {MailServiceErrorException} from '../exceptions/mail-service-error.except
 import {TenantService} from "../services/tenant.service";
 import {Tenant} from "../entity/tenant.entity";
 import {SecurityService} from "../casl/security.service";
+import {EmailTakenException} from "../exceptions/email-taken.exception";
+import * as argon2 from "argon2";
+import {InjectRepository} from "@nestjs/typeorm";
+import {Repository} from "typeorm";
 
 @Controller('api/users')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -31,7 +35,8 @@ export class UsersController {
         private readonly authService: AuthService,
         private readonly tenantService: TenantService,
         private readonly mailService: MailService,
-        private readonly securityService: SecurityService
+        private readonly securityService: SecurityService,
+        @InjectRepository(User) private usersRepository: Repository<User>,
     ) {
     }
 
@@ -39,21 +44,23 @@ export class UsersController {
     async signup(
         @Headers() headers,
         @Request() request,
-        @Body(new ValidationPipe(ValidationSchema.SignUpSchema)) body: any
+        @Body(new ValidationPipe(ValidationSchema.SignUpSchema)) body: { name: string, password: string, email: string }
     ): Promise<User> {
-        const user: User = await this.usersService.create(
-            request,
-            body.password,
-            body.email,
-            body.name,
-        );
+        const existingUser = await this.usersRepository.findOne({where: {email: body.email}});
+        if (existingUser) {
+            throw new EmailTakenException();
+        }
 
-        const token: string = await this.authService.createVerificationToken(user);
-        const link: string = 'https://' + headers.host + '/verify/' + token;
+        const hashedPassword = await argon2.hash(body.password);
+        let user = this.usersRepository.create({...body, password: hashedPassword});
+        user = await this.usersRepository.save(user);
 
-        const sent: boolean = await this.mailService.sendVerificationMail(user, link);
+        const token = await this.authService.createVerificationToken(user);
+        const link = `https://${headers.host}/api/oauth/verify-email/${token}`;
+
+        const sent = await this.mailService.sendVerificationMail(user, link);
         if (!sent) {
-            this.usersService.delete(request, user.id);
+            await this.usersRepository.remove(user);
             throw new MailServiceErrorException();
         }
 
@@ -65,20 +72,18 @@ export class UsersController {
     async signdown(
         @Request() request,
         @Body(new ValidationPipe(ValidationSchema.SignDownSchema)) body: { password: string }
-    ): Promise<User> {
-        let securityContext = this.securityService.getUserToken(request);
-        let user = await this.usersService.findByEmail(request, securityContext.email);
-        user = await this.usersService.deleteSecure(request, user.id, body.password);
-        return user;
+    ): Promise<{ status: boolean }> {
+        const securityContext = this.securityService.getUserToken(request);
+        const user = await this.usersService.findByEmail(request, securityContext.email);
+        await this.usersService.deleteSecure(request, user.id, body.password);
+        return {status: true}
     }
 
     @Get('/me')
     @UseGuards(JwtAuthGuard)
-    async getMyUser(
-        @Request() request
-    ): Promise<User> {
+    async getMyUser(@Request() request): Promise<User> {
         const securityContext = this.securityService.getUserToken(request);
-        const user: User = await this.usersService.findByEmail(request, securityContext.email);
+        const user = await this.usersService.findByEmail(request, securityContext.email);
         return this.usersService.findById(request, user.id);
     }
 
@@ -88,13 +93,13 @@ export class UsersController {
         @Request() request,
         @Headers() headers,
         @Body(new ValidationPipe(ValidationSchema.UpdateMyEmailSchema)) body: any
-    ): Promise<object> {
+    ): Promise<{ status: boolean }> {
         const securityContext = this.securityService.getUserToken(request);
-        const user: User = await this.usersService.findByEmail(request, securityContext.email);
-        const token: string = await this.authService.createChangeEmailToken(user, body.email);
-        const link: string = 'https://' + headers.host + '/change-email/' + token;
+        const user = await this.usersService.findByEmail(request, securityContext.email);
+        const token = await this.authService.createChangeEmailToken(user, body.email);
+        const link = `https://${headers.host}/api/oauth/change-email/${token}`;
 
-        const sent: boolean = await this.mailService.sendChangeEmailMail(body.email, link);
+        const sent = await this.mailService.sendChangeEmailMail(body.email, link);
         if (!sent) {
             throw new MailServiceErrorException();
         }
@@ -107,10 +112,11 @@ export class UsersController {
     async updateMyPassword(
         @Request() request,
         @Body(new ValidationPipe(ValidationSchema.UpdateMyPasswordSchema)) body: any
-    ): Promise<User> {
+    ): Promise<{ status: boolean }> {
         const securityContext = this.securityService.getUserToken(request);
-        const user: User = await this.usersService.findByEmail(request, securityContext.email);
-        return this.usersService.updatePasswordSecure(request, user.id, body.currentPassword, body.newPassword);
+        const user = await this.usersService.findByEmail(request, securityContext.email);
+        await this.usersService.updatePasswordSecure(request, user.id, body.currentPassword, body.newPassword);
+        return {status: true};
     }
 
     @Patch('/me/name')
@@ -120,19 +126,15 @@ export class UsersController {
         @Body(new ValidationPipe(ValidationSchema.UpdateMyNameSchema)) body: any
     ): Promise<User> {
         const securityContext = this.securityService.getUserToken(request);
-        const user: User = await this.usersService.findByEmail(request, securityContext.email);
+        const user = await this.usersService.findByEmail(request, securityContext.email);
         return this.usersService.updateName(request, user.id, body.name);
     }
 
     @Get('/me/tenants')
     @UseGuards(JwtAuthGuard)
-    async getTenants(
-        @Request() request,
-    ): Promise<Tenant[]> {
+    async getTenants(@Request() request): Promise<Tenant[]> {
         const securityContext = this.securityService.getUserToken(request);
-        const user: User = await this.usersService.findByEmail(request, securityContext.email);
+        const user = await this.usersService.findByEmail(request, securityContext.email);
         return this.tenantService.findByViewership(request, user);
     }
-
-
 }

@@ -1,6 +1,6 @@
-import { TestAppFixture } from "./test-app.fixture";
-import { UsersClient } from "./api-client/user-client";
-import { TokenFixture } from "./token.fixture";
+import { TestAppFixture } from "../test-app.fixture";
+import { UsersClient } from "../api-client/user-client";
+import { TokenFixture } from "../token.fixture";
 
 describe('e2e users', () => {
     let app: TestAppFixture;

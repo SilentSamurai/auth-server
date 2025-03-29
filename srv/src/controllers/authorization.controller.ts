@@ -3,7 +3,7 @@ import {
     ClassSerializerInterceptor,
     Controller,
     Delete,
-    Get, HttpException,
+    Get,
     Param,
     Patch,
     Post,
@@ -89,12 +89,13 @@ export class AuthorizationController {
         return auth.map(item => {
             return {
                 id: item.id,
-                role_id: item.role_id,
-                role_name: item.role_name,
-                tenant_id: item.tenant_id,
-                tenant_domain: item.tenant_domain,
+                role_id: item.role.id,
+                role_name: item.role.name,
+                tenant_id: item.tenant.id,
+                tenant_domain: item.tenant.domain,
+                effect: item.effect,
                 action: item.action,
-                subject: item.subject,
+                resource: item.resource,
                 conditions: item.conditions,
             }
         });
@@ -109,7 +110,7 @@ export class AuthorizationController {
     ) {
         const authContext = request as any as AuthContext;
         const role = await this.roleService.findById(authContext, id);
-        const auth = await this.authorizationService.updateAuthorization(authContext, id, body.action, body.subject, body.conditions)
+        const auth = await this.authorizationService.updateAuthorization(authContext, id, body.effect, body.action, body.subject, body.conditions)
         return auth;
     }
 

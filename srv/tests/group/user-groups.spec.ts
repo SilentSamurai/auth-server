@@ -1,6 +1,6 @@
-import {TestAppFixture} from "./test-app.fixture";
-import {TokenFixture} from "./token.fixture";
-import {HelperFixture} from "./helper.fixture";
+import {TestAppFixture} from "../test-app.fixture";
+import {TokenFixture} from "../token.fixture";
+import {HelperFixture} from "../helper.fixture";
 
 describe('e2e Groups Check', () => {
     let app: TestAppFixture;

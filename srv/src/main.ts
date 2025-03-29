@@ -6,7 +6,7 @@ import {Environment} from './config/environment.service';
 import * as express from 'express';
 import * as fs from 'fs';
 import * as process from "node:process";
-import {JsonConsoleLogger} from "./JsonConsoleLogger";
+import {JsonConsoleLogger} from "./log/JsonConsoleLogger";
 
 const os = require('os');
 const cluster = require('cluster');
@@ -74,7 +74,7 @@ async function main() {
     } else {
         // Workers can share any TCP connection
         // In this case it is an HTTP server
-        bootstrap()
+        await bootstrap()
 
         console.log(`Worker process(${process.pid}) started`);
     }

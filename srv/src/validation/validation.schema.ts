@@ -18,66 +18,66 @@ function parseDateString(value, originalValue) {
 
 const SignUpSchema = yup.object().shape(
     {
-        name: yup.string().required('name is required').matches(USERNAME_REGEXP, USERNAME_MESSAGE),
-        password: yup.string().required('Password is required').matches(PASSWORD_REGEXP, PASSWORD_MESSAGE),
-        email: yup.string().email().required('Email is required')
+        name: yup.string().required('name is required').max(128).matches(USERNAME_REGEXP, USERNAME_MESSAGE),
+        password: yup.string().required('Password is required').max(128).matches(PASSWORD_REGEXP, PASSWORD_MESSAGE),
+        email: yup.string().email().required('Email is required').max(128)
     });
 
 const SignDownSchema = yup.object().shape(
     {
-        password: yup.string().required('Password is required').matches(PASSWORD_REGEXP, PASSWORD_MESSAGE)
+        password: yup.string().required('Password is required').matches(PASSWORD_REGEXP, PASSWORD_MESSAGE).max(128)
     });
 
 const ForgotPasswordSchema = yup.object().shape(
     {
-        email: yup.string().email().required('Email is required')
+        email: yup.string().email().required('Email is required').max(128)
     });
 
 const ResetPasswordSchema = yup.object().shape(
     {
-        password: yup.string().required('Password is required').matches(PASSWORD_REGEXP, PASSWORD_MESSAGE)
+        password: yup.string().required('Password is required').matches(PASSWORD_REGEXP, PASSWORD_MESSAGE).max(128)
     });
 
 const UpdateMyUsernameSchema = yup.object().shape(
     {
-        username: yup.string().required('Username is required').matches(USERNAME_REGEXP, USERNAME_MESSAGE),
-        password: yup.string().required('Password is required').matches(PASSWORD_REGEXP, PASSWORD_MESSAGE)
+        username: yup.string().required('Username is required').matches(USERNAME_REGEXP, USERNAME_MESSAGE).max(128),
+        password: yup.string().required('Password is required').matches(PASSWORD_REGEXP, PASSWORD_MESSAGE).max(128)
     });
 
 const UpdateUsernameSchema = yup.object().shape(
     {
-        username: yup.string().required('Username is required').matches(USERNAME_REGEXP, USERNAME_MESSAGE)
+        username: yup.string().required('Username is required').matches(USERNAME_REGEXP, USERNAME_MESSAGE).max(128)
     });
 
 const UpdateMyEmailSchema = yup.object().shape(
     {
-        email: yup.string().email().required('Email is required')
+        email: yup.string().email().required('Email is required').max(128)
     });
 
 const UpdateMyPasswordSchema = yup.object().shape(
     {
-        currentPassword: yup.string().required('Current password is required').matches(PASSWORD_REGEXP, PASSWORD_MESSAGE),
-        newPassword: yup.string().required('New password is required').matches(PASSWORD_REGEXP, PASSWORD_MESSAGE)
+        currentPassword: yup.string().required('Current password is required').matches(PASSWORD_REGEXP, PASSWORD_MESSAGE).max(128),
+        newPassword: yup.string().required('New password is required').matches(PASSWORD_REGEXP, PASSWORD_MESSAGE).max(128)
     });
 
 const UpdateMyNameSchema = yup.object().shape(
     {
-        name: yup.string().defined('Name is required').max(15)
+        name: yup.string().defined('Name is required').max(128)
     });
 
 const UpdateNameSchema = yup.object().shape(
     {
-        name: yup.string().defined('Name is required').max(15)
+        name: yup.string().defined('Name is required').max(128)
     });
 
 const UpdateMySurnameSchema = yup.object().shape(
     {
-        surname: yup.string().defined('Name is required').max(15)
+        surname: yup.string().defined('Name is required').max(128)
     });
 
 const UpdateSurnameSchema = yup.object().shape(
     {
-        surname: yup.string().defined('Name is required').max(15)
+        surname: yup.string().defined('Name is required').max(128)
     });
 
 const UpdateMyBirthdateSchema = yup.object().shape(
@@ -120,27 +120,27 @@ const OperatingRoleSchema = yup.object().shape({
 const MemberOperationsSchema = yup.object().shape(
     {
         tenantId: yup.string().required('TenantId is required'),
-        email: yup.string().required('Email is required'),
+        email: yup.string().required('Email is required').max(128),
     });
 
 const CreateUserSchema = yup.object().shape(
     {
         email: yup.string().email().required('Email is required'),
-        name: yup.string().required('Name is required').max(15),
+        name: yup.string().required('Name is required').max(128),
         password: yup.string().required('Password is required').matches(PASSWORD_REGEXP, PASSWORD_MESSAGE),
     });
 
 const UpdateUserSchema = yup.object().shape(
     {
         id: yup.string().required('Id is required'),
-        email: yup.string().email().nullable(),
-        name: yup.string().max(20).nullable(),
-        password: yup.string().matches(PASSWORD_REGEXP, PASSWORD_MESSAGE).nullable(),
+        email: yup.string().max(128).email().nullable(),
+        name: yup.string().max(128).nullable(),
+        password: yup.string().matches(PASSWORD_REGEXP, PASSWORD_MESSAGE).nullable().max(128),
     });
 
 const LoginSchema = yup.object().shape({
-    email: yup.string().email().required('Email is required'),
-    password: yup.string().required('Password is required').matches(PASSWORD_REGEXP, PASSWORD_MESSAGE),
+    email: yup.string().email().required('Email is required').max(128),
+    password: yup.string().required('Password is required').matches(PASSWORD_REGEXP, PASSWORD_MESSAGE).max(128),
     client_id: yup.string().required('client_id is required'),
     code_challenge_method: yup.string().required().matches(/^(plain|S256|OWH32)$/, "method is required").default('plain'),
     code_challenge: yup.string().required('code_challenge is required')
@@ -148,8 +148,8 @@ const LoginSchema = yup.object().shape({
 
 const PasswordGrantSchema = yup.object().shape({
     grant_type: yup.string().required().matches(/^password$/g, {message: "grant type not recognised"}),
-    username: yup.string().email().required('Username is required'),
-    password: yup.string().required('Password is required').matches(PASSWORD_REGEXP, PASSWORD_MESSAGE),
+    username: yup.string().email().required('Username is required').max(128),
+    password: yup.string().required('Password is required').matches(PASSWORD_REGEXP, PASSWORD_MESSAGE).max(128),
     client_id: yup.string().required('client_id is required'),
     scopes: yup.array().of(
         yup.string().max(20)
@@ -199,8 +199,8 @@ const ExchangeTokenSchema = yup.object().shape(
 const SecurityContextSchema = yup.object().shape(
     {
         sub: yup.string().required('token is invalid'),
-        email: yup.string().required('token is invalid'),
-        name: yup.string().required('token is invalid'),
+        email: yup.string().required('token is invalid').max(128),
+        name: yup.string().required('token is invalid').max(128),
         tenant: yup.object().shape({
             id: yup.string().required('token is invalid'),
             name: yup.string().required('token is invalid'),
@@ -214,7 +214,7 @@ const SecurityContextSchema = yup.object().shape(
 
 const RefreshTokenSchema = yup.object().shape(
     {
-        email: yup.string().required('token is invalid'),
+        email: yup.string().required('token is invalid').max(128),
         domain: yup.string().required('token is invalid')
     });
 

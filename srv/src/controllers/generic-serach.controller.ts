@@ -1,4 +1,5 @@
 import {
+    BadRequestException,
     Body,
     ClassSerializerInterceptor,
     Controller,
@@ -15,7 +16,6 @@ import {User} from "../entity/user.entity";
 import {Tenant} from "../entity/tenant.entity";
 import {TenantMember} from "../entity/tenant.members.entity";
 import {Role} from "../entity/role.entity";
-import {NotFoundError} from "rxjs";
 import {Action} from "../casl/actions.enum";
 import {SecurityService} from "../casl/security.service";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
@@ -23,6 +23,7 @@ import {escapeRegExp} from "typeorm/util/escapeRegExp";
 import {Group} from "../entity/group.entity";
 import {FindOperator} from "typeorm/find-options/FindOperator";
 import {SubjectEnum} from "../entity/subjectEnum";
+import {NotFoundException} from "../exceptions/not-found.exception";
 
 const logger = new Logger('GenericSearchController');
 const RELATIONS = {
@@ -92,7 +93,7 @@ export class GenericSearchController {
 
         const repo = this.getRepo(entity);
         if (!repo) {
-            throw new NotFoundError(`Resource ${entity} not found`);
+            throw new NotFoundException(`Resource ${entity} not found`);
         }
 
         this.securityService.isAuthorized(request, Action.Read, SubjectEnum.getSubject(entity));
@@ -196,10 +197,22 @@ export const getCondition = (operator: string, value: any): FindOperator<any> =>
         return Not(ILike(`%${value}%`));
     }
     if (operator == FilterRule.IN) {
-        return In(value.split(','));
+        if(typeof value === 'string') {
+            value = value.split(',')
+        }
+        if (Array.isArray(value)) {
+            return In(value);
+        }
+        throw new BadRequestException(value);
     }
     if (operator == FilterRule.NOT_IN) {
-        return Not(In(value.split(',')));
+        if(typeof value === 'string') {
+            value = value.split(',')
+        }
+        if (Array.isArray(value)) {
+            return Not(In(value));
+        }
+        throw new BadRequestException(value);
     }
     if (operator == FilterRule.REGEX) {
         let newValue = value.replace(new RegExp(escapeRegExp("*"), 'g'), "%");

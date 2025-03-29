@@ -21,15 +21,15 @@ export class MainController {
     }
 
 
-    @Get('/check-auth')
-    @UseGuards(JwtAuthGuard)
-    async checkAuth(
-        @Request() request
-    ): Promise<any> {
-        return {
-            health: true
-        }
-    }
+    // @Get('/check-auth')
+    // @UseGuards(JwtAuthGuard)
+    // async checkAuth(
+    //     @Request() request
+    // ): Promise<any> {
+    //     return {
+    //         health: true
+    //     }
+    // }
 
     // @Post('/cpu-bound')
     // async cpubound(): Promise<object> {

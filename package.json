@@ -3,11 +3,14 @@
     "version": "1.0.0",
     "scripts": {
         "ui:build": "cd ./ui && npm i && npm run build",
-        "backend:build": "cd ./srv && npm i && npm run build",
-        "build": "npm run ui:build && npm run backend:build",
-        "start": "cd ./srv && npm run start:prod",
-        "dev:ui:start": "cd ./ui && npm run UI:BUILD:WATCH",
-        "dev:backend:start": "cd ./srv && npm run start:debug",
+        "srv:build": "cd ./srv && npm i && npm run build",
+        "build": "npm run ui:build && npm run srv:build",
+
+        "start:prod": "cd ./srv && npm run start:prod",
+
+        "start:srv": "cd ./ui && npm run UI:SERVE:WATCH",
+        "start:ui": "cd ./srv && npm run start:debug",
+
         "dev:external:start": "cd ./external-user-app && node server.js",
         "run:e2e-tests": "cd ./e2e && npm run test"
     },

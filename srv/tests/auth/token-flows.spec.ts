@@ -1,5 +1,5 @@
-import {TestAppFixture} from "./test-app.fixture";
-import {TokenFixture} from "./token.fixture";
+import {TestAppFixture} from "../test-app.fixture";
+import {TokenFixture} from "../token.fixture";
 
 describe('e2e positive token flow', () => {
     let app: TestAppFixture;

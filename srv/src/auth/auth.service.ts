@@ -26,7 +26,6 @@ import {
     TenantToken
 } from "../casl/contexts";
 import {AuthUserService} from "../casl/authUser.service";
-import {Error} from "mongoose";
 
 
 @Injectable()
@@ -280,7 +279,7 @@ export class AuthService {
         // Use the user's current email for signing the token.
         // All tokens generated before a successful email change would get invalidated.
         return this.jwtService.sign(payload, {
-            secret: globalTenant.publicKey,
+            secret: globalTenant.privateKey,
             expiresIn: this.configService.get('TOKEN_CHANGE_EMAIL_EXPIRATION_TIME')
         });
     }
@@ -309,7 +308,7 @@ export class AuthService {
 
         const authContext = await this.securityService.getUserAuthContext(payload.sub);
 
-        await this.userService.updateEmail(authContext, user.id, payload.sub);
+        await this.userService.updateEmail(authContext, user.id, payload.updatedEmail);
 
         return true;
     }

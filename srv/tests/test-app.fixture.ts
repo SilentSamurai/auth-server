@@ -24,8 +24,8 @@ export class TestAppFixture {
     public async init(): Promise<TestAppFixture> {
 
         global.console = console;
-
         process.env.ENV_FILE = './envs/.env.testing';
+
         Environment.setup();
         this.moduleRef = await Test.createTestingModule({
             imports: [AppModule],

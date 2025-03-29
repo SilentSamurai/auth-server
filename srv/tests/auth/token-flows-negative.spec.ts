@@ -1,4 +1,4 @@
-import {TestAppFixture} from "./test-app.fixture";
+import {TestAppFixture} from "../test-app.fixture";
 
 describe('e2e negative token flow', () => {
     let app: TestAppFixture;

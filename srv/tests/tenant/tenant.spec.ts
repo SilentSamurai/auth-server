@@ -1,6 +1,6 @@
-import { TestAppFixture } from "./test-app.fixture";
-import { TokenFixture } from "./token.fixture";
-import { HelperFixture } from "./helper.fixture";
+import { TestAppFixture } from "../test-app.fixture";
+import { TokenFixture } from "../token.fixture";
+import { HelperFixture } from "../helper.fixture";
 
 describe("E2E Tenant Management", () => {
     let app: TestAppFixture;
