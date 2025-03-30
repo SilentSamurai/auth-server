@@ -1,11 +1,13 @@
 import {Entity, Column, PrimaryGeneratedColumn, Index, ManyToOne, JoinColumn} from 'typeorm';
 import {Tenant} from "./tenant.entity";
 import {Role} from "./role.entity";
+import {Action, Effect} from "../casl/actions.enum";
 
 @Entity('authorization')
-@Index(['role_id'])
-@Index(['role_id', 'tenant_id'])
-export class Authorization {
+@Index(['role'])
+@Index(['role', 'tenant'])
+export class Policy {
+
     @PrimaryGeneratedColumn('uuid', { name: 'id' })
     id: string;
 
@@ -23,15 +25,22 @@ export class Authorization {
     })
     tenant: Tenant;
 
-    @Column({ name: 'effect'  , nullable: false })
-    effect: string;
+    @Column({
+        type: 'simple-enum',
+        enum: Effect,
+        default: Effect.ALLOW
+    })
+    effect: Effect;
 
-    @Column({ name: 'action'  , nullable: false })
-    action: string;
+    @Column({
+        type: 'simple-enum',
+        enum: Action
+    })
+    action: Action;
 
-    @Column({ name: 'resource'  , nullable: false })
-    resource: string;
+    @Column({ name: 'subject'  , nullable: false })
+    subject: string;
 
-    @Column('json', { name: 'conditions' })
+    @Column('simple-json', { name: 'conditions' })
     conditions: object;
 }

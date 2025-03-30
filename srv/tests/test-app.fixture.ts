@@ -40,7 +40,7 @@ export class TestAppFixture {
         return superTest(this.app.getHttpServer());
     }
 
-    public async close(): Promise<void> {
+    public async close() {
         await this.app.close();
         await this.moduleRef.close();
     }

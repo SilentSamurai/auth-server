@@ -18,7 +18,7 @@ import {TenantMember} from "../entity/tenant.members.entity";
 import {Group} from "../entity/group.entity";
 import {ServiceModule} from "../services/service.module";
 import {AuthController} from "./auth.controller";
-import {AuthorizationController} from "./authorization.controller";
+import {PolicyController} from "./policy.controller";
 import {GroupController} from "./group.controller";
 
 @Module(
@@ -41,7 +41,7 @@ import {GroupController} from "./group.controller";
             MainController,
             GenericSearchController,
             AuthController,
-            AuthorizationController,
+            PolicyController,
             GroupController
         ],
         providers: [],

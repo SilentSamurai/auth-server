@@ -7,6 +7,7 @@ import {AuthCode} from "./auth_code.entity";
 import {Group} from "./group.entity";
 import {GroupRole} from "./group.roles.entity";
 import {GroupUser} from "./group.users.entity";
+import {Policy} from "./authorization.entity";
 
 
 export const entities = [
@@ -18,5 +19,6 @@ export const entities = [
     AuthCode,
     Group,
     GroupRole,
-    GroupUser
+    GroupUser,
+    Policy
 ];

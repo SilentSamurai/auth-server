@@ -18,7 +18,6 @@ describe('GenericSearchController (e2e)', () => {
     beforeAll(async () => {
         // Create and set up the test application
         app = await new TestAppFixture().init();
-        await app.init();
 
         // Get admin access token for authenticated requests
         tokenFixture = new TokenFixture(app);
@@ -421,57 +420,117 @@ describe('GenericSearchController (e2e)', () => {
         const testCreatedAt = new Date().toISOString(); // Store the creation date
 
         const filterTests = [
-            {rule: 'equals', value: testUserEmail, check: (user) => user.email === testUserEmail},
+            {
+                rule: 'equals',
+                resource: "Users",
+                field: "email",
+                value: testUserEmail,
+                check: (user) => user.email === testUserEmail
+            },
             {
                 rule: 'notEquals',
+                resource: "Users",
+                field: "email",
                 value: 'non-existent@example.com',
                 check: (user) => user.email !== 'non-existent@example.com'
             },
             {
                 rule: 'greaterThan',
+                resource: "Users",
+                field: "createdAt",
                 value: testCreatedAt,
                 check: (user) => new Date(user.createdAt) > new Date(testCreatedAt)
             },
             {
                 rule: 'greaterThanEqual',
+                resource: "Users",
+                field: "createdAt",
                 value: testCreatedAt,
                 check: (user) => new Date(user.createdAt) >= new Date(testCreatedAt)
             },
-            {rule: 'lessThan', value: new Date().toISOString(), check: (user) => new Date(user.createdAt) < new Date()},
+            {
+                rule: 'lessThan',
+                resource: "Users",
+                field: "createdAt",
+                value: new Date().toISOString(),
+                check: (user) => new Date(user.createdAt) < new Date()
+            },
             {
                 rule: 'lessThanEquals',
+                resource: "Users",
+                field: "createdAt",
                 value: new Date().toISOString(),
                 check: (user) => new Date(user.createdAt) <= new Date()
             },
-            {rule: 'contains', value: 'test-', check: (user) => user.email.includes('test-')},
-            {rule: 'nlike', value: 'invalid', check: (user) => !user.email.includes('invalid')},
+            {
+                rule: 'contains',
+                resource: "Users",
+                field: "email",
+                value: 'test-',
+                check: (user) => user.email.includes('test-')
+            },
+            {
+                rule: 'nlike',
+                resource: "Users",
+                field: "email",
+                value: 'invalid',
+                check: (user) => !user.email.includes('invalid')
+            },
             {
                 rule: 'in',
+                resource: "Users",
+                field: "email",
                 value: [testUserEmail, 'another@example.com'],
                 check: (user) => [testUserEmail, 'another@example.com'].includes(user.email)
             },
-            {rule: 'nin', value: ['wrong@example.com'], check: (user) => !['wrong@example.com'].includes(user.email)},
-            {rule: 'isnull', value: null, check: (user) => user.someField === null}, // Replace `someField` with an actual nullable field
-            {rule: 'isnotnull', value: null, check: (user) => user.email !== null},
+            {
+                rule: 'nin',
+                resource: "Users",
+                field: "email",
+                value: ['wrong@example.com'],
+                check: (user) => !['wrong@example.com'].includes(user.email)
+            },
+            {
+                rule: 'isnull',
+                resource: "Users",
+                field: "verified",
+                value: null,
+                check: (user) => user.verified === null
+            },
+            {
+                rule: 'isnotnull',
+                resource: "Users",
+                field: "email",
+                value: null,
+                check: (user) => user.email !== null
+            },
             {
                 rule: 'regex',
-                value: '^test-.*@example.com$',
+                resource: "Users",
+                field: "email",
+                value: 'test-*@example.com',
                 check: (user) => new RegExp('^test-.*@example.com$').test(user.email)
             },
         ];
 
-        for (let {rule, value, check} of filterTests) {
+        for (let {rule, resource, field, value, check} of filterTests) {
             it(`should filter users using '${rule}' operator`, async () => {
                 const response = await httpServer
-                    .post('/api/search/Users')
+                    .post(`/api/search/${resource}`)
                     .set('Authorization', `Bearer ${accessToken}`)
                     .set('Accept', 'application/json')
                     .send({
                         pageNo: 0,
                         pageSize: 50,
-                        where: [{name: 'email', label: 'Email', value, operator: rule}]
+                        where: [{
+                            name: field,
+                            label: field,
+                            operator: rule,
+                            value: value
+                        }]
                     });
 
+                console.log(response.body);
                 expect(response.status).toBe(201);
                 expect(response.body.data).toBeDefined();
                 expect(Array.isArray(response.body.data)).toBe(true);

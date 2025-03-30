@@ -1,25 +1,10 @@
-function is2xx(response: { status: number }): boolean {
-    return response.status >= 200 && response.status < 300;
-}
-
-function expect2xx(response: { status: number; body: any }) {
-    if (!is2xx(response)) {
-        throw {
-            status: response.status,
-            body: response.body
-        };
-    }
-}
-
 import { TestAppFixture } from "../test-app.fixture";
+import {expect2xx, HttpClient} from "./client";
 
-export class GroupClient {
-    private readonly app: TestAppFixture;
-    private accessToken: string;
+export class GroupClient extends HttpClient {
 
     constructor(app: TestAppFixture, accessToken: string) {
-        this.app = app;
-        this.accessToken = accessToken;
+        super(app, accessToken);
     }
 
     public async createGroup(name: string, tenantId: string) {

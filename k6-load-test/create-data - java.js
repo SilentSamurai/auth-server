@@ -10,7 +10,7 @@ async function createUser(name, email) {
     await fetch(`${BASE_URL}/api/signUp`, {
         "headers": {
             "accept": "application/json, text/plain, */*",
-            // "authorization": "Bearer " + token,
+            // "policy": "Bearer " + token,
             "content-type": "application/json",
         },
         "body": JSON.stringify({

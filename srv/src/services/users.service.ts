@@ -39,13 +39,13 @@ export class UsersService implements OnModuleInit {
         email: string,
         name: string
     ): Promise<User> {
-        // Check read authorization and if email is already taken
+        // Check read policy and if email is already taken
         this.securityService.isAuthorized(authContext, Action.Read, SubjectEnum.USER, {email});
         if (await this.usersRepository.findOne({where: {email}})) {
             throw new EmailTakenException();
         }
 
-        // Check create authorization
+        // Check create policy
         this.securityService.isAuthorized(authContext, Action.Create, SubjectEnum.USER);
 
         // Create and save the new user

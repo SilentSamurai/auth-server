@@ -6,3 +6,10 @@ export enum Action {
     Delete = 'delete',
     ReadCredentials = 'read-credential'
 }
+
+
+
+export enum Effect {
+    ALLOW = 'ALLOW',
+    DENY = 'DENY'
+}

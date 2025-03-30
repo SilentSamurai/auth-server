@@ -27,7 +27,7 @@ export default function () {
     });
     const headers = {
         'Content-Type': 'application/json',
-        // "authorization": "Bearer " + token,
+        // "policy": "Bearer " + token,
     };
     let url = `${BASE_URL}/api/v1/cpu-bound`
     if (__ENV.TEST_TYPE === "IO") {

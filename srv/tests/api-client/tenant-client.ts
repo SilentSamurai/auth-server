@@ -1,26 +1,10 @@
 import {TestAppFixture} from "../test-app.fixture";
+import {expect2xx, HttpClient} from "./client";
 
-function is2xx(response: { status: number }) {
-    return response.status >= 200 && response.status < 300;
-}
-
-function expect2xx(response: {
-    body: any;
-    status: number
-}) {
-    if (is2xx(response)) {
-        return
-    }
-    throw {status: response.status, body: response.body};
-}
-
-export class TenantClient {
-    private readonly app: TestAppFixture;
-    private accessToken: string;
+export class TenantClient extends HttpClient {
 
     constructor(app: TestAppFixture, accessToken: string) {
-        this.app = app;
-        this.accessToken = accessToken;
+        super(app, accessToken);
     }
 
     public async createTenant(name: string, domain: string) {

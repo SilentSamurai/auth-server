@@ -1,23 +1,11 @@
-function is2xx(response: { status: number }) {
-    return response.status >= 200 && response.status < 300;
-}
-
-function expect2xx(response: { body: any; status: number }) {
-    if (is2xx(response)) {
-        return;
-    }
-    throw {status: response.status, body: response.body};
-}
+import {expect2xx, HttpClient} from "./client";
 
 import {TestAppFixture} from "../test-app.fixture";
 
-export class UsersClient {
-    private readonly app: TestAppFixture;
-    private accessToken: string;
+export class UsersClient extends HttpClient {
 
     constructor(app: TestAppFixture, accessToken: string) {
-        this.app = app;
-        this.accessToken = accessToken;
+        super(app, accessToken);
     }
 
     // -----------------------------------------------------------------

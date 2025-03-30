@@ -25,7 +25,6 @@ describe('UsersController (e2e)', () => {
     beforeAll(async () => {
         // Create and set up the test application
         app = await new TestAppFixture().init();
-        await app.init();
 
         smtpServer = createFakeSmtpServer();
         smtpServer.listen();

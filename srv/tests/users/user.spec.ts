@@ -23,7 +23,6 @@ describe('UsersController (e2e)', () => {
     beforeAll(async () => {
         // Create and set up the test application
         app = await new TestAppFixture().init();
-        await app.init();
 
         // Get admin access token for authenticated requests
         tokenFixture = new TokenFixture(app);

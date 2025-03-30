@@ -2,7 +2,7 @@ import {MigrationInterface, QueryRunner, Table, TableForeignKey, TableIndex} fro
 
 export class CreateAuthorizationTable1698765432100 implements MigrationInterface {
     public async up(queryRunner: QueryRunner): Promise<void> {
-        // Create the authorization table
+        // Create the policy table
         await queryRunner.createTable(
             new Table({
                 name: 'authorization',
@@ -35,7 +35,7 @@ export class CreateAuthorizationTable1698765432100 implements MigrationInterface
                         isNullable: false,
                     },
                     {
-                        name: 'resource',
+                        name: 'subject',
                         type: 'varchar',
                         isNullable: false,
                     },
