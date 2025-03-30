@@ -1,4 +1,4 @@
-import {INestApplication} from "@nestjs/common";
+import {INestApplication, Logger} from "@nestjs/common";
 import {Environment} from "../src/config/environment.service";
 import {Test, TestingModule} from "@nestjs/testing";
 import {AppModule} from "../src/app.module";
@@ -33,6 +33,9 @@ export class TestAppFixture {
         this.app = this.moduleRef.createNestApplication();
         this._jwtService = this.app.get<JwtService>(JwtService);
         await this.app.init();
+        this.app.useLogger(console);
+
+
         return this;
     }
 
@@ -41,6 +44,7 @@ export class TestAppFixture {
     }
 
     public async close() {
+        this.app.flushLogs();
         await this.app.close();
         await this.moduleRef.close();
     }

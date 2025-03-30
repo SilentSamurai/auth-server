@@ -21,9 +21,9 @@ export class SearchClient extends HttpClient {
         return searchCriteria;
     }
 
-    public async findByTenant(query: any) {
+    private async searchApi(entity: string, query: any) {
         let where = this.convertToCriteria(query);
-        const response = await this.post('/api/search/Tenants')
+        const response = await this.post(`/api/search/${entity}`)
             .send({
                 pageNo: 0,
                 pageSize: 50,
@@ -34,5 +34,13 @@ export class SearchClient extends HttpClient {
         expect2xx(response);
         expect(response.body.data.length).toBeGreaterThanOrEqual(1);
         return response.body.data[0];
+    }
+
+    public async findByTenant(query: any) {
+        return this.searchApi("Tenants", query);
+    }
+
+    async findByUser(query: any) {
+        return this.searchApi("Users", query);
     }
 }

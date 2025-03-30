@@ -7,8 +7,6 @@ export enum Action {
     ReadCredentials = 'read-credential'
 }
 
-
-
 export enum Effect {
     ALLOW = 'ALLOW',
     DENY = 'DENY'

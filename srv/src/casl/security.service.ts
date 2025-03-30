@@ -77,7 +77,7 @@ export class SecurityService implements OnModuleInit {
             && securityContext.tenant.domain === this.configService.get("SUPER_TENANT_DOMAIN");
     }
 
-    getAdminContextForInternalUse(): AuthContext {
+    async getAdminContextForInternalUse(): Promise<AuthContext> {
         const authContext: AuthContext = {
             SECURITY_CONTEXT: {
                 email: '',
@@ -94,7 +94,7 @@ export class SecurityService implements OnModuleInit {
             } as TenantToken,
             SCOPE_ABILITIES: null
         };
-        authContext.SCOPE_ABILITIES = this.caslAbilityFactory.createForSecurityContext(authContext.SECURITY_CONTEXT);
+        authContext.SCOPE_ABILITIES = await this.caslAbilityFactory.createForSecurityContext(authContext.SECURITY_CONTEXT);
         return authContext;
     }
 
@@ -111,7 +111,7 @@ export class SecurityService implements OnModuleInit {
             } as UserToken,
             SCOPE_ABILITIES: null
         };
-        authContext.SCOPE_ABILITIES = this.caslAbilityFactory.createForSecurityContext(authContext.SECURITY_CONTEXT);
+        authContext.SCOPE_ABILITIES = await this.caslAbilityFactory.createForSecurityContext(authContext.SECURITY_CONTEXT);
         return authContext;
     }
 
@@ -135,7 +135,7 @@ export class SecurityService implements OnModuleInit {
             } as TenantToken,
             SCOPE_ABILITIES: null
         };
-        authContext.SCOPE_ABILITIES = this.caslAbilityFactory.createForSecurityContext(authContext.SECURITY_CONTEXT);
+        authContext.SCOPE_ABILITIES = await this.caslAbilityFactory.createForSecurityContext(authContext.SECURITY_CONTEXT);
         return authContext;
     }
 
@@ -144,7 +144,7 @@ export class SecurityService implements OnModuleInit {
             SECURITY_CONTEXT: securityContext,
             SCOPE_ABILITIES: null
         };
-        authContext.SCOPE_ABILITIES = this.caslAbilityFactory.createForSecurityContext(securityContext);
+        authContext.SCOPE_ABILITIES = await this.caslAbilityFactory.createForSecurityContext(securityContext);
         return authContext;
     }
 }

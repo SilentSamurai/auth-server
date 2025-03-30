@@ -15,6 +15,7 @@ import {GroupRole} from "../entity/group.roles.entity";
 import {GroupUser} from "../entity/group.users.entity";
 import {Policy} from "../entity/authorization.entity";
 import {PolicyService} from "./policy.service";
+import {CacheService} from "./cache.service";
 
 @Module(
     {
@@ -23,8 +24,8 @@ import {PolicyService} from "./policy.service";
             TypeOrmModule.forFeature([Tenant, User, TenantMember, Role, UserRole, AuthCode, Group, GroupRole, GroupUser, Policy])
         ],
         controllers: [],
-        providers: [SecurityService, CaslAbilityFactory, AuthUserService, PolicyService ],
-        exports: [SecurityService, CaslAbilityFactory, AuthUserService, PolicyService ]
+        providers: [SecurityService, CaslAbilityFactory, AuthUserService, PolicyService, CacheService ],
+        exports: [SecurityService, CaslAbilityFactory, AuthUserService, PolicyService, CacheService ]
     })
 export class CaslModule {
 }

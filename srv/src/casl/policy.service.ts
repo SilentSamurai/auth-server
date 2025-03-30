@@ -1,4 +1,4 @@
-import {Injectable} from "@nestjs/common";
+import {Injectable, Logger} from "@nestjs/common";
 import {Role} from "../entity/role.entity";
 import {Environment} from "../config/environment.service";
 import {Policy} from "../entity/authorization.entity";
@@ -9,10 +9,13 @@ import {NotFoundException} from "../exceptions/not-found.exception";
 import {Action, Effect} from "./actions.enum";
 import {SecurityService} from "./security.service";
 import {SubjectEnum} from "../entity/subjectEnum";
+import {CacheService} from "./cache.service";
 
 
 @Injectable()
 export class PolicyService {
+
+    private logger = new Logger('PolicyService');
 
     constructor(
         private readonly configService: Environment,
@@ -27,7 +30,7 @@ export class PolicyService {
                                      subject: string,
                                      conditions: any) {
 
-        this.securityService.isAuthorized(authContext, Action.Create, SubjectEnum.POLICY);
+        this.securityService.isAuthorized(authContext, Action.Create, SubjectEnum.POLICY, {tenantId: role.tenant.id});
 
         const auth = this.authorizationRepository.create({
             role: role,
@@ -102,6 +105,5 @@ export class PolicyService {
         this.securityService.isAuthorized(authContext, Action.Update, SubjectEnum.POLICY, {roleId: auth.role.id});
         return await this.authorizationRepository.delete(id);
     }
-
 
 }

@@ -9,7 +9,7 @@ describe('PolicyController (e2e)', () => {
     let app: TestAppFixture;
     let accessToken: string;
     let authorizationId: string;
-    let authClient: PolicyClient;
+    let policyClient: PolicyClient;
     let role;
 
     beforeAll(async () => {
@@ -21,7 +21,7 @@ describe('PolicyController (e2e)', () => {
             "auth.server.com"
         );
         accessToken = tokenResponse.accessToken;
-        authClient = new PolicyClient(app, accessToken);
+        policyClient = new PolicyClient(app, accessToken);
         const tenantClient = new TenantClient(app, accessToken);
         const searchClient = new SearchClient(app, accessToken);
         const tenant = await searchClient.findByTenant({domain: "auth.server.com"});
@@ -35,7 +35,7 @@ describe('PolicyController (e2e)', () => {
     });
 
     it('should create an policy', async () => {
-        const auth = await authClient.createAuthorization(
+        const auth = await policyClient.createAuthorization(
             role.id,
             Effect.ALLOW,
             Action.Read,
@@ -53,7 +53,7 @@ describe('PolicyController (e2e)', () => {
     });
 
     it('should retrieve an policy by ID', async () => {
-        const auth = await authClient.getAuthorization(authorizationId);
+        const auth = await policyClient.getAuthorization(authorizationId);
 
         expect(auth).toHaveProperty('id');
         expect(auth.effect).toEqual(Effect.ALLOW);
@@ -65,7 +65,22 @@ describe('PolicyController (e2e)', () => {
     });
 
     it('should retrieve authorizations by role', async () => {
-        const response = await authClient.getRoleAuthorizations(role.id);
+        const response = await policyClient.getRoleAuthorizations(role.id);
+
+        expect(Array.isArray(response)).toBe(true);
+        expect(response.length).toBeGreaterThan(0);
+        const auth = response[0];
+        expect(auth).toHaveProperty('id');
+        expect(auth.effect).toEqual(Effect.ALLOW);
+        expect(auth.action).toEqual(Action.Read);
+        expect(auth.subject).toEqual("orders");
+        expect(auth.conditions).toBeDefined();
+        expect(auth.conditions.country).toBeDefined();
+        expect(auth.conditions.country).toEqual("US");
+    });
+
+    it('should retrieve authorizations by role from cache', async () => {
+        const response = await policyClient.getRoleAuthorizations(role.id);
 
         expect(Array.isArray(response)).toBe(true);
         expect(response.length).toBeGreaterThan(0);
@@ -80,7 +95,7 @@ describe('PolicyController (e2e)', () => {
     });
 
     it('should update an policy', async () => {
-        const auth = await authClient.updateAuthorization(authorizationId, {
+        const auth = await policyClient.updateAuthorization(authorizationId, {
             effect: Effect.DENY,
             action: Action.Update,
         });
@@ -95,26 +110,19 @@ describe('PolicyController (e2e)', () => {
     });
 
     it('should delete an policy', async () => {
-        await authClient.deleteAuthorization(authorizationId);
+        await policyClient.deleteAuthorization(authorizationId);
     });
 
     it('should return 404 when retrieving a non-existent policy', async () => {
         try {
-            const response = await authClient.getAuthorization("non-existent");
+            const response = await policyClient.getAuthorization("non-existent");
         } catch (e) {
             expect(e.status).toBe(404);
         }
     });
 
-    it('should return 403 when unauthorized user tries to access', async () => {
-        // const response = await app.getHttpServer()
-        //     .get(`/api/authorizations/role/${role.id}`);
-        //
-        // expect(response.status).toBe(403);
-    });
-
     it('get current user permissions', async () => {
-        const permissions = await authClient.getMyPermission();
+        const permissions = await policyClient.getMyPermission();
         expect(permissions).toBeInstanceOf(Array);
         expect(permissions.length).toBeGreaterThan(0);
         for (let permission of permissions) {

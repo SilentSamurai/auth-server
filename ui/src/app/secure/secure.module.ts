@@ -39,6 +39,7 @@ import {TNRL01SelectionComponent} from "./tenants/TNRL01-selection.component";
 import {UR02SelectionComponent} from "./users/UR02-selection.component";
 import {AbilityModule} from "@casl/angular";
 import {SkeletonModule} from "primeng/skeleton";
+import {CreatePolicyModalComponent} from "./roles/create-policy-modal.component";
 
 @NgModule({
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -66,7 +67,8 @@ import {SkeletonModule} from "primeng/skeleton";
         CreateGroupComponent,
         GP02Component,
         UpdateGroupComponent,
-        RL02Component
+        RL02Component,
+        CreatePolicyModalComponent
     ],
     imports: [
         TableModule,

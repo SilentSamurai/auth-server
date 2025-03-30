@@ -3,6 +3,7 @@ import {AuthService} from '../_services/auth.service';
 import {TokenStorageService} from '../_services/token-storage.service';
 import {ActivatedRoute, Router} from "@angular/router";
 import {lastValueFrom} from "rxjs";
+import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 
 @Component({
     selector: 'app-login',
@@ -10,27 +11,29 @@ import {lastValueFrom} from "rxjs";
     styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit {
-    form: any = {
-        email: null,
-        password: null,
-        client_id: null
-    };
+    loginForm: FormGroup;
     loading = true;
     isLoggedIn = false;
     isLoginFailed = false;
     errorMessage = '';
-    roles: string[] = [];
     freezeClientId = false;
     redirectUri = "";
     code_challenge = "";
-
     isPasswordVisible = false;
     code_challenge_method: string = "plain";
 
-    constructor(private authService: AuthService,
-                private router: Router,
-                private route: ActivatedRoute,
-                private tokenStorage: TokenStorageService) {
+    constructor(
+        private authService: AuthService,
+        private router: Router,
+        private route: ActivatedRoute,
+        private fb: FormBuilder,
+        private tokenStorage: TokenStorageService
+    ) {
+        this.loginForm = this.fb.group({
+            username: ['', Validators.required],
+            password: ['', Validators.required],
+            client_id: ['', Validators.required]
+        });
     }
 
     async ngOnInit(): Promise<void> {
@@ -51,8 +54,9 @@ export class LoginComponent implements OnInit {
         this.redirectUri = params.get("redirect_uri")!;
 
         if (params.has("client_id")) {
-            this.form.client_id = params.get("client_id");
-            if (this.form.client_id && this.form.client_id.length > 0) {
+            const cid = params.get("client_id");
+            this.loginForm.patchValue({client_id: cid});
+            if (cid && cid.length > 0) {
                 this.freezeClientId = true;
             }
         }
@@ -71,7 +75,7 @@ export class LoginComponent implements OnInit {
                     await this.router.navigate(['session-confirm'], {
                         queryParams: {
                             redirect_uri: this.redirectUri,
-                            client_id: this.form.client_id,
+                            client_id: this.loginForm.get("client_id"),
                             code_challenge: this.code_challenge
                         }
                     });
@@ -87,16 +91,17 @@ export class LoginComponent implements OnInit {
     }
 
     onContinue() {
+        // this.loginForm.get('client_id')?.disable();
         this.freezeClientId = true;
     }
 
     // redirection to home page might not work sometime,
     // check if internally anything is nav-ing to login page again
     async onSubmit(): Promise<void> {
-        const {email, password, client_id} = this.form;
+        const {username, password, client_id} = this.loginForm.value;
         try {
             const data = await this.authService.login(
-                email,
+                username,
                 password,
                 client_id,
                 this.code_challenge,

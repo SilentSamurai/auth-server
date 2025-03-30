@@ -29,7 +29,7 @@ export class PolicyController {
     constructor(
         private readonly configService: Environment,
         private readonly securityService: SecurityService,
-        private readonly authorizationService: PolicyService,
+        private readonly policyService: PolicyService,
         private readonly roleService: RoleService,
     ) {
     }
@@ -65,7 +65,7 @@ export class PolicyController {
     ): Promise<Policy> {
         const authContext = request as any as AuthContext;
         const role = await this.roleService.findById(authContext, body.role);
-        const policy = await this.authorizationService.createAuthorization(
+        const policy = await this.policyService.createAuthorization(
             authContext, role, body.effect, body.action, body.subject, body.conditions);
         return policy;
     }
@@ -78,7 +78,7 @@ export class PolicyController {
         @Param('id') id: string,
     ) {
         const authContext = request as any as AuthContext;
-        const auth = await this.authorizationService.findById(authContext, id);
+        const auth = await this.policyService.findById(authContext, id);
         return auth;
     }
 
@@ -90,7 +90,7 @@ export class PolicyController {
     ) {
         const authContext = request as any as AuthContext;
         const role = await this.roleService.findById(authContext, role_id);
-        const auth = await this.authorizationService.findByRole(authContext, role);
+        const auth = await this.policyService.findByRole(authContext, role);
         return auth;
     }
 
@@ -114,7 +114,7 @@ export class PolicyController {
         }
     ) {
         const authContext = request as any as AuthContext;
-        const auth = await this.authorizationService.updateAuthorization(authContext, id, body)
+        const auth = await this.policyService.updateAuthorization(authContext, id, body)
         return auth;
     }
 
@@ -125,7 +125,7 @@ export class PolicyController {
         @Param('id') id: string
     ) {
         const authContext = request as any as AuthContext;
-        const auth = await this.authorizationService.removeAuthorization(authContext, id)
+        const auth = await this.policyService.removeAuthorization(authContext, id)
         return auth;
     }
 

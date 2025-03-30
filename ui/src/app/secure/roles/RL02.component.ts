@@ -8,6 +8,8 @@ import {RoleService} from "../../_services/role.service";
 import {MessageService} from "primeng/api";
 import {ConfirmationService} from "../../component/dialogs/confirmation.service";
 import {StaticModel} from "../../component/model/StaticModel";
+import {PolicyService} from "../../_services/policy.service";
+import {CreatePolicyModalComponent} from "./create-policy-modal.component";
 
 @Component({
     selector: 'app-group-object',
@@ -103,6 +105,56 @@ import {StaticModel} from "../../component/model/StaticModel";
                     </ng-template>
                 </p-table>
             </app-object-page-section>
+
+            <app-object-page-section name="Policies">
+                <p-table [value]="policies" responsiveLayout="scroll">
+                    <ng-template pTemplate="caption">
+                        <div class="d-flex justify-content-between">
+                            <h5>Policies</h5>
+                            <button class="btn btn-sm btn-primary" (click)="openCreatePolicyModal()">
+                                New Policy
+                            </button>
+                        </div>
+                    </ng-template>
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th>Effect</th>
+                            <th>Action</th>
+                            <th>Subject</th>
+                            <th>Conditions</th>
+                            <th>Actions</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-policy>
+                        <tr>
+                            <td>{{ policy.effect }}</td>
+                            <td>{{ policy.action }}</td>
+                            <td>{{ policy.subject }}</td>
+                            <td>{{ isEmpty(policy.conditions) ? '' : '{...}' }}</td>
+                            <td>
+                                <button
+                                    class="btn btn-sm btn-success me-2"
+                                    (click)="openViewPolicyModal(policy.id)"
+                                >
+                                    <i class="fa fa-eye"></i>
+                                </button>
+                                <button
+                                    class="btn btn-sm btn-warning me-2"
+                                    (click)="openUpdatePolicyModal(policy.id)"
+                                >
+                                    <i class="fa fa-pencil"></i>
+                                </button>
+                                <button
+                                    class="btn btn-sm btn-danger"
+                                    (click)="onPolicyRemove(policy)"
+                                >
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </app-object-page-section>
         </app-object-page>
 
 
@@ -122,6 +174,12 @@ export class RL02Component implements OnInit {
     loading = true;
     role: any;
     users: any[] = [];
+    policies: any[] = [];
+    newPolicy = {
+        action: '',
+        subject: '',
+        effect: 'ALLOW'
+    };
     usersDM = new StaticModel(['id']);
     selectedUsers: any[] = [];
     private roleName: string = "";
@@ -135,7 +193,8 @@ export class RL02Component implements OnInit {
                 private router: Router,
                 private authDefaultService: AuthDefaultService,
                 private confirmationService: ConfirmationService,
-                private modalService: NgbModal) {
+                private modalService: NgbModal,
+                private policyService: PolicyService) {
     }
 
     async ngOnInit() {
@@ -153,6 +212,14 @@ export class RL02Component implements OnInit {
         this.role = response.role;
         this.users = response.users;
         this.usersDM.setData(this.users);
+
+        // Load policies for the given role
+        try {
+            this.policies = await this.policyService.getRoleAuthorizations(this.role.id);
+        } catch (e: any) {
+            console.error("Error fetching role authorizations:", e);
+            this.messageService.add({severity: 'error', summary: 'Error', detail: 'Could not load policies'});
+        }
 
         this.authDefaultService.setTitle("RL02: " + this.role.name);
 
@@ -202,5 +269,88 @@ export class RL02Component implements OnInit {
     //     $event.update(members, false);
     // }
 
+    async openCreatePolicyModal(): Promise<void> {
+        const modalRef = this.modalService.open(CreatePolicyModalComponent, {
+            size: 'lg',  // optional, sets modal size (lg, sm, etc.)
+            backdrop: 'static', // optional
+            centered: true     // optional
+        });
+        modalRef.componentInstance.role_id = this.role.id;  // create mode
+
+        const createdPolicy = await modalRef.result;
+        if (createdPolicy) {
+            await this.reloadPolicies();
+        }
+    }
+
+    // New method for editing (update) an existing policy
+    async openUpdatePolicyModal(policyId: string): Promise<void> {
+        const modalRef = this.modalService.open(CreatePolicyModalComponent, {
+            size: 'lg',  // optional, sets modal size (lg, sm, etc.)
+            backdrop: 'static', // optional
+            centered: true     // optional
+        });
+        modalRef.componentInstance.role_id = this.role.id;
+        modalRef.componentInstance.policyId = policyId;  // update mode
+
+        const updatedPolicy = await modalRef.result;
+        if (updatedPolicy) {
+            await this.reloadPolicies();
+        }
+    }
+
+    // New method to remove a policy
+    async onPolicyRemove(policy: any) {
+        await this.confirmationService.confirm({
+            message: `Are you sure you want to delete this policy?  [${policy.effect}] [${policy.action}] on [${policy.subject}].`,
+            accept: async () => {
+                try {
+                    await this.policyService.deleteAuthorization(policy.id);
+                    this.messageService.add({
+                        severity: 'info',
+                        summary: 'Policy Deleted',
+                        detail: `Policy [${policy.id}] was removed.`
+                    });
+                    await this.reloadPolicies();
+                } catch (err: any) {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Failed to delete policy',
+                        detail: err.message
+                    });
+                }
+            }
+        });
+    }
+
+    async reloadPolicies() {
+        try {
+            this.policies = await this.policyService.getRoleAuthorizations(this.role.id);
+        } catch (e: any) {
+            console.error("Error reloading policies:", e);
+            this.messageService.add({severity: 'error', summary: 'Failed', detail: 'Could not reload policies'});
+        }
+    }
+
+    async openViewPolicyModal(policyId: string): Promise<void> {
+        const modalRef = this.modalService.open(CreatePolicyModalComponent, {
+            size: 'lg',
+            backdrop: 'static',
+            centered: true
+        });
+        modalRef.componentInstance.policyId = policyId;
+        modalRef.componentInstance.viewOnly = true;
+
+        // Because it’s purely read-only, we don’t expect a changed policy returned
+        // but we can still wait for modalRef.result if needed
+        await modalRef.result;
+    }
+
+    isEmpty(obj: any) {
+        for (const prop in obj) {
+            return false;
+        }
+        return true;
+    }
 
 }

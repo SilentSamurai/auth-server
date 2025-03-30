@@ -40,7 +40,7 @@ export class AuthService {
     }
 
     async getPermissions(): Promise<any> {
-        return await lastValueFrom(this.http.get('/api/v1/user/permissions'));
+        return await lastValueFrom(this.http.get('/api/v1/my/permissions'));
     }
 
     validateAuthCode(authCode: string): Promise<any> {
