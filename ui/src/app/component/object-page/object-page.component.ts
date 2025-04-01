@@ -7,7 +7,7 @@ import {ObjectPageTabComponent} from "./object-page-tab.component";
 @Component({
     selector: 'app-object-page',
     template: `
-        <div class="container-fluid mb-5 px-0" *ngIf="!loading">
+        <div class="container-fluid mb-5 px-0 main-container" *ngIf="!loading">
             <div class="card shadow-sm" style="border-radius: 0">
                 <div class="container mt-4">
                     <div class="row">
@@ -53,7 +53,7 @@ import {ObjectPageTabComponent} from "./object-page-tab.component";
                 </div>
             </div>
 
-            <div class="container">
+            <div class="container flex-fill content-area">
                 <ng-container *ngIf="singlePage">
                     <div *ngFor="let tab of tabs" id="{{tab.name.toUpperCase()}}">
                         <ng-container [ngTemplateOutlet]="tab.template"></ng-container>
@@ -73,6 +73,26 @@ import {ObjectPageTabComponent} from "./object-page-tab.component";
         </div>
     `,
     styles: [`
+        :host {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            flex: 1 1 auto;
+            overflow: hidden;
+        }
+
+        .content-area {
+            display: flex;
+            flex-direction: column;
+            flex: 1 1 auto;
+            overflow: auto;
+        }
+
         .nav-tabs {
             scrollbar-width: thin;
             -ms-overflow-style: none;
