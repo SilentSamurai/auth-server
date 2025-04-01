@@ -16,13 +16,13 @@ import {StaticModel} from "../../component/model/StaticModel";
     template: `
         <nav-bar></nav-bar>
         <app-object-page *ngIf="!loading">
-            <app-object-page-title>
+            <app-op-title>
                 {{ group.name }}
-            </app-object-page-title>
-            <app-object-page-subtitle>
+            </app-op-title>
+            <app-op-subtitle>
                 {{ group.tenant.name }}
-            </app-object-page-subtitle>
-            <app-object-page-actions>
+            </app-op-subtitle>
+            <app-op-actions>
                 <button (click)="onUpdateGroup()"
                         class="btn btn-primary btn-sm me-2">
                     Update
@@ -32,8 +32,8 @@ import {StaticModel} from "../../component/model/StaticModel";
                         class="btn btn-danger btn-sm">
                     Delete
                 </button>
-            </app-object-page-actions>
-            <app-object-page-header>
+            </app-op-actions>
+            <app-op-header>
                 <div class="row">
                     <div class="col-md">
                         <app-attribute label="Group Name" valueClass="">
@@ -52,124 +52,127 @@ import {StaticModel} from "../../component/model/StaticModel";
                         </app-attribute>
                     </div>
                 </div>
-            </app-object-page-header>
+            </app-op-header>
 
-            <app-object-page-section name="Roles">
-                <p-table [value]="roles" responsiveLayout="scroll">
-                    <ng-template pTemplate="caption">
-                        <div class="d-flex justify-content-between">
-                            <h5>Roles </h5>
+            <app-op-tab name="Roles">
+                <app-op-section name="Roles">
+                    <app-section-content>
+                        <p-table [value]="roles" responsiveLayout="scroll">
+                            <ng-template pTemplate="caption">
+                                <div class="d-flex justify-content-between">
+                                    <h5>Roles</h5>
+                                    <div style="min-width:15rem">
+                                        <app-value-help-input
+                                            [dataModel]="rolesDM"
+                                            [(selection)]="selectedRoles"
+                                            class="col-3"
+                                            labelField="name"
+                                            multi="true"
+                                            name="Roles">
+                                            <app-vh-col label="Name" name="name"></app-vh-col>
+                                            <ng-template #vh_body let-row>
+                                                <td>{{ row.name }}</td>
+                                            </ng-template>
+                                        </app-value-help-input>
 
-                            <div style="min-width:15rem">
-                                <app-value-help-input
-                                    [dataModel]="rolesDM"
-                                    [(selection)]="selectedRoles"
-                                    class="col-3"
-                                    labelField="name"
-                                    multi="true"
-                                    name="Roles">
+                                        <button (click)="onAddRole()"
+                                                class="btn btn-primary btn-sm mt-2">
+                                            Assign Roles
+                                        </button>
+                                    </div>
+                                </div>
+                            </ng-template>
+                            <ng-template pTemplate="header">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Description</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </ng-template>
+                            <ng-template pTemplate="body" let-role>
+                                <tr>
+                                    <td>
+                                        <a [routerLink]="['/RL02', group.tenant.id, role.name]"
+                                           href="javascript:void(0)">
+                                            {{ role.name }}
+                                        </a>
+                                    </td>
+                                    <td>{{ role.description }}</td>
+                                    <td>
+                                        <button (click)="onRemoveRole(role)"
+                                                class="btn btn-sm"
+                                                type="button">
+                                            <i class="fa fa-solid fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </ng-template>
+                        </p-table>
+                    </app-section-content>
+                </app-op-section>
+            </app-op-tab>
 
-                                    <app-vh-col label="Name" name="name"></app-vh-col>
+            <!-- Convert 'Users' to an app-op-tab -->
+            <app-op-tab name="Users">
+                <app-op-section name="Users">
+                    <app-section-content>
+                        <p-table [value]="users" responsiveLayout="scroll">
+                            <ng-template pTemplate="caption">
+                                <div class="d-flex justify-content-between">
+                                    <h5>Users </h5>
+                                    <div style="min-width:15rem">
+                                        <app-value-help-input
+                                            [dataModel]="usersDM"
+                                            [(selection)]="selectedUsers"
+                                            class="col-3"
+                                            labelField="name"
+                                            multi="true"
+                                            name="Users">
+                                            <app-vh-col label="Email" name="email"></app-vh-col>
+                                            <ng-template #vh_body let-row>
+                                                <td>{{ row.email }}</td>
+                                            </ng-template>
+                                        </app-value-help-input>
 
-                                    <ng-template #vh_body let-row>
-                                        <td>{{ row.name }}</td>
-                                    </ng-template>
-
-                                </app-value-help-input>
-
-                                <button (click)="onAddRole()"
-                                        class="btn btn-primary btn-sm mt-2">
-                                    Assign Roles
-                                </button>
-                            </div>
-                        </div>
-                    </ng-template>
-                    <ng-template let-columns pTemplate="header">
-                        <tr>
-                            <th>Name</th>
-                            <th>Description</th>
-                            <th>Actions</th>
-                        </tr>
-                    </ng-template>
-                    <ng-template let-columns="columns" let-role pTemplate="body">
-                        <tr>
-                            <td>
-                                <a [routerLink]="['/RL02', group.tenant.id, role.name]"
-                                   href="javascript:void(0)">{{ role.name }}</a>
-                            </td>
-                            <td></td>
-                            <td>
-                                <button (click)="onRemoveRole(role)"
-                                        class="btn btn-sm"
-                                        type="button">
-                                    <i class="fa fa-solid fa-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    </ng-template>
-                </p-table>
-            </app-object-page-section>
-
-            <app-object-page-section name="Users">
-                <p-table [value]="users" responsiveLayout="scroll">
-                    <ng-template pTemplate="caption">
-                        <div class="d-flex justify-content-between">
-                            <h5>Users </h5>
-                            <div style="min-width:15rem">
-                                <app-value-help-input
-                                    [dataModel]="usersDM"
-                                    [(selection)]="selectedUsers"
-                                    class="col-3"
-                                    labelField="name"
-                                    multi="true"
-                                    name="Users">
-
-                                    <app-vh-col label="Email" name="email"></app-vh-col>
-
-                                    <ng-template #vh_body let-row>
-                                        <td>{{ row.email }}</td>
-                                    </ng-template>
-
-                                </app-value-help-input>
-
-                                <button (click)="onAddUsers()"
-                                        class="btn btn-primary btn-sm mt-2">
-                                    Assign Users
-                                </button>
-                            </div>
-                        </div>
-                    </ng-template>
-                    <ng-template let-columns pTemplate="header">
-                        <tr>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Assignments</th>
-                            <th>Actions</th>
-                        </tr>
-                    </ng-template>
-                    <ng-template let-columns="columns" let-user pTemplate="body">
-                        <tr>
-                            <td>{{ user.name }}</td>
-                            <td>
-                                <a [routerLink]="['/UR02', user.email]"
-                                   href="javascript:void(0)">{{ user.email }}</a>
-                            </td>
-                            <td>
-                                <a [routerLink]="['/TNRL01', group.tenant.id, user.email]"
-                                   href="javascript:void(0)">View Assignments</a>
-
-                            </td>
-                            <td>
-                                <button (click)="onUserRemove(user)"
-                                        class="btn btn-sm"
-                                        type="button">
-                                    <i class="fa fa-solid fa-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    </ng-template>
-                </p-table>
-            </app-object-page-section>
+                                        <button (click)="onAddUsers()"
+                                                class="btn btn-primary btn-sm mt-2">
+                                            Assign Users
+                                        </button>
+                                    </div>
+                                </div>
+                            </ng-template>
+                            <ng-template pTemplate="header">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Assignments</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </ng-template>
+                            <ng-template pTemplate="body" let-user>
+                                <tr>
+                                    <td>{{ user.name }}</td>
+                                    <td>
+                                        <a [routerLink]="['/UR02', user.email]"
+                                           href="javascript:void(0)">{{ user.email }}</a>
+                                    </td>
+                                    <td>
+                                        <a [routerLink]="['/TNRL01', group.tenant.id, user.email]"
+                                           href="javascript:void(0)">View Assignments</a>
+                                    </td>
+                                    <td>
+                                        <button (click)="onUserRemove(user)"
+                                                class="btn btn-sm"
+                                                type="button">
+                                            <i class="fa fa-solid fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </ng-template>
+                        </p-table>
+                    </app-section-content>
+                </app-op-section>
+            </app-op-tab>
         </app-object-page>
         <div class="text-center" *ngIf="loading">
             <div class="spinner-border" role="status">

@@ -1,13 +1,30 @@
-import {Component, Input, OnInit, TemplateRef, ViewChild} from '@angular/core';
-import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
-import {ConfirmationService, MessageService} from "primeng/api";
+import {
+    Component,
+    ContentChild,
+    ContentChildren,
+    Input,
+    OnInit,
+    QueryList,
+    TemplateRef,
+    ViewChild
+} from '@angular/core';
 
 @Component({
-    selector: 'app-object-page-section',
+    selector: 'app-op-section',
     template: `
-        <ng-template #OPS>
-            <ng-content></ng-content>
-        </ng-template>
+        <div class="row my-4" id="{{name.toUpperCase()}}" >
+            <div class="col-md-8">
+                <span class="h4 text-capitalize">{{ name }}</span>
+            </div>
+            <div class="col-md-4 d-flex justify-content-end">
+                <ng-content select="app-section-action"></ng-content>
+            </div>
+        </div>
+        <div class="row my-2">
+            <div class="col-md-12 ">
+                <ng-content select="app-section-content"></ng-content>
+            </div>
+        </div>
     `,
     styles: [''],
     providers: []
@@ -18,12 +35,9 @@ export class ObjectPageSectionComponent implements OnInit {
 
     loading = true;
 
-    @ViewChild('OPS', {static: true}) template!: TemplateRef<any>;
+    @ViewChild('OPSC', {static: true}) template!: TemplateRef<any>;
 
-    constructor(
-        private messageService: MessageService,
-        private confirmationService: ConfirmationService,
-        private modalService: NgbModal) {
+    constructor() {
     }
 
     async ngOnInit() {

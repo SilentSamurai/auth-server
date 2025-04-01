@@ -10,19 +10,20 @@ import {ConfirmationService} from "../../component/dialogs/confirmation.service"
 import {StaticModel} from "../../component/model/StaticModel";
 import {PolicyService} from "../../_services/policy.service";
 import {CreatePolicyModalComponent} from "./create-policy-modal.component";
+import {AddUsersModalComponent} from "./add-users-modal.component";
 
 @Component({
     selector: 'app-group-object',
     template: `
         <nav-bar></nav-bar>
         <app-object-page *ngIf="!loading">
-            <app-object-page-title>
+            <app-op-title>
                 {{ role.name }}
-            </app-object-page-title>
-            <app-object-page-subtitle>
+            </app-op-title>
+            <app-op-subtitle>
                 {{ role.tenant.name }}
-            </app-object-page-subtitle>
-            <app-object-page-actions>
+            </app-op-subtitle>
+            <app-op-actions>
                 <button (click)="onUpdateRole()"
                         class="btn btn-primary btn-sm me-2">
                     Update
@@ -32,8 +33,8 @@ import {CreatePolicyModalComponent} from "./create-policy-modal.component";
                         class="btn btn-danger btn-sm">
                     Delete
                 </button>
-            </app-object-page-actions>
-            <app-object-page-header>
+            </app-op-actions>
+            <app-op-header>
                 <div class="row">
                     <div class="col">
                         <app-attribute label="Name">
@@ -52,109 +53,101 @@ import {CreatePolicyModalComponent} from "./create-policy-modal.component";
                         </app-attribute>
                     </div>
                 </div>
-            </app-object-page-header>
-            <app-object-page-section
-                name="Users">
-                <p-table [value]="users" responsiveLayout="scroll">
-                    <ng-template pTemplate="caption">
-                        <div class="d-flex justify-content-between">
-                            <h5>Users </h5>
-                            <div style="min-width:15rem">
-                                <app-value-help-input
-                                    [dataModel]="usersDM"
-                                    [(selection)]="selectedUsers"
-                                    class="col-3"
-                                    labelField="name"
-                                    multi="true"
-                                    name="Users">
+            </app-op-header>
+            <app-op-tab name="Users">
+                <app-op-section name="Users">
+                    <app-section-action>
+                    </app-section-action>
+                    <app-section-content>
+                        <p-table [value]="users" responsiveLayout="scroll">
+                            <ng-template pTemplate="caption">
+                                <div class="d-flex justify-content-between">
+                                    <h5>Users </h5>
+                                    <button (click)="openAddUsersModal()"
+                                            class="btn btn-primary btn-sm">
+                                        Assign Users
+                                    </button>
+                                </div>
+                            </ng-template>
+                            <ng-template let-columns pTemplate="header">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </ng-template>
+                            <ng-template let-columns="columns" let-user pTemplate="body">
+                                <tr>
+                                    <td>{{ user.name }}</td>
+                                    <td>{{ user.email }}</td>
+                                    <td>
+                                        <button (click)="onUserRemove(user)"
+                                                class="btn btn-sm"
+                                                type="button">
+                                            <i class="fa fa-solid fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </ng-template>
+                        </p-table>
+                    </app-section-content>
+                </app-op-section>
+            </app-op-tab>
 
-                                    <app-vh-col label="Email" name="email"></app-vh-col>
 
-                                    <ng-template #vh_body let-row>
-                                        <td>{{ row.email }}</td>
-                                    </ng-template>
-
-                                </app-value-help-input>
-
-                                <button (click)="onAddUsers()"
-                                        class="btn btn-primary btn-sm mt-2">
-                                    Assign Users
-                                </button>
-                            </div>
-                        </div>
-                    </ng-template>
-                    <ng-template let-columns pTemplate="header">
-                        <tr>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Actions</th>
-                        </tr>
-                    </ng-template>
-                    <ng-template let-columns="columns" let-user pTemplate="body">
-                        <tr>
-                            <td>{{ user.name }}</td>
-                            <td>{{ user.email }}</td>
-                            <td>
-                                <button (click)="onUserRemove(user)"
-                                        class="btn btn-sm"
-                                        type="button">
-                                    <i class="fa fa-solid fa-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    </ng-template>
-                </p-table>
-            </app-object-page-section>
-
-            <app-object-page-section name="Policies">
-                <p-table [value]="policies" responsiveLayout="scroll">
-                    <ng-template pTemplate="caption">
-                        <div class="d-flex justify-content-between">
-                            <h5>Policies</h5>
-                            <button class="btn btn-sm btn-primary" (click)="openCreatePolicyModal()">
-                                New Policy
-                            </button>
-                        </div>
-                    </ng-template>
-                    <ng-template pTemplate="header">
-                        <tr>
-                            <th>Effect</th>
-                            <th>Action</th>
-                            <th>Subject</th>
-                            <th>Conditions</th>
-                            <th>Actions</th>
-                        </tr>
-                    </ng-template>
-                    <ng-template pTemplate="body" let-policy>
-                        <tr>
-                            <td>{{ policy.effect }}</td>
-                            <td>{{ policy.action }}</td>
-                            <td>{{ policy.subject }}</td>
-                            <td>{{ isEmpty(policy.conditions) ? '' : '{...}' }}</td>
-                            <td>
-                                <button
-                                    class="btn btn-sm btn-success me-2"
-                                    (click)="openViewPolicyModal(policy.id)"
-                                >
-                                    <i class="fa fa-eye"></i>
-                                </button>
-                                <button
-                                    class="btn btn-sm btn-warning me-2"
-                                    (click)="openUpdatePolicyModal(policy.id)"
-                                >
-                                    <i class="fa fa-pencil"></i>
-                                </button>
-                                <button
-                                    class="btn btn-sm btn-danger"
-                                    (click)="onPolicyRemove(policy)"
-                                >
-                                    <i class="fa fa-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    </ng-template>
-                </p-table>
-            </app-object-page-section>
+            <app-op-tab name="Policies">
+                <app-op-section name="Policies">
+                    <app-section-content>
+                        <p-table [value]="policies" responsiveLayout="scroll">
+                            <ng-template pTemplate="caption">
+                                <div class="d-flex justify-content-between">
+                                    <h5>Policies</h5>
+                                    <button class="btn btn-sm btn-primary" (click)="openCreatePolicyModal()">
+                                        New Policy
+                                    </button>
+                                </div>
+                            </ng-template>
+                            <ng-template pTemplate="header">
+                                <tr>
+                                    <th>Effect</th>
+                                    <th>Action</th>
+                                    <th>Subject</th>
+                                    <th>Conditions</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </ng-template>
+                            <ng-template pTemplate="body" let-policy>
+                                <tr>
+                                    <td>{{ policy.effect }}</td>
+                                    <td>{{ policy.action }}</td>
+                                    <td>{{ policy.subject }}</td>
+                                    <td>{{ isEmpty(policy.conditions) ? '' : '{...}' }}</td>
+                                    <td>
+                                        <button
+                                            class="btn btn-sm btn-success me-2"
+                                            (click)="openViewPolicyModal(policy.id)"
+                                        >
+                                            <i class="fa fa-eye"></i>
+                                        </button>
+                                        <button
+                                            class="btn btn-sm btn-warning me-2"
+                                            (click)="openUpdatePolicyModal(policy.id)"
+                                        >
+                                            <i class="fa fa-pencil"></i>
+                                        </button>
+                                        <button
+                                            class="btn btn-sm btn-danger"
+                                            (click)="onPolicyRemove(policy)"
+                                        >
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </ng-template>
+                        </p-table>
+                    </app-section-content>
+                </app-op-section>
+            </app-op-tab>
         </app-object-page>
 
 
@@ -257,10 +250,34 @@ export class RL02Component implements OnInit {
         await this.ngOnInit();
     }
 
-    async onAddUsers() {
-        if (this.selectedUsers.length > 0) {
-            await this.roleService.addUser(this.tenantId, this.roleName, this.selectedUsers.map(r => r.email));
-            await this.ngOnInit();
+    async openAddUsersModal(): Promise<void> {
+        const modalRef = this.modalService.open(AddUsersModalComponent, {
+            size: 'lg',
+            backdrop: 'static'
+        });
+
+        // Pass required context to modal
+        modalRef.componentInstance.tenantId = this.tenantId;
+        modalRef.componentInstance.roleName = this.roleName;
+        modalRef.componentInstance.usersDM.setData(this.users);
+
+        const result = await modalRef.result;
+        if (result) { // Only refresh if modal was closed with success
+            try {
+                const response = await this.roleService.getRoleDetails(this.tenantId, this.roleName);
+                this.users = response.users;
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Updated',
+                    detail: 'User list refreshed'
+                });
+            } catch (e) {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Refresh Failed',
+                    detail: 'Could not update user list'
+                });
+            }
         }
     }
 

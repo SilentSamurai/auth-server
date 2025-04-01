@@ -29,29 +29,32 @@ function parseBoolean(value: string): boolean {
 @Component({
     selector: 'app-value-help-input',
     template: `
-        <div class="col-3 input-group">
-            <div *ngIf="multi" class="form-control text-truncate">
-                <ng-container *ngFor="let row of selection; index as i; first as isFirst">
-                    <p-chip [removable]="false" label="{{getLabel(i)}}">
-                    </p-chip>
-                </ng-container>
+        <div>
+            <label *ngIf="label" class="form-label" [for]="name">{{ label }}</label>
+            <div class="col-3 input-group">
+                <div *ngIf="multi" class="form-control text-truncate">
+                    <ng-container *ngFor="let row of selection; index as i; first as isFirst">
+                        <p-chip [removable]="false" label="{{getLabel(i)}}">
+                        </p-chip>
+                    </ng-container>
+                </div>
+                <input *ngIf="!multi"
+                       class="form-control text-truncate"
+                       id="{{name}}"
+                       name="{{name}}"
+                       readonly
+                       placeholder="{{placeholder}}"
+                       required
+                       type="text"
+                       value="{{getLabel(0)}}"
+                />
+                <button (click)="openValueHelp()" class="input-group-text btn btn-outline-secondary"
+                        id="{{name}}-vh-btn"
+                        type="button">
+                    <i class="fa fas fa-clone"></i>
+                </button>
             </div>
-            <input *ngIf="!multi"
-                   class="form-control text-truncate"
-                   id="{{name}}"
-                   name="{{name}}"
-                   readonly
-                   placeholder="{{placeholder}}"
-                   required
-                   type="text"
-                   value="{{getLabel(0)}}"
-            />
-            <button (click)="openValueHelp()" class="input-group-text btn btn-outline-secondary" id="{{name}}-vh-btn"
-                    type="button">
-                <i class="fa fas fa-clone"></i>
-            </button>
         </div>
-
     `,
     styles: [`
         .p-chip-text {
@@ -67,6 +70,7 @@ export class ValueHelpInputComponent implements OnInit, AfterViewInit {
     @Input() name: string = '';
     @Input() multi: string | boolean = false;
     @Input() labelField!: string;
+    @Input() label: string = '';
     @Input() placeholder: string = '';
 
     @Input() selection: any[] = [];

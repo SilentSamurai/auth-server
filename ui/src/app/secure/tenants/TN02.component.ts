@@ -19,13 +19,13 @@ import {StaticModel} from "../../component/model/StaticModel";
     template: `
         <nav-bar></nav-bar>
         <app-object-page>
-            <app-object-page-title>
+            <app-op-title>
                 {{ tenant.name }}
-            </app-object-page-title>
-            <app-object-page-subtitle>
+            </app-op-title>
+            <app-op-subtitle>
                 {{ tenant.domain }}
-            </app-object-page-subtitle>
-            <app-object-page-actions>
+            </app-op-subtitle>
+            <app-op-actions>
                 <button (click)="onUpdateTenant()" [disabled]="!isTenantAdmin" id="UPDATE_TENANT_BTN"
                         class="btn btn-primary btn-sm">
                     Update
@@ -34,8 +34,8 @@ import {StaticModel} from "../../component/model/StaticModel";
                         class="btn btn-danger btn-sm ms-2 ">
                     Delete Tenant
                 </button>
-            </app-object-page-actions>
-            <app-object-page-header>
+            </app-op-actions>
+            <app-op-header>
                 <div class="row">
                     <div class="col-lg-5">
                         <app-attribute label="Tenant Domain">
@@ -66,84 +66,93 @@ import {StaticModel} from "../../component/model/StaticModel";
                         </app-attribute>
                     </div>
                 </div>
-            </app-object-page-header>
-            <app-object-page-section name="Members">
-                <app-table
-                    title="Member List"
-                    [dataModel]="memberDataModel">
+            </app-op-header>
+            <app-op-tab name="Members">
+                <app-op-section name="Members">
+                    <app-section-content>
+                        <app-table
+                            title="Member List"
+                            [dataModel]="memberDataModel">
 
-                    <app-table-col label="Name" name="name"></app-table-col>
-                    <app-table-col label="Email" name="email"></app-table-col>
-                    <app-table-col label="Assigned Roles" name="roles"></app-table-col>
-                    <app-table-col label="Actions" name="actions"></app-table-col>
+                            <app-table-col label="Name" name="name"></app-table-col>
+                            <app-table-col label="Email" name="email"></app-table-col>
+                            <app-table-col label="Assigned Roles" name="roles"></app-table-col>
+                            <app-table-col label="Actions" name="actions"></app-table-col>
 
-                    <app-table-btn>
-                        <button (click)="onAddMember()" [disabled]="!isTenantAdmin"
-                                id="OPEN_ADD_MEMBER_DIALOG_BTN"
-                                class="btn btn-primary btn-sm">
-                            Add
-                        </button>
-                    </app-table-btn>
+                            <app-table-btn>
+                                <button (click)="onAddMember()" [disabled]="!isTenantAdmin"
+                                        id="OPEN_ADD_MEMBER_DIALOG_BTN"
+                                        class="btn btn-primary btn-sm">
+                                    Add
+                                </button>
+                            </app-table-btn>
 
-                    <ng-template let-user #table_body>
-                        <td>{{ user.name }}</td>
-                        <td>{{ user.email }}</td>
-                        <td>
-                            <a [routerLink]="['/TNRL01/', tenant_id, user.id]"
-                               href="javascript:void(0)">View Role Assignments
-                            </a>
-                        </td>
-                        <td class="">
-                            <button (click)="removeMember(user)" [disabled]="!isTenantAdmin"
-                                    class="btn"
-                                    [attr.data-cy-id]="user.email"
-                                    type="button">
-                                <i class="fa fa-solid fa-trash"></i>
-                            </button>
-                        </td>
-                    </ng-template>
-                </app-table>
-            </app-object-page-section>
+                            <ng-template let-user #table_body>
+                                <td>{{ user.name }}</td>
+                                <td>{{ user.email }}</td>
+                                <td>
+                                    <a [routerLink]="['/TNRL01/', tenant_id, user.id]"
+                                       href="javascript:void(0)">View Role Assignments
+                                    </a>
+                                </td>
+                                <td class="">
+                                    <button (click)="removeMember(user)" [disabled]="!isTenantAdmin"
+                                            class="btn"
+                                            [attr.data-cy-id]="user.email"
+                                            type="button">
+                                        <i class="fa fa-solid fa-trash"></i>
+                                    </button>
+                                </td>
+                            </ng-template>
+                        </app-table>
+                    </app-section-content>
+                </app-op-section>
+            </app-op-tab>
 
-            <app-object-page-section name="Roles">
-                <app-table
-                    title="Role List"
-                    [dataModel]="rolesDataModel">
 
-                    <app-table-col label="Name" name="name"></app-table-col>
-                    <app-table-col label="Description" name="description"></app-table-col>
-                    <app-table-col label="Actions" name="actions"></app-table-col>
+            <app-op-tab name="Roles">
+                <app-op-section name="Roles">
+                    <app-section-content>
+                        <app-table
+                            title="Role List"
+                            [dataModel]="rolesDataModel">
 
-                    <app-table-btn>
-                        <button (click)="onAddRole()" [disabled]="!isTenantAdmin"
-                                id="ADD_ROLE_DIALOG_BTN"
-                                class="btn btn-primary btn-sm">
-                            Create
-                        </button>
-                    </app-table-btn>
+                            <app-table-col label="Name" name="name"></app-table-col>
+                            <app-table-col label="Description" name="description"></app-table-col>
+                            <app-table-col label="Actions" name="actions"></app-table-col>
 
-                    <ng-template let-role #table_body>
-                        <td>
-                            <a [routerLink]="['/RL02', tenant.id, role.name]"
-                               href="javascript:void(0)">{{ role.name }}
-                            </a>
-                        </td>
-                        <td>{{ role.description }}</td>
-                        <td>
-                            <button (click)="onRemoveRole(role)"
-                                    *ngIf="role.removable"
-                                    [disabled]="!isTenantAdmin"
-                                    class="btn btn-sm"
-                                    [attr.data-cy-id]="role.name"
-                                    type="button">
-                                <i class="fa fa-solid fa-trash"></i>
-                            </button>
-                        </td>
-                    </ng-template>
+                            <app-table-btn>
+                                <button (click)="onAddRole()" [disabled]="!isTenantAdmin"
+                                        id="ADD_ROLE_DIALOG_BTN"
+                                        class="btn btn-primary btn-sm">
+                                    Create
+                                </button>
+                            </app-table-btn>
 
-                </app-table>
+                            <ng-template let-role #table_body>
+                                <td>
+                                    <a [routerLink]="['/RL02', tenant.id, role.name]"
+                                       href="javascript:void(0)">{{ role.name }}
+                                    </a>
+                                </td>
+                                <td>{{ role.description }}</td>
+                                <td>
+                                    <button (click)="onRemoveRole(role)"
+                                            *ngIf="role.removable"
+                                            [disabled]="!isTenantAdmin"
+                                            class="btn btn-sm"
+                                            [attr.data-cy-id]="role.name"
+                                            type="button">
+                                        <i class="fa fa-solid fa-trash"></i>
+                                    </button>
+                                </td>
+                            </ng-template>
 
-            </app-object-page-section>
+                        </app-table>
+                    </app-section-content>
+
+                </app-op-section>
+            </app-op-tab>
         </app-object-page>
     `,
     styles: ['']

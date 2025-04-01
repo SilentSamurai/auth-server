@@ -8,8 +8,6 @@ import {ConfirmationService} from "../../component/dialogs/confirmation.service"
 import {MessageService} from "primeng/api";
 import {Location} from "@angular/common";
 import {AuthDefaultService} from "../../_services/auth.default.service";
-import {TableAsyncLoadEvent} from "../../component/table/app-table.component";
-import {DataModel} from "../../component/model/DataModel";
 import {StaticModel} from "../../component/model/StaticModel";
 
 @Component({
@@ -17,13 +15,13 @@ import {StaticModel} from "../../component/model/StaticModel";
     template: `
         <nav-bar></nav-bar>
         <app-object-page>
-            <app-object-page-header>
-                <app-object-page-title>
-                    {{ user.email }}
-                </app-object-page-title>
-                <app-object-page-subtitle>
-                    {{ user.name }}
-                </app-object-page-subtitle>
+            <app-op-title>
+                {{ user.email }}
+            </app-op-title>
+            <app-op-subtitle>
+                {{ user.name }}
+            </app-op-subtitle>
+            <app-op-header>
                 <div class="row">
                     <div class="col">
                         <app-attribute label="Email">
@@ -50,8 +48,8 @@ import {StaticModel} from "../../component/model/StaticModel";
                         </app-attribute>
                     </div>
                 </div>
-            </app-object-page-header>
-            <app-object-page-actions>
+            </app-op-header>
+            <app-op-actions>
                 <button (click)="openUpdateModal()" class="btn btn-sm btn-primary mx-2">
                     Update
                 </button>
@@ -64,31 +62,35 @@ import {StaticModel} from "../../component/model/StaticModel";
                 <button (click)="onDelete()" class="btn btn-sm  btn-danger mx-2">
                     Delete
                 </button>
-            </app-object-page-actions>
-            <app-object-page-section name="Tenants">
-                <app-table
-                    title="Tenant List"
-                    [dataModel]="tenantsDM">
+            </app-op-actions>
+            <app-op-tab name="Tenants">
+                <app-op-section name="Tenants">
+                    <app-section-content>
+                        <app-table
+                            title="Tenant List"
+                            [dataModel]="tenantsDM">
 
-                    <app-table-col label="Name" name="name"></app-table-col>
-                    <app-table-col label="Domain" name="domain"></app-table-col>
-                    <app-table-col label="Roles" name="roles"></app-table-col>
+                            <app-table-col label="Name" name="name"></app-table-col>
+                            <app-table-col label="Domain" name="domain"></app-table-col>
+                            <app-table-col label="Roles" name="roles"></app-table-col>
 
-                    <ng-template let-tenant #table_body>
-                        <td>{{ tenant.name }}</td>
-                        <td>
-                            <a [routerLink]="['/TN02/', tenant.id]"
-                               href="javascript:void(0)">{{ tenant.domain }}</a>
-                        </td>
-                        <td>
-                            <a [routerLink]="['/TNRL01/', tenant.id, user.id]"
-                               href="javascript:void(0)">View Role Assignments
-                            </a>
-                        </td>
-                    </ng-template>
+                            <ng-template let-tenant #table_body>
+                                <td>{{ tenant.name }}</td>
+                                <td>
+                                    <a [routerLink]="['/TN02/', tenant.id]"
+                                       href="javascript:void(0)">{{ tenant.domain }}</a>
+                                </td>
+                                <td>
+                                    <a [routerLink]="['/TNRL01/', tenant.id, user.id]"
+                                       href="javascript:void(0)">View Role Assignments
+                                    </a>
+                                </td>
+                            </ng-template>
 
-                </app-table>
-            </app-object-page-section>
+                        </app-table>
+                    </app-section-content>
+                </app-op-section>
+            </app-op-tab>
         </app-object-page>
     `,
     styles: []

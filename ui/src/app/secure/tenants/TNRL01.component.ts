@@ -15,14 +15,14 @@ import {StaticModel} from "../../component/model/StaticModel";
     template: `
         <nav-bar></nav-bar>
         <app-object-page *ngIf="!loading">
-            <app-object-page-title>
+            <app-op-title>
                 {{ user.email }}
-            </app-object-page-title>
-            <app-object-page-subtitle>
+            </app-op-title>
+            <app-op-subtitle>
                 {{ tenant.name }}
-            </app-object-page-subtitle>
+            </app-op-subtitle>
 
-            <app-object-page-actions>
+            <app-op-actions>
                 <div class="" style="min-width:15rem">
                     <app-value-help-input
                         [dataModel]="tenantRolesDM"
@@ -45,9 +45,9 @@ import {StaticModel} from "../../component/model/StaticModel";
                         Assign Role
                     </button>
                 </div>
-            </app-object-page-actions>
+            </app-op-actions>
 
-            <app-object-page-header>
+            <app-op-header>
                 <div class="row mb-2">
                     <div class="col">
                         <app-attribute label="Email">
@@ -66,37 +66,42 @@ import {StaticModel} from "../../component/model/StaticModel";
                         </app-attribute>
                     </div>
                 </div>
-            </app-object-page-header>
+            </app-op-header>
 
-            <app-object-page-section name="Roles">
-                <app-table title="Role List"
-                           [dataModel]="rolesDataModel"
-                >
+            <app-op-tab name="Roles">
+                <app-op-section name="Roles">
+                    <app-section-content>
+                        <app-table title="Role List"
+                                   [dataModel]="rolesDataModel"
+                        >
 
-                    <app-table-col label="Name" name="name"></app-table-col>
-                    <app-table-col label="Description" name="description"></app-table-col>
-                    <app-table-col label="Actions" name="actions"></app-table-col>
+                            <app-table-col label="Name" name="name"></app-table-col>
+                            <app-table-col label="Description" name="description"></app-table-col>
+                            <app-table-col label="Actions" name="actions"></app-table-col>
 
-                    <ng-template let-role #table_body>
-                        <td>
-                            <a [routerLink]="['/RL02', tenant.id, role.name]"
-                               href="javascript:void(0)">{{ role.name }}</a>
-                        </td>
-                        <td>
-                            {{ role.description }}
-                        </td>
-                        <td>
-                            <button (click)="onRemoveRole(role)"
-                                    *ngIf="role.removable"
-                                    class="btn btn-sm"
-                                    type="button">
-                                <i class="fa fa-solid fa-trash"></i>
-                            </button>
-                        </td>
-                    </ng-template>
+                            <ng-template let-role #table_body>
+                                <td>
+                                    <a [routerLink]="['/RL02', tenant.id, role.name]"
+                                       href="javascript:void(0)">{{ role.name }}</a>
+                                </td>
+                                <td>
+                                    {{ role.description }}
+                                </td>
+                                <td>
+                                    <button (click)="onRemoveRole(role)"
+                                            *ngIf="role.removable"
+                                            class="btn btn-sm"
+                                            type="button">
+                                        <i class="fa fa-solid fa-trash"></i>
+                                    </button>
+                                </td>
+                            </ng-template>
 
-                </app-table>
-            </app-object-page-section>
+                        </app-table>
+                    </app-section-content>
+                </app-op-section>
+            </app-op-tab>
+
         </app-object-page>
     `,
     styles: ['']
