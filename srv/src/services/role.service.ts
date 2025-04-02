@@ -25,15 +25,35 @@ export class RoleService {
     }
 
 
-    async create(authContext: AuthContext, name: string, tenant: Tenant, removable: boolean = true): Promise<Role> {
-
+    async create(
+        authContext: AuthContext,
+        name: string,
+        tenant: Tenant,
+        removable: boolean = true,
+    ): Promise<Role> {
         this.securityService.isAuthorized(authContext, Action.Create, SubjectEnum.ROLE);
 
-        let role: Role = this.roleRepository.create({
-            name: name,
-            tenant: tenant,
-            removable: removable
+        const role = this.roleRepository.create({
+            name,
+            tenant,
+            removable,
+            description: null
         });
+        return this.roleRepository.save(role);
+    }
+
+    async updateRole(
+        authContext: AuthContext,
+        roleId: string,
+        name: string,
+        newDescription: string,
+    ): Promise<Role> {
+        const role = await this.findById(authContext, roleId);
+
+        this.securityService.isAuthorized(authContext, Action.Update, SubjectEnum.TENANT, {id: role.tenant.id});
+
+        role.description = newDescription;
+        role.name = name;
         return this.roleRepository.save(role);
     }
 

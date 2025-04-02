@@ -58,7 +58,7 @@ export class AddRoleComponent implements OnInit {
 
     async onSubmit() {
         try {
-            const addedRoles = await this.tenantService.addRole(this.form.name, this.tenant.id);
+            const addedRoles = await this.tenantService.createRole(this.form.name, this.tenant.id);
             this.messageService.add({severity: 'success', summary: 'Success', detail: 'Role Added'});
             this.passEntry.emit(addedRoles);
             this.activeModal.close(addedRoles);

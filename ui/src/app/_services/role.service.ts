@@ -24,28 +24,15 @@ export class RoleService {
         };
     }
 
-    getAllRoles(): Observable<any> {
-        return this.http.get(`${API_URL}/roles`, this.getHttpOptions());
+    async updateRole(roleId: string, name: string, description: string) {
+        return lastValueFrom(this.http.patch(`${API_URL}//role/${roleId}`, {
+            name,
+            description
+        }, this.getHttpOptions()))
     }
 
     async getRoleDetails(tenantId: string, roleName: string): Promise<any> {
         return lastValueFrom(this.http.get(`${API_URL}/tenant/${tenantId}/role/${roleName}`, this.getHttpOptions()));
-    }
-
-    async deleteRole(tenantId: string, roleName: string): Promise<any> {
-
-    }
-
-    async removeUser(tenantId: string, roleName: string, users: any[]) {
-
-    }
-
-    async addUser(tenantId: string, roleName: string, users: any[]) {
-
-    }
-
-    async queryRoles(query: any): Promise<any> {
-        return await lastValueFrom(this.http.post(`${API_URL}/search/Roles`, query, this.getHttpOptions())) as any;
     }
 
     createDataModel(initialData: any[]): DataModel {

@@ -40,6 +40,8 @@ import {AppTableButtonComponent} from "./table/app-table-button.component";
 import {CheckboxModule} from "primeng/checkbox";
 import {RadioButtonModule} from "primeng/radiobutton";
 import {ObjectPageTabComponent} from "./object-page/object-page-tab.component";
+import {ValueHelpButtonComponent} from "./button/value-help-button.component";
+import {ModalService} from "./dialogs/modal.service";
 
 @NgModule({
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -71,7 +73,8 @@ import {ObjectPageTabComponent} from "./object-page/object-page-tab.component";
         ConfirmationDialogComponent,
         TextInputComponent,
         InputErrorComponent,
-        ButtonLinkComponent
+        ButtonLinkComponent,
+        ValueHelpButtonComponent,
     ],
     imports: [
         TableModule,
@@ -118,6 +121,7 @@ import {ObjectPageTabComponent} from "./object-page/object-page-tab.component";
         InputErrorComponent,
         ButtonLinkComponent,
         AppTableButtonComponent,
+        ValueHelpButtonComponent,
     ]
 })
 export class ComponentModule {

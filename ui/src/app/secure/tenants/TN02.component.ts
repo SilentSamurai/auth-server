@@ -234,7 +234,7 @@ export class TN02Component implements OnInit {
             icon: 'pi pi-info-circle',
             accept: async () => {
                 try {
-                    let deletedRole = await this.tenantService.removeRole(role.name, this.tenant.id);
+                    let deletedRole = await this.tenantService.deleteRole(role.name, this.tenant.id);
                     this.messageService.add({severity: 'success', summary: 'Success', detail: 'Role Deleted'});
                     return deletedRole;
                 } catch (e) {

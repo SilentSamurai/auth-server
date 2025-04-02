@@ -1,4 +1,4 @@
-import {AfterContentInit, Component, OnInit} from '@angular/core';
+import {AfterContentInit, Component} from '@angular/core';
 import {UserService} from '../../_services/user.service';
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {ActivatedRoute, Router} from "@angular/router";
@@ -7,7 +7,7 @@ import {lastValueFrom} from "rxjs";
 import {MessageService} from "primeng/api";
 import {AuthDefaultService} from "../../_services/auth.default.service";
 import {StaticModel} from "../../component/model/StaticModel";
-
+import {CloseType, ValueHelpResult} from "../../component/value-help/value-help.component";
 
 
 @Component({
@@ -22,48 +22,15 @@ import {StaticModel} from "../../component/model/StaticModel";
                 {{ tenant.name }}
             </app-op-subtitle>
 
-            <app-op-actions>
-                <div class="" style="min-width:15rem">
-                    <app-value-help-input
-                        [dataModel]="tenantRolesDM"
-                        [(selection)]="selectedRoles"
-                        class="col-3"
-                        labelField="name"
-                        multi="true"
-                        name="Roles">
-
-                        <app-vh-col label="Name" name="name"></app-vh-col>
-
-                        <ng-template #vh_body let-row>
-                            <td>{{ row.name }}</td>
-                        </ng-template>
-
-                    </app-value-help-input>
-
-                    <button (click)="onAddRole()"
-                            class="btn btn-primary btn-sm mt-2">
-                        Assign Role
-                    </button>
-                </div>
-            </app-op-actions>
-
             <app-op-header>
                 <div class="row mb-2">
                     <div class="col">
-                        <app-attribute label="Email">
-                            {{ user.email }}
-                        </app-attribute>
-                        <app-attribute label="Name">
-                            {{ user.name }}
-                        </app-attribute>
+                        <app-attribute label="Email">{{ user.email }}</app-attribute>
+                        <app-attribute label="Name">{{ user.name }}</app-attribute>
                     </div>
                     <div class="col">
-                        <app-attribute label="Tenant Name">
-                            {{ tenant.name }}
-                        </app-attribute>
-                        <app-attribute label="Tenant Id">
-                            {{ tenant.id }}
-                        </app-attribute>
+                        <app-attribute label="Tenant Name">{{ tenant.name }}</app-attribute>
+                        <app-attribute label="Tenant Id">{{ tenant.id }}</app-attribute>
                     </div>
                 </div>
             </app-op-header>
@@ -71,9 +38,32 @@ import {StaticModel} from "../../component/model/StaticModel";
             <app-op-tab name="Roles">
                 <app-op-section name="Roles">
                     <app-section-content>
-                        <app-table title="Role List"
-                                   [dataModel]="rolesDataModel"
+                        <app-table
+                            title="Role List"
+                            [dataModel]="rolesDataModel"
                         >
+
+                            <app-table-btn>
+                                <app-value-help-button
+                                    classStyle="btn-sm btn-primary "
+                                    [dataModel]="tenantRolesDM"
+                                    [multi]="true"
+                                    name="Assign Roles"
+                                    [selection]="roles"
+                                    (onClose)="onAddRoles($event)">
+
+                                    <app-btn-content>
+                                        Assign Roles
+                                    </app-btn-content>
+
+                                    <app-vh-col label="Name" name="name"></app-vh-col>
+
+                                    <ng-template #vh_body let-row>
+                                        <td>{{ row.name }}</td>
+                                    </ng-template>
+
+                                </app-value-help-button>
+                            </app-table-btn>
 
                             <app-table-col label="Name" name="name"></app-table-col>
                             <app-table-col label="Description" name="description"></app-table-col>
@@ -84,19 +74,17 @@ import {StaticModel} from "../../component/model/StaticModel";
                                     <a [routerLink]="['/RL02', tenant.id, role.name]"
                                        href="javascript:void(0)">{{ role.name }}</a>
                                 </td>
+                                <td>{{ role.description }}</td>
                                 <td>
-                                    {{ role.description }}
-                                </td>
-                                <td>
-                                    <button (click)="onRemoveRole(role)"
-                                            *ngIf="role.removable"
+                                    <!-- If role.removable is true, user can remove -->
+                                    <button *ngIf="role.removable"
+                                            (click)="onRemoveAssignment(role)"
                                             class="btn btn-sm"
                                             type="button">
                                         <i class="fa fa-solid fa-trash"></i>
                                     </button>
                                 </td>
                             </ng-template>
-
                         </app-table>
                     </app-section-content>
                 </app-op-section>
@@ -113,12 +101,11 @@ export class TNRL01Component implements AfterContentInit {
     member: any = {
         roles: []
     };
-    roles = [];
+    roles: any[] = [];
     user: any;
     tenant: any;
     loading = true;
-    tenantRoles: any;
-    selectedRoles: any[] = [];
+    tenantRoles: any[] = [];
     rolesDataModel = new StaticModel(["id"]);
     tenantRolesDM = new StaticModel(["id"]);
 
@@ -131,8 +118,6 @@ export class TNRL01Component implements AfterContentInit {
                 private modalService: NgbModal) {
 
     }
-
-
 
     async ngOnInit(): Promise<void> {
         this.authDefaultService.setTitle("TNRL01: Role Assignment of User");
@@ -179,34 +164,30 @@ export class TNRL01Component implements AfterContentInit {
         }
     }
 
-    openCreateModal() {
-
+    async onAddRoles(valueHelpResult: ValueHelpResult) {
+        if (valueHelpResult.closeType != CloseType.Confirm) {
+            return;
+        }
+        try {
+            await this.tenantService.addRolesToMember(valueHelpResult.selection, this.tenantId, this.userId);
+            this.messageService.add({ severity: 'success', summary: 'Assigned', detail: 'Roles assigned successfully' });
+            // Reload table
+            await this.loadTable();
+        } catch (err: any) {
+            console.error(err);
+            this.messageService.add({ severity: 'error', summary: 'Failed', detail: err?.error?.message || 'Error assigning roles' });
+        }
     }
 
-    openUpdateModal(user: any) {
-
-    }
-
-    openDeleteModal(user: any) {
-
-    }
-
-    async onAddRole() {
-        await this.tenantService.assignRole(this.selectedRoles, this.tenantId, this.userId);
-        await this.loadTable();
-        this.selectedRoles = [];
-    }
-
-    onRemoveRole(role: any) {
-
-    }
-
-    // provideRoles($event: TableAsyncLoadEvent) {
-    //     $event.update(this.tenantRoles, false);
-    // }
-
-    onAddRoleSelection(selected: any[]) {
-
+    async onRemoveAssignment(role: any) {
+        try {
+            await this.tenantService.removeRolesFromMember([role], this.tenantId, this.userId);
+            this.messageService.add({ severity: 'success', summary: 'Removed', detail: `${role.name} removed.` });
+            await this.loadTable();
+        } catch (err: any) {
+            console.error(err);
+            this.messageService.add({ severity: 'error', summary: 'Failed', detail: err?.error?.message || 'Error removing role' });
+        }
     }
 
 

@@ -57,12 +57,12 @@ import {Filter} from "../../component/model/Filters";
                         <td>{{ tenant.name }}</td>
                         <td class="" style="max-width: 100px">
                             <button (click)="openUpdateModal(tenant)" [disabled]="!this.isTenantAdmin"
-                                    class="btn"
+                                    class="btn btn-sm btn-primary me-2"
                                     type="button">
                                 <i class="fa fa-edit"></i>
                             </button>
-                            <button (click)="openDeleteModal(tenant)" [disabled]="!this.creationAllowed"
-                                    class="btn"
+                            <button (click)="openDeleteModal(tenant)" [disabled]="!this.deleteAllowed"
+                                    class="btn btn-sm btn-danger"
                                     type="button">
                                 <i class="fa fa-solid fa-trash"></i>
                             </button>
@@ -82,6 +82,7 @@ export class TN01Component implements OnInit {
     tenants: any = [];
     creationAllowed = false;
     isTenantAdmin = false;
+    deleteAllowed = false;
     dataModel: DataModel;
 
     constructor(private tokenStorageService: TokenStorageService,
@@ -105,13 +106,25 @@ export class TN01Component implements OnInit {
             this.isTenantAdmin = true;
         }
 
+        // Check for delete privileges
+        // (Requires that `Actions.Delete` is defined or recognized in your application)
+        if (this.permissionService.isAuthorized(Actions.Delete, Subjects.TENANT)) {
+            this.deleteAllowed = true;
+        }
+
+        await this.refreshData();
+    }
+
+    async refreshData() {
+        // Forces a fresh load from page 0 with no filters
+        await this.dataModel.apply({ pageNo: 0, append: false });
     }
 
     async openCreateModal() {
         const modalRef = this.modalService.open(CreateTenantComponent);
         const tenant = await modalRef.result;
         console.log("returned tenant", tenant);
-        await this.ngOnInit();
+        await this.refreshData();
     }
 
     async openUpdateModal(tenant: any) {
@@ -119,7 +132,7 @@ export class TN01Component implements OnInit {
         modalRef.componentInstance.tenant = tenant;
         const editedTenant = await modalRef.result;
         console.log(editedTenant);
-        await this.ngOnInit();
+        await this.refreshData();
     }
 
     async openDeleteModal(tenant: any) {
@@ -139,7 +152,7 @@ export class TN01Component implements OnInit {
             }
         });
         console.log(deletedTenant);
-        await this.ngOnInit();
+        await this.refreshData();
     }
 
     onFilter(event: Filter[]) {

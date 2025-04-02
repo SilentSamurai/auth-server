@@ -104,20 +104,6 @@ export class MemberController {
         }
     }
 
-    @Put('/:tenantId/member/:userId/roles')
-    @UseGuards(JwtAuthGuard)
-    async updateRole(
-        @Request() request,
-        @Param('tenantId') tenantId: string,
-        @Param('userId') userId: string,
-        @Body(new ValidationPipe(ValidationSchema.OperatingRoleSchema)) body: { roles: string[] }
-    ): Promise<Role[]> {
-        const user = await this.usersService.findById(request, userId);
-        let tenant = await this.tenantService.findById(request, tenantId);
-        this.securityService.check(request, Action.Update, subject(SubjectEnum.TENANT, tenant));
-        return this.tenantService.updateRolesOfMember(request, body.roles, tenantId, user);
-    }
-
     @Get('/:tenantId/member/:userId')
     @UseGuards(JwtAuthGuard)
     async getMember(
@@ -134,6 +120,64 @@ export class MemberController {
             userId: user.id,
             roles: roles
         };
+    }
+
+    @Put('/:tenantId/member/:userId/roles')
+    @UseGuards(JwtAuthGuard)
+    async setMemberRoles(
+        @Request() request,
+        @Param('tenantId') tenantId: string,
+        @Param('userId') userId: string,
+        @Body(new ValidationPipe(ValidationSchema.OperatingRoleSchema)) body: { roles: string[] }
+    ): Promise<Role[]> {
+        const user = await this.usersService.findById(request, userId);
+        let tenant = await this.tenantService.findById(request, tenantId);
+        this.securityService.check(request, Action.Update, subject(SubjectEnum.TENANT, tenant));
+        return this.tenantService.updateRolesOfMember(request, body.roles, tenantId, user);
+    }
+
+    /**
+     * Add roles to a given member without affecting existing roles.
+     */
+    @Post('/:tenantId/member/:userId/roles/add')
+    @UseGuards(JwtAuthGuard)
+    async addRolesToMember(
+        @Request() request,
+        @Param('tenantId') tenantId: string,
+        @Param('userId') userId: string,
+        @Body(new ValidationPipe(ValidationSchema.OperatingRoleSchema)) body: { roles: string[] }
+    ): Promise<Role[]> {
+        const user = await this.usersService.findById(request, userId);
+        const tenant = await this.tenantService.findById(request, tenantId);
+        this.securityService.check(request, Action.Update, subject(SubjectEnum.TENANT, tenant));
+
+        // Only add specified roles
+        await this.roleService.addRoles(request, user, tenant, body.roles);
+
+        // Return updated set of roles
+        return this.roleService.getMemberRoles(request, tenant, user);
+    }
+
+    /**
+     * Remove specified roles from a member without affecting other assigned roles.
+     */
+    @Delete('/:tenantId/member/:userId/roles/remove')
+    @UseGuards(JwtAuthGuard)
+    async removeRolesFromMember(
+        @Request() request,
+        @Param('tenantId') tenantId: string,
+        @Param('userId') userId: string,
+        @Body(new ValidationPipe(ValidationSchema.OperatingRoleSchema)) body: { roles: string[] }
+    ): Promise<Role[]> {
+        const user = await this.usersService.findById(request, userId);
+        const tenant = await this.tenantService.findById(request, tenantId);
+        this.securityService.check(request, Action.Update, subject(SubjectEnum.TENANT, tenant));
+
+        // Remove specified roles
+        await this.roleService.removeRoles(request, user, tenant, body.roles);
+
+        // Return updated set of roles
+        return this.roleService.getMemberRoles(request, tenant, user);
     }
 
     @Get('/:tenantId/member/:userId/roles')

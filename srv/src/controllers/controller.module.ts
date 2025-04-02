@@ -20,6 +20,7 @@ import {ServiceModule} from "../services/service.module";
 import {AuthController} from "./auth.controller";
 import {PolicyController} from "./policy.controller";
 import {GroupController} from "./group.controller";
+import {RoleControllerV2} from "./roleV2.controller";
 
 @Module(
     {
@@ -42,7 +43,8 @@ import {GroupController} from "./group.controller";
             GenericSearchController,
             AuthController,
             PolicyController,
-            GroupController
+            GroupController,
+            RoleControllerV2
         ],
         providers: [],
         exports: []

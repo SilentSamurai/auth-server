@@ -20,6 +20,9 @@ export class Role {
     @Column({nullable: false})
     name: string;
 
+    @Column({nullable: true})
+    description?: string;
+
     @ManyToOne(type => Tenant, tenant => tenant.roles)
     @JoinColumn({
         name: "tenant_id",

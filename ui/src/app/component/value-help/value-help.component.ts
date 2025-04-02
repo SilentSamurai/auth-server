@@ -1,12 +1,32 @@
-import {Component, EventEmitter, OnInit, QueryList, TemplateRef, ViewChild} from '@angular/core';
+import {Component, OnInit, QueryList, TemplateRef, ViewChild} from '@angular/core';
 
 import {NgbActiveModal, NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {ActivatedRoute} from "@angular/router";
 import {ValueHelpColumnComponent} from "../value-help-input/value-help-column.component";
-import {AppTableComponent, TableAsyncLoadEvent} from "../table/app-table.component";
+import {AppTableComponent} from "../table/app-table.component";
 import {FilterBarColumnComponent} from "../filter-bar/filter-bar.component";
 import {DataModel} from "../model/DataModel";
 import {Filter} from "../model/Filters";
+
+export enum CloseType {
+    Cancel,
+    Clear,
+    Confirm
+}
+
+export class ValueHelpResult {
+    selection: any[];
+    closeType: CloseType;
+
+    constructor(selection: any[], closeType: CloseType) {
+        this.selection = selection;
+        this.closeType = closeType;
+    }
+
+    public static result(selection: any[], closeType: CloseType) {
+        return new ValueHelpResult(selection, closeType);
+    }
+}
 
 @Component({
     selector: 'app-value-help',
@@ -107,15 +127,15 @@ export class ValueHelpComponent implements OnInit {
     }
 
     cancel() {
-        this.activeModal.close(this.previousSelectedRows);
+        this.activeModal.close(ValueHelpResult.result(this.previousSelectedRows, CloseType.Cancel));
     }
 
     confirm() {
-        this.activeModal.close(this.selectedItem);
+        this.activeModal.close(ValueHelpResult.result(this.selectedItem, CloseType.Confirm));
     }
 
     clear() {
-        this.activeModal.close([]);
+        this.activeModal.close(ValueHelpResult.result([], CloseType.Clear));
     }
 
     onFilter(filters: Filter[]) {

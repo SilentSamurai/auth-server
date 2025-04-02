@@ -10,14 +10,12 @@ import {
     QueryList,
     TemplateRef
 } from '@angular/core';
-
-import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {ActivatedRoute} from "@angular/router";
-import {UserService} from "../../_services/user.service";
-import {ValueHelpComponent} from "../value-help/value-help.component";
+import {ValueHelpComponent, ValueHelpResult} from "../value-help/value-help.component";
 import {ValueHelpColumnComponent} from "./value-help-column.component";
 import {FilterBarColumnComponent} from "../filter-bar/filter-bar.component";
 import {DataModel} from "../model/DataModel";
+import {ModalResult, ModalService} from "../dialogs/modal.service";
 
 
 function parseBoolean(value: string): boolean {
@@ -29,31 +27,27 @@ function parseBoolean(value: string): boolean {
 @Component({
     selector: 'app-value-help-input',
     template: `
-        <div>
-            <label *ngIf="label" class="form-label" [for]="name">{{ label }}</label>
-            <div class="col-3 input-group">
-                <div *ngIf="multi" class="form-control text-truncate">
-                    <ng-container *ngFor="let row of selection; index as i; first as isFirst">
-                        <p-chip [removable]="false" label="{{getLabel(i)}}">
-                        </p-chip>
-                    </ng-container>
-                </div>
-                <input *ngIf="!multi"
-                       class="form-control text-truncate"
-                       id="{{name}}"
-                       name="{{name}}"
-                       readonly
-                       placeholder="{{placeholder}}"
-                       required
-                       type="text"
-                       value="{{getLabel(0)}}"
-                />
-                <button (click)="openValueHelp()" class="input-group-text btn btn-outline-secondary"
-                        id="{{name}}-vh-btn"
-                        type="button">
-                    <i class="fa fas fa-clone"></i>
-                </button>
+        <div class="col-3 input-group">
+            <div *ngIf="multi" class="form-control text-truncate">
+                <ng-container *ngFor="let row of selection; index as i; first as isFirst">
+                    <p-chip [removable]="false" label="{{getLabel(i)}}">
+                    </p-chip>
+                </ng-container>
             </div>
+            <input *ngIf="!multi"
+                   class="form-control text-truncate"
+                   id="{{name}}"
+                   name="{{name}}"
+                   readonly
+                   placeholder="{{placeholder}}"
+                   required
+                   type="text"
+                   value="{{getLabel(0)}}"
+            />
+            <button (click)="openValueHelp()" class="input-group-text btn btn-outline-secondary" id="{{name}}-vh-btn"
+                    type="button">
+                <i class="fa fas fa-clone"></i>
+            </button>
         </div>
     `,
     styles: [`
@@ -70,7 +64,6 @@ export class ValueHelpInputComponent implements OnInit, AfterViewInit {
     @Input() name: string = '';
     @Input() multi: string | boolean = false;
     @Input() labelField!: string;
-    @Input() label: string = '';
     @Input() placeholder: string = '';
 
     @Input() selection: any[] = [];
@@ -88,9 +81,8 @@ export class ValueHelpInputComponent implements OnInit, AfterViewInit {
     @ContentChildren(FilterBarColumnComponent)
     filters!: QueryList<FilterBarColumnComponent>;
 
-    constructor(private userService: UserService,
-                private route: ActivatedRoute,
-                private modalService: NgbModal) {
+    constructor(private route: ActivatedRoute,
+                private modalService: ModalService) {
     }
 
     async ngOnInit(): Promise<void> {
@@ -103,35 +95,37 @@ export class ValueHelpInputComponent implements OnInit, AfterViewInit {
         console.log(this.columns?.length);
     }
 
-    changeValue(value: any | any[]) {
+    changeValue(value: ValueHelpResult) {
         if (!value) {
             return;
         }
-        if (Array.isArray(value)) {
-            this.selection = value;
+        if (Array.isArray(value.selection)) {
+            this.selection = value.selection;
             this.selectionChange.emit(this.selection);
         } else {
-            this.selection = [value];
+            this.selection = [value.selection];
             this.selectionChange.emit(this.selection);
         }
     }
 
     async openValueHelp() {
-        const modalRef = this.modalService.open(ValueHelpComponent, {size: 'lg', backdrop: 'static'});
-        this.modalInstance = modalRef.componentInstance as ValueHelpComponent;
-        this.modalInstance.body = this.body;
-        this.modalInstance.columns = this.columns;
-        this.modalInstance.filters = this.filters;
-        this.modalInstance.dataModel = this.dataModel;
-        await this.modalInstance.startUp({
-            name: this.name,
-            selectedItem: this.selection,
-            multi: this.multi as boolean,
-        })
 
-        const row = await modalRef.result;
-        this.changeValue(row);
-        console.log(row);
+        const result: ModalResult<ValueHelpResult> = await this.modalService.open(ValueHelpComponent, {
+            initData: {
+                name: this.name,
+                body: this.body,
+                columns: this.columns,
+                filters: this.filters,
+                dataModel: this.dataModel,
+                selectedItem: this.selection,
+                multi: this.multi as boolean,
+            }
+        });
+        if (result.is_ok()) {
+            const row = result.data!;
+            this.changeValue(row);
+            console.log(row);
+        }
     }
 
     getLabel(index: number) {

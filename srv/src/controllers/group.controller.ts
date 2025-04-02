@@ -90,7 +90,7 @@ export class GroupController {
     }
 
 
-    @Post('/group/:groupId/add-role')
+    @Post('/group/:groupId/add-roles')
     @UseGuards(JwtAuthGuard)
     async addRole(
         @Request() request,
@@ -106,7 +106,7 @@ export class GroupController {
         };
     }
 
-    @Post('/group/:groupId/remove-role')
+    @Post('/group/:groupId/remove-roles')
     @UseGuards(JwtAuthGuard)
     async removeRole(
         @Request() request,

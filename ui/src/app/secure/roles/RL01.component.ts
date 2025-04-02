@@ -5,7 +5,7 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {TenantService} from "../../_services/tenant.service";
 import {MessageService} from "primeng/api";
 import {AuthDefaultService} from "../../_services/auth.default.service";
-import {AppTableComponent, TableAsyncLoadEvent} from "../../component/table/app-table.component";
+import {AppTableComponent} from "../../component/table/app-table.component";
 import {RoleService} from "../../_services/role.service";
 import {ConfirmationService} from "../../component/dialogs/confirmation.service";
 import {DataModel} from "../../component/model/DataModel";
@@ -104,7 +104,7 @@ export class RL01Component implements OnInit {
         await this.confirmationService.confirm({
             message: "Are you sure you want to continue ?",
             accept: async () => {
-                await this.roleService.deleteRole(role.tenantId, role.name);
+                await this.tenantService.deleteRole(role.name, role.tenantId);
                 this.messageService.add({severity: 'success', summary: 'Successful', detail: 'Group removed'});
             }
         })

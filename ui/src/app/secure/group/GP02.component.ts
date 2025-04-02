@@ -5,11 +5,11 @@ import {TenantService} from "../../_services/tenant.service";
 import {TokenStorageService} from "../../_services/token-storage.service";
 import {GroupService} from "../../_services/group.service";
 import {AuthDefaultService} from "../../_services/auth.default.service";
-import {TableAsyncLoadEvent} from "../../component/table/app-table.component";
 import {UpdateGroupComponent} from "./dialogs/update-group.component";
 import {MessageService} from "primeng/api";
 import {ConfirmationService} from "../../component/dialogs/confirmation.service";
 import {StaticModel} from "../../component/model/StaticModel";
+import {CloseType, ValueHelpResult} from "../../component/value-help/value-help.component";
 
 @Component({
     selector: 'app-group-object',
@@ -61,25 +61,22 @@ import {StaticModel} from "../../component/model/StaticModel";
                             <ng-template pTemplate="caption">
                                 <div class="d-flex justify-content-between">
                                     <h5>Roles</h5>
-                                    <div style="min-width:15rem">
-                                        <app-value-help-input
-                                            [dataModel]="rolesDM"
-                                            [(selection)]="selectedRoles"
-                                            class="col-3"
-                                            labelField="name"
-                                            multi="true"
-                                            name="Roles">
-                                            <app-vh-col label="Name" name="name"></app-vh-col>
-                                            <ng-template #vh_body let-row>
-                                                <td>{{ row.name }}</td>
-                                            </ng-template>
-                                        </app-value-help-input>
-
-                                        <button (click)="onAddRole()"
-                                                class="btn btn-primary btn-sm mt-2">
+                                    <app-value-help-button
+                                        name="Roles"
+                                        classStyle="btn-primary btn-sm"
+                                        [multi]="true"
+                                        [dataModel]="rolesDM"
+                                        [selection]="selectedRoles"
+                                        (onClose)="onAddRoles($event)"
+                                    >
+                                        <app-btn-content>
                                             Assign Roles
-                                        </button>
-                                    </div>
+                                        </app-btn-content>
+                                        <app-vh-col label="Name" name="name"></app-vh-col>
+                                        <ng-template #vh_body let-row>
+                                            <td>{{ row.name }}</td>
+                                        </ng-template>
+                                    </app-value-help-button>
                                 </div>
                             </ng-template>
                             <ng-template pTemplate="header">
@@ -120,25 +117,22 @@ import {StaticModel} from "../../component/model/StaticModel";
                             <ng-template pTemplate="caption">
                                 <div class="d-flex justify-content-between">
                                     <h5>Users </h5>
-                                    <div style="min-width:15rem">
-                                        <app-value-help-input
-                                            [dataModel]="usersDM"
-                                            [(selection)]="selectedUsers"
-                                            class="col-3"
-                                            labelField="name"
-                                            multi="true"
-                                            name="Users">
-                                            <app-vh-col label="Email" name="email"></app-vh-col>
-                                            <ng-template #vh_body let-row>
-                                                <td>{{ row.email }}</td>
-                                            </ng-template>
-                                        </app-value-help-input>
-
-                                        <button (click)="onAddUsers()"
-                                                class="btn btn-primary btn-sm mt-2">
+                                    <app-value-help-button
+                                        name="Users"
+                                        classStyle="btn-primary btn-sm"
+                                        [multi]="true"
+                                        [dataModel]="usersDM"
+                                        [selection]="selectedUsers"
+                                        (onClose)="onAddUsers($event)"
+                                    >
+                                        <app-btn-content>
                                             Assign Users
-                                        </button>
-                                    </div>
+                                        </app-btn-content>
+                                        <app-vh-col label="Email" name="email"></app-vh-col>
+                                        <ng-template #vh_body let-row>
+                                            <td>{{ row.email }}</td>
+                                        </ng-template>
+                                    </app-value-help-button>
                                 </div>
                             </ng-template>
                             <ng-template pTemplate="header">
@@ -267,10 +261,13 @@ export class GP02Component implements OnInit {
         })
     }
 
-    async onAddUsers() {
-        if (this.selectedUsers.length > 0) {
-            await this.groupService.addUser(this.group_id, this.selectedUsers.map(r => r.email));
-            await this.ngOnInit();
+    async onAddUsers(result: ValueHelpResult) {
+        if (result.closeType === CloseType.Confirm) {
+            const selectedUsers = result.selection;
+            if (selectedUsers.length > 0) {
+                await this.groupService.addUser(this.group_id, selectedUsers.map(r => r.email));
+                await this.ngOnInit();
+            }
         }
     }
 
@@ -284,10 +281,13 @@ export class GP02Component implements OnInit {
     //     $event.update(roles, false);
     // }
 
-    async onAddRole() {
-        if (this.selectedRoles.length > 0) {
-            await this.groupService.addRoles(this.group_id, this.selectedRoles.map(r => r.name));
-            await this.ngOnInit();
+    async onAddRoles(result: ValueHelpResult) {
+        if (result.closeType === CloseType.Confirm) {
+            const selectedRoles = result.selection;
+            if (selectedRoles.length > 0) {
+                await this.groupService.addRoles(this.group_id, selectedRoles.map(r => r.name));
+                await this.ngOnInit();
+            }
         }
     }
 

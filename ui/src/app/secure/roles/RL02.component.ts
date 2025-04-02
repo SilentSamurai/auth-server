@@ -1,6 +1,5 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from "@angular/router";
-import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {TenantService} from "../../_services/tenant.service";
 import {TokenStorageService} from "../../_services/token-storage.service";
 import {AuthDefaultService} from "../../_services/auth.default.service";
@@ -10,10 +9,12 @@ import {ConfirmationService} from "../../component/dialogs/confirmation.service"
 import {StaticModel} from "../../component/model/StaticModel";
 import {PolicyService} from "../../_services/policy.service";
 import {CreatePolicyModalComponent} from "./create-policy-modal.component";
-import {AddUsersModalComponent} from "./add-users-modal.component";
+import {CloseType, ValueHelpResult} from "../../component/value-help/value-help.component";
+import {UpdateRoleModalComponent} from "./update-role-modal.component";
+import { ModalService, ModalResult } from "../../component/dialogs/modal.service"; // an example path
 
 @Component({
-    selector: 'app-group-object',
+    selector: 'app-RL02',
     template: `
         <nav-bar></nav-bar>
         <app-object-page *ngIf="!loading">
@@ -57,16 +58,32 @@ import {AddUsersModalComponent} from "./add-users-modal.component";
             <app-op-tab name="Users">
                 <app-op-section name="Users">
                     <app-section-action>
+
                     </app-section-action>
                     <app-section-content>
                         <p-table [value]="users" responsiveLayout="scroll">
                             <ng-template pTemplate="caption">
                                 <div class="d-flex justify-content-between">
                                     <h5>Users </h5>
-                                    <button (click)="openAddUsersModal()"
-                                            class="btn btn-primary btn-sm">
-                                        Assign Users
-                                    </button>
+                                    <app-value-help-button
+                                        classStyle="btn-sm btn-primary"
+                                        [dataModel]="usersDM"
+                                        [multi]="true"
+                                        [selection]="users"
+                                        name="Select Users"
+                                        (onOpen)="onUserVhOpen()"
+                                        (onClose)="onUserVhClose($event)">
+
+                                        <app-btn-content>
+                                            Assign Users
+                                        </app-btn-content>
+                                        <app-vh-col label="Email" name="email"></app-vh-col>
+
+                                        <ng-template #vh_body let-row>
+                                            <td>{{ row.email }}</td>
+                                        </ng-template>
+
+                                    </app-value-help-button>
                                 </div>
                             </ng-template>
                             <ng-template let-columns pTemplate="header">
@@ -157,8 +174,6 @@ import {AddUsersModalComponent} from "./add-users-modal.component";
             </div>
         </div>
         <p-confirmDialog></p-confirmDialog>
-
-
     `,
     styles: ['']
 })
@@ -174,7 +189,6 @@ export class RL02Component implements OnInit {
         effect: 'ALLOW'
     };
     usersDM = new StaticModel(['id']);
-    selectedUsers: any[] = [];
     private roleName: string = "";
     private tenantId: string = "";
 
@@ -186,7 +200,7 @@ export class RL02Component implements OnInit {
                 private router: Router,
                 private authDefaultService: AuthDefaultService,
                 private confirmationService: ConfirmationService,
-                private modalService: NgbModal,
+                private modalService: ModalService,            // Replaced NgbModal with ModalService
                 private policyService: PolicyService) {
     }
 
@@ -200,19 +214,8 @@ export class RL02Component implements OnInit {
         this.roleName = this.actRoute.snapshot.params['roleName'];
         this.tenantId = this.actRoute.snapshot.params['tenantId'];
 
-        let response = await this.roleService.getRoleDetails(this.tenantId, this.roleName);
-
-        this.role = response.role;
-        this.users = response.users;
-        this.usersDM.setData(this.users);
-
-        // Load policies for the given role
-        try {
-            this.policies = await this.policyService.getRoleAuthorizations(this.role.id);
-        } catch (e: any) {
-            console.error("Error fetching role authorizations:", e);
-            this.messageService.add({severity: 'error', summary: 'Error', detail: 'Could not load policies'});
-        }
+        await this.reloadUsers();
+        await this.reloadPolicies();
 
         this.authDefaultService.setTitle("RL02: " + this.role.name);
 
@@ -220,57 +223,85 @@ export class RL02Component implements OnInit {
     }
 
     async onUpdateRole() {
-        // const modalRef = this.modalService.open(UpdateGroupComponent);
-        // modalRef.componentInstance.groupId = this.group_id;
-        // const user = await modalRef.result;
-        // console.log(user);
-        this.ngOnInit();
+        // Show the update-role modal
+        const modalResult: ModalResult<any> = await this.modalService.open(UpdateRoleModalComponent, {
+            initData: {
+                role: { ...this.role },
+                tenantId: this.tenantId
+            }
+        });
+
+        // If the user saved changes in the modal
+        if (modalResult.is_ok()) {
+            const updatedRole = modalResult.data;
+            if (updatedRole) {
+                this.role.name = updatedRole.name;
+                this.role.description = updatedRole.description;
+            }
+        }
     }
 
     async onDeleteRole() {
         await this.confirmationService.confirm({
             message: 'Are you sure you want to proceed?',
             accept: async () => {
-                await this.roleService.deleteRole(this.role.tenantId, this.role.name);
+                await this.tenantService.deleteRole(this.role.name, this.role.tenantId);
                 this.messageService.add({severity: 'info', summary: 'Successful', detail: 'Group removed'});
                 await this.router.navigate(["/RL01"]);
             }
-        })
+        });
     }
 
+    async reloadUsers() {
+        try {
+            let response = await this.roleService.getRoleDetails(this.tenantId, this.roleName);
+            this.role = response.role;
+            this.users = response.users;
+        } catch (e: any) {
+            console.error("Error reloading users:", e);
+            this.messageService.add({severity: 'error', summary: 'Failed', detail: 'Could not load users'});
+        }
+    }
 
     async onUserRemove(user: any) {
         await this.confirmationService.confirm({
             message: 'Are you sure you want to proceed?',
             accept: async () => {
-                await this.roleService.removeUser(this.tenantId, this.roleName, [user.email]);
+
+                await this.tenantService.removeRolesFromMember([this.role], this.tenantId, user.id);
                 this.messageService.add({severity: 'info', summary: 'Successful', detail: 'User removed'});
             }
         });
         await this.ngOnInit();
     }
 
-    async openAddUsersModal(): Promise<void> {
-        const modalRef = this.modalService.open(AddUsersModalComponent, {
-            size: 'lg',
-            backdrop: 'static'
-        });
+    async onUserVhOpen() {
+        try {
+            const members = await this.tenantService.getMembers(this.tenantId);
+            this.usersDM.setData(members);
+        } catch (e) {
+            this.messageService.add({
+                severity: 'error',
+                summary: 'Member Load Failed',
+                detail: 'Could not load member'
+            });
+        }
 
-        // Pass required context to modal
-        modalRef.componentInstance.tenantId = this.tenantId;
-        modalRef.componentInstance.roleName = this.roleName;
-        modalRef.componentInstance.usersDM.setData(this.users);
+    }
 
-        const result = await modalRef.result;
-        if (result) { // Only refresh if modal was closed with success
+    async onUserVhClose(valueHelpResult: ValueHelpResult): Promise<void> {
+        if (valueHelpResult.closeType === CloseType.Confirm) { // Only refresh if modal was closed with success
             try {
+                const selectedUser = valueHelpResult.selection;
+                for (let user of selectedUser) {
+                    await this.tenantService.addRolesToMember(
+                        [this.role],
+                        this.tenantId,
+                        user.id
+                    );
+                }
                 const response = await this.roleService.getRoleDetails(this.tenantId, this.roleName);
                 this.users = response.users;
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Updated',
-                    detail: 'User list refreshed'
-                });
             } catch (e) {
                 this.messageService.add({
                     severity: 'error',
@@ -287,36 +318,36 @@ export class RL02Component implements OnInit {
     // }
 
     async openCreatePolicyModal(): Promise<void> {
-        const modalRef = this.modalService.open(CreatePolicyModalComponent, {
-            size: 'lg',  // optional, sets modal size (lg, sm, etc.)
-            backdrop: 'static', // optional
-            centered: true     // optional
+        const modalResult: ModalResult<any> = await this.modalService.open(CreatePolicyModalComponent, {
+            initData: {
+                role_id: this.role.id
+            }
         });
-        modalRef.componentInstance.role_id = this.role.id;  // create mode
 
-        const createdPolicy = await modalRef.result;
-        if (createdPolicy) {
-            await this.reloadPolicies();
+        if (modalResult.is_ok()) {
+            const createdPolicy = modalResult.data;
+            if (createdPolicy) {
+                await this.reloadPolicies();
+            }
         }
     }
 
-    // New method for editing (update) an existing policy
     async openUpdatePolicyModal(policyId: string): Promise<void> {
-        const modalRef = this.modalService.open(CreatePolicyModalComponent, {
-            size: 'lg',  // optional, sets modal size (lg, sm, etc.)
-            backdrop: 'static', // optional
-            centered: true     // optional
+        const modalResult: ModalResult<any> = await this.modalService.open(CreatePolicyModalComponent, {
+            initData: {
+                role_id: this.role.id,
+                policyId: policyId
+            }
         });
-        modalRef.componentInstance.role_id = this.role.id;
-        modalRef.componentInstance.policyId = policyId;  // update mode
 
-        const updatedPolicy = await modalRef.result;
-        if (updatedPolicy) {
-            await this.reloadPolicies();
+        if (modalResult.is_ok()) {
+            const updatedPolicy = modalResult.data;
+            if (updatedPolicy) {
+                await this.reloadPolicies();
+            }
         }
     }
 
-    // New method to remove a policy
     async onPolicyRemove(policy: any) {
         await this.confirmationService.confirm({
             message: `Are you sure you want to delete this policy?  [${policy.effect}] [${policy.action}] on [${policy.subject}].`,
@@ -350,17 +381,17 @@ export class RL02Component implements OnInit {
     }
 
     async openViewPolicyModal(policyId: string): Promise<void> {
-        const modalRef = this.modalService.open(CreatePolicyModalComponent, {
-            size: 'lg',
-            backdrop: 'static',
-            centered: true
+        const modalResult: ModalResult<any> = await this.modalService.open(CreatePolicyModalComponent, {
+            initData: {
+                policyId: policyId,
+                viewOnly: true
+            }
         });
-        modalRef.componentInstance.policyId = policyId;
-        modalRef.componentInstance.viewOnly = true;
 
-        // Because it’s purely read-only, we don’t expect a changed policy returned
-        // but we can still wait for modalRef.result if needed
-        await modalRef.result;
+        // If read-only, it may not return updated data, so no further logic is necessary
+        if (modalResult.is_ok()) {
+            // Optionally handle data if your read-only modal returns anything
+        }
     }
 
     isEmpty(obj: any) {
