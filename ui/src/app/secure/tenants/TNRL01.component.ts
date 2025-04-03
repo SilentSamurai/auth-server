@@ -1,12 +1,13 @@
-import {Component, OnInit} from '@angular/core';
+import {AfterContentInit, Component} from '@angular/core';
 import {UserService} from '../../_services/user.service';
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {ActivatedRoute, Router} from "@angular/router";
 import {TenantService} from "../../_services/tenant.service";
 import {lastValueFrom} from "rxjs";
-import {VHAsyncLoadEvent} from "../../component/value-help-input/value-help-input.component";
 import {MessageService} from "primeng/api";
 import {AuthDefaultService} from "../../_services/auth.default.service";
+import {StaticModel} from "../../component/model/StaticModel";
+import {CloseType, ValueHelpResult} from "../../component/value-help/value-help.component";
 
 
 @Component({
@@ -14,49 +15,46 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
     template: `
         <nav-bar></nav-bar>
         <app-object-page *ngIf="!loading">
-            <app-object-page-title>
+            <app-op-title>
                 {{ user.email }}
-            </app-object-page-title>
-            <app-object-page-subtitle>
+            </app-op-title>
+            <app-op-subtitle>
                 {{ tenant.name }}
-            </app-object-page-subtitle>
+            </app-op-subtitle>
 
-            <app-object-page-header>
+            <app-op-header>
                 <div class="row mb-2">
                     <div class="col">
-                        <app-attribute label="Email">
-                            {{ user.email }}
-                        </app-attribute>
-                        <app-attribute label="Name">
-                            {{ user.name }}
-                        </app-attribute>
+                        <app-attribute label="Email">{{ user.email }}</app-attribute>
+                        <app-attribute label="Name">{{ user.name }}</app-attribute>
                     </div>
                     <div class="col">
-                        <app-attribute label="Tenant Name">
-                            {{ tenant.name }}
-                        </app-attribute>
-                        <app-attribute label="Tenant Id">
-                            {{ tenant.id }}
-                        </app-attribute>
+                        <app-attribute label="Tenant Name">{{ tenant.name }}</app-attribute>
+                        <app-attribute label="Tenant Id">{{ tenant.id }}</app-attribute>
                     </div>
                 </div>
-            </app-object-page-header>
+            </app-op-header>
 
-            <app-object-page-section name="Roles">
-                <p-table [value]="member.roles" responsiveLayout="scroll">
-                    <ng-template pTemplate="caption">
-                        <div class="d-flex justify-content-between">
-                            <h5>Role List</h5>
+            <app-op-tab name="Roles">
+                <app-op-section name="Roles">
+                    <app-section-content>
+                        <app-table
+                            title="Role List"
+                            [dataModel]="rolesDataModel"
+                        >
 
-                            <div class="" style="min-width:15rem">
-                                <app-value-help-input
-                                    (dataProvider)="provideRoles($event)"
-                                    [(selection)]="selectedRoles"
-                                    class="col-3"
-                                    idField="id"
-                                    labelField="name"
-                                    multi="true"
-                                    name="Roles">
+                            <app-table-btn>
+                                <app-value-help-button
+                                    classStyle="btn-sm btn-primary "
+                                    [dataModel]="tenantRolesDM"
+                                    [multi]="true"
+                                    name="Assign Roles"
+                                    [selection]="roles"
+                                    (onClose)="onAddRoles($event)">
+
+                                    <app-btn-content>
+                                        Assign Roles
+                                    </app-btn-content>
 
                                     <app-vh-col label="Name" name="name"></app-vh-col>
 
@@ -64,59 +62,52 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
                                         <td>{{ row.name }}</td>
                                     </ng-template>
 
-                                </app-value-help-input>
+                                </app-value-help-button>
+                            </app-table-btn>
 
-                                <button (click)="onAddRole()"
-                                        class="btn btn-primary btn-sm mt-2">
-                                    Assign Role
-                                </button>
-                            </div>
-                        </div>
-                    </ng-template>
-                    <ng-template let-columns pTemplate="header">
-                        <tr>
-                            <th>Name</th>
-                            <th>Description</th>
-                            <th>Actions</th>
-                        </tr>
-                    </ng-template>
-                    <ng-template let-columns="columns" let-role pTemplate="body">
-                        <tr>
-                            <td>
-                                <a [routerLink]="['/RL02', tenant.id, role.name]"
-                                   href="javascript:void(0)">{{ role.name }}</a>
-                            </td>
-                            <td>
+                            <app-table-col label="Name" name="name"></app-table-col>
+                            <app-table-col label="Description" name="description"></app-table-col>
+                            <app-table-col label="Actions" name="actions"></app-table-col>
 
-                            </td>
-                            <td>
-                                <button (click)="onRemoveRole(role)"
-                                        *ngIf="role.removable"
-                                        class="btn btn-sm"
-                                        type="button">
-                                    <i class="fa fa-solid fa-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    </ng-template>
-                </p-table>
-            </app-object-page-section>
+                            <ng-template let-role #table_body>
+                                <td>
+                                    <a [routerLink]="['/RL02', tenant.id, role.name]"
+                                       href="javascript:void(0)">{{ role.name }}</a>
+                                </td>
+                                <td>{{ role.description }}</td>
+                                <td>
+                                    <!-- If role.removable is true, user can remove -->
+                                    <button *ngIf="role.removable"
+                                            (click)="onRemoveAssignment(role)"
+                                            class="btn btn-sm"
+                                            type="button">
+                                        <i class="fa fa-solid fa-trash"></i>
+                                    </button>
+                                </td>
+                            </ng-template>
+                        </app-table>
+                    </app-section-content>
+                </app-op-section>
+            </app-op-tab>
+
         </app-object-page>
     `,
     styles: ['']
 })
-export class TNRL01Component implements OnInit {
+export class TNRL01Component implements AfterContentInit {
 
     tenantId: string = '';
-    email: string = '';
+    userId: string = '';
     member: any = {
         roles: []
     };
+    roles: any[] = [];
     user: any;
     tenant: any;
     loading = true;
-    tenantRoles: any;
-    selectedRoles: any[] = [];
+    tenantRoles: any[] = [];
+    rolesDataModel = new StaticModel(["id"]);
+    tenantRolesDM = new StaticModel(["id"]);
 
     constructor(private userService: UserService,
                 private tenantService: TenantService,
@@ -125,13 +116,14 @@ export class TNRL01Component implements OnInit {
                 private messageService: MessageService,
                 private authDefaultService: AuthDefaultService,
                 private modalService: NgbModal) {
+
     }
 
     async ngOnInit(): Promise<void> {
         this.authDefaultService.setTitle("TNRL01: Role Assignment of User");
 
         this.tenantId = this.route.snapshot.params['tenantId'];
-        this.email = this.route.snapshot.params['email'];
+        this.userId = this.route.snapshot.params['userId'];
 
         // let params = this.route.snapshot.queryParamMap;
         // if (!params.has('email') || !params.has('tenantId')) {
@@ -139,16 +131,17 @@ export class TNRL01Component implements OnInit {
         // }
         // this.email = params.get('email') as string;
         // this.tenantId = params.get('tenantId') as string;
-        if (!this.email || !this.tenantId) {
-            await this.router.navigate(['/RL02']);
+        if (!this.userId || !this.tenantId) {
+            await this.router.navigate(['/home']);
         }
 
         this.tenant = await this.tenantService.getTenantDetails(this.tenantId);
-        this.user = await lastValueFrom(this.userService.getUser(this.email));
+        this.user = await lastValueFrom(this.userService.getUser(this.userId));
         try {
 
             await this.loadTable();
             this.tenantRoles = this.tenant.roles;
+            this.tenantRolesDM.setData(this.tenantRoles);
             this.loading = false;
 
         } catch (exception: any) {
@@ -158,39 +151,44 @@ export class TNRL01Component implements OnInit {
 
     }
 
+    ngAfterContentInit(): void {
+
+    }
+
     async loadTable() {
-        if (this.tenantId && this.email) {
-            this.member = await this.tenantService.getMemberDetails(this.tenantId, this.email);
+        if (this.tenantId && this.userId) {
+            this.member = await this.tenantService.getMemberDetails(this.tenantId, this.userId);
+            // $event.update(this.member, false);
+            this.roles = this.member.roles;
+            this.rolesDataModel.setData(this.roles);
         }
     }
 
-    openCreateModal() {
-
+    async onAddRoles(valueHelpResult: ValueHelpResult) {
+        if (valueHelpResult.closeType != CloseType.Confirm) {
+            return;
+        }
+        try {
+            await this.tenantService.addRolesToMember(valueHelpResult.selection, this.tenantId, this.userId);
+            this.messageService.add({ severity: 'success', summary: 'Assigned', detail: 'Roles assigned successfully' });
+            // Reload table
+            await this.loadTable();
+        } catch (err: any) {
+            console.error(err);
+            this.messageService.add({ severity: 'error', summary: 'Failed', detail: err?.error?.message || 'Error assigning roles' });
+        }
     }
 
-    openUpdateModal(user: any) {
-
+    async onRemoveAssignment(role: any) {
+        try {
+            await this.tenantService.removeRolesFromMember([role], this.tenantId, this.userId);
+            this.messageService.add({ severity: 'success', summary: 'Removed', detail: `${role.name} removed.` });
+            await this.loadTable();
+        } catch (err: any) {
+            console.error(err);
+            this.messageService.add({ severity: 'error', summary: 'Failed', detail: err?.error?.message || 'Error removing role' });
+        }
     }
 
-    openDeleteModal(user: any) {
 
-    }
-
-    async onAddRole() {
-        await this.tenantService.assignRole(this.selectedRoles, this.tenantId, this.email);
-        await this.loadTable();
-        this.selectedRoles = [];
-    }
-
-    onRemoveRole(role: any) {
-
-    }
-
-    provideRoles($event: VHAsyncLoadEvent) {
-        $event.update(this.tenantRoles, []);
-    }
-
-    onAddRoleSelection(selected: any[]) {
-
-    }
 }

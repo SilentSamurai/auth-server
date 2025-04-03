@@ -3,10 +3,12 @@ import {UserService} from '../../_services/user.service';
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {CreateUserModalComponent} from "./dialogs/create-user.modal.component";
 import {EditUserModalComponent} from "./dialogs/edit-user.modal.component";
-import {DeleteUserModalComponent} from "./dialogs/delete-user.modal.component";
 import {AppTableComponent, TableAsyncLoadEvent} from "../../component/table/app-table.component";
-import {Filter} from "../../component/filter-bar/filter-bar.component";
 import {AuthDefaultService} from "../../_services/auth.default.service";
+import {ConfirmationService} from "../../component/dialogs/confirmation.service";
+import {MessageService} from "primeng/api";
+import {DataModel} from "../../component/model/DataModel";
+import {Filter} from "../../component/model/Filters";
 
 @Component({
     selector: 'app-board-user',
@@ -21,7 +23,8 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
                 <div class="d-flex justify-content-between">
                     <span class="h4"></span>
                     <button (click)="openCreateModal()"
-                            class="btn btn-outline-success btn-sm"
+                            id="CREATE_USER_DIALOG_BTN"
+                            class="btn btn-success btn-sm"
                             type="button">
                         <i class="fa fa-solid fa-plus me-2"></i>Create User
                     </button>
@@ -29,10 +32,8 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
             </app-page-view-header>
             <app-page-view-body>
                 <app-table
+                    [dataModel]="usersDM"
                     title="Users"
-                    (onLoad)="lazyLoad($event)"
-                    idField="email"
-                    isFilterAsync="true"
                     multi="true"
                     scrollHeight="65vh">
 
@@ -42,13 +43,12 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
                     <app-table-col label="Action" name="action"></app-table-col>
 
                     <ng-template #table_body let-user>
-                        <td><span class="p-column-title">Name</span>{{ user.name }} {{ user.surname }}</td>
+                        <td>{{ user.name }} {{ user.surname }}</td>
                         <td>
-                            <span class="p-column-title">Email</span>
-                            <a [routerLink]="['/UR02/', user.email]"
+                            <a [routerLink]="['/UR02/', user.id]"
                                href="javascript:void(0)">{{ user.email }}</a>
                         </td>
-                        <td><span class="p-column-title">Created At</span>{{ user.createdAt | date }}</td>
+                        <td>{{ user.createdAt | date }}</td>
                         <td class="d-flex ">
                             <button (click)="openUpdateModal(user)" class="btn " type="button">
                                 <i class="fa fa-edit"></i>
@@ -70,10 +70,14 @@ export class UR01Component implements OnInit {
     table!: AppTableComponent;
 
     users: any = [];
+    usersDM!: DataModel;
 
     constructor(private userService: UserService,
                 private authDefaultService: AuthDefaultService,
+                private confirmationService: ConfirmationService,
+                private messageService: MessageService,
                 private modalService: NgbModal) {
+        this.usersDM = this.userService.createDataModel([]);
     }
 
     async ngOnInit(): Promise<void> {
@@ -97,20 +101,23 @@ export class UR01Component implements OnInit {
     }
 
     async openDeleteModal(user: any) {
-        const modalRef = this.modalService.open(DeleteUserModalComponent);
-        modalRef.componentInstance.user = user;
-        const deletedUser = await modalRef.result;
+        const deletedUser = await this.confirmationService.confirm({
+            message: `Are you sure you want to delete ${user.email} ?`,
+            header: 'Confirmation',
+            icon: 'pi pi-info-circle',
+            accept: async () => {
+                try {
+                    let deletedUser = await this.userService.deleteUser(user.id);
+                    this.messageService.add({severity: 'success', summary: 'Success', detail: 'User Deleted'});
+                    return deletedUser;
+                } catch (e) {
+                    this.messageService.add({severity: 'error', summary: 'Error', detail: 'User Deletion Failed'});
+                }
+                return null;
+            }
+        })
         console.log(deletedUser);
         this.ngOnInit();
-    }
-
-    async lazyLoad($event: TableAsyncLoadEvent) {
-
-        this.users = await this.userService.queryUser({
-            pageNo: $event.pageNo,
-            where: $event.filters.filter(item => item.value != null && item.value.length > 0),
-        });
-        $event.update(this.users.data);
     }
 
     onFilter(filters: Filter[]) {

@@ -1,18 +1,18 @@
 import {Injectable, Logger} from '@nestjs/common';
-import {ConfigService} from '../config/config.service';
-import {UsersService} from '../users/users.service';
+import {Environment} from '../config/environment.service';
 import {JwtService} from '@nestjs/jwt';
-import {TenantService} from "../tenants/tenant.service";
+import {TenantService} from "../services/tenant.service";
 import {NotFoundException} from "../exceptions/not-found.exception";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
-import {AuthCode} from "./auth_code.entity";
-import {User} from "../users/user.entity";
-import {Tenant} from "../tenants/tenant.entity";
+import {AuthCode} from "../entity/auth_code.entity";
+import {User} from "../entity/user.entity";
+import {Tenant} from "../entity/tenant.entity";
 import {CryptUtil} from "../util/crypt.util";
 import {InvalidCredentialsException} from "../exceptions/invalid-credentials.exception";
 import {Cron} from "@nestjs/schedule";
 import * as ms from 'ms';
+import {AuthUserService} from "../casl/authUser.service";
 
 
 @Injectable()
@@ -21,11 +21,12 @@ export class AuthCodeService {
     private readonly LOGGER = new Logger("AuthCodeService");
 
     constructor(
-        private readonly configService: ConfigService,
-        private readonly usersService: UsersService,
+        private readonly configService: Environment,
+        private readonly authUserService: AuthUserService,
         private readonly tenantService: TenantService,
         private readonly jwtService: JwtService,
-        @InjectRepository(AuthCode) private authCodeRepository: Repository<AuthCode>
+        @InjectRepository(AuthCode) private authCodeRepository: Repository<AuthCode>,
+        @InjectRepository(User) private usersRepository: Repository<User>
     ) {
     }
 
@@ -49,8 +50,8 @@ export class AuthCodeService {
     /**
      * Create a verification token for the user.
      */
-    async createAuthToken(user: User, tenant: Tenant, code_challenge: string): Promise<string> {
-        let roles = await this.tenantService.getMemberRoles(tenant.id, user);
+    async createAuthToken(user: User, tenant: Tenant, code_challenge: string, method: string): Promise<string> {
+        let roles = await this.authUserService.getMemberRoles(tenant, user);
 
         let code = CryptUtil.generateOTP(6);
 
@@ -61,6 +62,7 @@ export class AuthCodeService {
         let session = this.authCodeRepository.create({
             codeChallenge: code_challenge,
             code: code,
+            method: method,
             tenantId: tenant.id,
             userId: user.id,
         });
@@ -71,10 +73,10 @@ export class AuthCodeService {
 
     async validateAuthCode(code: string, codeVerifier: string) {
         let session = await this.findByCode(code);
-        let tenant = await this.tenantService.findById(session.tenantId);
-        let user = await this.usersService.findById(session.userId);
-        let genChallenge = CryptUtil.generateCodeChallenge(codeVerifier);
-        if (genChallenge !== session.codeChallenge && codeVerifier !== session.codeChallenge) {
+        let tenant = await this.authUserService.findTenantById(session.tenantId);
+        let user = await this.authUserService.findUserById(session.userId);
+        let generateCodeChallenge = CryptUtil.generateCodeChallenge(codeVerifier, session.method);
+        if (generateCodeChallenge !== session.codeChallenge) {
             throw new InvalidCredentialsException();
         }
         return {tenant, user};

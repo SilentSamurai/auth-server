@@ -2,11 +2,16 @@ import {Component, OnInit, ViewChild} from '@angular/core';
 import {UserService} from '../../_services/user.service';
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {AppTableComponent, TableAsyncLoadEvent} from "../../component/table/app-table.component";
-import {Filter} from "../../component/filter-bar/filter-bar.component";
+
 import {AuthDefaultService} from "../../_services/auth.default.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {GroupService} from "../../_services/group.service";
 import {CreateGroupComponent} from "./dialogs/create-group.component";
+import {ConfirmationService} from "../../component/dialogs/confirmation.service";
+import {MessageService} from "primeng/api";
+import {UpdateGroupComponent} from "./dialogs/update-group.component";
+import {DataModel} from "../../component/model/DataModel";
+import {Filter} from "../../component/model/Filters";
 
 @Component({
     selector: 'app-board-user',
@@ -31,9 +36,7 @@ import {CreateGroupComponent} from "./dialogs/create-group.component";
             <app-page-view-body>
                 <app-table
                     title="Groups"
-                    (onLoad)="lazyLoad($event)"
-                    idField="id"
-                    isFilterAsync="true"
+                    [dataModel]="groupsDM"
                     multi="true"
                     scrollHeight="75vh">
 
@@ -75,13 +78,17 @@ export class GP01Component implements OnInit {
     tenantId: string = "";
 
     groups: any = [];
+    groupsDM: DataModel;
 
     constructor(private userService: UserService,
                 private authDefaultService: AuthDefaultService,
                 private groupService: GroupService,
                 private route: ActivatedRoute,
                 private router: Router,
+                private messageService: MessageService,
+                private confirmationService: ConfirmationService,
                 private modalService: NgbModal) {
+        this.groupsDM = this.groupService.createDataModel([]);
     }
 
     async ngOnInit(): Promise<void> {
@@ -97,34 +104,27 @@ export class GP01Component implements OnInit {
         this.ngOnInit();
     }
 
-    async openUpdateModal(user: any) {
-        // const modalRef = this.modalService.open(EditUserModalComponent);
-        // modalRef.componentInstance.user = user;
-        // const editedUser = await modalRef.result;
-        // console.log(editedUser);
+    async openUpdateModal(group: any) {
+        const modalRef = this.modalService.open(UpdateGroupComponent);
+        modalRef.componentInstance.groupId = group.id;
+        modalRef.componentInstance.form.name = group.name;
+        group = await modalRef.result;
+        console.log(group);
         this.ngOnInit();
     }
 
-    async openDeleteModal(user: any) {
-        // const modalRef = this.modalService.open(DeleteUserModalComponent);
-        // modalRef.componentInstance.user = user;
-        // const deletedUser = await modalRef.result;
-        // console.log(deletedUser);
+    async openDeleteModal(group: any) {
+        await this.confirmationService.confirm({
+            message: "Are you sure you want to continue ?",
+            accept: async () => {
+                await this.groupService.deleteGroup(group.id);
+                this.messageService.add({severity: 'success', summary: 'Successful', detail: 'Group removed'});
+            },
+            reject: async () => {
+                // this.messageService.add({severity: 'info', summary: 'Successful', detail: 'Group removed'});
+            }
+        })
         this.ngOnInit();
-    }
-
-    async lazyLoad($event: TableAsyncLoadEvent) {
-        // let filters = $event.filters.filter(item => item.value != null && item.value.length > 0);
-        // filters.push({
-        //     name: "tenantId",
-        //     value: this.tenantId,
-        //     operator: "equals"
-        // })
-        this.groups = await this.groupService.queryGroup({
-            pageNo: $event.pageNo,
-            where: $event.filters.filter(item => item.value != null && item.value.length > 0),
-        });
-        $event.update(this.groups.data);
     }
 
     onFilter(filters: Filter[]) {

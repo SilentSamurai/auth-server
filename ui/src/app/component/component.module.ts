@@ -2,7 +2,7 @@ import {CUSTOM_ELEMENTS_SCHEMA, NgModule} from '@angular/core';
 import {TableModule} from "primeng/table";
 import {RouterModule} from "@angular/router";
 import {CommonModule} from "@angular/common";
-import {FormsModule} from "@angular/forms";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {MultiSelectModule} from "primeng/multiselect";
 import {ChipModule} from "primeng/chip";
 import {MenuModule} from "primeng/menu";
@@ -18,7 +18,6 @@ import {FilterBarColumnComponent, FilterBarComponent} from "./filter-bar/filter-
 import {AppTableComponent} from "./table/app-table.component";
 import {TileGroupsComponent} from "./tile/tile-groups.component";
 import {ObjectPageComponent} from "./object-page/object-page.component";
-import {ObjectPageHeaderComponent} from "./object-page/object-page-header.component";
 import {ObjectPageSectionComponent} from "./object-page/object-page-section.component";
 import {LaunchPadComponent} from "./tile/launchpad.component";
 import {PageViewComponent} from "./page-view/page-view.component";
@@ -30,9 +29,19 @@ import {FilterValueHelpComponent} from "./filter-bar/filter-value-help.component
 import {ButtonModule} from "primeng/button";
 import {RippleModule} from "primeng/ripple";
 import {AttributeComponent} from "./fields/attribute.component";
-import {ObjectPageTitleComponent} from "./object-page/object-page-title.component";
-import {ObjectPageActionsComponent} from "./object-page/object-page-actions.component";
-import {ObjectPageSubTitleComponent} from "./object-page/object-page-subtitle.component";
+import {StandardDialogComponent} from "./dialogs/standard-dialog.component";
+import {DialogActionsComponent} from "./dialogs/dialog-actions.component";
+import {DialogTabComponent} from "./dialogs/dialog-tab.component";
+import {DialogFooterComponent} from "./dialogs/dialog-footer.component";
+import {ConfirmationDialogComponent, ConfirmationService} from "./dialogs/confirmation.service";
+import {InputErrorComponent, TextInputComponent} from "./inputs/text-input.component";
+import {ButtonLinkComponent} from "./button/button-link.component";
+import {AppTableButtonComponent} from "./table/app-table-button.component";
+import {CheckboxModule} from "primeng/checkbox";
+import {RadioButtonModule} from "primeng/radiobutton";
+import {ObjectPageTabComponent} from "./object-page/object-page-tab.component";
+import {ValueHelpButtonComponent} from "./button/value-help-button.component";
+import {ModalService} from "./dialogs/modal.service";
 
 @NgModule({
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -46,19 +55,26 @@ import {ObjectPageSubTitleComponent} from "./object-page/object-page-subtitle.co
         FilterFieldComponent,
         FilterValueHelpComponent,
         AppTableComponent,
+        AppTableButtonComponent,
         TableColumnComponent,
         TileGroupsComponent,
         LaunchPadComponent,
         ObjectPageComponent,
-        ObjectPageHeaderComponent,
         ObjectPageSectionComponent,
-        ObjectPageTitleComponent,
-        ObjectPageSubTitleComponent,
-        ObjectPageActionsComponent,
+        ObjectPageTabComponent,
         PageViewComponent,
         PageViewBodyComponent,
         PageViewHeaderComponent,
-        AttributeComponent
+        AttributeComponent,
+        StandardDialogComponent,
+        DialogActionsComponent,
+        DialogTabComponent,
+        DialogFooterComponent,
+        ConfirmationDialogComponent,
+        TextInputComponent,
+        InputErrorComponent,
+        ButtonLinkComponent,
+        ValueHelpButtonComponent,
     ],
     imports: [
         TableModule,
@@ -75,9 +91,12 @@ import {ObjectPageSubTitleComponent} from "./object-page/object-page-subtitle.co
         CardModule,
         SkeletonModule,
         ButtonModule,
-        RippleModule
+        RippleModule,
+        ReactiveFormsModule,
+        CheckboxModule,
+        RadioButtonModule
     ],
-    providers: [],
+    providers: [ConfirmationService],
     exports: [
         TileComponent,
         ValueHelpInputComponent,
@@ -88,16 +107,21 @@ import {ObjectPageSubTitleComponent} from "./object-page/object-page-subtitle.co
         FilterBarComponent,
         TileGroupsComponent,
         ObjectPageComponent,
-        ObjectPageHeaderComponent,
         ObjectPageSectionComponent,
+        ObjectPageTabComponent,
         LaunchPadComponent,
         PageViewComponent,
         PageViewHeaderComponent,
         PageViewBodyComponent,
         AttributeComponent,
-        ObjectPageTitleComponent,
-        ObjectPageActionsComponent,
-        ObjectPageSubTitleComponent
+        StandardDialogComponent,
+        DialogTabComponent,
+        DialogFooterComponent,
+        TextInputComponent,
+        InputErrorComponent,
+        ButtonLinkComponent,
+        AppTableButtonComponent,
+        ValueHelpButtonComponent,
     ]
 })
 export class ComponentModule {

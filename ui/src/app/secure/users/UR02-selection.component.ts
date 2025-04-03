@@ -2,11 +2,11 @@ import {Component, OnInit} from '@angular/core';
 import {UserService} from '../../_services/user.service';
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {ActivatedRoute, Router} from "@angular/router";
-import {lastValueFrom} from "rxjs";
 import {TenantService} from "../../_services/tenant.service";
 import {TableAsyncLoadEvent} from "../../component/table/app-table.component";
 import {MessageService} from "primeng/api";
 import {AuthDefaultService} from "../../_services/auth.default.service";
+import {DataModel} from "../../component/model/DataModel";
 
 
 @Component({
@@ -25,17 +25,16 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
                             Email
                         </label>
                         <app-value-help-input
-                            (dataProvider)="userDataProvider($event)"
+                            [dataModel]="usersDM"
                             [(selection)]="selectedUser"
                             class="col-3"
-                            idField="email"
                             labelField="email"
                             multi="false"
                             name="Email">
 
                             <app-fb-col name="email" label="Email"></app-fb-col>
                             <app-fb-col name="name" label="Name"></app-fb-col>
-                            <app-fb-col name="domain" label="Domain"></app-fb-col>
+                            <app-fb-col name="tenants/domain" label="Domain"></app-fb-col>
 
                             <app-vh-col name="name" label="Name"></app-vh-col>
                             <app-vh-col name="email" label="Email"></app-vh-col>
@@ -51,7 +50,8 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
 
 
                         <div class=" d-grid gap-2 py-3 d-flex justify-content-end ">
-                            <button (click)="continue()" class="btn btn-primary btn-block btn-sm" id="login-btn">
+                            <button (click)="continue()" class="btn btn-primary btn-block btn-sm"
+                                    id="UR02-SEL-CONT-BTN">
                                 Continue
                             </button>
                         </div>
@@ -70,6 +70,7 @@ export class UR02SelectionComponent implements OnInit {
     email: string | null = '';
     users: any[] = [];
     selectedUser: any[] = [];
+    usersDM!: DataModel;
 
     constructor(private userService: UserService,
                 private tenantService: TenantService,
@@ -82,6 +83,7 @@ export class UR02SelectionComponent implements OnInit {
 
     async ngOnInit(): Promise<void> {
         this.authDefaultService.setTitle("UR02: Select User");
+        this.usersDM = this.userService.createDataModel([]);
     }
 
     async continue() {
@@ -89,15 +91,17 @@ export class UR02SelectionComponent implements OnInit {
             'users': this.selectedUser
         });
         if (this.selectedUser.length > 0) {
-            await this.router.navigate(['/UR02', this.selectedUser[0].email])
+            await this.router.navigate(['/UR02', this.selectedUser[0].id])
         }
     }
 
-    async userDataProvider(event: TableAsyncLoadEvent) {
-        if (event.pageNo == 0) {
-            this.users = await lastValueFrom(this.userService.getAllUsers());
-            event.update(this.users);
-        }
-    }
+    // async userDataProvider(event: TableAsyncLoadEvent) {
+    //     let response = await this.userService.queryUser({
+    //         pageNo: event.pageNo,
+    //         where: event.filters.filter(item => item.value != null && item.value.length > 0),
+    //     });
+    //     this.users = response.data;
+    //     event.update(this.users, response.hasNextPage);
+    // }
 
 }

@@ -23,17 +23,20 @@ export class CreateInitialTables1681147242561 implements MigrationInterface {
                     {
                         name: "name",
                         type: DB_STRING_TYPE,
+                        length: "128",
                         isNullable: false
                     },
                     {
                         name: "password",
                         type: DB_STRING_TYPE,
+                        length: "128",
                         isNullable: false
                     },
                     {
                         name: "email",
                         type: DB_STRING_TYPE,
                         isUnique: true,
+                        length: "128",
                         isNullable: false
                     },
                     {
@@ -50,7 +53,6 @@ export class CreateInitialTables1681147242561 implements MigrationInterface {
             }),
             true,
         );
-
 
         await queryRunner.createTable(
             new Table({

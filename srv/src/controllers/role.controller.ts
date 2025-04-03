@@ -9,23 +9,23 @@ import {
     UseGuards,
     UseInterceptors
 } from "@nestjs/common";
-import {ConfigService} from "../config/config.service";
-import {TenantService} from "../tenants/tenant.service";
+import {Environment} from "../config/environment.service";
+import {TenantService} from "../services/tenant.service";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
-import {RoleService} from "../roles/role.service";
-import {Role} from "../roles/role.entity";
-import {SecurityService} from "../roles/security.service";
-import {Action} from "../roles/actions.enum";
+import {RoleService} from "../services/role.service";
+import {Role} from "../entity/role.entity";
+import {SecurityService} from "../casl/security.service";
+import {Action} from "../casl/actions.enum";
 import {subject} from "@casl/ability";
-import {SubjectEnum} from "../roles/subjectEnum";
-import {UsersService} from "../users/users.service";
+import {SubjectEnum} from "../entity/subjectEnum";
+import {UsersService} from "../services/users.service";
 
 @Controller('api/tenant')
 @UseInterceptors(ClassSerializerInterceptor)
 export class RoleController {
 
     constructor(
-        private readonly configService: ConfigService,
+        private readonly configService: Environment,
         private readonly tenantService: TenantService,
         private readonly userService: UsersService,
         private readonly roleService: RoleService,
@@ -40,9 +40,10 @@ export class RoleController {
         @Param('tenantId') tenantId: string,
         @Param('name') name: string,
     ): Promise<Role> {
-        let tenant = await this.tenantService.findById(tenantId);
+        let tenant = await this.tenantService.findById(request, tenantId);
         this.securityService.check(request, Action.Update, subject(SubjectEnum.TENANT, tenant));
         return this.roleService.create(
+            request,
             name,
             tenant
         );
@@ -55,10 +56,10 @@ export class RoleController {
         @Param('tenantId') tenantId: string,
         @Param('name') name: string,
     ): Promise<Role> {
-        let tenant = await this.tenantService.findById(tenantId);
+        let tenant = await this.tenantService.findById(request, tenantId);
         this.securityService.check(request, Action.Update, subject(SubjectEnum.TENANT, tenant));
-        let roles = await this.roleService.findByNameAndTenant(name, tenant);
-        return await this.roleService.deleteById(roles.id);
+        let roles = await this.roleService.findByNameAndTenant(request, name, tenant);
+        return await this.roleService.deleteById(request, roles.id);
     }
 
     @Get('/:tenantId/roles')
@@ -67,9 +68,8 @@ export class RoleController {
         @Request() request,
         @Param('tenantId') tenantId: string
     ): Promise<Role[]> {
-        const tenant = await this.tenantService.findById(tenantId);
-        this.securityService.check(request, Action.Read, subject(SubjectEnum.TENANT, tenant));
-        return this.tenantService.getTenantRoles(tenant)
+        const tenant = await this.tenantService.findById(request, tenantId);
+        return this.tenantService.getTenantRoles(request, tenant)
     }
 
     @Get('/:tenantId/role/:name')
@@ -79,10 +79,10 @@ export class RoleController {
         @Param('tenantId') tenantId: string,
         @Param('name') name: string,
     ): Promise<any> {
-        const tenant = await this.tenantService.findById(tenantId);
+        const tenant = await this.tenantService.findById(request, tenantId);
         this.securityService.check(request, Action.Read, subject(SubjectEnum.TENANT, tenant));
-        let role = await this.roleService.findByNameAndTenant(name, tenant);
-        let users = await this.userService.findByRole(role);
+        let role = await this.roleService.findByNameAndTenant(request, name, tenant);
+        let users = await this.userService.findByRole(request, role);
         return {
             role: role,
             users: users

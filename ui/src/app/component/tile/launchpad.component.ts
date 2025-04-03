@@ -8,12 +8,14 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
 @Component({
     selector: 'app-launchpad',
     template: `
-        <div class="container-fluid bg-white py-1 px-4 shadow-sm">
+        <div class="container-fluid bg-white mb-2 px-4 shadow-sm">
             <ul class="nav nav-tabs nav-tab-btn ">
                 <li class="nav-item " *ngFor="let group of internalGroups">
-                    <button class="nav-link nav-tab-btn text-capitalize px-0 me-4"
-                            type="button" (click)="doScroll(group.id)">
-                        <strong>{{ group.navName }} </strong>
+                    <button class="nav-link nav-tab-btn text-capitalize"
+                            type="button" (click)="doScroll(group.id)" id="{{group.id}}_HOME_NAV">
+                        <strong class="">
+                            {{ group.navName }}
+                        </strong>
                     </button>
                 </li>
             </ul>
@@ -33,7 +35,7 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
         }
 
         .nav-tab-btn {
-            border-bottom: 0.25rem solid white;
+            border-bottom: 0.25rem ;
         }
     `]
 })

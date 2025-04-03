@@ -11,18 +11,16 @@ import {
     UseGuards,
     UseInterceptors
 } from "@nestjs/common";
-import {ConfigService} from "../config/config.service";
-import {UsersService} from "../users/users.service";
-import {TenantService} from "../tenants/tenant.service";
+import {Environment} from "../config/environment.service";
+import {UsersService} from "../services/users.service";
+import {TenantService} from "../services/tenant.service";
 import {ValidationPipe} from "../validation/validation.pipe";
 import {ValidationSchema} from "../validation/validation.schema";
-import {Tenant} from "../tenants/tenant.entity";
+import {Tenant} from "../entity/tenant.entity";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
-import {RoleGuard} from "../roles/role.guard";
-import {RoleRule, Rules} from "../roles/roles.decorator";
-import {SecurityService} from "../roles/security.service";
-import {SubjectEnum} from "../roles/subjectEnum";
-import {Action} from "../roles/actions.enum";
+import {SecurityService} from "../casl/security.service";
+import {SubjectEnum} from "../entity/subjectEnum";
+import {Action} from "../casl/actions.enum";
 import {subject} from "@casl/ability";
 
 @Controller('api/tenant')
@@ -30,7 +28,7 @@ import {subject} from "@casl/ability";
 export class TenantController {
 
     constructor(
-        private readonly configService: ConfigService,
+        private readonly configService: Environment,
         private readonly tenantService: TenantService,
         private readonly usersService: UsersService,
         private readonly securityService: SecurityService
@@ -38,16 +36,14 @@ export class TenantController {
     }
 
     @Post('/create')
-    @UseGuards(JwtAuthGuard, RoleGuard)
-    @Rules(
-        RoleRule.can(Action.Create, SubjectEnum.TENANT),
-    )
+    @UseGuards(JwtAuthGuard)
     async createTenant(
         @Request() request,
         @Body(new ValidationPipe(ValidationSchema.CreateTenantSchema)) body: any
     ): Promise<Tenant> {
-        const user = await this.usersService.findByEmail(request.user.email);
+        const user = await this.usersService.findByEmail(request, request.user.email);
         const tenant: Tenant = await this.tenantService.create(
+            request,
             body.name,
             body.domain,
             user
@@ -60,38 +56,35 @@ export class TenantController {
     async updateTenant(
         @Request() request,
         @Param('tenantId') tenantId: string,
-        @Body(new ValidationPipe(ValidationSchema.UpdateTenantSchema)) body: { name: string, domain: string }
+        @Body(new ValidationPipe(ValidationSchema.UpdateTenantSchema)) body: { name: string }
     ): Promise<Tenant> {
-        let tenant = await this.tenantService.findById(tenantId);
+        let tenant = await this.tenantService.findById(request, tenantId);
         this.securityService.check(request, Action.Update, subject(SubjectEnum.TENANT, tenant));
         return this.tenantService.updateTenant(
+            request,
             tenantId,
-            body.name,
-            body.domain
+            body.name
         );
 
     }
 
 
     @Delete('/:tenantId')
-    @UseGuards(JwtAuthGuard, RoleGuard)
-    @Rules(
-        RoleRule.can(Action.Delete, SubjectEnum.TENANT),
-    )
+    @UseGuards(JwtAuthGuard)
     async deleteTenant(
+        @Request() request,
         @Param('tenantId') tenantId: string
     ): Promise<Tenant> {
-        return this.tenantService.deleteTenant(tenantId);
+        return this.tenantService.deleteTenant(request, tenantId);
     }
 
 
     @Get('')
-    @UseGuards(JwtAuthGuard, RoleGuard)
-    @Rules(
-        RoleRule.can(Action.Manage, SubjectEnum.TENANT),
-    )
-    async getTenants(): Promise<Tenant[]> {
-        return await this.tenantService.getAllTenants();
+    @UseGuards(JwtAuthGuard)
+    async getTenants(
+        @Request() request,
+    ): Promise<Tenant[]> {
+        return await this.tenantService.getAllTenants(request);
     }
 
 
@@ -101,7 +94,7 @@ export class TenantController {
         @Request() request
     ): Promise<any> {
         let securityContext = this.securityService.getUserOrTechnicalSecurityContext(request);
-        let tenant = await this.tenantService.findById(securityContext.tenant.id);
+        let tenant = await this.tenantService.findById(request, securityContext.tenant.id);
         this.securityService.check(request, Action.ReadCredentials, subject(SubjectEnum.TENANT, tenant));
         return {
             id: tenant.id,
@@ -118,7 +111,7 @@ export class TenantController {
         @Request() request,
         @Param('tenantId') tenantId: string
     ): Promise<any> {
-        let tenant = await this.tenantService.findById(tenantId);
+        let tenant = await this.tenantService.findById(request, tenantId);
         this.securityService.check(request, Action.ReadCredentials, subject(SubjectEnum.TENANT, tenant));
         return {
             id: tenant.id,
@@ -134,7 +127,7 @@ export class TenantController {
         @Request() request,
         @Param('tenantId') tenantId: string
     ): Promise<Tenant> {
-        let tenant = await this.tenantService.findById(tenantId);
+        let tenant = await this.tenantService.findById(request, tenantId);
         this.securityService.check(request, Action.Read, subject(SubjectEnum.TENANT, tenant));
         return tenant;
     }

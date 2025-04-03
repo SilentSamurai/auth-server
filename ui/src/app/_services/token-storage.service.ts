@@ -1,6 +1,8 @@
 import {Injectable} from '@angular/core';
 import jwt_decode from "jwt-decode";
 import {Router} from "@angular/router";
+import {PureAbility} from "@casl/ability";
+// import {createHash} from "crypto";
 
 const TOKEN_KEY = 'auth-token';
 const USER_KEY = 'auth-user';
@@ -11,7 +13,7 @@ const CODE_VERIFIER = 'code-verifier';
     providedIn: 'root'
 })
 export class TokenStorageService {
-    constructor(private router: Router) {
+    constructor(private router: Router, private ability: PureAbility) {
     }
 
     public clearSession(): void {
@@ -48,6 +50,13 @@ export class TokenStorageService {
         const token = window.localStorage.getItem(TOKEN_KEY);
         return token != null && tokenExpired(token);
 
+    }
+
+    public updatePermissions(rules: any[]): void {
+
+        // const rules = await defineRulesFor(user);
+        // return new AppAbility(rules);
+        this.ability.update(rules);
     }
 
     // public async getToken(): Promise<string | null> {
@@ -95,9 +104,9 @@ export class TokenStorageService {
         return this.isSuperAdmin() || this.isLoggedIn() && this.getUser().scopes.find((scope: string) => scope === "TENANT_ADMIN") !== undefined;
     }
 
-    public async getCodeChallenge(): Promise<string> {
+    public async getCodeChallenge(method: string): Promise<string> {
         let codeVerifier = this.getCodeVerifier();
-        return await generateCodeChallenge(codeVerifier);
+        return await generateCodeChallenge(codeVerifier, method);
     }
 
     private saveUser(user: any): void {
@@ -106,8 +115,16 @@ export class TokenStorageService {
     }
 }
 
-async function generateCodeChallenge(verifier: string): Promise<string> {
-    return oneWayHash(verifier);
+async function generateCodeChallenge(verifier: string, method: string): Promise<string> {
+    if (method === 'S256') {
+        // // commenting as cannot use in http context only https allowed.
+        // const hash = createHash('sha256').update(verifier).digest();
+        // return base64urlencode(hash).replace(/=+$/, '');
+    }
+    if (method === 'OWH32') {
+        return oneWayHash(verifier);
+    }
+    return verifier;
 }
 
 function generateCodeVerifier(): string {

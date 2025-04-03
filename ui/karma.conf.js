@@ -25,7 +25,7 @@ module.exports = function (config) {
             suppressAll: true // removes the duplicated traces
         },
         coverageReporter: {
-            dir: require('path').join(__dirname, './coverage/Angular13JwtAuth'),
+            dir: require('path').join(__dirname, './coverage/auth-server'),
             subdir: '.',
             reporters: [
                 {type: 'html'},
@@ -39,6 +39,6 @@ module.exports = function (config) {
         autoWatch: true,
         browsers: ['Chrome'],
         singleRun: false,
-        restartOnFileChange: true
+        restartOnFileChange: true,
     });
 };

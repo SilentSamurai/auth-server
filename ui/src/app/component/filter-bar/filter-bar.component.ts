@@ -10,23 +10,11 @@ import {
     ViewChildren
 } from '@angular/core';
 
-import {Operators} from "./operator";
-import {Util} from "../utils";
+import {Operators} from "../model/Operator";
+import {Util} from "../util/utils";
 import {FilterFieldComponent} from "./filter-field.component";
+import {Filter} from "../model/Filters";
 
-export class Filter {
-    name: string;
-    label: string;
-    value: string;
-    operator: string;
-
-    constructor(name: string, label: string, value: string, operator: string) {
-        this.name = name;
-        this.label = label;
-        this.value = value;
-        this.operator = operator;
-    }
-}
 
 @Component({
     selector: 'app-fb-col',
@@ -63,7 +51,9 @@ export class FilterBarColumnComponent implements OnInit {
             </div>
             <div class="col-md-1 col-sm-12 my-2 ">
                 <div class="col align-content-end d-flex justify-content-end">
-                    <button *ngIf="visibility" (click)="onGo()" class="btn btn-primary btn-block btn-sm">
+                    <button *ngIf="visibility"
+                            (click)="onGo()" id="{{name}}FILTER_BAR_GO_BTN"
+                            class="btn btn-primary btn-block btn-sm">
                         Go
                     </button>
 
@@ -72,7 +62,6 @@ export class FilterBarColumnComponent implements OnInit {
                     </button>
                 </div>
             </div>
-
         </div>
     `,
     styles: [
@@ -87,6 +76,8 @@ export class FilterBarColumnComponent implements OnInit {
 export class FilterBarComponent implements OnInit, AfterViewInit {
 
     Operators = Operators;
+
+    @Input() name: string = "";
 
     @Input() editable: boolean | string = true;
     @Input() visibility: boolean = true;
@@ -104,6 +95,9 @@ export class FilterBarComponent implements OnInit, AfterViewInit {
     async ngOnInit(): Promise<void> {
         if (typeof this.editable === 'string') {
             this.editable = Util.parseBoolean(this.editable);
+        }
+        if (this.name.length > 0) {
+            this.name = this.name + "_";
         }
     }
 

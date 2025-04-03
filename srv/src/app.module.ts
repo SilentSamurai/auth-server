@@ -1,63 +1,56 @@
 import {MiddlewareConsumer, Module, NestModule} from '@nestjs/common';
 import {ConfigModule} from './config/config.module';
-import {ServeStaticModule} from '@nestjs/serve-static';
 import {ScheduleModule} from '@nestjs/schedule';
 import {TypeOrmModule} from '@nestjs/typeorm';
-import {RolesModule} from './roles/roles.module';
-import {UsersModule} from './users/users.module';
+import {CaslModule} from './casl/casl.module';
 import {AuthModule} from './auth/auth.module';
-import {ConfigService} from './config/config.service';
+import {Environment} from './config/environment.service';
 import {LoggerMiddleware} from './log/logger.middleware';
-import {TenantModule} from "./tenants/tenant.module";
 import {StartUpService} from "./startUp.service";
 import {ControllersModule} from "./controllers/controller.module";
-import {User} from "./users/user.entity";
-import {Tenant} from "./tenants/tenant.entity";
-import {TenantMember} from "./tenants/tenant.members.entity";
-import {UserRole} from "./roles/user.roles.entity";
-import {Role} from "./roles/role.entity";
-import {CreateInitialTables1681147242561} from "./migrations/1681147242561-initial-creation";
-import {SessionMigration1684308185392} from "./migrations/1684308185392-session-migration";
-import {AuthCode} from "./auth/auth_code.entity";
-import {Migrations1718012430697} from "./migrations/1718012430697-migrations";
-import {GroupRole} from "./groups/group.roles.entity";
-import {GroupUser} from "./groups/group.users.entity";
-import {Group} from "./groups/group.entity";
+import {ServiceModule} from "./services/service.module";
+import {migrations} from "./migrations/migrations";
+import {entities} from "./entity/entities";
 
 @Module({
     imports: [
         ConfigModule,
-        ServeStaticModule.forRootAsync(
-            {
-                inject: [ConfigService],
-                useFactory: (configService: ConfigService) => {
-                    return [{rootPath: configService.getStaticPath()}];
-                }
-            }),
+        // ServeStaticModule.forRootAsync(
+        //     {
+        //         inject: [ConfigService],
+        //         useFactory: (configService: ConfigService) => {
+        //             return [{rootPath: configService.getStaticPath()}];
+        //         }
+        //     }),
         ScheduleModule.forRoot(), // Initializes the scheduler and registers any declarative cron jobs, timeouts and intervals that exist within the app.
         TypeOrmModule.forRootAsync( // Get the configuration settings from the config service asynchronously.
             {
                 imports: undefined,
-                inject: [ConfigService],
-                useFactory: (configService: ConfigService) => {
+                inject: [Environment],
+                useFactory: (environment: Environment) => {
+                    const sslEnvEnabled: boolean = environment.get('DATABASE_SSL', false);
+                    console.log(`db ssl value found: ${sslEnvEnabled}`);
                     return {
-                        type: configService.get('DATABASE_TYPE'),
-                        host: configService.get('DATABASE_HOST'),
-                        port: configService.get('DATABASE_PORT'),
-                        username: configService.get('DATABASE_USERNAME'),
-                        password: configService.get('DATABASE_PASSWORD'),
-                        database: configService.get('DATABASE_NAME'),
-                        entities: [Tenant, User, TenantMember, Role, UserRole, AuthCode, Group, GroupRole, GroupUser],
-                        migrations: [CreateInitialTables1681147242561, SessionMigration1684308185392, Migrations1718012430697],
+                        type: environment.get('DATABASE_TYPE'),
+                        host: environment.get('DATABASE_HOST'),
+                        port: environment.get('DATABASE_PORT'),
+                        username: environment.get('DATABASE_USERNAME'),
+                        password: environment.get('DATABASE_PASSWORD'),
+                        database: environment.get('DATABASE_NAME'),
+                        entities: entities,
+                        migrations: migrations,
                         synchronize: false,
-                        ssl: configService.get('DATABASE_SSL'),
-                        logging: configService.get('DATABASE_LOGGING'),
+                        ssl: sslEnvEnabled ? {rejectUnauthorized: false} : false,
+                        logging: environment.get('DATABASE_LOGGING'),
+                        schema: environment.get('DATABASE_SCHEMA'),
+                        extra: {
+                            ssl: sslEnvEnabled ? {rejectUnauthorized: false} : false
+                        }
                     };
                 }
             }),
-        UsersModule,
-        TenantModule,
-        RolesModule,
+        CaslModule,
+        ServiceModule,
         AuthModule,
         ControllersModule,
     ],

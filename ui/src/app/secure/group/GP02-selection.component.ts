@@ -7,6 +7,7 @@ import {TableAsyncLoadEvent} from "../../component/table/app-table.component";
 import {MessageService} from "primeng/api";
 import {AuthDefaultService} from "../../_services/auth.default.service";
 import {GroupService} from "../../_services/group.service";
+import {DataModel} from "../../component/model/DataModel";
 
 
 @Component({
@@ -25,10 +26,9 @@ import {GroupService} from "../../_services/group.service";
                             Group
                         </label>
                         <app-value-help-input
-                            (dataProvider)="groupDataProvider($event)"
+                            [dataModel]="groupsDM"
                             [(selection)]="selectedGroup"
                             class="col-3"
-                            idField="id"
                             labelField="name"
                             multi="false"
                             name="Group">
@@ -50,7 +50,8 @@ import {GroupService} from "../../_services/group.service";
 
 
                         <div class=" d-grid gap-2 py-3 d-flex justify-content-end ">
-                            <button (click)="continue()" class="btn btn-primary btn-block btn-sm" id="login-btn">
+                            <button (click)="continue()" class="btn btn-primary btn-block btn-sm"
+                                    id="GP02-SEL-CONT-BTN">
                                 Continue
                             </button>
                         </div>
@@ -67,6 +68,7 @@ import {GroupService} from "../../_services/group.service";
 export class GP02SelectionComponent implements OnInit {
 
     groups: any[] = [];
+    groupsDM!: DataModel;
     selectedGroup: any[] = [];
 
     constructor(private userService: UserService,
@@ -81,7 +83,7 @@ export class GP02SelectionComponent implements OnInit {
 
     async ngOnInit(): Promise<void> {
         this.authDefaultService.setTitle("GP02: Select Group");
-
+        this.groupsDM = this.groupService.createDataModel([]);
     }
 
     async continue() {
@@ -97,16 +99,16 @@ export class GP02SelectionComponent implements OnInit {
         }
     }
 
-    async groupDataProvider(event: TableAsyncLoadEvent) {
-        if (event.pageNo == 0) {
-            let response = await this.groupService.queryGroup({
-                pageNo: event.pageNo,
-                where: event.filters.filter(f => f.value != null && f.value.length > 0),
-                expand: ["Tenants"]
-            });
-            this.groups = response.data;
-            event.update(this.groups);
-        }
-    }
+    // async groupDataProvider(event: TableAsyncLoadEvent) {
+    //     if (event.pageNo == 0) {
+    //         let response = await this.groupService.queryGroup({
+    //             pageNo: event.pageNo,
+    //             where: event.filters.filter(f => f.value != null && f.value.length > 0),
+    //             expand: ["Tenants"]
+    //         });
+    //         this.groups = response.data;
+    //         event.update(this.groups, response.hasNextPage);
+    //     }
+    // }
 
 }

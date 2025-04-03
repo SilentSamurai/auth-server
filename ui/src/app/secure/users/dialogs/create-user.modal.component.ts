@@ -2,79 +2,40 @@ import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {UserService} from '../../../_services/user.service';
 import {NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
 import {MessageService} from "primeng/api";
+import {UntypedFormBuilder, UntypedFormGroup, Validators} from "@angular/forms";
 
 @Component({
     selector: 'create-user-modal',
     template: `
-        <div class="modal-header">
-            <h4 class="modal-title" id="modal-basic-title">Create User</h4>
-            <button (click)="activeModal.close('Cross click')"
-                    aria-label="Close"
-                    class="btn-sm btn "
-                    type="button">
-        <span aria-hidden="true">
-            <i class="fa fa-icons fa-close"></i>
-        </span>
-            </button>
-        </div>
-        <div class="modal-body">
-            <form #createUserForm="ngForm"
-                  (ngSubmit)="createUserForm.form.valid && onSubmit()"
-                  name="createUserForm"
-                  novalidate>
-                <div class="mb-3 form-group">
-                    <label class="form-label" for="create.user.name">Name</label>
-                    <input #name="ngModel"
-                           [(ngModel)]="form.name"
-                           class="form-control"
-                           id="create.user.name"
-                           name="name"
-                           required
-                           type="text">
-                    <div
-                        *ngIf="name.errors && createUserForm.submitted"
-                        class="alert alert-danger"
-                        role="alert">
-                        Name is required!
-                    </div>
-                </div>
-                <div class="mb-3 form-group">
-                    <label class="form-label" for="create.user.email">Email address</label>
-                    <input #email="ngModel"
-                           [(ngModel)]="form.email"
-                           aria-describedby="emailHelp"
-                           class="form-control"
-                           id="create.user.email"
-                           name="email"
-                           required type="email">
-                    <div
-                        *ngIf="email.errors && createUserForm.submitted"
-                        class="alert alert-danger"
-                        role="alert">
-                        Email is required!
-                    </div>
-                </div>
+        <app-standard-dialog title="Create User" subtitle="Create a system user">
+            <app-dialog-tab>
+                <form [formGroup]="form" name="CREATE_USER" novalidate>
+                    <app-text-input [form]="form" formName="CREATE_USER"
+                                    formField="name" label="Name"></app-text-input>
 
-                <div class="mb-3 form-group">
-                    <label class="form-label" for="create.user.password">Default Password</label>
-                    <input #password="ngModel"
-                           [(ngModel)]="form.password"
-                           class="form-control"
-                           id="create.user.password"
-                           name="password"
-                           required type="password">
-                    <div
-                        *ngIf="password.errors && createUserForm.submitted"
-                        class="alert alert-danger"
-                        role="alert">
-                        Password is required!
-                    </div>
-                </div>
+                    <app-text-input [form]="form" formName="CREATE_USER"
+                                    formField="email" label="Email"></app-text-input>
 
-                <button class="btn btn-primary" type="submit">Create</button>
-            </form>
-        </div>
+                    <app-text-input [form]="form" formName="CREATE_USER" type="password"
+                                    formField="password" label="Password"></app-text-input>
 
+                    <app-text-input [form]="form" formName="CREATE_USER" type="password"
+                                    formField="confirmPassword" label="Confirm Password">
+                        <app-input-error field="confirmedValidator">
+                            Both password should match.
+                        </app-input-error>
+                    </app-text-input>
+                </form>
+            </app-dialog-tab>
+            <app-dialog-footer>
+                <button class="btn btn-primary" type="submit"
+                        id="CREATE_USER_SUBMIT_BTN"
+                        [disabled]="form.invalid"
+                        (click)="onSubmit()">
+                    Create
+                </button>
+            </app-dialog-footer>
+        </app-standard-dialog>
     `,
     styles: [`
 
@@ -83,14 +44,20 @@ import {MessageService} from "primeng/api";
 export class CreateUserModalComponent implements OnInit {
     @Output() passEntry: EventEmitter<any> = new EventEmitter();
 
-    form: any = {
-        email: null,
-        name: null,
-        password: null
-    };
+    form = this.formBuilder.group({
+        email: ['', Validators.required],
+        name: ['', Validators.required],
+        password: ['', Validators.required],
+        confirmPassword: ['', Validators.required]
+    }, {
+        validator: this.ConfirmedValidator('password', 'confirmPassword'),
+    });
+    krishna: any;
+
 
     constructor(private userService: UserService,
                 private messageService: MessageService,
+                private formBuilder: UntypedFormBuilder,
                 public activeModal: NgbActiveModal) {
     }
 
@@ -98,8 +65,9 @@ export class CreateUserModalComponent implements OnInit {
     }
 
     async onSubmit() {
+        let data = this.form.value;
         try {
-            let createdUser = await this.userService.createUser(this.form.name, this.form.email, this.form.password);
+            let createdUser = await this.userService.createUser(data.name, data.email, data.password);
             this.messageService.add({severity: 'success', summary: 'Success', detail: 'User Created'});
             this.passEntry.emit(createdUser);
             this.activeModal.close(createdUser);
@@ -107,6 +75,21 @@ export class CreateUserModalComponent implements OnInit {
             console.error(e);
             this.messageService.add({severity: 'error', summary: 'Error', detail: e.error.message});
         }
+    }
+
+    ConfirmedValidator(controlName: string, matchingControlName: string) {
+        return (formGroup: UntypedFormGroup) => {
+            const control = formGroup.controls[controlName];
+            const matchingControl = formGroup.controls[matchingControlName];
+            if (matchingControl.errors && !matchingControl.errors['confirmedValidator']) {
+                return;
+            }
+            if (control.value !== matchingControl.value) {
+                matchingControl.setErrors({confirmedValidator: true});
+            } else {
+                matchingControl.setErrors(null);
+            }
+        };
     }
 }
 

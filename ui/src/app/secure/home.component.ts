@@ -118,7 +118,7 @@ export class HomeComponent implements OnInit {
                 {
                     title: "RL01",
                     subtitle: "Manage Roles",
-                    icon: "fa-roles",
+                    icon: "fa-casl",
                     link: ['/RL01']
                 },
                 {

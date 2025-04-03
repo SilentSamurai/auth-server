@@ -1,8 +1,9 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {Operator, Operators} from "./operator";
+import {Operator, Operators} from "../model/Operator";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {FilterValueHelpComponent} from "./filter-value-help.component";
-import {Filter} from "./filter-bar.component";
+import {Filter} from "../model/Filters";
+
 
 export class Condition {
     operator: Operator;
@@ -39,7 +40,7 @@ export class InternalFilter {
             </div>
             <div class="">
                 <div class="input-group-sm input-group">
-                    <input class=" form-control form-control-sm border-dark-subtle"
+                    <input class=" form-control form-control-sm border-dark-subtle" id="FILTER_FIELD_{{internalFilter.name}}"
                            [(ngModel)]="internalFilter.conditions[0].value"
                            type="text">
                     <button (click)="openValueHelp()" class="input-group-text btn btn-outline-secondary"
@@ -82,7 +83,7 @@ export class FilterFieldComponent implements OnInit {
             this.internalFilter.name,
             this.internalFilter.label,
             condition.value,
-            condition.operator.label,
+            condition.operator,
         ));
     }
 }

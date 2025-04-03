@@ -1,51 +1,50 @@
-import {AfterViewInit, Component, ContentChild, ContentChildren, OnInit, QueryList} from '@angular/core';
-import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
+import {AfterViewInit, booleanAttribute, Component, ContentChildren, Input, OnInit, QueryList} from '@angular/core';
 import {ConfirmationService, MessageService} from "primeng/api";
-import {ObjectPageHeaderComponent} from "./object-page-header.component";
-import {ObjectPageSectionComponent} from "./object-page-section.component";
-import {ActivatedRoute} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {firstValueFrom} from "rxjs";
-import {ObjectPageTitleComponent} from "./object-page-title.component";
-import {ObjectPageActionsComponent} from "./object-page-actions.component";
-import {ObjectPageSubTitleComponent} from "./object-page-subtitle.component";
+import {ObjectPageTabComponent} from "./object-page-tab.component";
 
 @Component({
     selector: 'app-object-page',
     template: `
-        <div class="container-fluid mb-5 px-0" *ngIf="!loading">
+        <div class="container-fluid mb-5 px-0 main-container" *ngIf="!loading">
             <div class="card shadow-sm" style="border-radius: 0">
                 <div class="container mt-4">
-                    <div class="row" *ngIf="titleComponent || subTitleComponent || actions">
+                    <div class="row">
                         <div class="col mb-4">
                             <div class="d-flex align-items-center justify-content-between">
-                                <div *ngIf="titleComponent || subTitleComponent">
+                                <div>
                                     <div class="h3 text-primary">
-                                        <ng-container [ngTemplateOutlet]="titleComponent.template"></ng-container>
+                                        <ng-content select="app-op-title"></ng-content>
                                     </div>
-                                    <div class="h6 text-secondary" *ngIf="subTitleComponent">
-                                        <ng-container [ngTemplateOutlet]="subTitleComponent.template"></ng-container>
+                                    <div class="h6 text-secondary">
+                                        <ng-content select="app-op-subtitle"></ng-content>
                                     </div>
                                 </div>
 
-                                <div class="d-flex justify-content-end" *ngIf="actions">
-                                    <ng-container [ngTemplateOutlet]="actions.template"></ng-container>
+                                <div class="d-flex justify-content-end">
+                                    <ng-content select="app-op-actions"></ng-content>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col">
-                            <ng-container [ngTemplateOutlet]="header.template"></ng-container>
+                            <ng-content select="app-op-header"></ng-content>
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="col">
-                            <ul class="nav nav-tabs">
-                                <li class="nav-item " *ngFor="let section of sections">
-                                    <button class="nav-link nav-tab-btn text-uppercase px-0 me-4"
-                                            type="button" (click)="doScroll(section.name.toUpperCase())">
-                                        <strong>{{ section.name }} </strong>
+                            <ul class="nav flex-nowrap overflow-x-auto overflow-y-hidden">
+                                <li class="nav-item" *ngFor="let tab of tabs">
+                                    <button
+                                        class="nav-link text-uppercase"
+                                        [class.nav-tab-btn]="currentTab === tab"
+                                        [attr.aria-current]="currentTab === tab ? 'page' : null"
+                                        id="{{ tab.name.toUpperCase() }}_SECTION_NAV"
+                                        (click)="onNavButtonClick(tab)">
+                                        <strong>{{ tab.name }}</strong>
                                     </button>
                                 </li>
                             </ul>
@@ -54,24 +53,16 @@ import {ObjectPageSubTitleComponent} from "./object-page-subtitle.component";
                 </div>
             </div>
 
-            <div class="container">
-                <div class="" *ngFor="let section of sections">
-                    <div class="row my-4" id="{{section.name.toUpperCase()}}">
-                        <div class="col-md-12 ">
-                            <span class="h4 text-capitalize">{{ section.name }}</span>
-                        </div>
+            <div class="container flex-fill content-area">
+                <ng-container *ngIf="singlePage">
+                    <div *ngFor="let tab of tabs" id="{{tab.name.toUpperCase()}}">
+                        <ng-container [ngTemplateOutlet]="tab.template"></ng-container>
                     </div>
-                    <div class="row my-2">
-                        <div class="col-md-12 ">
-                            <div class="card">
-                                <div class="">
-                                    <ng-container [ngTemplateOutlet]="section.template"></ng-container>
-                                </div>
-                            </div>
 
-                        </div>
-                    </div>
-                </div>
+                </ng-container>
+                <ng-container *ngIf="!singlePage && currentTab">
+                    <ng-container [ngTemplateOutlet]="currentTab.template"></ng-container>
+                </ng-container>
             </div>
         </div>
 
@@ -82,8 +73,65 @@ import {ObjectPageSubTitleComponent} from "./object-page-subtitle.component";
         </div>
     `,
     styles: [`
-        .nav-tab-btn:focus {
-            border-bottom: 0.25rem solid blue
+        :host {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            flex: 1 1 auto;
+            overflow: hidden;
+        }
+
+        .content-area {
+            display: flex;
+            flex-direction: column;
+            flex: 1 1 auto;
+            overflow: auto;
+        }
+
+        .nav-tabs {
+            scrollbar-width: thin;
+            -ms-overflow-style: none;
+        }
+
+        .nav-tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .nav-tab-btn {
+            border: none;
+            background: none;
+            position: relative;
+            white-space: nowrap;
+        }
+
+        .nav-tab-btn:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 0.25rem;
+            background: transparent;
+            transition: background-color 0.2s;
+        }
+
+        .nav-tab-btn[aria-current="page"]:after,
+        .nav-tab-btn:hover:after {
+            background: var(--bs-primary);
+        }
+
+        .nav-tab-btn:focus-visible {
+            outline: 2px solid var(--bs-primary);
+            outline-offset: 2px;
+        }
+
+        .card-body {
+            padding: 1.5rem;
         }
     `],
     providers: []
@@ -91,48 +139,58 @@ import {ObjectPageSubTitleComponent} from "./object-page-subtitle.component";
 export class ObjectPageComponent implements OnInit, AfterViewInit {
 
     loading = true;
+    @Input({transform: booleanAttribute}) singlePage = false;
 
-    @ContentChild(ObjectPageHeaderComponent)
-    header!: ObjectPageHeaderComponent;
+    @ContentChildren(ObjectPageTabComponent, {descendants: true})
+    tabs!: QueryList<ObjectPageTabComponent>;
 
-    @ContentChild(ObjectPageTitleComponent)
-    titleComponent!: ObjectPageTitleComponent;
-
-    @ContentChild(ObjectPageSubTitleComponent)
-    subTitleComponent!: ObjectPageSubTitleComponent;
-
-    @ContentChild(ObjectPageActionsComponent)
-    actions!: ObjectPageActionsComponent;
-
-    @ContentChildren(ObjectPageSectionComponent)
-    sections!: QueryList<ObjectPageSectionComponent>;
+    currentTab: ObjectPageTabComponent | undefined;
 
     constructor(
+        private router: Router,
         private messageService: MessageService,
         private confirmationService: ConfirmationService,
-        private actRoute: ActivatedRoute,
-        private modalService: NgbModal) {
+        private actRoute: ActivatedRoute) {
     }
 
     async ngOnInit() {
         this.loading = true;
         this.loading = false;
+
     }
 
     async ngAfterViewInit(): Promise<void> {
         const fragment = await firstValueFrom(this.actRoute.fragment);
         if (fragment) {
-            setTimeout(() => this.doScroll(fragment.toUpperCase()), 500);
+            const ftab = this.tabs.find(item => item.name.toUpperCase() === fragment.toUpperCase());
+            this.onNavButtonClick(ftab)
+        } else {
+            this.currentTab = this.tabs.get(0);
         }
     }
 
-    doScroll(elementId: string) {
-        try {
-            console.log("scrolling to", elementId);
-            let elements = document.getElementById(elementId);
-            elements?.scrollIntoView();
-        } finally {
+    onNavButtonClick(tab: ObjectPageTabComponent | undefined) {
+        if (tab) {
+            if (this.singlePage) {
+                this.doScroll(tab.name.toUpperCase());
+            } else {
+                this.currentTab = tab;
+            }
+            this.updateFragment(tab.name.toUpperCase());
         }
+    }
+
+    updateFragment(fragment: string): void {
+        this.router.navigate([], { fragment });
+    }
+
+    doScroll(elementId: string): void {
+        const element = document.getElementById(elementId);
+        if (!element) {
+            console.warn(`Element with ID "${elementId}" not found.`);
+            return;
+        }
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
 

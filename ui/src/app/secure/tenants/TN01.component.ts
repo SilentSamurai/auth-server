@@ -2,12 +2,15 @@ import {Component, OnInit, ViewChild} from '@angular/core';
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {CreateTenantComponent} from "./dialogs/create-tenant.component";
 import {UpdateTenantComponent} from "./dialogs/update-tenant.component";
-import {DeleteTenantComponent} from "./dialogs/delete-tenant.component";
 import {TenantService} from "../../_services/tenant.service";
 import {TokenStorageService} from "../../_services/token-storage.service";
-import {AppTableComponent, TableAsyncLoadEvent} from "../../component/table/app-table.component";
-import {Filter} from "../../component/filter-bar/filter-bar.component";
+import {AppTableComponent} from "../../component/table/app-table.component";
 import {AuthDefaultService} from "../../_services/auth.default.service";
+import {ConfirmationService} from "../../component/dialogs/confirmation.service";
+import {MessageService} from "primeng/api";
+import {Actions, PermissionService, Subjects} from "../../_services/permission.service";
+import {DataModel} from "../../component/model/DataModel";
+import {Filter} from "../../component/model/Filters";
 
 @Component({
     selector: 'app-TN01',
@@ -23,8 +26,8 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
                     </app-fb>
                     <div class="d-flex justify-content-between mt-2">
                         <div></div>
-                        <button (click)="openCreateModal()" [disabled]="!this.creationAllowed"
-                                class="btn btn-outline-success btn-sm"
+                        <button (click)="openCreateModal()" [disabled]="!('create' | ablePure: 'Tenant') "
+                                class="btn btn-outline-success btn-sm" id="CREATE_TENANT_DIALOG_BTN"
                                 type="button">
                             <i class="fa fa-solid fa-plus me-2"></i> Create Tenant
                         </button>
@@ -36,35 +39,30 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
             <app-page-view-body>
                 <app-table
                     title="Tenant List"
-                    (onLoad)="lazyLoad($event)"
-                    idField="id"
-                    isFilterAsync="true"
                     multi="true"
-                    scrollHeight="75vh">
+                    scrollHeight="75vh"
+                    [dataModel]="dataModel">
 
-                    <app-table-col label="Tenant Id" name="id"></app-table-col>
-                    <app-table-col label="Name" name="name"></app-table-col>
                     <app-table-col label="Domain" name="domain"></app-table-col>
+                    <app-table-col label="Name" name="name"></app-table-col>
                     <app-table-col>
                         <th style="max-width: 100px">Action</th>
                     </app-table-col>
 
                     <ng-template #table_body let-tenant>
                         <td>
-                            <span class="p-column-title">Name</span>
                             <a [routerLink]="['/TN02/', tenant.id]"
-                               href="javascript:void(0)">{{ tenant.id }}</a>
+                               href="javascript:void(0)">{{ tenant.domain }}</a>
                         </td>
                         <td>{{ tenant.name }}</td>
-                        <td>{{ tenant.domain }}</td>
                         <td class="" style="max-width: 100px">
                             <button (click)="openUpdateModal(tenant)" [disabled]="!this.isTenantAdmin"
-                                    class="btn"
+                                    class="btn btn-sm btn-primary me-2"
                                     type="button">
                                 <i class="fa fa-edit"></i>
                             </button>
-                            <button (click)="openDeleteModal(tenant)" [disabled]="!this.creationAllowed"
-                                    class="btn"
+                            <button (click)="openDeleteModal(tenant)" [disabled]="!this.deleteAllowed"
+                                    class="btn btn-sm btn-danger"
                                     type="button">
                                 <i class="fa fa-solid fa-trash"></i>
                             </button>
@@ -84,29 +82,49 @@ export class TN01Component implements OnInit {
     tenants: any = [];
     creationAllowed = false;
     isTenantAdmin = false;
+    deleteAllowed = false;
+    dataModel: DataModel;
 
     constructor(private tokenStorageService: TokenStorageService,
                 private tenantService: TenantService,
                 private authDefaultService: AuthDefaultService,
+                private confirmationService: ConfirmationService,
+                private messageService: MessageService,
+                private permissionService: PermissionService,
                 private modalService: NgbModal) {
+
+        this.dataModel = this.tenantService.createDataModel([]);
     }
 
-    async ngOnInit(): Promise<void> {
-        // this.tenants = await lastValueFrom(this.tenantService.getAllTenants());
+    async ngOnInit() {
         this.authDefaultService.setTitle("TN01: Manage Tenants");
-        if (this.tokenStorageService.isSuperAdmin()) {
+
+        if (this.permissionService.isAuthorized(Actions.Create, Subjects.TENANT)) {
             this.creationAllowed = true;
         }
         if (this.tokenStorageService.isTenantAdmin()) {
             this.isTenantAdmin = true;
         }
+
+        // Check for delete privileges
+        // (Requires that `Actions.Delete` is defined or recognized in your application)
+        if (this.permissionService.isAuthorized(Actions.Delete, Subjects.TENANT)) {
+            this.deleteAllowed = true;
+        }
+
+        await this.refreshData();
+    }
+
+    async refreshData() {
+        // Forces a fresh load from page 0 with no filters
+        await this.dataModel.apply({ pageNo: 0, append: false });
     }
 
     async openCreateModal() {
         const modalRef = this.modalService.open(CreateTenantComponent);
         const tenant = await modalRef.result;
         console.log("returned tenant", tenant);
-        await this.ngOnInit();
+        await this.refreshData();
     }
 
     async openUpdateModal(tenant: any) {
@@ -114,23 +132,27 @@ export class TN01Component implements OnInit {
         modalRef.componentInstance.tenant = tenant;
         const editedTenant = await modalRef.result;
         console.log(editedTenant);
-        await this.ngOnInit();
+        await this.refreshData();
     }
 
     async openDeleteModal(tenant: any) {
-        const modalRef = this.modalService.open(DeleteTenantComponent);
-        modalRef.componentInstance.tenant = tenant;
-        const deletedTenant = await modalRef.result;
-        console.log(deletedTenant);
-        await this.ngOnInit();
-    }
-
-    async lazyLoad($event: TableAsyncLoadEvent) {
-        this.tenants = await this.tenantService.queryTenant({
-            pageNo: $event.pageNo,
-            where: $event.filters.filter(item => item.value != null && item.value.length > 0),
+        const deletedTenant = await this.confirmationService.confirm({
+            message: `Are you sure you want to delete <b> ${tenant.domain} </b> ?`,
+            header: 'Confirmation',
+            icon: 'pi pi-info-circle',
+            accept: async () => {
+                try {
+                    let deletedTenant = await this.tenantService.deleteTenant(tenant.id);
+                    this.messageService.add({severity: 'success', summary: 'Success', detail: 'Tenant Deleted'});
+                    return deletedTenant;
+                } catch (e) {
+                    this.messageService.add({severity: 'error', summary: 'Error', detail: 'Tenant Deletion Failed'});
+                }
+                return null;
+            }
         });
-        $event.update(this.tenants.data);
+        console.log(deletedTenant);
+        await this.refreshData();
     }
 
     onFilter(event: Filter[]) {

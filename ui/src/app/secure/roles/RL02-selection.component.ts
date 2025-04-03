@@ -2,10 +2,10 @@ import {Component, OnInit} from '@angular/core';
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {ActivatedRoute, Router} from "@angular/router";
 import {TenantService} from "../../_services/tenant.service";
-import {TableAsyncLoadEvent} from "../../component/table/app-table.component";
 import {MessageService} from "primeng/api";
 import {AuthDefaultService} from "../../_services/auth.default.service";
 import {RoleService} from "../../_services/role.service";
+import {DataModel} from "../../component/model/DataModel";
 
 
 @Component({
@@ -22,22 +22,24 @@ import {RoleService} from "../../_services/role.service";
                             Role:
                         </label>
                         <app-value-help-input
-                            (dataProvider)="onRoleLoad($event)"
+                            [dataModel]="rolesDM"
                             [(selection)]="selectedRole"
                             class="col-3"
-                            idField="id"
                             labelField="name"
                             multi="false"
                             name="Role">
 
                             <app-fb-col name="name" label="Name"></app-fb-col>
-                            <app-fb-col name="tenant" label="Tenant"></app-fb-col>
+                            <app-fb-col name="tenant/domain" label="Tenant Domain"></app-fb-col>
 
-                            <app-vh-col name="name" label="Name"></app-vh-col>
-                            <app-vh-col name="tenant/name" label="Tenant"></app-vh-col>
+                            <app-vh-col name="name" label="Role Name"></app-vh-col>
+                            <app-vh-col name="tenant/domain" label="Tenant Domain"></app-vh-col>
+                            <app-vh-col name="tenant/name" label="Tenant Name"></app-vh-col>
+
 
                             <ng-template #vh_body let-row>
                                 <td>{{ row.name }}</td>
+                                <td>{{ row.tenant.domain }}</td>
                                 <td>{{ row.tenant.name }}</td>
                             </ng-template>
 
@@ -45,7 +47,7 @@ import {RoleService} from "../../_services/role.service";
 
 
                         <div class=" d-grid gap-2 py-3 d-flex justify-content-end ">
-                            <button (click)="continue()" class="btn btn-primary btn-block btn-sm" id="login-btn">
+                            <button (click)="continue()" class="btn btn-primary btn-block btn-sm">
                                 Continue
                             </button>
                         </div>
@@ -62,6 +64,7 @@ import {RoleService} from "../../_services/role.service";
 export class RL02SelectionComponent implements OnInit {
 
     roles = [];
+    rolesDM: DataModel;
     tenants: [] = [];
     selectedTenant: any[] = [];
     selectedRole: any[] = [];
@@ -73,10 +76,12 @@ export class RL02SelectionComponent implements OnInit {
                 private authDefaultService: AuthDefaultService,
                 private messageService: MessageService,
                 private modalService: NgbModal) {
+        this.rolesDM = this.roleService.createDataModel([]);
     }
 
     async ngOnInit(): Promise<void> {
         this.authDefaultService.setTitle("RL02: Select Role");
+
     }
 
     async continue() {
@@ -87,16 +92,6 @@ export class RL02SelectionComponent implements OnInit {
             await this.router.navigate([
                 '/RL02', this.selectedRole[0].tenant.id, this.selectedRole[0].name]);
         }
-    }
-
-    async onRoleLoad(event: TableAsyncLoadEvent) {
-        let roles = await this.roleService.queryRoles({
-            pageNo: event.pageNo,
-            where: event.filters.filter(item => item.value != null && item.value.length > 0),
-            expand: ["Tenants"]
-        });
-        this.roles = roles.data;
-        event.update(this.roles);
     }
 
 }

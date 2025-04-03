@@ -2,10 +2,10 @@
 //@import "~bootstrap/dist/css/bootstrap.css";
 
 /* Importing Bootstrap SCSS file. */
-@import '~bootstrap/scss/bootstrap';
-@import "~primeng/resources/themes/lara-light-blue/theme.css";
-@import "~primeng/resources/primeng.css";
-@import "~primeicons/primeicons.css";
+@import 'bootstrap/scss/bootstrap';
+@import "primeng/resources/themes/lara-light-blue/theme.css";
+@import "primeng/resources/primeng.css";
+@import "primeicons/primeicons.css";
 
 
 //body{
@@ -89,3 +89,8 @@ div.modal-body .p-datatable.p-datatable-sm .p-datatable-tbody > tr > td {
     border-bottom-width: medium !important;
 }
 
+td , tr.a-table-row > td{
+    vertical-align: middle;
+    padding-top: 0;
+    padding-bottom: 0;
+}

@@ -6,8 +6,10 @@ npm run build
 cd ../srv
 npm run build
 
+cd ..
 # build image
-#docker build
+# docker build
+minikube image build -t uaa-auth-srv-img ./Dockerfile
 
 # deploy
-docker-compose up
+#docker-compose up

@@ -7,7 +7,7 @@ import {AuthDefaultService} from "../_services/auth.default.service";
 @Component({
     selector: 'app-register',
     templateUrl: './register.component.html',
-    styleUrls: ['./register.component.css']
+    styleUrls: ['./register.component.scss']
 })
 export class RegisterComponent implements OnInit {
     form: any = {

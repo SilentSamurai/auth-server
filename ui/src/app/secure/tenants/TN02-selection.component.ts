@@ -2,11 +2,11 @@ import {Component, OnInit} from '@angular/core';
 import {UserService} from '../../_services/user.service';
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {ActivatedRoute, Router} from "@angular/router";
-import {lastValueFrom} from "rxjs";
 import {TenantService} from "../../_services/tenant.service";
 import {TableAsyncLoadEvent} from "../../component/table/app-table.component";
 import {MessageService} from "primeng/api";
 import {AuthDefaultService} from "../../_services/auth.default.service";
+import {DataModel} from "../../component/model/DataModel";
 
 
 @Component({
@@ -25,13 +25,12 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
                             Tenant
                         </label>
 
-                        <app-value-help-input
-                            (dataProvider)="onTenantLoad($event)"
-                            [(selection)]="selectedTenant"
-                            class="col-3"
-                            idField="id"
-                            labelField="name"
-                            name="Tenant">
+                        <app-value-help-input id="select-tenant"
+                                              [dataModel]="tenantsDM"
+                                              [(selection)]="selectedTenant"
+                                              class="col-3"
+                                              labelField="name"
+                                              name="Tenant">
 
                             <app-fb-col name="name" label="Name"></app-fb-col>
                             <app-fb-col name="domain" label="Domain"></app-fb-col>
@@ -51,7 +50,8 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
 
 
                         <div class=" d-grid gap-2 py-3 d-flex justify-content-end ">
-                            <button (click)="continue()" class="btn btn-primary btn-block btn-sm" id="login-btn">
+                            <button (click)="continue()" class="btn btn-primary btn-block btn-sm"
+                                    id="TN02_SEL_CONT_BTN">
                                 Continue
                             </button>
                         </div>
@@ -67,13 +67,9 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
 })
 export class TN02SelectionComponent implements OnInit {
 
-    tenantId: any | null = null;
-    email: string | null = '';
-    roles = [];
-    users: any[] = [];
     tenants: [] = [];
     selectedTenant: any[] = [];
-    selectedUser: any[] = [];
+    tenantsDM!: DataModel;
 
     constructor(private userService: UserService,
                 private tenantService: TenantService,
@@ -86,6 +82,7 @@ export class TN02SelectionComponent implements OnInit {
 
     async ngOnInit(): Promise<void> {
         this.authDefaultService.setTitle("TN02: Select Tenant");
+        this.tenantsDM = this.tenantService.createDataModel([]);
     }
 
     async continue() {
@@ -98,11 +95,13 @@ export class TN02SelectionComponent implements OnInit {
     }
 
 
-    async onTenantLoad(event: TableAsyncLoadEvent) {
-        if (event.pageNo == 0) {
-            this.tenants = await lastValueFrom(this.tenantService.getAllTenants());
-            event.update(this.tenants);
-        }
-    }
+    // async onTenantLoad(event: TableAsyncLoadEvent) {
+    //     let response = await this.tenantService.queryTenant({
+    //         pageNo: event.pageNo,
+    //         where: event.filters.filter(item => item.value != null && item.value.length > 0)
+    //     });
+    //     this.tenants = response.data;
+    //     event.update(this.tenants, response.hasNextPage);
+    // }
 
 }

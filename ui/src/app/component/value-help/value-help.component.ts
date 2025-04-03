@@ -1,10 +1,32 @@
-import {Component, EventEmitter, OnInit, QueryList, TemplateRef, ViewChild} from '@angular/core';
+import {Component, OnInit, QueryList, TemplateRef, ViewChild} from '@angular/core';
 
 import {NgbActiveModal, NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {ActivatedRoute} from "@angular/router";
 import {ValueHelpColumnComponent} from "../value-help-input/value-help-column.component";
-import {AppTableComponent, TableAsyncLoadEvent} from "../table/app-table.component";
-import {Filter, FilterBarColumnComponent} from "../filter-bar/filter-bar.component";
+import {AppTableComponent} from "../table/app-table.component";
+import {FilterBarColumnComponent} from "../filter-bar/filter-bar.component";
+import {DataModel} from "../model/DataModel";
+import {Filter} from "../model/Filters";
+
+export enum CloseType {
+    Cancel,
+    Clear,
+    Confirm
+}
+
+export class ValueHelpResult {
+    selection: any[];
+    closeType: CloseType;
+
+    constructor(selection: any[], closeType: CloseType) {
+        this.selection = selection;
+        this.closeType = closeType;
+    }
+
+    public static result(selection: any[], closeType: CloseType) {
+        return new ValueHelpResult(selection, closeType);
+    }
+}
 
 @Component({
     selector: 'app-value-help',
@@ -36,11 +58,8 @@ import {Filter, FilterBarColumnComponent} from "../filter-bar/filter-bar.compone
         </div>
         <div class="modal-body p-0 ">
             <app-table
-                [title]="name"
-                [idField]="idField"
+                [dataModel]="dataModel"
                 [multi]="multi"
-                [isFilterAsync]="isFilterAsync"
-                (onLoad)="lazyLoad($event)"
                 [(selection)]="selectedItem">
                 <app-table-col *ngFor="let col of columns"
                                label="{{col.label}}"
@@ -58,7 +77,7 @@ import {Filter, FilterBarColumnComponent} from "../filter-bar/filter-bar.compone
                     class="btn btn-outline-secondary btn-block btn-sm">
                 Clear
             </button>
-            <button (click)="confirm()"
+            <button (click)="confirm()" id="{{name}}_VH_SELECT_BTN"
                     class="btn btn-primary btn-block btn-sm">
                 Select
             </button>
@@ -70,9 +89,9 @@ import {Filter, FilterBarColumnComponent} from "../filter-bar/filter-bar.compone
 })
 export class ValueHelpComponent implements OnInit {
 
-    idField!: string;
     name: string = "";
     multi: boolean = true;
+    dataModel!: DataModel;
 
     body: TemplateRef<any> | null = null;
 
@@ -81,11 +100,6 @@ export class ValueHelpComponent implements OnInit {
 
     columns!: QueryList<ValueHelpColumnComponent>;
     filters!: QueryList<FilterBarColumnComponent>;
-
-
-    onLoad!: EventEmitter<TableAsyncLoadEvent>;
-
-    isFilterAsync: boolean = false;
 
     @ViewChild(AppTableComponent)
     table!: AppTableComponent;
@@ -102,12 +116,10 @@ export class ValueHelpComponent implements OnInit {
     }
 
     async startUp(params: {
-        idField: string;
         selectedItem: any[];
         name: string;
         multi: boolean
     }): Promise<any> {
-        this.idField = params.idField;
         this.name = params.name;
         this.multi = params.multi
         this.previousSelectedRows = Array.from(params.selectedItem);
@@ -115,20 +127,15 @@ export class ValueHelpComponent implements OnInit {
     }
 
     cancel() {
-        this.activeModal.close(this.previousSelectedRows);
+        this.activeModal.close(ValueHelpResult.result(this.previousSelectedRows, CloseType.Cancel));
     }
 
     confirm() {
-        this.activeModal.close(this.selectedItem);
+        this.activeModal.close(ValueHelpResult.result(this.selectedItem, CloseType.Confirm));
     }
 
     clear() {
-        this.activeModal.close([]);
-    }
-
-    lazyLoad($event: TableAsyncLoadEvent) {
-        console.log("lazy", $event);
-        this.onLoad.emit($event)
+        this.activeModal.close(ValueHelpResult.result([], CloseType.Clear));
     }
 
     onFilter(filters: Filter[]) {
