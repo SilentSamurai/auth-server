@@ -18,7 +18,7 @@ export class SessionConfirmationComponent implements OnInit {
     redirectUri = "";
     username = "";
     code_challenge = "";
-    domain = "";
+    client_id = "";
 
     constructor(private userService: UserService,
                 private router: Router,
@@ -30,8 +30,8 @@ export class SessionConfirmationComponent implements OnInit {
 
     async ngOnInit(): Promise<void> {
         let params = this.route.snapshot.queryParamMap;
-        this.redirectUri = params.get("redirect")!;
-        this.domain = params.get("domain")!;
+        this.redirectUri = params.get("redirect_uri")!;
+        this.client_id = params.get("client_id")!;
         this.code_challenge = params.get("code_challenge")!;
 
 
@@ -59,8 +59,8 @@ export class SessionConfirmationComponent implements OnInit {
         this.tokenStorage.clearSession();
         await this.router.navigate(['login'], {
             queryParams: {
-                redirect: this.redirectUri,
-                domain: this.domain,
+                redirect_uri: this.redirectUri,
+                client_id: this.client_id,
                 code_challenge: this.code_challenge
             }
         });

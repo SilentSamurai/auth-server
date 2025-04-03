@@ -10,115 +10,119 @@ import {
     TemplateRef,
     ViewChild
 } from '@angular/core';
-import {Filter, FilterBarComponent} from "../filter-bar/filter-bar.component";
-import {Table, TableLazyLoadEvent} from "primeng/table"
+import {FilterBarComponent} from "../filter-bar/filter-bar.component";
 import {TableColumnComponent} from "./app-table-column.component";
-import {Util} from "../utils";
+import {Util} from "../util/utils";
 import {AppTableButtonComponent} from "./app-table-button.component";
+import {DataModel, DataPushEvent, DataPushEventStatus, Query} from "../model/DataModel";
+import {Filter} from "../model/Filters";
+import {CheckboxChangeEvent} from "primeng/checkbox";
 
 
-export class TableAsyncLoadEvent {
-    pageNo!: number;
-    pageSize!: number;
-    sortBy!: any[];
-    filters!: any[];
-    update!: (data: any[], isNextPageAvailable: boolean) => void;
+export class TableAsyncLoadEvent extends Query {
+
 }
 
 
 @Component({
     selector: 'app-table',
     template: `
-        <p-table
-            [(selection)]="selectedItem"
-            [scrollable]="true"
-            scrollHeight="{{scrollHeight}}"
-            [lazy]="true"
-            (onLazyLoad)="lazyLoad($event)"
-            [dataKey]="idField"
-            [rowHover]="true"
-            [loading]="loading"
-            [value]="actualRows"
-            [selectionMode]="multi ? 'multiple' : 'single' "
-            [virtualScrollItemSize]="20"
-            [virtualScroll]="true"
-            styleClass="p-datatable-striped p-datatable-sm"
-        >
-            <ng-template pTemplate="caption">
-                <div class="d-flex align-items-center justify-content-between">
-                    <div>
-                        {{ title }}
-                    </div>
-                    <div>
-                        <ng-container *ngFor="let btnTmpl of buttons">
-                            <ng-container [ngTemplateOutlet]="btnTmpl.template"></ng-container>
-                        </ng-container>
-                        <button type="button" class="btn btn-sm " (click)="reset()" pRipple>
-                            <i class="pi pi-refresh "></i>
-                        </button>
-                        <button type="button" class="btn btn-sm ps-2" (click)="reset()" pRipple>
-                            <i class="pi pi-sort-alt "></i>
-                        </button>
-                    </div>
+        <div class="a-table-caption h6 p-2 mb-0 border-bottom">
+            <div class="d-flex align-items-center justify-content-between">
+                <div class="app-table-body">
+                    {{ title }} <span>({{ dataModel.totalRowCount() }})</span>
                 </div>
-
-            </ng-template>
-            <ng-template pTemplate="header">
+                <div>
+                    <ng-container *ngFor="let btnTmpl of buttons">
+                        <ng-container [ngTemplateOutlet]="btnTmpl.template"></ng-container>
+                    </ng-container>
+                    <button type="button" class="btn btn-sm " (click)="reset()" pRipple>
+                        <i class="pi pi-refresh "></i>
+                    </button>
+                    <button type="button" class="btn btn-sm ps-2" (click)="reset()" pRipple>
+                        <i class="pi pi-sort-alt "></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="table-responsive" style="max-height: {{scrollHeight}}" (scroll)="lazyLoad($event)">
+            <table class="table a-table">
+                <thead class="sticky-top top-0">
                 <tr style="min-height:35px">
-                    <th style="max-width:40px">
-                        <p-tableHeaderCheckbox *ngIf="multi"></p-tableHeaderCheckbox>
+                    <th style="width:40px">
+                        <p-checkbox *ngIf="multi"
+                                    [binary]="true"
+                                    [(ngModel)]="_selectAll"
+                                    (onChange)="onSelectAll($event)"></p-checkbox>
                     </th>
                     <ng-container *ngFor="let col of columns">
                         <ng-container *ngIf="col.isTemplateProvided" [ngTemplateOutlet]="col.template"></ng-container>
                         <ng-container *ngIf="!col.isTemplateProvided">
-                            <th>
+                            <th scope="col">
                                 {{ col.label }}
                             </th>
                         </ng-container>
 
                     </ng-container>
                 </tr>
-            </ng-template>
-            <ng-template let-row let-rowIndex="rowIndex" pTemplate="body">
-                <tr style="height:35px">
-                    <td style="max-width:40px">
-                        <p-tableCheckbox [value]="row"></p-tableCheckbox>
+                </thead>
+                <tbody>
+                <tr class="a-table-row" style="height:35px" *ngFor="let row of actualRows">
+                    <td style="width:40px">
+                        <p-checkbox *ngIf="multi"
+                                    [value]="getKeyValue(row)"
+                                    [(ngModel)]="selectedItem"></p-checkbox>
 
-                        <!--                        <p-tableRadioButton *ngIf="!multi" [value]="row" ></p-tableRadioButton>-->
+                        <p-radioButton *ngIf="!multi"
+                                       name="table_input"
+                                       [value]="getKeyValue(row)"
+                                       [(ngModel)]="selectedItem"></p-radioButton>
                     </td>
                     <ng-container *ngTemplateOutlet="body; context: {$implicit: row}"></ng-container>
                 </tr>
-            </ng-template>
-            <ng-template pTemplate="loadingbody">
-                <tr style="height:40px">
+                <tr style="height:40px" *ngIf="loading">
+                    <td>
+                        <div class="loading-text"></div>
+                        <p-skeleton [ngStyle]="{'width': '100%'}"></p-skeleton>
+                    </td>
                     <td *ngFor="let col of columns">
                         <div class="loading-text"></div>
                         <p-skeleton [ngStyle]="{'width': '100%'}"></p-skeleton>
                     </td>
                 </tr>
-            </ng-template>
-            <ng-template pTemplate="footer">
+                </tbody>
+            </table>
+        </div>
 
-            </ng-template>
-        </p-table>
     `,
-    styles: [''],
+    styles: [`
+
+    `],
 })
+// Table for reuse
 export class AppTableComponent implements OnInit {
 
     loading: boolean = false;
 
+    _dataModel!: DataModel;
+
+    @Input({required: true})
+    set dataModel(dataModel: DataModel) {
+        this._dataModel = dataModel;
+        this.idFields = dataModel.getKeyFields();
+        this._dataModel.dataPusher().subscribe(this.dataPushEventHandler.bind(this))
+    }
+
+    get dataModel(): DataModel {
+        return this._dataModel
+    }
+
     @Input() title: string = "";
     @Input() scrollHeight: string = "65vh";
-    @Input() idField!: string;
     @Input() multi: string | boolean = true;
-    @Input() isFilterAsync: string | boolean = false;
-    @Input() filters: Filter[] = [];
 
     @Input() selection: any[] = [];
     @Output() selectionChange: EventEmitter<any[]> = new EventEmitter();
-
-    @Output() onDataRequest: EventEmitter<TableAsyncLoadEvent> = new EventEmitter();
 
     @ContentChild('table_body')
     body: TemplateRef<any> | null = null;
@@ -134,115 +138,149 @@ export class AppTableComponent implements OnInit {
     @ViewChild(FilterBarComponent)
     filterBar!: FilterBarComponent;
 
-    @ViewChild(Table)
-    pTable!: Table;
+    _selectAll: boolean = false;
 
-    pageNo: number = -1;
-    isLastPageReached: boolean = false;
+    protected nextPageNo: number = 0;
     private sortBy: any[] = [];
+    protected idFields: string[] = [];
+
+    protected pagesLoaded = new Set();
+    protected pagesInProgress = new Set();
+    protected _selectedKeys: string[] | null = null;
 
 
     constructor() {
-    }
 
-    get selectedItem() {
-        return this.selection;
-    }
-
-    set selectedItem(selection: any[] | any) {
-        if (Array.isArray(selection)) {
-            this.selection = selection;
-            this.selectionChange.emit(this.selection);
-        } else {
-            this.selection = [selection];
-            this.selectionChange.emit(this.selection);
-        }
     }
 
     async ngOnInit(): Promise<void> {
-        if (typeof this.isFilterAsync === 'string') {
-            this.isFilterAsync = Util.parseBoolean(this.isFilterAsync);
-        }
         if (typeof this.multi === 'string') {
             this.multi = Util.parseBoolean(this.multi);
         }
+
+        this.reset();
     }
 
-    // getIdFieldData(row: any, index: any) {
-    //     if (this.idField) {
-    //         return row[this.idField];
-    //     } else {
-    //         return index;
-    //     }
-    // }
+    getKeyValue(row: any) {
+        return this.idFields.map(kf => row[kf].toString())
+            .reduce((a, b) => a + b, "");
+    }
 
-    setData(data: any[], isNextPageAvailable: boolean) {
-        this.pageNo = 0;
-        this.isLastPageReached = !isNextPageAvailable;
+    get selectedItem() {
+        if (!this._selectedKeys) {
+            this._selectedKeys = this.selection.map(this.getKeyValue.bind(this));
+        }
+        return this._selectedKeys
+    }
+
+    set selectedItem(selectedKeys: any[] | any) {
+        this._selectedKeys = selectedKeys;
+        if (Array.isArray(selectedKeys)) {
+            const keysSet = new Set(selectedKeys);
+            this.selection = this.actualRows.filter(
+                item => keysSet.has(this.getKeyValue(item))
+            )
+            this.selectionChange.emit(this.selection);
+        } else {
+            this.selection = this.actualRows.filter(
+                item => this.getKeyValue(item) === selectedKeys
+            )
+            this.selectionChange.emit(this.selection);
+        }
+    }
+
+    onSelectAll($event: CheckboxChangeEvent) {
+        if ($event.checked) {
+            this._selectAll = true;
+            this.selectedItem = this.actualRows;
+        } else {
+            this._selectAll = false;
+            this.selectedItem = [];
+        }
+    }
+
+    dataPushEventHandler(event: DataPushEvent) {
+        switch (event.operation) {
+            case DataPushEventStatus.UPDATED_DATA:
+                if (event.srcOptions.append === true) {
+                    this.appendData(event.data!, event.pageNo!);
+                }
+                if (event.srcOptions.append === false) {
+                    this.setData(event.data!);
+                }
+                break;
+            case DataPushEventStatus.START_FETCH:
+                this.loading = true;
+                break;
+            default:
+                this.loading = false;
+        }
+    }
+
+    protected setData(data: any[]) {
+        this.nextPageNo = 1;
+        this.pagesInProgress.clear();
+        this.pagesLoaded.clear();
+        // this.isLastPageReached = !isNextPageAvailable;
+        this.pagesLoaded.add(0);
         this.actualRows = data;
     }
 
-    appendData(data: any[], isNextPageAvailable: boolean) {
-        if (data.length > 0) {
-            // this.actualRows.push(...data);
-            this.actualRows = [...this.actualRows, ...data];
-            this.pageNo += 1;
-        }
-        this.isLastPageReached = !isNextPageAvailable;
-    }
-
-    requestForData(options: any) {
-        this.filters = options.filters || this.filters;
-        this.sortBy = options.sortBy || this.sortBy;
-        this.pageNo = options.pageNo || this.pageNo;
-        if (options.append === false) {
-            this.pageNo = 0;
-            this.isLastPageReached = false;
-        }
-        // const timeout = setTimeout(() => this.loading = false, 5 * 60 * 1000);
-        const eventObj = {
-            pageNo: options.append === true ? this.pageNo + 1 : this.pageNo,
-            pageSize: 30,
-            sortBy: this.sortBy,
-            filters: this.filters,
-            update: (data: any[], isNextPageAvailable: boolean) => {
-                if (options.append === true) {
-                    this.appendData(data, isNextPageAvailable);
-                } else {
-                    this.setData(data, isNextPageAvailable);
-                }
-                this.loading = false;
+    protected appendData(data: any[], pageNo: number) {
+        this.pagesInProgress.delete(pageNo);
+        if (!this.pagesLoaded.has(pageNo)) {
+            this.pagesLoaded.add(pageNo);
+            if (data.length > 0) {
+                // this.actualRows.push(...data);
+                this.actualRows = [...this.actualRows, ...data];
+                this.nextPageNo += 1;
             }
         }
-        this.loading = true;
-        this.onDataRequest.emit(eventObj);
+        // this.isLastPageReached = !isNextPageAvailable;
+    }
+
+    protected async requestForData(options: any) {
+        this.sortBy = options.sortBy || this.sortBy;
+        this.nextPageNo = options.pageNo || this.nextPageNo;
+        if (options.append === false) {
+            // reset next page no
+            this.nextPageNo = 0;
+        }
+        if (this.dataModel.hasPage(this.nextPageNo) &&
+            !this.pagesLoaded.has(this.nextPageNo) && !this.pagesInProgress.has(this.nextPageNo)) {
+            this.dataModel.pageNo(this.nextPageNo)
+            this.dataModel.orderBy(this.sortBy);
+            if (options.filters && options.filters.length > 0) {
+                this.dataModel.filter(options.filters)
+            }
+            this.pagesInProgress.add(this.nextPageNo);
+            await this.dataModel.apply(options);
+        }
 
     }
 
-    lazyLoad(event: TableLazyLoadEvent) {
-        console.log("lazy", event);
-        if (!this.isLastPageReached && !this.loading) {
+    lazyLoad(event: any) {
+        // console.log("lazy", event);
+        const reachedEnd = event.target.offsetHeight + event.target.scrollTop >= event.target.scrollHeight - 1;
+        // console.log(reachedEnd, event.target.offsetHeight + event.target.scrollTop, event.target.scrollHeight);
+        if (reachedEnd && this.pagesInProgress.size < 1) {
+            console.log("lazy", event);
             this.requestForData({append: true})
         }
+
     }
 
     filter(filters: Filter[]) {
-        if (this.isFilterAsync) {
-            this.requestForData({pageNo: 0, filters, append: false});
-        } else {
-            // if (filters.length > 0) {
-            //     console.log(filters);
-            //     this.pTable.clearState();
-            //     for (let filter of filters) {
-            //         let value = filter.value;
-            //         this.pTable.filter(value, filter.name, FilterMatchMode.CONTAINS);
-            //     }
-            // }
-        }
-
+        this.pagesInProgress.clear();
+        this.pagesLoaded.clear();
+        this.requestForData({pageNo: 0, filters, append: false});
     }
 
     reset() {
+        this.pagesInProgress.clear();
+        this.pagesLoaded.clear();
         this.requestForData({pageNo: 0, append: false});
     }
+
+
 }

@@ -11,15 +11,13 @@ import {
     UseGuards,
     UseInterceptors
 } from "@nestjs/common";
-import {ConfigService} from "../config/config.service";
+import {Environment} from "../config/environment.service";
 import {UsersService} from "../services/users.service";
 import {TenantService} from "../services/tenant.service";
 import {ValidationPipe} from "../validation/validation.pipe";
 import {ValidationSchema} from "../validation/validation.schema";
 import {Tenant} from "../entity/tenant.entity";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
-import {RoleGuard} from "../auth/role.guard";
-import {RoleRule, Rules} from "../casl/roles.decorator";
 import {SecurityService} from "../casl/security.service";
 import {SubjectEnum} from "../entity/subjectEnum";
 import {Action} from "../casl/actions.enum";
@@ -30,7 +28,7 @@ import {subject} from "@casl/ability";
 export class TenantController {
 
     constructor(
-        private readonly configService: ConfigService,
+        private readonly configService: Environment,
         private readonly tenantService: TenantService,
         private readonly usersService: UsersService,
         private readonly securityService: SecurityService
@@ -58,15 +56,14 @@ export class TenantController {
     async updateTenant(
         @Request() request,
         @Param('tenantId') tenantId: string,
-        @Body(new ValidationPipe(ValidationSchema.UpdateTenantSchema)) body: { name: string, domain: string }
+        @Body(new ValidationPipe(ValidationSchema.UpdateTenantSchema)) body: { name: string }
     ): Promise<Tenant> {
         let tenant = await this.tenantService.findById(request, tenantId);
         this.securityService.check(request, Action.Update, subject(SubjectEnum.TENANT, tenant));
         return this.tenantService.updateTenant(
             request,
             tenantId,
-            body.name,
-            body.domain
+            body.name
         );
 
     }

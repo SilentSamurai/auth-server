@@ -4,12 +4,13 @@ import {CreateTenantComponent} from "./dialogs/create-tenant.component";
 import {UpdateTenantComponent} from "./dialogs/update-tenant.component";
 import {TenantService} from "../../_services/tenant.service";
 import {TokenStorageService} from "../../_services/token-storage.service";
-import {AppTableComponent, TableAsyncLoadEvent} from "../../component/table/app-table.component";
-import {Filter} from "../../component/filter-bar/filter-bar.component";
+import {AppTableComponent} from "../../component/table/app-table.component";
 import {AuthDefaultService} from "../../_services/auth.default.service";
 import {ConfirmationService} from "../../component/dialogs/confirmation.service";
 import {MessageService} from "primeng/api";
 import {Actions, PermissionService, Subjects} from "../../_services/permission.service";
+import {DataModel} from "../../component/model/DataModel";
+import {Filter} from "../../component/model/Filters";
 
 @Component({
     selector: 'app-TN01',
@@ -38,11 +39,9 @@ import {Actions, PermissionService, Subjects} from "../../_services/permission.s
             <app-page-view-body>
                 <app-table
                     title="Tenant List"
-                    (onDataRequest)="lazyLoad($event)"
-                    idField="id"
-                    isFilterAsync="true"
                     multi="true"
-                    scrollHeight="75vh">
+                    scrollHeight="75vh"
+                    [dataModel]="dataModel">
 
                     <app-table-col label="Domain" name="domain"></app-table-col>
                     <app-table-col label="Name" name="name"></app-table-col>
@@ -52,19 +51,18 @@ import {Actions, PermissionService, Subjects} from "../../_services/permission.s
 
                     <ng-template #table_body let-tenant>
                         <td>
-                            <span class="p-column-title">Name</span>
                             <a [routerLink]="['/TN02/', tenant.id]"
                                href="javascript:void(0)">{{ tenant.domain }}</a>
                         </td>
                         <td>{{ tenant.name }}</td>
                         <td class="" style="max-width: 100px">
                             <button (click)="openUpdateModal(tenant)" [disabled]="!this.isTenantAdmin"
-                                    class="btn"
+                                    class="btn btn-sm btn-primary me-2"
                                     type="button">
                                 <i class="fa fa-edit"></i>
                             </button>
-                            <button (click)="openDeleteModal(tenant)" [disabled]="!this.creationAllowed"
-                                    class="btn"
+                            <button (click)="openDeleteModal(tenant)" [disabled]="!this.deleteAllowed"
+                                    class="btn btn-sm btn-danger"
                                     type="button">
                                 <i class="fa fa-solid fa-trash"></i>
                             </button>
@@ -84,6 +82,8 @@ export class TN01Component implements OnInit {
     tenants: any = [];
     creationAllowed = false;
     isTenantAdmin = false;
+    deleteAllowed = false;
+    dataModel: DataModel;
 
     constructor(private tokenStorageService: TokenStorageService,
                 private tenantService: TenantService,
@@ -92,6 +92,8 @@ export class TN01Component implements OnInit {
                 private messageService: MessageService,
                 private permissionService: PermissionService,
                 private modalService: NgbModal) {
+
+        this.dataModel = this.tenantService.createDataModel([]);
     }
 
     async ngOnInit() {
@@ -103,13 +105,26 @@ export class TN01Component implements OnInit {
         if (this.tokenStorageService.isTenantAdmin()) {
             this.isTenantAdmin = true;
         }
+
+        // Check for delete privileges
+        // (Requires that `Actions.Delete` is defined or recognized in your application)
+        if (this.permissionService.isAuthorized(Actions.Delete, Subjects.TENANT)) {
+            this.deleteAllowed = true;
+        }
+
+        await this.refreshData();
+    }
+
+    async refreshData() {
+        // Forces a fresh load from page 0 with no filters
+        await this.dataModel.apply({ pageNo: 0, append: false });
     }
 
     async openCreateModal() {
         const modalRef = this.modalService.open(CreateTenantComponent);
         const tenant = await modalRef.result;
         console.log("returned tenant", tenant);
-        await this.ngOnInit();
+        await this.refreshData();
     }
 
     async openUpdateModal(tenant: any) {
@@ -117,7 +132,7 @@ export class TN01Component implements OnInit {
         modalRef.componentInstance.tenant = tenant;
         const editedTenant = await modalRef.result;
         console.log(editedTenant);
-        await this.ngOnInit();
+        await this.refreshData();
     }
 
     async openDeleteModal(tenant: any) {
@@ -137,15 +152,7 @@ export class TN01Component implements OnInit {
             }
         });
         console.log(deletedTenant);
-        await this.ngOnInit();
-    }
-
-    async lazyLoad($event: TableAsyncLoadEvent) {
-        this.tenants = await this.tenantService.queryTenant({
-            pageNo: $event.pageNo,
-            where: $event.filters.filter(item => item.value != null && item.value.length > 0),
-        });
-        $event.update(this.tenants.data, this.tenants.hasNextPage);
+        await this.refreshData();
     }
 
     onFilter(event: Filter[]) {

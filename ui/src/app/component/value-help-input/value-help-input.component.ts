@@ -10,14 +10,12 @@ import {
     QueryList,
     TemplateRef
 } from '@angular/core';
-
-import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {ActivatedRoute} from "@angular/router";
-import {UserService} from "../../_services/user.service";
-import {ValueHelpComponent} from "../value-help/value-help.component";
+import {ValueHelpComponent, ValueHelpResult} from "../value-help/value-help.component";
 import {ValueHelpColumnComponent} from "./value-help-column.component";
-import {TableAsyncLoadEvent} from "../table/app-table.component";
 import {FilterBarColumnComponent} from "../filter-bar/filter-bar.component";
+import {DataModel} from "../model/DataModel";
+import {ModalResult, ModalService} from "../dialogs/modal.service";
 
 
 function parseBoolean(value: string): boolean {
@@ -51,7 +49,6 @@ function parseBoolean(value: string): boolean {
                 <i class="fa fas fa-clone"></i>
             </button>
         </div>
-
     `,
     styles: [`
         .p-chip-text {
@@ -61,16 +58,17 @@ function parseBoolean(value: string): boolean {
 })
 export class ValueHelpInputComponent implements OnInit, AfterViewInit {
 
+    @Input({required: true}) dataModel!: DataModel;
+
     @Input() required = false;
     @Input() name: string = '';
     @Input() multi: string | boolean = false;
     @Input() labelField!: string;
-    @Input() idField!: string;
-    @Input() isFilterAsync: string | boolean = true;
     @Input() placeholder: string = '';
+
     @Input() selection: any[] = [];
     @Output() selectionChange = new EventEmitter<any[]>();
-    @Output() dataProvider = new EventEmitter<TableAsyncLoadEvent>();
+
 
     @ContentChild('vh_body')
     body: TemplateRef<any> | null = null;
@@ -83,17 +81,13 @@ export class ValueHelpInputComponent implements OnInit, AfterViewInit {
     @ContentChildren(FilterBarColumnComponent)
     filters!: QueryList<FilterBarColumnComponent>;
 
-    constructor(private userService: UserService,
-                private route: ActivatedRoute,
-                private modalService: NgbModal) {
+    constructor(private route: ActivatedRoute,
+                private modalService: ModalService) {
     }
 
     async ngOnInit(): Promise<void> {
         if (typeof this.multi === 'string') {
             this.multi = parseBoolean(this.multi);
-        }
-        if (typeof this.isFilterAsync === 'string') {
-            this.isFilterAsync = parseBoolean(this.isFilterAsync);
         }
     }
 
@@ -101,37 +95,37 @@ export class ValueHelpInputComponent implements OnInit, AfterViewInit {
         console.log(this.columns?.length);
     }
 
-    changeValue(value: any | any[]) {
+    changeValue(value: ValueHelpResult) {
         if (!value) {
             return;
         }
-        if (Array.isArray(value)) {
-            this.selection = value;
+        if (Array.isArray(value.selection)) {
+            this.selection = value.selection;
             this.selectionChange.emit(this.selection);
         } else {
-            this.selection = [value];
+            this.selection = [value.selection];
             this.selectionChange.emit(this.selection);
         }
     }
 
     async openValueHelp() {
-        const modalRef = this.modalService.open(ValueHelpComponent, {size: 'lg', backdrop: 'static'});
-        this.modalInstance = modalRef.componentInstance as ValueHelpComponent;
-        this.modalInstance.body = this.body;
-        this.modalInstance.onLoad = this.dataProvider;
-        this.modalInstance.columns = this.columns;
-        this.modalInstance.filters = this.filters;
-        this.modalInstance.isFilterAsync = this.isFilterAsync as boolean;
-        await this.modalInstance.startUp({
-            name: this.name,
-            selectedItem: this.selection,
-            multi: this.multi as boolean,
-            idField: this.idField
-        })
 
-        const row = await modalRef.result;
-        this.changeValue(row);
-        console.log(row);
+        const result: ModalResult<ValueHelpResult> = await this.modalService.open(ValueHelpComponent, {
+            initData: {
+                name: this.name,
+                body: this.body,
+                columns: this.columns,
+                filters: this.filters,
+                dataModel: this.dataModel,
+                selectedItem: this.selection,
+                multi: this.multi as boolean,
+            }
+        });
+        if (result.is_ok()) {
+            const row = result.data!;
+            this.changeValue(row);
+            console.log(row);
+        }
     }
 
     getLabel(index: number) {

@@ -2,6 +2,8 @@ import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {lastValueFrom} from 'rxjs';
 import {TokenStorageService} from "./token-storage.service";
+import {DataModel} from "../component/model/DataModel";
+import {RestApiModel} from "../component/model/RestApiModel";
 
 const API_URL = '/api';
 
@@ -17,7 +19,6 @@ export class GroupService {
         return {
             headers: new HttpHeaders({
                 'Content-Type': 'application/json',
-                // 'Authorization': 'Bearer ' + this.tokenService.getToken()
             })
         };
     }
@@ -73,5 +74,16 @@ export class GroupService {
 
     async deleteGroup(groupId: any) {
         return await lastValueFrom(this.http.delete(`${API_URL}/group/${groupId}/delete`, this.getHttpOptions())) as any;
+    }
+
+    createDataModel(initialData: any[]): DataModel {
+        let restApiModel = new RestApiModel(
+            this.http,
+            `${API_URL}/search/Groups`,
+            ["id"],
+            initialData
+        );
+        restApiModel.expands(['Tenants'])
+        return restApiModel;
     }
 }

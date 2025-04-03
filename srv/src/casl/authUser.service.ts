@@ -8,14 +8,14 @@ import {NotFoundException} from "../exceptions/not-found.exception";
 import {Role} from "../entity/role.entity";
 import {ForbiddenException} from "../exceptions/forbidden.exception";
 import {TenantMember} from "../entity/tenant.members.entity";
-import {ConfigService} from "../config/config.service";
+import {Environment} from "../config/environment.service";
 
 
 @Injectable()
 export class AuthUserService {
 
     constructor(
-        private readonly configService: ConfigService,
+        private readonly configService: Environment,
         @InjectRepository(User) private usersRepository: Repository<User>,
         @InjectRepository(Tenant) private tenantRepository: Repository<Tenant>,
         @InjectRepository(TenantMember) private tenantMemberRepository: Repository<TenantMember>,
@@ -47,6 +47,15 @@ export class AuthUserService {
         }
 
         return user;
+    }
+
+    async tenantExistsByDomain(domain: string): Promise<boolean> {
+        return await this.tenantRepository.exists({
+            where: {domain: domain}, relations: {
+                members: true,
+                roles: true
+            }
+        });
     }
 
     async findTenantByDomain(domain: string) {
@@ -85,6 +94,15 @@ export class AuthUserService {
                 tenant: {id: tenant.id},
                 users: {id: user.id}
             },
+        });
+    }
+
+    async tenantExistsByClientId(clientId: string): Promise<boolean> {
+        return await this.tenantRepository.exists({
+            where: {clientId}, relations: {
+                members: true,
+                roles: true
+            }
         });
     }
 

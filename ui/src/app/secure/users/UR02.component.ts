@@ -8,19 +8,20 @@ import {ConfirmationService} from "../../component/dialogs/confirmation.service"
 import {MessageService} from "primeng/api";
 import {Location} from "@angular/common";
 import {AuthDefaultService} from "../../_services/auth.default.service";
+import {StaticModel} from "../../component/model/StaticModel";
 
 @Component({
     selector: 'tenant-details',
     template: `
         <nav-bar></nav-bar>
         <app-object-page>
-            <app-object-page-header>
-                <app-object-page-title>
-                    {{ user.email }}
-                </app-object-page-title>
-                <app-object-page-subtitle>
-                    {{ user.name }}
-                </app-object-page-subtitle>
+            <app-op-title>
+                {{ user.email }}
+            </app-op-title>
+            <app-op-subtitle>
+                {{ user.name }}
+            </app-op-subtitle>
+            <app-op-header>
                 <div class="row">
                     <div class="col">
                         <app-attribute label="Email">
@@ -47,8 +48,8 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
                         </app-attribute>
                     </div>
                 </div>
-            </app-object-page-header>
-            <app-object-page-actions>
+            </app-op-header>
+            <app-op-actions>
                 <button (click)="openUpdateModal()" class="btn btn-sm btn-primary mx-2">
                     Update
                 </button>
@@ -61,40 +62,35 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
                 <button (click)="onDelete()" class="btn btn-sm  btn-danger mx-2">
                     Delete
                 </button>
-            </app-object-page-actions>
-            <app-object-page-section name="Tenants">
-                <p-table [value]="tenants" responsiveLayout="scroll">
-                    <ng-template pTemplate="caption">
-                        <div class="d-flex justify-content-between">
-                            <h5>Tenant List</h5>
-                        </div>
+            </app-op-actions>
+            <app-op-tab name="Tenants">
+                <app-op-section name="Tenants">
+                    <app-section-content>
+                        <app-table
+                            title="Tenant List"
+                            [dataModel]="tenantsDM">
 
-                    </ng-template>
-                    <ng-template let-columns pTemplate="header">
-                        <tr>
-                            <th>Tenant Id</th>
-                            <th>Name</th>
-                            <th>Domain</th>
-                            <th>Roles</th>
-                        </tr>
-                    </ng-template>
-                    <ng-template let-columns="columns" let-tenant pTemplate="body">
-                        <tr>
-                            <td><span class="p-column-title">Tenant Id</span>
-                                <a [routerLink]="['/TN02/', tenant.id]"
-                                   href="javascript:void(0)">{{ tenant.id }}</a>
-                            </td>
-                            <td><span class="p-column-title">Name</span>{{ tenant.name }}</td>
-                            <td><span class="p-column-title">Domain</span>{{ tenant.domain }}</td>
-                            <td><span class="p-column-title">Roles</span>
-                                <a [routerLink]="['/TNRL01/', tenant.id, user.id]"
-                                   href="javascript:void(0)">View Role Assignments
-                                </a>
-                            </td>
-                        </tr>
-                    </ng-template>
-                </p-table>
-            </app-object-page-section>
+                            <app-table-col label="Name" name="name"></app-table-col>
+                            <app-table-col label="Domain" name="domain"></app-table-col>
+                            <app-table-col label="Roles" name="roles"></app-table-col>
+
+                            <ng-template let-tenant #table_body>
+                                <td>{{ tenant.name }}</td>
+                                <td>
+                                    <a [routerLink]="['/TN02/', tenant.id]"
+                                       href="javascript:void(0)">{{ tenant.domain }}</a>
+                                </td>
+                                <td>
+                                    <a [routerLink]="['/TNRL01/', tenant.id, user.id]"
+                                       href="javascript:void(0)">View Role Assignments
+                                    </a>
+                                </td>
+                            </ng-template>
+
+                        </app-table>
+                    </app-section-content>
+                </app-op-section>
+            </app-op-tab>
         </app-object-page>
     `,
     styles: []
@@ -107,6 +103,7 @@ export class UR02Component implements OnInit {
         createdAt: ""
     };
     tenants: any = [];
+    tenantsDM = new StaticModel(["id"]);
 
     constructor(private userService: UserService,
                 private actRoute: ActivatedRoute,
@@ -122,7 +119,8 @@ export class UR02Component implements OnInit {
         this.userId = this.actRoute.snapshot.params['userId'];
         console.log(this.userId)
         this.user = await lastValueFrom(this.userService.getUser(this.userId));
-        this.tenants = await lastValueFrom(this.userService.getUserTenants(this.userId))
+        this.tenants = await lastValueFrom(this.userService.getUserTenants(this.userId));
+        this.tenantsDM.setData(this.tenants);
     }
 
     openUpdateModal() {
@@ -155,4 +153,9 @@ export class UR02Component implements OnInit {
         await this.userService.verifyUser(this.user.email, true);
         await this.ngOnInit();
     }
+
+    // async onTenantLoad($event: TableAsyncLoadEvent) {
+    //     this.tenants = await lastValueFrom(this.userService.getUserTenants(this.userId));
+    //     $event.update(this.tenants, false);
+    // }
 }

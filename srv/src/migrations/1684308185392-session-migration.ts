@@ -22,6 +22,11 @@ export class SessionMigration1684308185392 implements MigrationInterface {
                         isNullable: false
                     },
                     {
+                        name: "method",
+                        type: DB_STRING_TYPE,
+                        isNullable: false
+                    },
+                    {
                         name: "user_id",
                         type: DB_STRING_TYPE,
                         isNullable: false

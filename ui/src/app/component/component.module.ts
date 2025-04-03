@@ -18,7 +18,6 @@ import {FilterBarColumnComponent, FilterBarComponent} from "./filter-bar/filter-
 import {AppTableComponent} from "./table/app-table.component";
 import {TileGroupsComponent} from "./tile/tile-groups.component";
 import {ObjectPageComponent} from "./object-page/object-page.component";
-import {ObjectPageHeaderComponent} from "./object-page/object-page-header.component";
 import {ObjectPageSectionComponent} from "./object-page/object-page-section.component";
 import {LaunchPadComponent} from "./tile/launchpad.component";
 import {PageViewComponent} from "./page-view/page-view.component";
@@ -30,9 +29,6 @@ import {FilterValueHelpComponent} from "./filter-bar/filter-value-help.component
 import {ButtonModule} from "primeng/button";
 import {RippleModule} from "primeng/ripple";
 import {AttributeComponent} from "./fields/attribute.component";
-import {ObjectPageTitleComponent} from "./object-page/object-page-title.component";
-import {ObjectPageActionsComponent} from "./object-page/object-page-actions.component";
-import {ObjectPageSubTitleComponent} from "./object-page/object-page-subtitle.component";
 import {StandardDialogComponent} from "./dialogs/standard-dialog.component";
 import {DialogActionsComponent} from "./dialogs/dialog-actions.component";
 import {DialogTabComponent} from "./dialogs/dialog-tab.component";
@@ -41,6 +37,11 @@ import {ConfirmationDialogComponent, ConfirmationService} from "./dialogs/confir
 import {InputErrorComponent, TextInputComponent} from "./inputs/text-input.component";
 import {ButtonLinkComponent} from "./button/button-link.component";
 import {AppTableButtonComponent} from "./table/app-table-button.component";
+import {CheckboxModule} from "primeng/checkbox";
+import {RadioButtonModule} from "primeng/radiobutton";
+import {ObjectPageTabComponent} from "./object-page/object-page-tab.component";
+import {ValueHelpButtonComponent} from "./button/value-help-button.component";
+import {ModalService} from "./dialogs/modal.service";
 
 @NgModule({
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -59,11 +60,8 @@ import {AppTableButtonComponent} from "./table/app-table-button.component";
         TileGroupsComponent,
         LaunchPadComponent,
         ObjectPageComponent,
-        ObjectPageHeaderComponent,
         ObjectPageSectionComponent,
-        ObjectPageTitleComponent,
-        ObjectPageSubTitleComponent,
-        ObjectPageActionsComponent,
+        ObjectPageTabComponent,
         PageViewComponent,
         PageViewBodyComponent,
         PageViewHeaderComponent,
@@ -75,7 +73,8 @@ import {AppTableButtonComponent} from "./table/app-table-button.component";
         ConfirmationDialogComponent,
         TextInputComponent,
         InputErrorComponent,
-        ButtonLinkComponent
+        ButtonLinkComponent,
+        ValueHelpButtonComponent,
     ],
     imports: [
         TableModule,
@@ -93,7 +92,9 @@ import {AppTableButtonComponent} from "./table/app-table-button.component";
         SkeletonModule,
         ButtonModule,
         RippleModule,
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        CheckboxModule,
+        RadioButtonModule
     ],
     providers: [ConfirmationService],
     exports: [
@@ -106,16 +107,13 @@ import {AppTableButtonComponent} from "./table/app-table-button.component";
         FilterBarComponent,
         TileGroupsComponent,
         ObjectPageComponent,
-        ObjectPageHeaderComponent,
         ObjectPageSectionComponent,
+        ObjectPageTabComponent,
         LaunchPadComponent,
         PageViewComponent,
         PageViewHeaderComponent,
         PageViewBodyComponent,
         AttributeComponent,
-        ObjectPageTitleComponent,
-        ObjectPageActionsComponent,
-        ObjectPageSubTitleComponent,
         StandardDialogComponent,
         DialogTabComponent,
         DialogFooterComponent,
@@ -123,6 +121,7 @@ import {AppTableButtonComponent} from "./table/app-table-button.component";
         InputErrorComponent,
         ButtonLinkComponent,
         AppTableButtonComponent,
+        ValueHelpButtonComponent,
     ]
 })
 export class ComponentModule {

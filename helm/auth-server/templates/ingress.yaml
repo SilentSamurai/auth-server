@@ -1,0 +1,18 @@
+{{ if .Values.ingress.enabled }}
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+    name: auth-server
+    namespace: auth-server
+spec:
+    entryPoints:
+        - web
+    routes:
+        -   match: Host(`{{.Values.ingress.host}}`)
+            kind: Rule
+            services:
+                -   name: auth-server-web
+                    port: {{ .Values.web.service.port }}
+
+
+{{ end }}

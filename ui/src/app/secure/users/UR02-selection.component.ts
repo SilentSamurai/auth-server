@@ -6,6 +6,7 @@ import {TenantService} from "../../_services/tenant.service";
 import {TableAsyncLoadEvent} from "../../component/table/app-table.component";
 import {MessageService} from "primeng/api";
 import {AuthDefaultService} from "../../_services/auth.default.service";
+import {DataModel} from "../../component/model/DataModel";
 
 
 @Component({
@@ -24,10 +25,9 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
                             Email
                         </label>
                         <app-value-help-input
-                            (dataProvider)="userDataProvider($event)"
+                            [dataModel]="usersDM"
                             [(selection)]="selectedUser"
                             class="col-3"
-                            idField="email"
                             labelField="email"
                             multi="false"
                             name="Email">
@@ -70,6 +70,7 @@ export class UR02SelectionComponent implements OnInit {
     email: string | null = '';
     users: any[] = [];
     selectedUser: any[] = [];
+    usersDM!: DataModel;
 
     constructor(private userService: UserService,
                 private tenantService: TenantService,
@@ -82,6 +83,7 @@ export class UR02SelectionComponent implements OnInit {
 
     async ngOnInit(): Promise<void> {
         this.authDefaultService.setTitle("UR02: Select User");
+        this.usersDM = this.userService.createDataModel([]);
     }
 
     async continue() {
@@ -93,13 +95,13 @@ export class UR02SelectionComponent implements OnInit {
         }
     }
 
-    async userDataProvider(event: TableAsyncLoadEvent) {
-        let response = await this.userService.queryUser({
-            pageNo: event.pageNo,
-            where: event.filters.filter(item => item.value != null && item.value.length > 0),
-        });
-        this.users = response.data;
-        event.update(this.users, response.hasNextPage);
-    }
+    // async userDataProvider(event: TableAsyncLoadEvent) {
+    //     let response = await this.userService.queryUser({
+    //         pageNo: event.pageNo,
+    //         where: event.filters.filter(item => item.value != null && item.value.length > 0),
+    //     });
+    //     this.users = response.data;
+    //     event.update(this.users, response.hasNextPage);
+    // }
 
 }

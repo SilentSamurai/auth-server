@@ -1,5 +1,5 @@
 import {Injectable, OnModuleInit} from "@nestjs/common";
-import {ConfigService} from "../config/config.service";
+import {Environment} from "../config/environment.service";
 import {UsersService} from "./users.service";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
@@ -22,7 +22,7 @@ import {SubjectEnum} from "../entity/subjectEnum";
 export class TenantService implements OnModuleInit {
 
     constructor(
-        private readonly configService: ConfigService,
+        private readonly configService: Environment,
         private readonly usersService: UsersService,
         private readonly roleService: RoleService,
         private readonly securityService: SecurityService,
@@ -170,18 +170,11 @@ export class TenantService implements OnModuleInit {
         return this.tenantRepository.find();
     }
 
-    async updateTenant(authContext: AuthContext, id: string, name: string, domain: string) {
+    async updateTenant(authContext: AuthContext, id: string, name: string) {
 
         this.securityService.isAuthorized(authContext, Action.Update, SubjectEnum.TENANT);
 
         const tenant: Tenant = await this.findById(authContext, id);
-        if (domain) {
-            const domainTaken: Tenant = await this.tenantRepository.findOne({where: {domain}});
-            if (domainTaken) {
-                throw new ValidationErrorException("domain is already taken");
-            }
-            tenant.domain = domain || tenant.domain;
-        }
         tenant.name = name || tenant.name;
         return this.tenantRepository.save(tenant)
     }
@@ -327,7 +320,7 @@ export class TenantService implements OnModuleInit {
 
     async getTenantRoles(authContext: AuthContext, tenant: Tenant): Promise<Role[]> {
 
-        this.securityService.isAuthorized(authContext, Action.Delete, SubjectEnum.TENANT, {id: tenant.id});
+        this.securityService.isAuthorized(authContext, Action.Read, SubjectEnum.ROLE, {tenantId: tenant.id});
 
         return this.roleService.getTenantRoles(authContext, tenant);
     }

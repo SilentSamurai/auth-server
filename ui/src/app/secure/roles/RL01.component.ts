@@ -5,10 +5,11 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {TenantService} from "../../_services/tenant.service";
 import {MessageService} from "primeng/api";
 import {AuthDefaultService} from "../../_services/auth.default.service";
-import {Filter} from "../../component/filter-bar/filter-bar.component";
-import {AppTableComponent, TableAsyncLoadEvent} from "../../component/table/app-table.component";
+import {AppTableComponent} from "../../component/table/app-table.component";
 import {RoleService} from "../../_services/role.service";
 import {ConfirmationService} from "../../component/dialogs/confirmation.service";
+import {DataModel} from "../../component/model/DataModel";
+import {Filter} from "../../component/model/Filters";
 
 
 @Component({
@@ -28,16 +29,14 @@ import {ConfirmationService} from "../../component/dialogs/confirmation.service"
             </app-page-view-header>
             <app-page-view-body>
                 <app-table
-                    (onDataRequest)="loadTable($event)"
-                    idField="id"
-                    isFilterAsync="true"
+                    [dataModel]="rolesDM"
+                    title="Roles"
                     multi="true"
                     scrollHeight="75vh">
 
                     <app-table-col label="Role Name" name="name"></app-table-col>
                     <app-table-col label="Tenant Domain" name="tenants/domain"></app-table-col>
                     <app-table-col label="Tenant Name" name="tenants/name"></app-table-col>
-                    <app-table-col label="Create At" name="createdAt"></app-table-col>
                     <app-table-col label="Action" name="action"></app-table-col>
 
                     <ng-template #table_body let-role>
@@ -50,7 +49,6 @@ import {ConfirmationService} from "../../component/dialogs/confirmation.service"
                                href="javascript:void(0)">{{ role.tenant.domain }}</a>
                         </td>
                         <td>{{ role.tenant.name }}</td>
-                        <td>{{ role.createdAt | date:'medium' }}</td>
                         <td class="d-flex ">
                             <button (click)="openDeleteModal(role)" class="btn " type="button" *ngIf="role.removable">
                                 <i class="fa fa-solid fa-trash"></i>
@@ -70,6 +68,7 @@ export class RL01Component implements OnInit {
     table!: AppTableComponent;
 
     roles: any;
+    rolesDM: DataModel;
 
     constructor(private userService: UserService,
                 private tenantService: TenantService,
@@ -80,6 +79,7 @@ export class RL01Component implements OnInit {
                 private authDefaultService: AuthDefaultService,
                 private confirmationService: ConfirmationService,
                 private modalService: NgbModal) {
+        this.rolesDM = this.roleService.createDataModel([]);
     }
 
     async ngOnInit(): Promise<void> {
@@ -87,14 +87,14 @@ export class RL01Component implements OnInit {
 
     }
 
-    async loadTable($event: TableAsyncLoadEvent) {
-        this.roles = await this.roleService.queryRoles({
-            pageNo: $event.pageNo,
-            where: $event.filters.filter(item => item.value != null && item.value.length > 0),
-            expand: ["Tenants"]
-        });
-        $event.update(this.roles.data, this.roles.hasNextPage);
-    }
+    // async loadTable($event: TableAsyncLoadEvent) {
+    //     this.roles = await this.roleService.queryRoles({
+    //         pageNo: $event.pageNo,
+    //         where: $event.filters.filter(item => item.value != null && item.value.length > 0),
+    //         expand: ["Tenants"]
+    //     });
+    //     $event.update(this.roles.data, this.roles.hasNextPage);
+    // }
 
     onFilter(filters: Filter[]) {
         this.table.filter(filters);
@@ -104,7 +104,7 @@ export class RL01Component implements OnInit {
         await this.confirmationService.confirm({
             message: "Are you sure you want to continue ?",
             accept: async () => {
-                await this.roleService.deleteRole(role.tenantId, role.name);
+                await this.tenantService.deleteRole(role.name, role.tenantId);
                 this.messageService.add({severity: 'success', summary: 'Successful', detail: 'Group removed'});
             }
         })

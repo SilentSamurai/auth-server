@@ -1,5 +1,5 @@
 import {Injectable} from "@nestjs/common";
-import {ConfigService} from "../config/config.service";
+import {Environment} from "../config/environment.service";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 import {Tenant} from "../entity/tenant.entity";
@@ -16,7 +16,7 @@ import {SubjectEnum} from "../entity/subjectEnum";
 export class RoleService {
 
     constructor(
-        private readonly configService: ConfigService,
+        private readonly configService: Environment,
         private readonly securityService: SecurityService,
         @InjectRepository(User) private usersRepository: Repository<User>,
         @InjectRepository(Role) private roleRepository: Repository<Role>,
@@ -25,22 +25,39 @@ export class RoleService {
     }
 
 
-    async create(authContext: AuthContext, name: string, tenant: Tenant, removable: boolean = true): Promise<Role> {
-
+    async create(
+        authContext: AuthContext,
+        name: string,
+        tenant: Tenant,
+        removable: boolean = true,
+    ): Promise<Role> {
         this.securityService.isAuthorized(authContext, Action.Create, SubjectEnum.ROLE);
 
-        let role: Role = this.roleRepository.create({
-            name: name,
-            tenant: tenant,
-            removable: removable
+        const role = this.roleRepository.create({
+            name,
+            tenant,
+            removable,
+            description: null
         });
         return this.roleRepository.save(role);
     }
 
+    async updateRole(
+        authContext: AuthContext,
+        roleId: string,
+        name: string,
+        newDescription: string,
+    ): Promise<Role> {
+        const role = await this.findById(authContext, roleId);
+
+        this.securityService.isAuthorized(authContext, Action.Update, SubjectEnum.TENANT, {id: role.tenant.id});
+
+        role.description = newDescription;
+        role.name = name;
+        return this.roleRepository.save(role);
+    }
+
     async findById(authContext: AuthContext, id: string) {
-
-        this.securityService.isAuthorized(authContext, Action.Read, SubjectEnum.ROLE, {id: id});
-
         let role: Role = await this.roleRepository.findOne({
             where: {id: id},
             relations: ['tenant']
@@ -48,6 +65,7 @@ export class RoleService {
         if (role === null) {
             throw new ValidationErrorException("role not found");
         }
+        this.securityService.isAuthorized(authContext, Action.Read, SubjectEnum.ROLE, {tenantId: role.tenant.id});
         return role;
     }
 
@@ -72,7 +90,7 @@ export class RoleService {
         role: Role
     ): Promise<number> {
 
-        this.securityService.isAuthorized(authContext, Action.Read, SubjectEnum.ROLE, {id: role.id});
+        this.securityService.isAuthorized(authContext, Action.Read, SubjectEnum.ROLE, {tenantId: role.tenant.id});
 
         const count: number = await this.usersRepository.count({
             where: {
@@ -92,6 +110,8 @@ export class RoleService {
     async deleteById(authContext: AuthContext, id: string): Promise<Role> {
         let role: Role = await this.findById(authContext, id);
         const count = await this.countByRole(authContext, role);
+        this.securityService.isAuthorized(authContext, Action.Delete, SubjectEnum.ROLE, {tenantId: role.tenant.id});
+
         if (count > 0 || !role.removable) {
             throw new ValidationErrorException("role is assigned to members | role is protected");
         }
@@ -120,7 +140,7 @@ export class RoleService {
 
     async getTenantRoles(authContext: AuthContext, tenant: Tenant): Promise<Role[]> {
 
-        this.securityService.isAuthorized(authContext, Action.Read, SubjectEnum.TENANT, {id: tenant.id});
+        this.securityService.isAuthorized(authContext, Action.Read, SubjectEnum.ROLE, {tenantId: tenant.id});
 
         return this.roleRepository.find({
             where: {
@@ -130,9 +150,7 @@ export class RoleService {
     }
 
     async getMemberRoles(authContext: AuthContext, tenant: Tenant, user: User): Promise<Role[]> {
-
-        this.securityService.isAuthorized(authContext, Action.Read, SubjectEnum.TENANT, {id: tenant.id});
-
+        this.securityService.isAuthorized(authContext, Action.Read, SubjectEnum.ROLE, {tenantId: tenant.id});
         return this.roleRepository.find({
             where: {
                 tenant: {id: tenant.id},

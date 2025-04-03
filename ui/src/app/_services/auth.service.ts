@@ -15,13 +15,20 @@ export class AuthService {
     constructor(private http: HttpClient) {
     }
 
-    login(email: string, password: string, domain: string, code_challenge: string): Observable<any> {
-        return this.http.post(`${AUTH_API}/login`, {
-            code_challenge: code_challenge,
-            email,
-            password,
-            domain
-        }, httpOptions);
+    async login(email: string,
+                password: string,
+                client_id: string,
+                code_challenge: string,
+                method: string): Promise<any> {
+        return await lastValueFrom(
+            this.http.post(`${AUTH_API}/login`, {
+                code_challenge: code_challenge,
+                code_challenge_method: method,
+                client_id,
+                email,
+                password,
+            }, httpOptions)
+        );
     }
 
     getAccessToken(code: string, verifier: string): Observable<any> {
@@ -33,7 +40,7 @@ export class AuthService {
     }
 
     async getPermissions(): Promise<any> {
-        return await lastValueFrom(this.http.get('/api/v1/user/permissions'));
+        return await lastValueFrom(this.http.get('/api/v1/my/permissions'));
     }
 
     validateAuthCode(authCode: string): Promise<any> {

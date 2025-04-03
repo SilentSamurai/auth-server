@@ -12,10 +12,10 @@ export class User {
     @Exclude() // Exclude from responses.
     password: string;
 
-    @Column({unique: true, nullable: false})
+    @Column({unique: true, nullable: false, length: 128})
     email: string;
 
-    @Column({nullable: false})
+    @Column({nullable: false, length: 128})
     name: string;
 
     @ManyToMany(() => Tenant, (tenant) => tenant.members)

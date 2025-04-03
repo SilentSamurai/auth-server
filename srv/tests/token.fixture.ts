@@ -8,17 +8,22 @@ export class TokenFixture {
         this.app = app;
     }
 
-    public async fetchAccessToken(email: string, password: string, domain: string): Promise<{ accessToken, refreshToken, jwt }> {
+    public async fetchAccessToken(username: string, password: string, client_id: string): Promise<{
+        accessToken,
+        refreshToken,
+        jwt
+    }> {
         const response = await this.app.getHttpServer()
             .post('/api/oauth/token')
             .send({
                 "grant_type": "password",
-                "email": email,
+                "username": username,
                 "password": password,
-                "domain": domain
+                "client_id": client_id
             })
             .set('Accept', 'application/json');
 
+        console.log(response.body);
         expect(response.status).toEqual(201);
         expect(response.body.access_token).toBeDefined();
         expect(response.body.expires_in).toBeDefined();
@@ -39,6 +44,23 @@ export class TokenFixture {
             refreshToken: response.body.refresh_token,
             jwt: decode
         }
+    }
+
+
+    public async getUser(email: string, password: string) {
+        const token = await this.fetchAccessToken(
+            email,
+            password,
+            "auth.server.com"
+        );
+        const response = await this.app.getHttpServer()
+            .get("/api/users/me")
+            .set('Authorization', `Bearer ${token.accessToken}`)
+            .set('Accept', 'application/json');
+
+        expect(response.status).toEqual(200);
+        console.log(response.body);
+        return response.body;
     }
 
 

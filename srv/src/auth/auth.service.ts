@@ -1,5 +1,5 @@
 import {Injectable, Logger} from '@nestjs/common';
-import {ConfigService} from '../config/config.service';
+import {Environment} from '../config/environment.service';
 import {UsersService} from '../services/users.service';
 import {JwtService} from '@nestjs/jwt';
 import {User} from '../entity/user.entity';
@@ -34,7 +34,7 @@ export class AuthService {
     private readonly LOGGER = new Logger("AuthService");
 
     constructor(
-        private readonly configService: ConfigService,
+        private readonly configService: Environment,
         private readonly securityService: SecurityService,
         private readonly authUserService: AuthUserService,
         private readonly userService: UsersService,
@@ -78,16 +78,17 @@ export class AuthService {
 
             let tenant = await this.authUserService.findTenantByDomain(payload.tenant.domain);
             payload = await this.jwtService.verifyAsync(token, {publicKey: tenant.publicKey});
-            console.log("token verified with public Key");
+            this.LOGGER.log("token verified with public Key");
             if (payload.grant_type === GRANT_TYPES.CLIENT_CREDENTIAL) {
                 if (payload.sub !== "oauth") {
-                    throw new UnauthorizedException();
+                    throw "Invalid Token";
                 }
             } else {
                 let user = await this.authUserService.findUserByEmail(payload.email);
             }
             return payload;
         } catch (e) {
+            this.LOGGER.error("Token Validation Failed: ", e.stack);
             throw new UnauthorizedException(e);
         }
     }
@@ -105,7 +106,7 @@ export class AuthService {
         return tenant;
     }
 
-    async createTechnicalAccessToken(tenant: Tenant, roles: string[]): Promise<string> {
+    createTechnicalToken(tenant: Tenant, roles: string[]): TechnicalToken {
         roles = roles instanceof Array ? roles : [];
         const payload: TechnicalToken = {
             sub: "oauth",
@@ -121,6 +122,12 @@ export class AuthService {
             grant_type: GRANT_TYPES.CLIENT_CREDENTIAL,
             isTechnical: true
         };
+        return payload;
+    }
+
+    async createTechnicalAccessToken(tenant: Tenant, roles: string[]): Promise<string> {
+        roles = roles instanceof Array ? roles : [];
+        const payload: TechnicalToken = this.createTechnicalToken(tenant, roles);
         return this.jwtService.sign(payload, {privateKey: tenant.privateKey,});
     }
 
@@ -272,7 +279,7 @@ export class AuthService {
         // Use the user's current email for signing the token.
         // All tokens generated before a successful email change would get invalidated.
         return this.jwtService.sign(payload, {
-            secret: globalTenant.publicKey,
+            secret: globalTenant.privateKey,
             expiresIn: this.configService.get('TOKEN_CHANGE_EMAIL_EXPIRATION_TIME')
         });
     }
@@ -301,7 +308,7 @@ export class AuthService {
 
         const authContext = await this.securityService.getUserAuthContext(payload.sub);
 
-        await this.userService.updateEmail(authContext, user.id, payload.sub);
+        await this.userService.updateEmail(authContext, user.id, payload.updatedEmail);
 
         return true;
     }

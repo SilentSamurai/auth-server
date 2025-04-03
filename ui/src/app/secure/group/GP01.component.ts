@@ -2,7 +2,7 @@ import {Component, OnInit, ViewChild} from '@angular/core';
 import {UserService} from '../../_services/user.service';
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {AppTableComponent, TableAsyncLoadEvent} from "../../component/table/app-table.component";
-import {Filter} from "../../component/filter-bar/filter-bar.component";
+
 import {AuthDefaultService} from "../../_services/auth.default.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {GroupService} from "../../_services/group.service";
@@ -10,6 +10,8 @@ import {CreateGroupComponent} from "./dialogs/create-group.component";
 import {ConfirmationService} from "../../component/dialogs/confirmation.service";
 import {MessageService} from "primeng/api";
 import {UpdateGroupComponent} from "./dialogs/update-group.component";
+import {DataModel} from "../../component/model/DataModel";
+import {Filter} from "../../component/model/Filters";
 
 @Component({
     selector: 'app-board-user',
@@ -34,9 +36,7 @@ import {UpdateGroupComponent} from "./dialogs/update-group.component";
             <app-page-view-body>
                 <app-table
                     title="Groups"
-                    (onDataRequest)="lazyLoad($event)"
-                    idField="id"
-                    isFilterAsync="true"
+                    [dataModel]="groupsDM"
                     multi="true"
                     scrollHeight="75vh">
 
@@ -78,6 +78,7 @@ export class GP01Component implements OnInit {
     tenantId: string = "";
 
     groups: any = [];
+    groupsDM: DataModel;
 
     constructor(private userService: UserService,
                 private authDefaultService: AuthDefaultService,
@@ -87,6 +88,7 @@ export class GP01Component implements OnInit {
                 private messageService: MessageService,
                 private confirmationService: ConfirmationService,
                 private modalService: NgbModal) {
+        this.groupsDM = this.groupService.createDataModel([]);
     }
 
     async ngOnInit(): Promise<void> {
@@ -123,14 +125,6 @@ export class GP01Component implements OnInit {
             }
         })
         this.ngOnInit();
-    }
-
-    async lazyLoad($event: TableAsyncLoadEvent) {
-        this.groups = await this.groupService.queryGroup({
-            pageNo: $event.pageNo,
-            where: $event.filters.filter(item => item.value != null && item.value.length > 0),
-        });
-        $event.update(this.groups.data, this.groups.hasNextPage);
     }
 
     onFilter(filters: Filter[]) {

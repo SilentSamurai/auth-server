@@ -1,7 +1,7 @@
 import {forwardRef, Inject, Injectable, OnModuleInit} from '@nestjs/common';
 
 import {RoleEnum} from "../entity/roleEnum";
-import {ConfigService} from "../config/config.service";
+import {Environment} from "../config/environment.service";
 import {ForbiddenException} from "../exceptions/forbidden.exception";
 import {CaslAbilityFactory} from "./casl-ability.factory";
 import {AnyAbility} from "@casl/ability/dist/types/PureAbility";
@@ -15,7 +15,7 @@ import {User} from "../entity/user.entity";
 @Injectable()
 export class SecurityService implements OnModuleInit {
 
-    constructor(private readonly configService: ConfigService,
+    constructor(private readonly configService: Environment,
                 private readonly authUserService: AuthUserService,
                 @Inject(forwardRef(() => CaslAbilityFactory)) private readonly caslAbilityFactory: CaslAbilityFactory
     ) {
@@ -77,7 +77,7 @@ export class SecurityService implements OnModuleInit {
             && securityContext.tenant.domain === this.configService.get("SUPER_TENANT_DOMAIN");
     }
 
-    getAdminContextForInternalUse(): AuthContext {
+    async getAdminContextForInternalUse(): Promise<AuthContext> {
         const authContext: AuthContext = {
             SECURITY_CONTEXT: {
                 email: '',
@@ -94,7 +94,7 @@ export class SecurityService implements OnModuleInit {
             } as TenantToken,
             SCOPE_ABILITIES: null
         };
-        authContext.SCOPE_ABILITIES = this.caslAbilityFactory.createForSecurityContext(authContext.SECURITY_CONTEXT);
+        authContext.SCOPE_ABILITIES = await this.caslAbilityFactory.createForSecurityContext(authContext.SECURITY_CONTEXT);
         return authContext;
     }
 
@@ -111,7 +111,7 @@ export class SecurityService implements OnModuleInit {
             } as UserToken,
             SCOPE_ABILITIES: null
         };
-        authContext.SCOPE_ABILITIES = this.caslAbilityFactory.createForSecurityContext(authContext.SECURITY_CONTEXT);
+        authContext.SCOPE_ABILITIES = await this.caslAbilityFactory.createForSecurityContext(authContext.SECURITY_CONTEXT);
         return authContext;
     }
 
@@ -135,7 +135,7 @@ export class SecurityService implements OnModuleInit {
             } as TenantToken,
             SCOPE_ABILITIES: null
         };
-        authContext.SCOPE_ABILITIES = this.caslAbilityFactory.createForSecurityContext(authContext.SECURITY_CONTEXT);
+        authContext.SCOPE_ABILITIES = await this.caslAbilityFactory.createForSecurityContext(authContext.SECURITY_CONTEXT);
         return authContext;
     }
 
@@ -144,7 +144,7 @@ export class SecurityService implements OnModuleInit {
             SECURITY_CONTEXT: securityContext,
             SCOPE_ABILITIES: null
         };
-        authContext.SCOPE_ABILITIES = this.caslAbilityFactory.createForSecurityContext(securityContext);
+        authContext.SCOPE_ABILITIES = await this.caslAbilityFactory.createForSecurityContext(securityContext);
         return authContext;
     }
 }

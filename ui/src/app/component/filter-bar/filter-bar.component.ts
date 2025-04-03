@@ -10,23 +10,11 @@ import {
     ViewChildren
 } from '@angular/core';
 
-import {Operators} from "./operator";
-import {Util} from "../utils";
+import {Operators} from "../model/Operator";
+import {Util} from "../util/utils";
 import {FilterFieldComponent} from "./filter-field.component";
+import {Filter} from "../model/Filters";
 
-export class Filter {
-    name: string;
-    label: string;
-    value: string;
-    operator: string;
-
-    constructor(name: string, label: string, value: string, operator: string) {
-        this.name = name;
-        this.label = label;
-        this.value = value;
-        this.operator = operator;
-    }
-}
 
 @Component({
     selector: 'app-fb-col',

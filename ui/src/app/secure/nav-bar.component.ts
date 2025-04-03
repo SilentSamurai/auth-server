@@ -9,51 +9,53 @@ import {ProfileComponent} from "../profile/profile.component";
 @Component({
     selector: 'nav-bar',
     template: `
-        <nav class="navbar navbar-expand-lg " ngbNav style="background-color: steelblue;">
-            <a class="navbar-brand" href="javascript:void(0)" routerLink="/home" id="BCK_TO_HOME_BTN">
-                <img alt="" class="rounded-circle mx-2" height="30" src="/assets/logo-img.jpg" width="30">
-                <span class="fw-semibold">{{ this.getTitle() }}</span>
-            </a>
-            <button aria-controls="navbarSupportedContent"
-                    aria-expanded="false"
-                    aria-label="Toggle navigation"
-                    class="navbar-toggler"
-                    data-bs-target="#navbarSupportedContent"
-                    data-bs-toggle="collapse"
-                    (click)="isCollapsed = !isCollapsed"
-                    type="button">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div [ngbCollapse]="isCollapsed" class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav px-2 w-100">
-                    <li [ngbNavItem]="3" class="ms-auto nav-item" ngbDropdown placement="bottom-left">
-                        <a class="nav-link"
-                           id="dropdownUser1"
-                           ngbDropdownToggle>
-                            <span class="mt-1 fw-semibold">{{ email }}</span>
-                        </a>
-                        <div aria-labelledby="dropdownUser1"
-                             class="dropdown-menu text-small shadow" ngbDropdownMenu>
-                            <a href="#" ngbDropdownItem>Settings</a>
-                            <a href="javascript:void(0)"
-                               ngbDropdownItem
-                               (click)="openProfileModal()">Profile</a>
-                            <hr class="dropdown-divider">
-                            <a href="https://silentsamurai.github.io/auth-server" ngbDropdownItem>
-                                Api Docs
-                            </a>
-                            <hr class="dropdown-divider">
-                            <a (click)="logout()" href="javascript:void(0)" ngbDropdownItem>
-                                Sign Out
-                            </a>
-                        </div>
+        <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: steelblue;">
+            <div class="container-fluid">
+                <a class="navbar-brand d-flex align-items-center" routerLink="/home">
+                    <img alt="Logo" class="rounded-circle me-2" height="30" src="/assets/logo-img.jpg" width="30">
+                    <span class="text-white">{{ getTitle() }}</span>
+                </a>
 
-                    </li>
-                </ul>
+                <button class="navbar-toggler"
+                        type="button"
+                        (click)="isCollapsed = !isCollapsed"
+                        aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div [ngbCollapse]="isCollapsed" class="collapse navbar-collapse">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item dropdown" ngbDropdown>
+                            <a class="nav-link dropdown-toggle text-white"
+                               id="dropdownUser1"
+                               ngbDropdownToggle
+                               role="button">
+                                <span class="me-2">{{ email }}</span>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-end" ngbDropdownMenu>
+                                <a class="dropdown-item" href="#">Settings</a>
+                                <a class="dropdown-item"
+                                   href="javascript:void(0)"
+                                   (click)="openProfileModal()">Profile</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item"
+                                   href="https://silentsamurai.github.io/auth-server">API Docs</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item"
+                                   href="javascript:void(0)"
+                                   (click)="logout()">Sign Out</a>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </nav>
     `,
-    styles: ['']
+    styles: [`
+        .navbar-toggler:focus {
+            box-shadow: 0 0 0 2px rgba(255,255,255,0.5);
+        }
+    `]
 })
 export class AdminNavBarComponent implements OnInit {
     isLoggedIn = false;

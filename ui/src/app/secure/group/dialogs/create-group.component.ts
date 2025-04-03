@@ -2,8 +2,8 @@ import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
 import {MessageService} from "primeng/api";
 import {GroupService} from "../../../_services/group.service";
-import {TableAsyncLoadEvent} from "../../../component/table/app-table.component";
 import {TenantService} from "../../../_services/tenant.service";
+import {DataModel} from "../../../component/model/DataModel";
 
 @Component({
     selector: 'app-create-group',
@@ -32,11 +32,10 @@ import {TenantService} from "../../../_services/tenant.service";
                     <div class="mb-3 form-group">
                         <label class="form-label" for="create.group.domain">Tenant</label>
                         <app-value-help-input
-                            (dataProvider)="onTenantLoad($event)"
+                            [dataModel]="tenantsDM"
                             [(selection)]="form.tenantId"
                             class=""
                             id="create.group.tenantId"
-                            idField="id"
                             labelField="name"
                             name="tenantId">
 
@@ -74,12 +73,14 @@ export class CreateGroupComponent implements OnInit {
         tenantId: [] as any[]
     }
     private tenants: any[] = [];
+    tenantsDM: DataModel;
     krishna: any;
 
     constructor(private groupService: GroupService,
                 private tenantService: TenantService,
                 private messageService: MessageService,
                 public activeModal: NgbActiveModal) {
+        this.tenantsDM = this.tenantService.createDataModel([]);
     }
 
     ngOnInit(): void {
@@ -96,12 +97,12 @@ export class CreateGroupComponent implements OnInit {
         }
     }
 
-    async onTenantLoad(event: TableAsyncLoadEvent) {
-        let response = await this.tenantService.queryTenant({
-            pageNo: event.pageNo,
-            where: event.filters.filter(f => f.value != null && f.value.length > 0),
-        });
-        this.tenants = response.data;
-        event.update(this.tenants, response.hasNextPage);
-    }
+    // async onTenantLoad(event: TableAsyncLoadEvent) {
+    //     let response = await this.tenantService.queryTenant({
+    //         pageNo: event.pageNo,
+    //         where: event.filters.filter(f => f.value != null && f.value.length > 0),
+    //     });
+    //     this.tenants = response.data;
+    //     event.update(this.tenants, response.hasNextPage);
+    // }
 }

@@ -13,20 +13,19 @@ import {AuthCode} from "../entity/auth_code.entity";
 import {Group} from "../entity/group.entity";
 import {GroupRole} from "../entity/group.roles.entity";
 import {GroupUser} from "../entity/group.users.entity";
-import {MongooseModule} from "@nestjs/mongoose";
-import {Authorization, authorizationSchema} from "../entity/authorization.schema";
-import {AuthorizationService} from "./authorization.service";
+import {Policy} from "../entity/authorization.entity";
+import {PolicyService} from "./policy.service";
+import {CacheService} from "./cache.service";
 
 @Module(
     {
         imports: [
             ConfigModule,
-            TypeOrmModule.forFeature([Tenant, User, TenantMember, Role, UserRole, AuthCode, Group, GroupRole, GroupUser]),
-            MongooseModule.forFeature([{name: Authorization.name, schema: authorizationSchema}])
+            TypeOrmModule.forFeature([Tenant, User, TenantMember, Role, UserRole, AuthCode, Group, GroupRole, GroupUser, Policy])
         ],
         controllers: [],
-        providers: [SecurityService, CaslAbilityFactory, AuthUserService, AuthorizationService ],
-        exports: [SecurityService, CaslAbilityFactory, AuthUserService, AuthorizationService ]
+        providers: [SecurityService, CaslAbilityFactory, AuthUserService, PolicyService, CacheService ],
+        exports: [SecurityService, CaslAbilityFactory, AuthUserService, PolicyService, CacheService ]
     })
 export class CaslModule {
 }

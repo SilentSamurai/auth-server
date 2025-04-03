@@ -2,6 +2,8 @@ import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {lastValueFrom} from 'rxjs';
 import {TokenStorageService} from "./token-storage.service";
+import {RestApiModel} from "../component/model/RestApiModel";
+import {DataModel} from "../component/model/DataModel";
 
 const API_URL = '/api';
 
@@ -58,15 +60,8 @@ export class TenantService {
         }, this.getHttpOptions()))
     }
 
-    async addRole(name: string, tenantId: string) {
+    async createRole(name: string, tenantId: string) {
         return lastValueFrom(this.http.post(`${API_URL}/tenant/${tenantId}/role/${name}`, {}, this.getHttpOptions()))
-    }
-
-    async assignRole(selectedRoles: any[], tenantId: string, userId: string) {
-        const roles = selectedRoles.map(role => role.name);
-        return lastValueFrom(this.http.put(`${API_URL}/tenant/${tenantId}/member/${userId}/roles`, {
-            roles: roles,
-        }, this.getHttpOptions()))
     }
 
     async removeMember(email: string, tenantId: string) {
@@ -77,7 +72,7 @@ export class TenantService {
         }))
     }
 
-    async removeRole(name: string, tenantId: string) {
+    async deleteRole(name: string, tenantId: string) {
         return lastValueFrom(this.http.delete(`${API_URL}/tenant/${tenantId}/role/${name}`, this.getHttpOptions()))
     }
 
@@ -93,5 +88,35 @@ export class TenantService {
         return await lastValueFrom(this.http.post(`${API_URL}/search/Tenants`, query, this.getHttpOptions())) as any;
     }
 
+    async replaceRoles(selectedRoles: any[], tenantId: string, userId: string) {
+        const roles = selectedRoles.map(role => role.name);
+        return lastValueFrom(this.http.put(`${API_URL}/tenant/${tenantId}/member/${userId}/roles`, {
+            roles: roles,
+        }, this.getHttpOptions()))
+    }
 
+    async addRolesToMember(selectedRoles: any[], tenantId: string, userId: string) {
+        const roles = selectedRoles.map(role => role.name);
+        return lastValueFrom(this.http.post(`${API_URL}/tenant/${tenantId}/member/${userId}/roles/add`, {
+            roles: roles,
+        }, this.getHttpOptions()))
+    }
+
+    async removeRolesFromMember(selectedRoles: any[], tenantId: string, userId: string) {
+        const roles = selectedRoles.map(role => role.name);
+        return lastValueFrom(this.http.delete(`${API_URL}/tenant/${tenantId}/member/${userId}/roles/remove`, {
+            body: {
+                roles: roles,
+            }
+        }))
+    }
+
+    createDataModel(initialData: any[]): DataModel {
+        return new RestApiModel(
+            this.http,
+            `${API_URL}/search/Tenants`,
+            ["id"],
+            initialData
+        );
+    }
 }

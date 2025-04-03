@@ -14,3 +14,17 @@ and [Nest.js](https://nestjs.com/).
 - API [documentation](https://silentsamurai.github.io/Speedy-API) available.
 
 
+# minikube 
+docker context use default
+minikube start
+minikube addons enable metrics-server
+minikube dashboard --url
+
+minikube docker-env | Invoke-Expression
+docker build -t uaa-auth-srv-img  .
+
+minikube service <service-name> --url
+minikube image build -t uaa-auth-srv-img  .
+minikube image load your-image-name
+
+helmfile apply

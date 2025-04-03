@@ -4,10 +4,11 @@ import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {CreateUserModalComponent} from "./dialogs/create-user.modal.component";
 import {EditUserModalComponent} from "./dialogs/edit-user.modal.component";
 import {AppTableComponent, TableAsyncLoadEvent} from "../../component/table/app-table.component";
-import {Filter} from "../../component/filter-bar/filter-bar.component";
 import {AuthDefaultService} from "../../_services/auth.default.service";
 import {ConfirmationService} from "../../component/dialogs/confirmation.service";
 import {MessageService} from "primeng/api";
+import {DataModel} from "../../component/model/DataModel";
+import {Filter} from "../../component/model/Filters";
 
 @Component({
     selector: 'app-board-user',
@@ -31,10 +32,8 @@ import {MessageService} from "primeng/api";
             </app-page-view-header>
             <app-page-view-body>
                 <app-table
+                    [dataModel]="usersDM"
                     title="Users"
-                    (onDataRequest)="lazyLoad($event)"
-                    idField="email"
-                    isFilterAsync="true"
                     multi="true"
                     scrollHeight="65vh">
 
@@ -44,13 +43,12 @@ import {MessageService} from "primeng/api";
                     <app-table-col label="Action" name="action"></app-table-col>
 
                     <ng-template #table_body let-user>
-                        <td><span class="p-column-title">Name</span>{{ user.name }} {{ user.surname }}</td>
+                        <td>{{ user.name }} {{ user.surname }}</td>
                         <td>
-                            <span class="p-column-title">Email</span>
                             <a [routerLink]="['/UR02/', user.id]"
                                href="javascript:void(0)">{{ user.email }}</a>
                         </td>
-                        <td><span class="p-column-title">Created At</span>{{ user.createdAt | date }}</td>
+                        <td>{{ user.createdAt | date }}</td>
                         <td class="d-flex ">
                             <button (click)="openUpdateModal(user)" class="btn " type="button">
                                 <i class="fa fa-edit"></i>
@@ -72,12 +70,14 @@ export class UR01Component implements OnInit {
     table!: AppTableComponent;
 
     users: any = [];
+    usersDM!: DataModel;
 
     constructor(private userService: UserService,
                 private authDefaultService: AuthDefaultService,
                 private confirmationService: ConfirmationService,
                 private messageService: MessageService,
                 private modalService: NgbModal) {
+        this.usersDM = this.userService.createDataModel([]);
     }
 
     async ngOnInit(): Promise<void> {
@@ -118,14 +118,6 @@ export class UR01Component implements OnInit {
         })
         console.log(deletedUser);
         this.ngOnInit();
-    }
-
-    async lazyLoad($event: TableAsyncLoadEvent) {
-        this.users = await this.userService.queryUser({
-            pageNo: $event.pageNo,
-            where: $event.filters.filter(item => item.value != null && item.value.length > 0),
-        });
-        $event.update(this.users.data, this.users.hasNextPage);
     }
 
     onFilter(filters: Filter[]) {

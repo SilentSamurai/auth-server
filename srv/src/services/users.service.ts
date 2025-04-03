@@ -2,7 +2,7 @@ import {Injectable, Logger, OnModuleInit} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {Repository} from 'typeorm';
 import {User} from '../entity/user.entity';
-import {ConfigService} from '../config/config.service';
+import {Environment} from '../config/environment.service';
 import {EmailTakenException} from '../exceptions/email-taken.exception';
 import {UserNotFoundException} from '../exceptions/user-not-found.exception';
 import {InvalidCredentialsException} from '../exceptions/invalid-credentials.exception';
@@ -22,7 +22,7 @@ export class UsersService implements OnModuleInit {
 
     constructor(
         @InjectRepository(User) private usersRepository: Repository<User>,
-        private readonly configService: ConfigService,
+        private readonly configService: Environment,
         private readonly securityService: SecurityService
     ) {
     }
@@ -39,19 +39,20 @@ export class UsersService implements OnModuleInit {
         email: string,
         name: string
     ): Promise<User> {
-
-        this.securityService.isAuthorized(authContext, Action.Read, SubjectEnum.USER, {email: email});
-        const emailTaken: User = await this.usersRepository.findOne({where: {email}});
-        if (emailTaken) {
+        // Check read policy and if email is already taken
+        this.securityService.isAuthorized(authContext, Action.Read, SubjectEnum.USER, {email});
+        if (await this.usersRepository.findOne({where: {email}})) {
             throw new EmailTakenException();
         }
 
+        // Check create policy
         this.securityService.isAuthorized(authContext, Action.Create, SubjectEnum.USER);
 
+        // Create and save the new user
         const user: User = this.usersRepository.create({
-            email: email,
+            email,
             password: await argon2.hash(password),
-            name: name
+            name
         });
 
         return this.usersRepository.save(user);
@@ -233,12 +234,12 @@ export class UsersService implements OnModuleInit {
     async updateEmail(
         authContext: AuthContext,
         id: string,
-        email: string
+        newEmail: string
     ): Promise<User> {
         const user: User = await this.findById(authContext, id);
-        user.email = email;
+        user.email = newEmail;
 
-        this.securityService.isAuthorized(authContext, Action.Update, SubjectEnum.USER, {email: email});
+        this.securityService.isAuthorized(authContext, Action.Update, SubjectEnum.USER, {id: id});
 
         return await this.usersRepository.save(user);
     }

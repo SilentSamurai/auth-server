@@ -1,13 +1,10 @@
 import {TestAppFixture} from "../test-app.fixture";
+import {expect2xx, HttpClient} from "./client";
 
-export class RoleClient {
-
-    private readonly app: TestAppFixture;
-    private accessToken: string;
+export class RoleClient extends HttpClient {
 
     constructor(app: TestAppFixture, accessToken: string) {
-        this.app = app;
-        this.accessToken = accessToken;
+        super(app, accessToken);
     }
 
     public async createRole(name: string, tenantId: string) {
@@ -17,7 +14,7 @@ export class RoleClient {
             .set('Accept', 'application/json');
 
         console.log(response.body);
-        expect(response.status).toEqual(201);
+        expect2xx(response);
         return response.body;
     }
 }
