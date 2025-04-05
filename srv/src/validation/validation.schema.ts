@@ -1,11 +1,11 @@
 import * as yup from 'yup';
 import {isDate, parse} from "date-fns";
 
-const USERNAME_REGEXP = /^[a-zA-Z]+(.){2,20}$/;
-const USERNAME_MESSAGE = "Username must start with an alpha character and contain from 3 to 20 characters";
+export const USERNAME_REGEXP = /^[a-zA-Z]+(.){2,20}$/;
+export  const USERNAME_MESSAGE = "Username must start with an alpha character and contain from 3 to 20 characters";
 
-const PASSWORD_REGEXP = /^[a-zA-Z]+(.){7,20}$/;
-const PASSWORD_MESSAGE = "Password must start with an alpha character and contain from 8 to 20 characters";
+export const PASSWORD_REGEXP = /^[a-zA-Z]+(.){7,20}$/;
+export const PASSWORD_MESSAGE = "Password must start with an alpha character and contain from 8 to 20 characters";
 
 yup.addMethod(yup.string, 'defined', function (msg = 'Parameter must be defined') {
     return this.test('defined', msg, (value) => value !== undefined && value !== null);

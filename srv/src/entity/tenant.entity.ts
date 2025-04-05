@@ -34,6 +34,9 @@ export class Tenant {
     @Exclude()
     publicKey: string;
 
+    @Column({nullable: false, name: 'allow_sign_up', default: false})
+    allowSignUp: boolean;
+
     @OneToMany(type => Role, role => role.tenant, {
         cascade: true,
         onDelete: "CASCADE"

@@ -36,7 +36,7 @@ export class SearchClient extends HttpClient {
         return response.body.data[0];
     }
 
-    public async findByTenant(query: any) {
+    public async findTenantBy(query: any) {
         return this.searchApi("Tenants", query);
     }
 

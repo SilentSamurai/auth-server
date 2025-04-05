@@ -1,4 +1,4 @@
-import {INestApplication, Logger} from "@nestjs/common";
+import {INestApplication} from "@nestjs/common";
 import {Environment} from "../src/config/environment.service";
 import {Test, TestingModule} from "@nestjs/testing";
 import {AppModule} from "../src/app.module";
@@ -6,6 +6,7 @@ import {JwtService} from "@nestjs/jwt";
 import * as superTest from 'supertest';
 import * as process from "node:process";
 import TestAgent from "supertest/lib/agent";
+import {createFakeSmtpServer, FakeSmtpServer} from "../src/mail/FakeSmtpServer";
 
 let console = require('console');
 
@@ -13,6 +14,7 @@ export class TestAppFixture {
     private app: INestApplication;
     private moduleRef: TestingModule;
     private _jwtService: JwtService;
+    private smtpServer: FakeSmtpServer;
 
     constructor() {
     }
@@ -21,12 +23,20 @@ export class TestAppFixture {
         return this._jwtService;
     }
 
+    public get smtp(): FakeSmtpServer {
+        return this.smtpServer;
+    }
+
     public async init(): Promise<TestAppFixture> {
 
         global.console = console;
         process.env.ENV_FILE = './envs/.env.testing';
 
         Environment.setup();
+
+        this.smtpServer = createFakeSmtpServer();
+        this.smtpServer.listen();
+
         this.moduleRef = await Test.createTestingModule({
             imports: [AppModule],
         }).compile()
@@ -34,7 +44,6 @@ export class TestAppFixture {
         this._jwtService = this.app.get<JwtService>(JwtService);
         await this.app.init();
         this.app.useLogger(console);
-
 
         return this;
     }
@@ -47,5 +56,6 @@ export class TestAppFixture {
         this.app.flushLogs();
         await this.app.close();
         await this.moduleRef.close();
+        await this.smtpServer.close();
     }
 }

@@ -60,7 +60,6 @@ import {ProfileComponent} from "../profile/profile.component";
 export class AdminNavBarComponent implements OnInit {
     isLoggedIn = false;
     email?: string;
-    _isSuperAdmin = true;
     public isCollapsed = true;
 
     constructor(private userService: UserService,
@@ -71,15 +70,12 @@ export class AdminNavBarComponent implements OnInit {
 
     }
 
-    isSuperAdmin() {
-        return this._isSuperAdmin;
-    }
 
     async ngOnInit(): Promise<void> {
         this.isLoggedIn = !!this.tokenStorageService.getToken();
 
-        if (this.isLoggedIn) {
-            const user = this.tokenStorageService.getUser();
+        if (this.tokenStorageService.isLoggedIn()) {
+            const user = this.tokenStorageService.getUser()!;
             this.email = user.email;
         }
     }

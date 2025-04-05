@@ -1,4 +1,5 @@
 import {TestAppFixture} from "./test-app.fixture";
+import {expect2xx} from "./api-client/client";
 
 export class TokenFixture {
 
@@ -23,7 +24,10 @@ export class TokenFixture {
             })
             .set('Accept', 'application/json');
 
-        console.log(response.body);
+        console.log("fetchAccessToken Response: ", response.body);
+
+        expect2xx(response);
+
         expect(response.status).toEqual(201);
         expect(response.body.access_token).toBeDefined();
         expect(response.body.expires_in).toBeDefined();

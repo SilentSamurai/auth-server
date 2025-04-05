@@ -170,12 +170,19 @@ export class TenantService implements OnModuleInit {
         return this.tenantRepository.find();
     }
 
-    async updateTenant(authContext: AuthContext, id: string, name: string) {
+    async updateTenant(authContext: AuthContext, id: string, body: { name?: string, allowSignUp?: boolean }) {
 
         this.securityService.isAuthorized(authContext, Action.Update, SubjectEnum.TENANT);
 
         const tenant: Tenant = await this.findById(authContext, id);
-        tenant.name = name || tenant.name;
+        if (body.name) {
+            tenant.name = body.name || tenant.name;
+        }
+
+        if (body.allowSignUp) {
+            tenant.allowSignUp = body.allowSignUp || tenant.allowSignUp;
+        }
+
         return this.tenantRepository.save(tenant)
     }
 
@@ -323,6 +330,25 @@ export class TenantService implements OnModuleInit {
         this.securityService.isAuthorized(authContext, Action.Read, SubjectEnum.ROLE, {tenantId: tenant.id});
 
         return this.roleService.getTenantRoles(authContext, tenant);
+    }
+
+    async findByClientIdOrDomain(authContext: AuthContext, clientIdOrDomain: string): Promise<Tenant> {
+
+        this.securityService.isAuthorized(authContext, Action.Read, SubjectEnum.TENANT, {clientId: clientIdOrDomain});
+
+        let tenant = await this.tenantRepository.findOne({
+            where: [
+                {clientId: clientIdOrDomain,},
+                {domain: clientIdOrDomain,}
+            ], relations: {
+                members: true,
+                roles: true
+            }
+        });
+        if (tenant === null) {
+            throw new NotFoundException("tenant not found");
+        }
+        return tenant;
     }
 
 

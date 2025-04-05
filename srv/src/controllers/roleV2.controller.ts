@@ -2,6 +2,7 @@ import {
     Body,
     ClassSerializerInterceptor,
     Controller,
+    Get,
     Param,
     Patch,
     Request,
@@ -17,6 +18,9 @@ import {SecurityService} from "../casl/security.service";
 import {UsersService} from "../services/users.service";
 import * as yup from "yup";
 import {ValidationPipe} from "../validation/validation.pipe";
+import {Action} from "../casl/actions.enum";
+import {subject} from "@casl/ability";
+import {SubjectEnum} from "../entity/subjectEnum";
 
 @Controller('api/role')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -44,6 +48,22 @@ export class RoleControllerV2 {
         @Body(new ValidationPipe(RoleControllerV2.UpdateRoleSchema)) body: { name: string, description: string }
     ): Promise<Role> {
         return this.roleService.updateRole(request, roleId, body.name, body.description);
+    }
+
+    @Get('/:roleId')
+    @UseGuards(JwtAuthGuard)
+    async getRole(
+        @Request() request,
+        @Param('roleId') roleId: string
+    ): Promise<any> {
+        const role = await this.roleService.findById(request, roleId);
+        const tenant = role.tenant;
+        this.securityService.check(request, Action.Read, subject(SubjectEnum.TENANT, tenant));
+        let users = await this.userService.findByRole(request, role);
+        return {
+            role: role,
+            users: users
+        }
     }
 
 }

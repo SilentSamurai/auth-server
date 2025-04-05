@@ -155,4 +155,12 @@ export class LoginComponent implements OnInit {
             return false;
         }
     }
+
+    async onSigUpClick() {
+        await this.router.navigate(['/register'], {
+            queryParams: {
+                client_id: this.loginForm.get("client_id")?.value!
+            }
+        })
+    }
 }

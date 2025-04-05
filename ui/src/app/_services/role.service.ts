@@ -31,8 +31,8 @@ export class RoleService {
         }, this.getHttpOptions()))
     }
 
-    async getRoleDetails(tenantId: string, roleName: string): Promise<any> {
-        return lastValueFrom(this.http.get(`${API_URL}/tenant/${tenantId}/role/${roleName}`, this.getHttpOptions()));
+    async getRoleDetails(tenantId: string, roleId: string): Promise<any> {
+        return lastValueFrom(this.http.get(`${API_URL}/role/${roleId}`, this.getHttpOptions()));
     }
 
     createDataModel(initialData: any[]): DataModel {

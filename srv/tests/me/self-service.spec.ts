@@ -2,7 +2,7 @@ import {v4 as uuidv4} from 'uuid';
 import {TestAppFixture} from "../test-app.fixture";
 import {UsersClient} from "../api-client/user-client";
 import {TokenFixture} from "../token.fixture";
-import {createFakeSmtpServer, EmailSearchCriteria, FakeSmtpServer} from "../../src/mail/FakeSmtpServer";
+import {EmailSearchCriteria} from "../../src/mail/FakeSmtpServer";
 
 
 describe('UsersController (e2e)', () => {
@@ -10,7 +10,6 @@ describe('UsersController (e2e)', () => {
     let usersClient: UsersClient;
     let tokenFixture: TokenFixture;
     let accessToken: string;
-    let smtpServer: FakeSmtpServer;
 
     // Test user credentials
     const testUserEmail = `test-user-${uuidv4()}@example.com`;
@@ -21,41 +20,32 @@ describe('UsersController (e2e)', () => {
     const updatedName = 'U Test User';
     const updatedEmail = `updated-${uuidv4()}@example.com`;
     const updatedPassword = 'UpdatedTest@123456';
+    const clientId = "shire.local";
 
     beforeAll(async () => {
         // Create and set up the test application
         app = await new TestAppFixture().init();
 
-        smtpServer = createFakeSmtpServer();
-        smtpServer.listen();
-
         // Get admin access token for authenticated requests
         tokenFixture = new TokenFixture(app);
-        const tokenResponse = await tokenFixture.fetchAccessToken(
-            "admin@auth.server.com",
-            "admin9000",
-            "auth.server.com"
-        );
-        accessToken = tokenResponse.accessToken;
-
         // Initialize the users client with the access token
-        usersClient = new UsersClient(app, accessToken);
+        usersClient = new UsersClient(app, "");
     });
 
     afterAll(async () => {
         await app.close();
-        smtpServer.close();
     });
 
-    describe('User Registration and Authentication Flow', () => {
+    describe('User Registration and Authentication Flow with a Tenant', () => {
         it('should register a new user', async () => {
+
             // Test signup endpoint
-            const signupResponse = await usersClient.signup(testUserName, testUserEmail, testUserPassword);
+            const signupResponse = await usersClient.signup(testUserName, testUserEmail, testUserPassword, clientId);
 
             expect(signupResponse).toBeDefined();
-            expect(signupResponse.email).toBe(testUserEmail);
-            expect(signupResponse.name).toBe(testUserName);
-            expect(signupResponse.id).toBeDefined();
+            expect(signupResponse.success).toBeDefined();
+            expect(signupResponse.success).toBe(true);
+
             // Password should not be returned
             expect(signupResponse.password).toBeUndefined();
         });
@@ -66,12 +56,12 @@ describe('UsersController (e2e)', () => {
                 to: testUserEmail,
                 subject: /signing.*up.*Auth.*Server/i,
             }
-            const verificationEmail = await smtpServer.waitForEmail(search);
+            const verificationEmail = await app.smtp.waitForEmail(search);
             // Verify we found the email
             expect(verificationEmail).toBeDefined();
 
             // Extract the verification URL from the email body
-            let urlMatch = smtpServer.extractPaths(verificationEmail);
+            let urlMatch = app.smtp.extractPaths(verificationEmail);
             expect(urlMatch).toBeDefined();
             expect(urlMatch.length).toBeGreaterThan(1);
 
@@ -94,7 +84,7 @@ describe('UsersController (e2e)', () => {
             const authResponse = await tokenFixture.fetchAccessToken(
                 testUserEmail,
                 testUserPassword,
-                "auth.server.com"
+                clientId
             );
 
             expect(authResponse).toBeDefined();
@@ -136,12 +126,12 @@ describe('UsersController (e2e)', () => {
                 to: updatedEmail,
                 subject: /.*Change.*email.*Auth.*Server.*/i,
             }
-            const verificationEmail = await smtpServer.waitForEmail(search);
+            const verificationEmail = await app.smtp.waitForEmail(search);
             // Verify we found the email
             expect(verificationEmail).toBeDefined();
 
             // Extract the verification URL from the email body
-            let urlMatch = smtpServer.extractPaths(verificationEmail);
+            let urlMatch = app.smtp.extractPaths(verificationEmail);
             expect(urlMatch).toBeDefined();
             expect(urlMatch.length).toBeGreaterThan(1);
 
@@ -163,7 +153,7 @@ describe('UsersController (e2e)', () => {
             const authResponse = await tokenFixture.fetchAccessToken(
                 updatedEmail,
                 testUserPassword,
-                "auth.server.com"
+                clientId
             );
 
             expect(authResponse).toBeDefined();
@@ -184,7 +174,7 @@ describe('UsersController (e2e)', () => {
             const authResponse = await tokenFixture.fetchAccessToken(
                 updatedEmail, // Use the updated email
                 updatedPassword,
-                "auth.server.com"
+                clientId
             );
 
             expect(authResponse.accessToken).toBeDefined();
@@ -227,7 +217,7 @@ describe('UsersController (e2e)', () => {
                 await tokenFixture.fetchAccessToken(
                     updatedEmail,
                     updatedPassword,
-                    "auth.server.com"
+                    clientId
                 );
                 fail('Should not be able to login with deleted account');
             } catch (error) {

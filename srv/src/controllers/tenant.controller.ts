@@ -22,6 +22,7 @@ import {SecurityService} from "../casl/security.service";
 import {SubjectEnum} from "../entity/subjectEnum";
 import {Action} from "../casl/actions.enum";
 import {subject} from "@casl/ability";
+import * as yup from "yup";
 
 @Controller('api/tenant')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -51,19 +52,25 @@ export class TenantController {
         return tenant;
     }
 
+    static UpdateTenantSchema = yup.object().shape({
+        name: yup.string().max(128),
+        allow_sign_up: yup.boolean()
+    });
+
+
     @Patch('/:tenantId')
     @UseGuards(JwtAuthGuard)
     async updateTenant(
         @Request() request,
         @Param('tenantId') tenantId: string,
-        @Body(new ValidationPipe(ValidationSchema.UpdateTenantSchema)) body: { name: string }
+        @Body(new ValidationPipe(TenantController.UpdateTenantSchema)) body: { name: string, allow_sign_up: boolean }
     ): Promise<Tenant> {
         let tenant = await this.tenantService.findById(request, tenantId);
         this.securityService.check(request, Action.Update, subject(SubjectEnum.TENANT, tenant));
         return this.tenantService.updateTenant(
             request,
             tenantId,
-            body.name
+            body
         );
 
     }

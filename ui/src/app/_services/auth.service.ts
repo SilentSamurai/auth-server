@@ -49,11 +49,22 @@ export class AuthService {
         }, httpOptions));
     }
 
-    register(name: string, email: string, password: string): Observable<any> {
-        return this.http.post(`api/users/signup`, {
+    signUp(name: string, email: string, password: string, client_id: string): Promise<any> {
+        return lastValueFrom(this.http.post(`api/signup`, {
             name,
             email,
-            password
-        }, httpOptions);
+            password,
+            client_id
+        }, httpOptions));
+    }
+
+    registerTenant(name: string, email: string, password: string, orgName: string, domain: string): Promise<any> {
+        return lastValueFrom(this.http.post(`api/register-domain`, {
+            name,
+            email,
+            password,
+            orgName,
+            domain
+        }, httpOptions));
     }
 }

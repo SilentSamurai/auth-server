@@ -7,7 +7,7 @@ import {AuthDefaultService} from "../_services/auth.default.service";
 @Injectable({
     providedIn: 'root'
 })
-export class AdminAuthGuard  {
+export class SuperAdminAuthGuard {
 
 
     constructor(private tokenStorageService: TokenStorageService,

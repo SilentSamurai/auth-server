@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import jwt_decode from "jwt-decode";
 import {Router} from "@angular/router";
 import {PureAbility} from "@casl/ability";
+import {AuthUser, User} from "../model/user.model";
 // import {createHash} from "crypto";
 
 const TOKEN_KEY = 'auth-token';
@@ -68,10 +69,10 @@ export class TokenStorageService {
     //     return token;
     // }
 
-    public getUser(): any | null {
+    public getUser(): User | null {
         const user = window.localStorage.getItem(USER_KEY);
         if (user) {
-            return JSON.parse(user);
+            return new User(JSON.parse(user));
         }
         return null;
     }
@@ -97,11 +98,11 @@ export class TokenStorageService {
     }
 
     public isSuperAdmin(): boolean {
-        return this.isLoggedIn() && this.getUser().scopes.find((scope: string) => scope === "SUPER_ADMIN") !== undefined;
+        return this.isLoggedIn() && this.getUser()!.scopes.find((scope: string) => scope === "SUPER_ADMIN") !== undefined;
     }
 
     public isTenantAdmin(): boolean {
-        return this.isSuperAdmin() || this.isLoggedIn() && this.getUser().scopes.find((scope: string) => scope === "TENANT_ADMIN") !== undefined;
+        return this.isSuperAdmin() || this.isLoggedIn() && this.getUser()!.scopes.find((scope: string) => scope === "TENANT_ADMIN") !== undefined;
     }
 
     public async getCodeChallenge(method: string): Promise<string> {

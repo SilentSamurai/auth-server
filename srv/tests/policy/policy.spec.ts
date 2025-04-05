@@ -24,7 +24,7 @@ describe('PolicyController (e2e)', () => {
         policyClient = new PolicyClient(app, accessToken);
         const tenantClient = new TenantClient(app, accessToken);
         const searchClient = new SearchClient(app, accessToken);
-        const tenant = await searchClient.findByTenant({domain: "auth.server.com"});
+        const tenant = await searchClient.findTenantBy({domain: "auth.server.com"});
 
         role = await tenantClient.createRole(tenant.id, "TEST_ROLE");
 

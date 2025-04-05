@@ -65,7 +65,7 @@ export class GroupClient extends HttpClient {
 
     public async addRole(groupId: string, roles: string[]) {
         const response = await this.app.getHttpServer()
-            .post(`/api/group/${groupId}/add-role`)
+            .post(`/api/group/${groupId}/add-roles`)
             .set('Authorization', `Bearer ${this.accessToken}`)
             .set('Accept', 'application/json')
             .send({ roles });
@@ -85,7 +85,7 @@ export class GroupClient extends HttpClient {
 
     public async removeRoles(groupId: string, roles: string[]) {
         const response = await this.app.getHttpServer()
-            .post(`/api/group/${groupId}/remove-role`)
+            .post(`/api/group/${groupId}/remove-roles`)
             .set('Authorization', `Bearer ${this.accessToken}`)
             .set('Accept', 'application/json')
             .send({ roles });

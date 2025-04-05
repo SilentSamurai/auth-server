@@ -139,6 +139,10 @@
                     <a class="mt-1" href="https://silentsamurai.github.io/auth-server">
                         Api Docs
                     </a>
+
+                    <a class="mt-1" *ngIf="freezeClientId" (click)="onSigUpClick()">
+                        Sign Up
+                    </a>
                 </div>
             </div>
         </div>

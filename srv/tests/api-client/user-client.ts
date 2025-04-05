@@ -132,14 +132,26 @@ export class UsersClient extends HttpClient {
     }
 
 
+    public async registerTenant(name: string, email: string, password: string, orgName: string, domain: string) {
+        const response = await this.app.getHttpServer()
+            .post('/api/register-domain')
+            .set('Accept', 'application/json')
+            .send({name, email, password, orgName, domain});
+
+        console.log("Signup Response:", response.body);
+        expect2xx(response);
+        return response.body;
+    }
+
+
     // -----------------------------------------------------------------
     // Sign up a new user (POST /api/users/signup)
     // -----------------------------------------------------------------
-    public async signup(name: string, email: string, password: string) {
+    public async signup(name: string, email: string, password: string, client_id: string) {
         const response = await this.app.getHttpServer()
-            .post('/api/users/signup')
+            .post('/api/signup')
             .set('Accept', 'application/json')
-            .send({name, email, password});
+            .send({name, email, password, client_id});
 
         console.log("Signup Response:", response.body);
         expect2xx(response);
@@ -151,7 +163,7 @@ export class UsersClient extends HttpClient {
     // -----------------------------------------------------------------
     public async signdown(password: string) {
         const response = await this.app.getHttpServer()
-            .post('/api/users/signdown')
+            .post('/api/signdown')
             .set('Authorization', `Bearer ${this.accessToken}`)
             .set('Accept', 'application/json')
             .send({password});

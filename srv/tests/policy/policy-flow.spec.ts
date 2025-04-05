@@ -29,7 +29,7 @@ describe('Policy Flow (e2e)', () => {
         const tenantClient = new TenantClient(app, accessToken);
         const searchClient = new SearchClient(app, accessToken);
 
-        const tenant = await searchClient.findByTenant({domain: "shire.local"});
+        const tenant = await searchClient.findTenantBy({domain: "shire.local"});
         const user = await searchClient.findByUser({email: "admin@shire.local"});
 
         let role = await tenantClient.createRole(tenant.id, "TEST_ROLE");
