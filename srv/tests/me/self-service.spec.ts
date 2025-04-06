@@ -23,6 +23,7 @@ describe('UsersController (e2e)', () => {
     const clientId = "shire.local";
 
     beforeAll(async () => {
+        console.log("Starting Test Stating");
         // Create and set up the test application
         app = await new TestAppFixture().init();
 
@@ -30,10 +31,13 @@ describe('UsersController (e2e)', () => {
         tokenFixture = new TokenFixture(app);
         // Initialize the users client with the access token
         usersClient = new UsersClient(app, "");
+        console.log("Starting Test Finish");
     });
 
     afterAll(async () => {
+        console.log("Closing Test Stating");
         await app.close();
+        console.log("Closing Test Finished");
     });
 
     describe('User Registration and Authentication Flow with a Tenant', () => {

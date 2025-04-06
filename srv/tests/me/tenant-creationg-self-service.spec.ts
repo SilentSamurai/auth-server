@@ -14,7 +14,6 @@ describe('UsersController (e2e)', () => {
     let searchClient: SearchClient;
     let tokenFixture: TokenFixture;
     let accessToken: string;
-    let smtpServer: FakeSmtpServer;
 
     // Test user credentials
     const testUserEmail = `test-user-${uuidv4()}@example.com`;
@@ -30,6 +29,7 @@ describe('UsersController (e2e)', () => {
     const tenantDomain = "tt.com"
 
     beforeAll(async () => {
+        console.log("Starting Test Stating");
         // Create and set up the test application
         app = await new TestAppFixture().init();
 
@@ -38,10 +38,13 @@ describe('UsersController (e2e)', () => {
 
         // Initialize the users client with the access token
         usersClient = new UsersClient(app, "");
+        console.log("Starting Test Finish");
     });
 
     afterAll(async () => {
+        console.log("Closing Test Stating");
         await app.close();
+        console.log("Closing Test Finish");
     });
 
 
@@ -64,12 +67,12 @@ describe('UsersController (e2e)', () => {
                 to: testUserEmail,
                 subject: /signing.*up.*Auth.*Server/i,
             }
-            const verificationEmail = await smtpServer.waitForEmail(search);
+            const verificationEmail = await app.smtp.waitForEmail(search);
             // Verify we found the email
             expect(verificationEmail).toBeDefined();
 
             // Extract the verification URL from the email body
-            let urlMatch = smtpServer.extractPaths(verificationEmail);
+            let urlMatch = app.smtp.extractPaths(verificationEmail);
             expect(urlMatch).toBeDefined();
             expect(urlMatch.length).toBeGreaterThan(1);
 

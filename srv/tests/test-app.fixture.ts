@@ -35,7 +35,7 @@ export class TestAppFixture {
         Environment.setup();
 
         this.smtpServer = createFakeSmtpServer();
-        this.smtpServer.listen();
+        await this.smtpServer.listen();
 
         this.moduleRef = await Test.createTestingModule({
             imports: [AppModule],

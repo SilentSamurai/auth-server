@@ -47,7 +47,7 @@ async function prepareApp() {
     // smtp
     if (!Environment.isProduction()) {
         const server = createFakeSmtpServer({});
-        server.listen();
+        await server.listen();
     }
 
     console.log("Application options: ", options);
