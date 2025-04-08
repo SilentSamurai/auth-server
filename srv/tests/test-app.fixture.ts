@@ -27,6 +27,10 @@ export class TestAppFixture {
         return this.smtpServer;
     }
 
+    public get nestApp(): INestApplication {
+        return this.app;
+    }
+
     public async init(): Promise<TestAppFixture> {
 
         global.console = console;

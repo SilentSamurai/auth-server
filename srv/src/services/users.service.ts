@@ -379,6 +379,25 @@ export class UsersService implements OnModuleInit {
         });
     }
 
+    async findByEmailSecure(
+        authContext: AuthContext,
+        email: string,
+        password: string
+    ): Promise<User> {
+        this.securityService.isAuthorized(authContext, Action.Read, SubjectEnum.USER, {email: email});
+        const user: User = await this.usersRepository.findOne({
+            where: {email}
+        });
+        if (!user) {
+            throw new InvalidCredentialsException();
+        }
+        const valid: boolean = await argon2.verify(user.password, password);
+        if (!valid) {
+            throw new InvalidCredentialsException();
+        }
+        return user;
+    }
+
 
 }
 

@@ -139,9 +139,12 @@ export class RegisterController {
             }
 
         } else {
-            user = await this.usersRepository.findOne({where: {email: body.email}})
+            user = await this.usersService.findByEmailSecure(adminContext, body.email, body.password);
         }
-        await this.tenantService.addMember(adminContext, tenant.id, user);
+
+        if (!await this.tenantService.isMember(adminContext, tenant.id, user)) {
+            await this.tenantService.addMember(adminContext, tenant.id, user);
+        }
 
         return {success: true};
     }
