@@ -1,0 +1,303 @@
+import {Injectable} from '@nestjs/common';
+import {InjectRepository} from '@nestjs/typeorm';
+import {Repository} from 'typeorm';
+import {Subscription, SubscriptionStatus} from '../entity/subscription.entity';
+import {Tenant} from '../entity/tenant.entity';
+import {Role} from '../entity/role.entity';
+import {App} from '../entity/app.entity';
+import {NotFoundException} from "../exceptions/not-found.exception";
+
+/**
+ * Interface for the response from app's onboard endpoint
+ */
+interface OnboardResponse {
+    appNames?: string[];
+}
+
+/**
+ * Interface for the response from app's offboard endpoint
+ */
+interface OffboardResponse {
+    appNames?: string[];
+}
+
+@Injectable()
+export class SubscriptionService {
+    constructor(
+        @InjectRepository(Subscription)
+        private readonly subscriptionRepo: Repository<Subscription>,
+        @InjectRepository(Role)
+        private readonly roleRepo: Repository<Role>,
+        @InjectRepository(App)
+        private readonly appRepo: Repository<App>,
+    ) {
+    }
+
+    /**
+     * This public method handles the app subscription process:
+     * 1) Create a subscription in PENDING status.
+     * 2) Copy the owner's roles for the subscriber.
+     * 3) Call the onboard endpoint and parse additional apps to subscribe to.
+     * 4) Update the subscription status to SUCCESS if everything completes properly.
+     *
+     * If any part of the process throws an error, that error is captured in subscription.message.
+     *
+     * @param subscriberTenant The tenant initiating the subscription
+     * @param app The app they want to subscribe to
+     * @param visited A set used to avoid re-subscribing the same app in recursion
+     */
+    async subscribeApp(
+        subscriberTenant: Tenant,
+        app: App,
+        visited: Set<string> = new Set<string>()
+    ): Promise<Subscription> {
+        let subscription: Subscription;
+
+        try {
+            // If we've already processed this app, simply return the existing subscription (if any)
+            if (visited.has(app.id)) {
+                const existingSub = await this.subscriptionRepo.findOne({
+                    where: {subscriber: {id: subscriberTenant.id}, app: {id: app.id}},
+                });
+                if (existingSub) {
+                    return existingSub;
+                }
+            }
+            visited.add(app.id);
+
+            // 1) Create a new subscription with status = PENDING
+            subscription = await this.createPendingSubscription(subscriberTenant, app);
+
+            // 2) Copy the app owner's roles
+            await this.copyOwnerRoles(subscriberTenant, app);
+
+            // 3) Call the onboard endpoint; potentially subscribe to additional apps
+            const onboardSucceeded = await this.callOnboardEndpoint(subscriberTenant, app, visited);
+
+            // 4) If everything went well, mark the subscription as SUCCESS
+            if (onboardSucceeded) {
+                subscription.status = SubscriptionStatus.SUCCESS;
+                subscription.message = null;
+                await this.subscriptionRepo.save(subscription);
+            }
+
+            return subscription;
+        } catch (error) {
+            // If anything goes wrong, store the error message in subscription
+            const errorText = error instanceof Error ? error.message : String(error);
+
+            // Initialize subscription if none existed yet
+            if (!subscription) {
+                subscription = this.subscriptionRepo.create({
+                    subscriber: subscriberTenant,
+                    app,
+                    status: SubscriptionStatus.PENDING,
+                });
+            }
+
+            subscription.message = errorText;
+            subscription.status = SubscriptionStatus.PENDING;
+            await this.subscriptionRepo.save(subscription);
+
+            // Re-throw the error
+            throw error;
+        }
+    }
+
+    /**
+     * Create a new subscription with status = PENDING.
+     */
+    private async createPendingSubscription(tenant: Tenant, app: App): Promise<Subscription> {
+        const subscription = this.subscriptionRepo.create({
+            subscriber: tenant,
+            app,
+            status: SubscriptionStatus.PENDING
+        });
+        return this.subscriptionRepo.save(subscription);
+    }
+
+    /**
+     * Copy all roles owned by the app's owner to the subscriber tenant.
+     */
+    private async copyOwnerRoles(subscriberTenant: Tenant, app: App): Promise<void> {
+        const ownerRoles = await this.roleRepo.find({
+            where: {tenant: {id: app.owner.id}, app: {id: app.id}},
+        });
+
+        const newRoles = ownerRoles.map(role => {
+            const roleCopy = this.roleRepo.create({
+                ...role,
+                id: undefined,      // Let TypeORM generate a new ID
+                tenant: subscriberTenant, // Switch ownership to the subscribing tenant
+                app: null           // Usually you set app = null or keep it the same if you want tenant B to have explicit reference
+            });
+            return roleCopy;
+        });
+
+        await this.roleRepo.save(newRoles);
+    }
+
+    /**
+     * Call the app's onboard endpoint. If more apps are returned in the response,
+     * recursively subscribe to them. Return whether the onboarding call
+     * succeeded or not.
+     *
+     * If an error occurs, we throw it so that higher-level logic can handle
+     * and store it in subscription.message.
+     */
+    private async callOnboardEndpoint(
+        tenant: Tenant,
+        app: App,
+        visited: Set<string>
+    ): Promise<boolean> {
+        if (!app.appUrl) {
+            // No onboard endpoint available
+            return true;
+        }
+
+        const endpoint = `${app.appUrl.replace(/\/+$/, '')}/onboard/tenant/`;
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({tenantId: tenant.id}),
+        });
+
+        if (!response.ok) {
+            // Something went wrong with the request
+            const errorMsg = `Onboarding request failed for app "${app.name}": ${response.status} ${response.statusText}`;
+            console.warn(errorMsg);
+            throw new Error(errorMsg);
+        }
+
+        const data = (await response.json()) as OnboardResponse;
+        if (data.appNames && Array.isArray(data.appNames)) {
+            // Recursively subscribe to each app name returned
+            for (const name of data.appNames) {
+                const nextApp = await this.appRepo.findOne({where: {name}});
+                if (nextApp) {
+                    await this.subscribeApp(tenant, nextApp, visited);
+                } else {
+                    throw new NotFoundException(`App ${name} not found`);
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Unsubscribes a tenant from an app by setting the subscription status
+     * to CANCELED, then calls the /offboard/tenant/<tenantId> endpoint.
+     * If the endpoint returns additional apps, we recursively unsubscribe from them.
+     * Any error is captured in the subscription's message field.
+     */
+    async unsubscribe(
+        tenant: Tenant,
+        app: App,
+        visited: Set<string> = new Set<string>()
+    ): Promise<Subscription> {
+        let subscription: Subscription;
+
+        try {
+            // Retrieve or create subscription if needed
+            subscription = await this.subscriptionRepo.findOne({
+                where: {subscriber: {id: tenant.id}, app: {id: app.id}},
+            });
+
+            if (!subscription) {
+                // If there's no existing subscription, create one in PENDING state
+                subscription = this.subscriptionRepo.create({
+                    subscriber: tenant,
+                    app,
+                    status: SubscriptionStatus.PENDING,
+                    message: 'Unsubscribe requested, but no prior subscription found.',
+                });
+            }
+
+            // Prevent multiple processes from unsubscribing the same app repeatedly
+            if (visited.has(app.id)) {
+                return subscription;
+            }
+            visited.add(app.id);
+
+            // Call the offboard endpoint (if it fails, an error is thrown and caught below)
+            await this.callOffboardEndpoint(tenant, app, visited);
+
+            // Remove roles that were created for this tenant
+            const rolesToRemove = await this.roleRepo.find({
+                where: {
+                    tenant: {id: tenant.id},
+                    app: null // Assuming roles were created with app = null during subscription
+                },
+            });
+            if (rolesToRemove.length > 0) {
+                await this.roleRepo.remove(rolesToRemove);
+            }
+
+            // Mark subscription as CANCELED
+            subscription.status = SubscriptionStatus.CANCELED;
+            subscription.message = null;
+            await this.subscriptionRepo.save(subscription);
+
+            return subscription;
+        } catch (error) {
+            const errorText = error instanceof Error ? error.message : String(error);
+
+            // If subscription wasn't found or created, create a new one for error reporting
+            if (!subscription) {
+                subscription = this.subscriptionRepo.create({
+                    subscriber: tenant,
+                    app,
+                    status: SubscriptionStatus.PENDING,
+                });
+            }
+
+            // Store the error in subscription.message
+            subscription.message = errorText;
+            await this.subscriptionRepo.save(subscription);
+            throw error;
+        }
+    }
+
+    /**
+     * Calls the appUrl/offboard/tenant/<tenantId> endpoint, throwing an error
+     * if it fails. If additional apps are returned in the response, recursively
+     * unsubscribe from them as well.
+     */
+    private async callOffboardEndpoint(
+        tenant: Tenant,
+        app: App,
+        visited: Set<string>
+    ): Promise<void> {
+        // If no appUrl is set, there's nothing to call, so skip
+        if (!app.appUrl) {
+            return;
+        }
+
+        const endpoint = `${app.appUrl.replace(/\/+$/, '')}/offboard/tenant/${tenant.id}`;
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+        });
+
+        if (!response.ok) {
+            throw new Error(
+                `Offboarding request failed for app "${app.name}": ${response.status} ${response.statusText}`
+            );
+        }
+
+        // Parse the response to see if there are more apps to offboard
+        const data = (await response.json()) as OffboardResponse;
+        if (data.appNames && Array.isArray(data.appNames)) {
+            for (const name of data.appNames) {
+                const nextApp = await this.appRepo.findOne({where: {name}});
+                if (nextApp) {
+                    await this.unsubscribe(tenant, nextApp, visited);
+                } else {
+                    throw new NotFoundException(`App ${name} not found`);
+                }
+            }
+        }
+    }
+
+}

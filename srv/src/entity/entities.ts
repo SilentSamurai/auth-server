@@ -8,6 +8,8 @@ import {Group} from "./group.entity";
 import {GroupRole} from "./group.roles.entity";
 import {GroupUser} from "./group.users.entity";
 import {Policy} from "./authorization.entity";
+import {App} from "./app.entity";
+import {Subscription} from "./subscription.entity";
 
 
 export const entities = [
@@ -20,5 +22,7 @@ export const entities = [
     Group,
     GroupRole,
     GroupUser,
-    Policy
+    Policy,
+    App,
+    Subscription
 ];

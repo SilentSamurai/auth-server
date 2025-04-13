@@ -22,6 +22,7 @@ import {PolicyController} from "./policy.controller";
 import {GroupController} from "./group.controller";
 import {RoleControllerV2} from "./roleV2.controller";
 import {RegisterController} from "./registration.controller";
+import {AppController} from "./app.controller";
 
 @Module(
     {
@@ -46,7 +47,8 @@ import {RegisterController} from "./registration.controller";
             PolicyController,
             GroupController,
             RoleControllerV2,
-            RegisterController
+            RegisterController,
+            AppController
         ],
         providers: [],
         exports: []

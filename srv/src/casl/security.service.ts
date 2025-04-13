@@ -9,7 +9,7 @@ import {Action} from "./actions.enum";
 import {subject} from "@casl/ability";
 import {AuthUserService} from "./authUser.service";
 import {AuthContext, GRANT_TYPES, OAuthToken, TenantToken, UserToken} from "./contexts";
-import {User} from "../entity/user.entity";
+import {UnauthorizedException} from "../exceptions/unauthorized.exception";
 
 
 @Injectable()
@@ -25,7 +25,10 @@ export class SecurityService implements OnModuleInit {
     }
 
     getAbility(authContext: AuthContext): AnyAbility {
-        return authContext.SCOPE_ABILITIES;
+        if (authContext.SCOPE_ABILITIES) {
+            return authContext.SCOPE_ABILITIES;
+        }
+        throw new UnauthorizedException();
     }
 
     isAuthorized(authContext: AuthContext, action: Action, object: string, obj: any = null): boolean {

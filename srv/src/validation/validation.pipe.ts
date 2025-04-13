@@ -20,3 +20,9 @@ export class ValidationPipe implements PipeTransform {
         }
     }
 }
+
+
+export function schemaPipe(schema: any) {
+    return new ValidationPipe(schema);
+}
+

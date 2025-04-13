@@ -9,7 +9,8 @@ import {
     PrimaryGeneratedColumn
 } from "typeorm";
 import {Tenant} from "./tenant.entity";
-import {User} from "./user.entity"; // Used with ClassSerializerInterceptor to exclude from responses.
+import {User} from "./user.entity";
+import {App} from "./app.entity"; // Used with ClassSerializerInterceptor to exclude from responses.
 
 
 @Entity({name: "roles"})
@@ -29,6 +30,11 @@ export class Role {
         referencedColumnName: "id"
     })
     tenant: Tenant;
+
+    // Reference to the App that this role belongs to (optional if the role is global)
+    @ManyToOne(() => App, app => app.roles, {nullable: true})
+    @JoinColumn({name: "app_id", referencedColumnName: "id"})
+    app?: App;
 
     @ManyToMany(() => User, user => user.roles)
     @JoinTable({

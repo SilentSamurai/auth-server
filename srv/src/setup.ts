@@ -1,7 +1,7 @@
 import {NestApplicationOptions} from "@nestjs/common/interfaces/nest-application-options.interface";
 import {Environment} from "./config/environment.service";
 import fs from "fs";
-import process from "node:process";
+import * as process from 'node:process';
 import {JsonConsoleLogger} from "./log/JsonConsoleLogger";
 import {createFakeSmtpServer} from "./mail/FakeSmtpServer";
 import {NestExpressApplication} from "@nestjs/platform-express";
@@ -76,14 +76,14 @@ export async function prepareApp() {
 export async function run(app: NestExpressApplication) {
     // Graceful shutdown: on SIGTERM/SIGINT, close Nest app cleanly
     const signals: NodeJS.Signals[] = ['SIGINT', 'SIGTERM'];
-    signals.forEach((signal) => {
+    for (let signal in signals) {
         process.on(signal, async () => {
             console.log(`Received ${signal}, closing Nest application...`);
             await app.close();
             console.log('Nest application successfully closed.');
             process.exit(0);
         });
-    });
+    }
 
     const port = Environment.get('PORT') || 9000;
     await app.listen(port);
