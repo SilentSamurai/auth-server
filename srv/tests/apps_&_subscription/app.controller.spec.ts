@@ -4,7 +4,7 @@ import { v4 as uuid } from 'uuid';
 import { AppClient } from '../api-client/app-client';
 import { SearchClient } from '../api-client/search-client';
 import { TokenFixture } from '../token.fixture';
-import { createMockOnboardServer, MockOnboardServer } from './mock-onboard-server';
+import { createTenantAppServer, TenantAppServer } from './tenant-app-server';
 
 describe('AppController', () => {
     let app: INestApplication;
@@ -14,12 +14,12 @@ describe('AppController', () => {
     let tokenFixture: TokenFixture;
     let accessToken: string;
     let tenantId: string;
-    let mockServer: MockOnboardServer;
+    let mockServer: TenantAppServer;
     const MOCK_SERVER_PORT = 3000;
 
     beforeAll(async () => {
         // Start the mock server
-        mockServer = createMockOnboardServer({ port: MOCK_SERVER_PORT });
+        mockServer = createTenantAppServer({ port: MOCK_SERVER_PORT });
         await mockServer.listen();
         
         // Initialize the test app
@@ -115,6 +115,31 @@ describe('AppController', () => {
             expect(subscription.id).toBeDefined();
             expect(subscription.status).toBeDefined();
             expect(subscription.subscribedAt).toBeDefined();
+            
+            // Verify that the onboard request was made
+            const onboardRequests = mockServer.getOnboardRequests();
+            expect(onboardRequests.length).toBeGreaterThan(0);
+            expect(onboardRequests[0].tenantId).toBe(tenantId);
+        });
+
+        it('should successfully unsubscribe from an app', async () => {
+            const subscription = await appClient.subscribeToApp(testAppId, tenantId);
+
+            // Then unsubscribe using the AppClient
+            const unsubscribeResponse = await appClient.unsubscribeApp(testAppId, tenantId);
+            expect(unsubscribeResponse).toBeDefined();
+            expect(unsubscribeResponse.status).toBeDefined();
+            expect(unsubscribeResponse.status).toEqual(true);
+            
+            // Verify that the offboard request was made
+            const offboardRequests = mockServer.getOffboardRequests();
+            expect(offboardRequests.length).toBeGreaterThan(0);
+            expect(offboardRequests[0].tenantId).toBe(tenantId);
+            
+            // Verify the subscription is no longer active
+            const tenantSubscriptions = await appClient.getTenantSubscriptions(tenantId);
+            const unsubscribedApp = tenantSubscriptions.find(sub => sub.appId === testAppId);
+            expect(unsubscribedApp).toBeUndefined();
         });
 
         it('should fail when subscribing with invalid app ID', async () => {

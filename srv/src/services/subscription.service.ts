@@ -185,17 +185,12 @@ export class SubscriptionService {
         return true;
     }
 
-    /**
-     * Unsubscribes a tenant from an app by setting the subscription status
-     * to CANCELED, then calls the /offboard/tenant/<tenantId> endpoint.
-     * If the endpoint returns additional apps, we recursively unsubscribe from them.
-     * Any error is captured in the subscription's message field.
-     */
+    
     async unsubscribe(
         tenant: Tenant,
         app: App,
         visited: Set<string> = new Set<string>()
-    ): Promise<Subscription> {
+    ): Promise<{status: boolean}> {
         let subscription: Subscription;
 
         try {
@@ -206,55 +201,42 @@ export class SubscriptionService {
 
             if (!subscription) {
                 // If there's no existing subscription, create one in PENDING state
-                subscription = this.subscriptionRepo.create({
-                    subscriber: tenant,
-                    app,
-                    status: SubscriptionStatus.PENDING,
-                    message: 'Unsubscribe requested, but no prior subscription found.',
-                });
+                return {status: true};
             }
 
             // Prevent multiple processes from unsubscribing the same app repeatedly
             if (visited.has(app.id)) {
-                return subscription;
+                return {status: true};
             }
             visited.add(app.id);
 
             // Call the offboard endpoint (if it fails, an error is thrown and caught below)
-            await this.callOffboardEndpoint(tenant, app, visited);
+            await this.callOffboardingEndpoint(tenant, app, visited);
 
             // Remove roles that were created for this tenant
             const rolesToRemove = await this.roleRepo.find({
                 where: {
                     tenant: {id: tenant.id},
-                    app: null // Assuming roles were created with app = null during subscription
+                    app: app
                 },
             });
             if (rolesToRemove.length > 0) {
                 await this.roleRepo.remove(rolesToRemove);
             }
+            
+            await this.subscriptionRepo.delete(subscription);
 
-            // Mark subscription as CANCELED
-            subscription.status = SubscriptionStatus.CANCELED;
-            subscription.message = null;
-            await this.subscriptionRepo.save(subscription);
-
-            return subscription;
+            return {status: true};
         } catch (error) {
             const errorText = error instanceof Error ? error.message : String(error);
 
             // If subscription wasn't found or created, create a new one for error reporting
-            if (!subscription) {
-                subscription = this.subscriptionRepo.create({
-                    subscriber: tenant,
-                    app,
-                    status: SubscriptionStatus.PENDING,
-                });
+            if (subscription) {
+                // Store the error in subscription.message
+                subscription.message = errorText;
+                await this.subscriptionRepo.save(subscription);
             }
 
-            // Store the error in subscription.message
-            subscription.message = errorText;
-            await this.subscriptionRepo.save(subscription);
             throw error;
         }
     }
@@ -264,7 +246,7 @@ export class SubscriptionService {
      * if it fails. If additional apps are returned in the response, recursively
      * unsubscribe from them as well.
      */
-    private async callOffboardEndpoint(
+    private async callOffboardingEndpoint(
         tenant: Tenant,
         app: App,
         visited: Set<string>
@@ -298,6 +280,27 @@ export class SubscriptionService {
                 }
             }
         }
+    }
+
+    public async findAllByAppId(appId: string): Promise<Subscription[]> {
+        return this.subscriptionRepo.find({
+            where: {app: {id: appId}},
+            relations: ['subscriber', 'app']
+        });
+    }
+
+    /**
+     * Returns all apps to which the specified tenant is subscribed.
+     * @param tenantId The UUID of the tenant whose subscriptions we want to list.
+     */
+    public async findAppsByTenantId(tenantId: string): Promise<App[]> {
+        const subscriptions = await this.subscriptionRepo.find({
+            where: { subscriber: { id: tenantId } },
+            relations: ['app'],
+        });
+
+        // Map each subscription to its associated app
+        return subscriptions.map(sub => sub.app);
     }
 
 }

@@ -1,4 +1,4 @@
-import {Body, Controller, Param, ParseUUIDPipe, Post, Request, UseGuards} from '@nestjs/common';
+import {Body, Controller, Get, Param, ParseUUIDPipe, Post, Request, UseGuards} from '@nestjs/common';
 
 import {SubscriptionService} from '../services/subscription.service';
 import {AppService} from "../services/app.service";
@@ -43,5 +43,39 @@ export class AppController {
             await this.tenantService.findById(request, tenantId),
             await this.appService.getAppById(appId)
         );
+    }
+
+    @Post('/:appId/unsubscribe/:tenantId')
+    @UseGuards(JwtAuthGuard)
+    async unsubscribeFromApp(
+        @Request() request: AuthContext,
+        @Param('appId', ParseUUIDPipe) appId: string,
+        @Param('tenantId', ParseUUIDPipe) tenantId: string
+    ) {
+        // Retrieve the subscriber tenant & the app, then unsubscribe
+        return this.subscriptionService.unsubscribe(
+            await this.tenantService.findById(request, tenantId),
+            await this.appService.getAppById(appId)
+        );
+    }
+
+    @Get('/:appId/subscriptions')
+    @UseGuards(JwtAuthGuard)
+    async getSubscriptions(
+        @Param('appId', ParseUUIDPipe) appId: string
+    ) {
+        return this.subscriptionService.findAllByAppId(appId);
+    }
+
+    /**
+     * New endpoint to get all apps to which a single tenant is subscribed.
+     */
+    @Get('/tenant/:tenantId/subscribed')
+    @UseGuards(JwtAuthGuard)
+    async getSubscribedAppsByTenant(
+        @Request() request: AuthContext,
+        @Param('tenantId', ParseUUIDPipe) tenantId: string
+    ) {
+        return this.subscriptionService.findAppsByTenantId(tenantId);
     }
 }
