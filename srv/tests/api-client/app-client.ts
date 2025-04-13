@@ -94,7 +94,7 @@ export class AppClient extends HttpClient {
      */
     public async getTenantSubscriptions(tenantId: string) {
         const response = await this.app.getHttpServer()
-            .get(`/api/apps/subscriptions/${tenantId}`)
+            .get(`/api/apps/tenant/${tenantId}/subscribed`)
             .set('Authorization', `Bearer ${this.accessToken}`)
             .set('Accept', 'application/json');
 
@@ -105,20 +105,32 @@ export class AppClient extends HttpClient {
         return response.body;
     }
 
+    public async getAppSubscriptions(appId: string) {
+        const response = await this.app.getHttpServer()
+            .get(`/api/apps/${appId}/subscriptions`)
+            .set('Authorization', `Bearer ${this.accessToken}`)
+            .set('Accept', 'application/json');
+
+        console.log("Get App Subscriptions Response:", response.body);
+        expect2xx(response);
+        expect(Array.isArray(response.body)).toBe(true);
+
+        return response.body;
+    }
+
     /**
      * Unsubscribe from an app
      */
-    public async unsubscribeFromApp(appId: string, tenantId: string) {
+    public async unsubscribeApp(appId: string, tenantId: string) {
         const response = await this.app.getHttpServer()
-            .delete(`/api/apps/${appId}/subscribe`)
-            .send({ tenantId })
+            .post(`/api/apps/${appId}/unsubscribe/${tenantId}`)
             .set('Authorization', `Bearer ${this.accessToken}`)
             .set('Accept', 'application/json');
 
         console.log("Unsubscribe from App Response:", response.body);
         expect2xx(response);
-        expect(response.body.id).toBeDefined();
-        expect(response.body.status).toEqual('canceled');
+        expect(response.body.status).toBeDefined();
+        expect(response.body.status).toEqual(true);
 
         return response.body;
     }
