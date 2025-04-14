@@ -13,11 +13,11 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
     }
 
     onModuleInit() {
-        this.logger.log('Cache Service Initialized');
+        // this.logger.log('Cache Service Initialized');
     }
 
     onModuleDestroy() {
-        this.logger.log('Flushing cache before shutdown');
+        // this.logger.log('Flushing cache before shutdown');
         this.cache.flushAll();
     }
 

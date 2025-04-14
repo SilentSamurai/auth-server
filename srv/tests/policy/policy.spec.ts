@@ -130,4 +130,5 @@ describe('PolicyController (e2e)', () => {
             expect(permission.subject).toBeDefined();
         }
     });
+
 });

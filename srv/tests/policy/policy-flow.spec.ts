@@ -47,17 +47,18 @@ describe('Policy Flow (e2e)', () => {
             {public: false}
         );
 
-        tokenResponse = await tokenFixture.fetchAccessToken(
-            "admin@shire.local",
-            "admin9000",
-            "shire.local"
+        const credential = await tenantClient.getTenantCredentials(tenant.id);
+
+        const ccTr = await tokenFixture.fetchClientCredentialsToken(
+            credential.clientId,
+            credential.clientSecret
         );
-        accessToken = tokenResponse.accessToken;
+        accessToken = ccTr.accessToken;
 
         policyClient = new PolicyClient(app, accessToken);
 
         // 6) Check if user permission now includes that policy
-        const myPolicies = await policyClient.getMyPermission();
+        const myPolicies = await policyClient.getTenantPermissions("admin@shire.local");
         expect(myPolicies).toBeDefined();
         expect(Array.isArray(myPolicies)).toBe(true);
         expect(myPolicies.length).toBeGreaterThan(0);

@@ -94,4 +94,14 @@ export class PolicyClient extends HttpClient {
         expect2xx(response);
         return response.body;
     }
+
+    async getTenantPermissions(email: string) {
+        const response = await this.post("/api/v1/tenant-user/permissions")
+            .send({email})
+
+
+        console.log("Tenant Permission Response:", response.body);
+        expect2xx(response);
+        return response.body;
+    }
 }

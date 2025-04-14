@@ -21,6 +21,9 @@ import {ValidationPipe} from "../validation/validation.pipe";
 import * as yup from "yup";
 import {Action, Effect} from "../casl/actions.enum";
 import {Policy} from "../entity/authorization.entity";
+import {TenantService} from "../services/tenant.service";
+import {UsersService} from "../services/users.service";
+import {ro} from "date-fns/locale";
 
 @Controller('api/v1')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -31,16 +34,38 @@ export class PolicyController {
         private readonly securityService: SecurityService,
         private readonly policyService: PolicyService,
         private readonly roleService: RoleService,
+        private readonly tenantService: TenantService,
+        private readonly usersService: UsersService,
     ) {
     }
 
     @Get('/my/permissions')
     @UseGuards(JwtAuthGuard)
-    async getUserPermissions(
+    async getMyPermission(
         @Request() request: Request
     ): Promise<any> {
         const ability = this.securityService.getAbility(request as unknown as AuthContext);
         return ability.rules;
+    }
+
+    @Post('/tenant-user/permissions')
+    @UseGuards(JwtAuthGuard)
+    async getUserPermissions(
+        @Request() request: AuthContext,
+        @Body('email') email: string
+    ): Promise<any> {
+        let token = this.securityService.getTechnicalToken(request);
+        let tenant = await this.tenantService.findById(request, token.tenant.id);
+
+        let user = await this.tenantService.findMember(request, tenant, email);
+        let roles = await this.tenantService.getMemberRoles(request, tenant.id, user);
+
+        let policies = [];
+        for (let role of roles) {
+            let policiesOfRole = await this.policyService.findByRole(request, role, tenant);
+            policies.push(...policiesOfRole);
+        }
+        return policies;
     }
 
     static CreateSchema = yup.object().shape({
@@ -85,12 +110,11 @@ export class PolicyController {
     @Get('/policy/byRole/:role_id')
     @UseGuards(JwtAuthGuard)
     async getAuthByRole(
-        @Request() request: Request,
+        @Request() authContext: AuthContext,
         @Param('role_id') role_id: string,
     ) {
-        const authContext = request as any as AuthContext;
         const role = await this.roleService.findById(authContext, role_id);
-        const auth = await this.policyService.findByRole(authContext, role);
+        const auth = await this.policyService.findByRole(authContext, role, role.tenant);
         return auth;
     }
 

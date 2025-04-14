@@ -28,6 +28,7 @@ export class TenantService implements OnModuleInit {
         private readonly securityService: SecurityService,
         @InjectRepository(Tenant) private tenantRepository: Repository<Tenant>,
         @InjectRepository(TenantMember) private tenantMemberRepository: Repository<TenantMember>,
+        @InjectRepository(User) private userRepository: Repository<User>,
     ) {
     }
 
@@ -352,4 +353,29 @@ export class TenantService implements OnModuleInit {
     }
 
 
+    async findMember(request: AuthContext, tenant: Tenant, email: string): Promise<User> {
+        this.securityService.isAuthorized(request, Action.Read, SubjectEnum.TENANT, {id: tenant.id});
+
+        // Find the user by email
+        const user = await this.userRepository.findOneBy({
+            email
+        });
+        if (!user) {
+            throw new NotFoundException(`User with email ${email} not found`);
+        }
+
+        // Check if the user is a member of the given tenant
+        const tenantMember = await this.tenantMemberRepository.findOne({
+            where: {
+                tenantId: tenant.id,
+                userId: user.id
+            }
+        });
+
+        if (!tenantMember) {
+            throw new NotFoundException(`User with email ${email} is not a member of tenant ${tenant.id}`);
+        }
+
+        return user;
+    }
 }
