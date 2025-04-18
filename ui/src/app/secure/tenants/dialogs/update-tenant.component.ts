@@ -2,7 +2,7 @@ import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
 import {lastValueFrom} from "rxjs";
 import {MessageService} from "primeng/api";
-import {TenantService} from "../../../_services/tenant.service";
+import {TenantService, NoChangesException} from "../../../_services/tenant.service";
 
 @Component({
     selector: 'app-update-tenant',
@@ -36,13 +36,25 @@ import {TenantService} from "../../../_services/tenant.service";
                                class="form-control"
                                id="update.tenant.domain"
                                name="domain"
-                               required type="text">
+                               readonly
+                               type="text">
                         <div
                             *ngIf="domain.errors && updateTenantForm.submitted"
                             class="text-danger"
                             role="alert">
                             Domain is required!
                         </div>
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        <input type="checkbox"
+                               class="form-check-input"
+                               id="update.tenant.allowSignUp"
+                               name="allowSignUp"
+                               [(ngModel)]="form.allowSignUp">
+                        <label class="form-check-label" for="update.tenant.allowSignUp">
+                            Allow Sign Up
+                        </label>
                     </div>
 
                 </form>
@@ -69,7 +81,8 @@ export class UpdateTenantComponent implements OnInit {
 
     form = {
         name: "",
-        domain: ""
+        domain: "",
+        allowSignUp: false
     }
     krishna: any;
 
@@ -81,7 +94,8 @@ export class UpdateTenantComponent implements OnInit {
     ngOnInit(): void {
         this.form = {
             name: this.tenant.name,
-            domain: this.tenant.domain
+            domain: this.tenant.domain,
+            allowSignUp: this.tenant.allowSignUp
         }
         this.subtitle = "Update: " + this.tenant.name;
     }
@@ -91,13 +105,18 @@ export class UpdateTenantComponent implements OnInit {
             let editedTenant = await lastValueFrom(this.tenantService.editTenant(
                 this.tenant.id,
                 this.tenant.name === this.form.name ? null : this.form.name,
-                this.tenant.domain === this.form.domain ? null : this.form.domain
+                this.tenant.allowSignUp === this.form.allowSignUp ? null : this.form.allowSignUp
             ));
             this.messageService.add({severity: 'success', summary: 'Success', detail: 'Tenant Updated'});
             this.passEntry.emit(editedTenant);
             this.activeModal.close(editedTenant);
-        } catch (e) {
-            this.messageService.add({severity: 'error', summary: 'Error', detail: 'Tenant Update Failed'});
+        } catch (e: any) {
+            if (e instanceof NoChangesException) {
+                this.messageService.add({severity: 'info', summary: 'Info', detail: 'No changes were made to the tenant'});
+                this.activeModal.close(this.tenant);
+            } else {
+                this.messageService.add({severity: 'error', summary: 'Error', detail: 'Tenant Update Failed: ' + e.message});
+            }
         }
     }
 }

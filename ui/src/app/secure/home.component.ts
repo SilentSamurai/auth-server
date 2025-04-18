@@ -4,6 +4,9 @@ import {TokenStorageService} from "../_services/token-storage.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {AuthService} from "../_services/auth.service";
 import {AuthDefaultService} from "../_services/auth.default.service";
+import {makeLaunchPad} from "../component/tile/models";
+import {Actions, PermissionService, Subjects} from "../_services/permission.service";
+
 
 @Component({
     selector: 'app-home',
@@ -19,7 +22,7 @@ export class HomeComponent implements OnInit {
     loading = true;
     groups: any = [
         {
-            name: "",
+            name: "Home",
             tiles: [
                 {
                     title: "Tenant Overview",
@@ -62,19 +65,28 @@ export class HomeComponent implements OnInit {
                     title: "TN01",
                     subtitle: "Manage All Tenants",
                     icon: "fa-bars",
-                    link: ['/TN01']
+                    link: ['/TN01'],
+                    canActivate: (ps: PermissionService) => {
+                        return ps.isAuthorized(Actions.Manage, Subjects.TENANT);
+                    },
                 },
                 {
                     title: "TN02",
                     subtitle: "Display Tenant",
                     icon: "fa-bars",
-                    link: ['/TN02']
+                    link: ['/TN02'],
+                    canActivate: (ps: PermissionService) => {
+                        return ps.isAuthorized(Actions.Read, Subjects.TENANT);
+                    },
                 },
                 {
                     title: "TNRL01",
                     subtitle: "Manage Role Assignments",
                     icon: "fa-magic",
-                    link: ['/TNRL01']
+                    link: ['/TNRL01'],
+                    canActivate: (ps: PermissionService) => {
+                        return ps.isAuthorized(Actions.Manage, Subjects.TENANT);
+                    },
                 }
             ]
         },
@@ -85,13 +97,19 @@ export class HomeComponent implements OnInit {
                     title: "UR01",
                     subtitle: "Manage Users",
                     icon: "fa-users",
-                    link: ['/UR01']
+                    link: ['/UR01'],
+                    canActivate: (ps: PermissionService) => {
+                        return ps.isAuthorized(Actions.Manage, Subjects.USER);
+                    },
                 },
                 {
                     title: "UR02",
                     subtitle: "Display User",
                     icon: "fa-users",
-                    link: ['/UR02']
+                    link: ['/UR02'],
+                    canActivate: (ps: PermissionService) => {
+                        return ps.isAuthorized(Actions.Read, Subjects.USER);
+                    },
                 }
             ]
         },
@@ -102,13 +120,19 @@ export class HomeComponent implements OnInit {
                     title: "GP01",
                     subtitle: "Manage Groups",
                     icon: "fa-group",
-                    link: ['/GP01']
+                    link: ['/GP01'],
+                    canActivate: (ps: PermissionService) => {
+                        return ps.isAuthorized(Actions.Manage, Subjects.GROUP);
+                    },
                 },
                 {
                     title: "GP02",
                     subtitle: "Display Group",
                     icon: "fa-group",
-                    link: ['/GP02']
+                    link: ['/GP02'],
+                    canActivate: (ps: PermissionService) => {
+                        return ps.isAuthorized(Actions.Read, Subjects.GROUP);
+                    },
                 }
             ]
         },
@@ -119,13 +143,19 @@ export class HomeComponent implements OnInit {
                     title: "RL01",
                     subtitle: "Manage Roles",
                     icon: "fa-casl",
-                    link: ['/RL01']
+                    link: ['/RL01'],
+                    canActivate: (ps: PermissionService) => {
+                        return ps.isAuthorized(Actions.Manage, Subjects.ROLE);
+                    },
                 },
                 {
                     title: "RL02",
                     subtitle: "Display Role",
                     icon: "fa-role",
-                    link: ['/RL02']
+                    link: ['/RL02'],
+                    canActivate: (ps: PermissionService) => {
+                        return ps.isAuthorized(Actions.Read, Subjects.ROLE);
+                    },
                 }
             ]
         }
@@ -135,8 +165,10 @@ export class HomeComponent implements OnInit {
                 private router: Router,
                 private route: ActivatedRoute,
                 private authService: AuthService,
+                private ps: PermissionService,
                 private authDefaultService: AuthDefaultService,
                 private tokenStorage: TokenStorageService) {
+        this.groups = makeLaunchPad(this.groups, this.ps);
     }
 
     ngOnInit(): void {

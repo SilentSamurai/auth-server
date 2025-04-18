@@ -1,7 +1,6 @@
 import {NestApplicationOptions} from "@nestjs/common/interfaces/nest-application-options.interface";
 import {Environment} from "./config/environment.service";
 import fs from "fs";
-import process from "node:process";
 import {JsonConsoleLogger} from "./log/JsonConsoleLogger";
 import {createFakeSmtpServer} from "./mail/FakeSmtpServer";
 import {NestExpressApplication} from "@nestjs/platform-express";
@@ -9,6 +8,7 @@ import {NestFactory} from "@nestjs/core";
 import {AppModule} from "./app.module";
 import {HttpExceptionFilter} from "./exceptions/http-exception.filter";
 import * as express from "express";
+import * as process from 'node:process';
 
 export async function prepareApp() {
     Environment.setup();

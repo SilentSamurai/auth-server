@@ -54,16 +54,15 @@ export class TenantController {
 
     static UpdateTenantSchema = yup.object().shape({
         name: yup.string().max(128),
-        allow_sign_up: yup.boolean()
+        allowSignUp: yup.boolean()
     });
-
 
     @Patch('/:tenantId')
     @UseGuards(JwtAuthGuard)
     async updateTenant(
         @Request() request,
         @Param('tenantId') tenantId: string,
-        @Body(new ValidationPipe(TenantController.UpdateTenantSchema)) body: { name: string, allow_sign_up: boolean }
+        @Body(new ValidationPipe(TenantController.UpdateTenantSchema)) body: { name?: string, allowSignUp?: boolean }
     ): Promise<Tenant> {
         let tenant = await this.tenantService.findById(request, tenantId);
         this.securityService.check(request, Action.Update, subject(SubjectEnum.TENANT, tenant));
@@ -72,9 +71,7 @@ export class TenantController {
             tenantId,
             body
         );
-
     }
-
 
     @Delete('/:tenantId')
     @UseGuards(JwtAuthGuard)
@@ -85,7 +82,6 @@ export class TenantController {
         return this.tenantService.deleteTenant(request, tenantId);
     }
 
-
     @Get('')
     @UseGuards(JwtAuthGuard)
     async getTenants(
@@ -93,7 +89,6 @@ export class TenantController {
     ): Promise<Tenant[]> {
         return await this.tenantService.getAllTenants(request);
     }
-
 
     @Get('/my/credentials')
     @UseGuards(JwtAuthGuard)
@@ -110,7 +105,6 @@ export class TenantController {
             publicKey: tenant.publicKey
         };
     }
-
 
     @Get('/:tenantId/credentials')
     @UseGuards(JwtAuthGuard)
@@ -138,6 +132,4 @@ export class TenantController {
         this.securityService.check(request, Action.Read, subject(SubjectEnum.TENANT, tenant));
         return tenant;
     }
-
-
 }

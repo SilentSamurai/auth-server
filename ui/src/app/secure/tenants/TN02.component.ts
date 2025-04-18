@@ -47,6 +47,9 @@ import {StaticModel} from "../../component/model/StaticModel";
                         <app-attribute label="Tenant Name">
                             {{ tenant.name }}
                         </app-attribute>
+                        <app-attribute label="Allow Sign Up">
+                            {{ tenant.allowSignUp ? 'Yes' : 'No' }}
+                        </app-attribute>
                     </div>
                     <div class="col-lg-7">
                         <app-attribute label="Client Id">
@@ -131,7 +134,7 @@ import {StaticModel} from "../../component/model/StaticModel";
 
                             <ng-template let-role #table_body>
                                 <td>
-                                    <a [routerLink]="['/RL02', tenant.id, role.name]"
+                                    <a [routerLink]="['/RL02', tenant.id, role.id]"
                                        href="javascript:void(0)">{{ role.name }}
                                     </a>
                                 </td>

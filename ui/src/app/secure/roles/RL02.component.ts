@@ -214,7 +214,7 @@ export class RL02Component implements OnInit {
         this.roleId = this.actRoute.snapshot.params['roleId'];
         this.tenantId = this.actRoute.snapshot.params['tenantId'];
 
-        await this.reloadUsers();
+        await this.loadRoleAndUser();
         await this.reloadPolicies();
 
         this.authDefaultService.setTitle("RL02: " + this.role.name);
@@ -252,7 +252,7 @@ export class RL02Component implements OnInit {
         });
     }
 
-    async reloadUsers() {
+    async loadRoleAndUser() {
         try {
             let response = await this.roleService.getRoleDetails(this.tenantId, this.roleId);
             this.role = response.role;

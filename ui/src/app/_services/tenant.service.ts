@@ -7,6 +7,15 @@ import {DataModel} from "../component/model/DataModel";
 
 const API_URL = '/api';
 
+/**
+ * Custom exception for when no changes are made to a tenant
+ */
+export class NoChangesException extends Error {
+    constructor(message: string = 'No changes have been made to the tenant') {
+        super(message);
+        this.name = 'NoChangesException';
+    }
+}
 
 @Injectable({
     providedIn: 'root'
@@ -31,11 +40,25 @@ export class TenantService {
         }, this.getHttpOptions());
     }
 
-    editTenant(tenantId: string, name: null | string, domain: null | string) {
-        return this.http.patch(`${API_URL}/tenant/${tenantId}`, {
-            name,
-            domain
-        }, this.getHttpOptions());
+    editTenant(tenantId: string, name: null | string, allowSignUp: null | boolean) {
+        // Create a request body object
+        const requestBody: any = {};
+        
+        // Only add non-null parameters to the request body
+        if (name !== null) {
+            requestBody.name = name;
+        }
+        
+        if (allowSignUp !== null) {
+            requestBody.allowSignUp = allowSignUp;
+        }
+        
+        // If all values are null, throw a specific exception
+        if (Object.keys(requestBody).length === 0) {
+            throw new NoChangesException();
+        }
+        
+        return this.http.patch(`${API_URL}/tenant/${tenantId}`, requestBody, this.getHttpOptions());
     }
 
     deleteTenant(tenantId: string) {

@@ -19,7 +19,8 @@ export const all_actions = [
 export enum Subjects {
     USER = "User",
     TENANT = "Tenant",
-    ROLE = "Role"
+    ROLE = "Role",
+    GROUP = "Group",
 }
 
 @Injectable({
@@ -34,11 +35,24 @@ export class PermissionService {
     }
 
     public isAuthorized(action: Actions, subjectStr: Subjects, condition: any = null): boolean {
-        console.log("isAuthorized action: ", action, " subject: ", subjectStr, " condition: ", condition);
+        // console.log("[PermissionService] isAuthorized check:", {
+        //     action,
+        //     subject: subjectStr,
+        //     condition
+        // });
+        let result: boolean;
         if (condition) {
-            return this.ability.can(action, subject(subjectStr, condition));
+            result = this.ability.can(action, subject(subjectStr, condition));
+        } else {
+            result = this.ability.can(action, subjectStr);
         }
-        return this.ability.can(action, subjectStr);
+        console.log(`[PermissionService] isAuthorized result:`, {
+            action,
+            subject: subjectStr,
+            condition,
+            result
+        });
+        return result;
     }
 
 

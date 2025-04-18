@@ -171,20 +171,14 @@ export class TenantService implements OnModuleInit {
         return this.tenantRepository.find();
     }
 
-    async updateTenant(authContext: AuthContext, id: string, body: { name?: string, allowSignUp?: boolean }) {
-
+    async updateTenant(authContext: AuthContext, id: string, data: { name?: string, allowSignUp?: boolean }) {
         this.securityService.isAuthorized(authContext, Action.Update, SubjectEnum.TENANT);
-
         const tenant: Tenant = await this.findById(authContext, id);
-        if (body.name) {
-            tenant.name = body.name || tenant.name;
-        }
+        
+        if (data.name !== undefined) tenant.name = data.name;
+        if (data.allowSignUp !== undefined) tenant.allowSignUp = data.allowSignUp;
 
-        if (body.allowSignUp) {
-            tenant.allowSignUp = body.allowSignUp || tenant.allowSignUp;
-        }
-
-        return this.tenantRepository.save(tenant)
+        return this.tenantRepository.save(tenant);
     }
 
     async getMemberRoles(authContext: AuthContext, tenantId: string, user: User): Promise<Role[]> {
