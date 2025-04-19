@@ -1,5 +1,6 @@
 // test-send.js
 import {createFakeSmtpServer, EmailSearchCriteria, FakeSmtpServer} from "../src/mail/FakeSmtpServer";
+import {setupConsole} from "./helper.fixture";
 
 const nodemailer = require('nodemailer');
 
@@ -23,14 +24,13 @@ async function sendTestEmail() {
     console.log('✅ Test email sent');
 }
 
-let console = require('console');
-global.console = console;
 
 describe("Fake Smtp Server Test", () => {
 
     let smtpServer: FakeSmtpServer;
 
     beforeAll(async () => {
+        setupConsole();
         smtpServer = createFakeSmtpServer();
         await smtpServer.listen();
     })

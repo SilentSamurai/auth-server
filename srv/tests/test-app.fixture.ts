@@ -7,8 +7,7 @@ import * as superTest from 'supertest';
 import * as process from "node:process";
 import TestAgent from "supertest/lib/agent";
 import {createFakeSmtpServer, FakeSmtpServer} from "../src/mail/FakeSmtpServer";
-
-let console = require('console');
+import {setupConsole} from "./helper.fixture";
 
 export class TestAppFixture {
     private app: INestApplication;
@@ -17,6 +16,7 @@ export class TestAppFixture {
     private smtpServer: FakeSmtpServer;
 
     constructor() {
+        setupConsole();
     }
 
     public jwtService(): JwtService {
@@ -33,7 +33,6 @@ export class TestAppFixture {
 
     public async init(): Promise<TestAppFixture> {
 
-        global.console = console;
         process.env.ENV_FILE = './envs/.env.testing';
 
         Environment.setup();

@@ -8,7 +8,7 @@ COPY package.json .
 COPY ./ /home/app
 
 RUN npm install
-RUN npm run release
+RUN npm run build
 
 # Stage 2: Production
 FROM node:20.19.0-alpine
