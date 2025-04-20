@@ -3,6 +3,7 @@ import {TenantClient} from "./api-client/tenant-client";
 import {RoleClient} from "./api-client/role-client";
 import {GroupClient} from "./api-client/group-client";
 import {UsersClient} from "./api-client/user-client";
+import * as process from "node:process";
 
 export class HelperFixture {
 
@@ -23,4 +24,13 @@ export class HelperFixture {
         this.user = new UsersClient(app, accessToken);
     }
 
+}
+
+
+export function setupConsole() {
+    if (
+        process.env.CUSTOM_LOG && process.env.CUSTOM_LOG.includes("1")
+    ) {
+        global.console = require('console');
+    }
 }

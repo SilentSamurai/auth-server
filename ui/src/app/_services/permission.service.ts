@@ -1,7 +1,5 @@
-import {Injectable} from '@angular/core';
-import {PureAbility} from "@casl/ability";
-import {HttpClient} from '@angular/common/http';
-import {lastValueFrom} from 'rxjs';
+import {Inject, Injectable} from '@angular/core';
+import {MongoAbility, PureAbility, subject} from "@casl/ability";
 
 
 export enum Actions {
@@ -21,7 +19,8 @@ export const all_actions = [
 export enum Subjects {
     USER = "User",
     TENANT = "Tenant",
-    ROLE = "Role"
+    ROLE = "Role",
+    GROUP = "Group",
 }
 
 @Injectable({
@@ -31,15 +30,29 @@ export class PermissionService {
     private readonly baseUrl = '/api/v1'; // match the prefix from PolicyClient
 
     constructor(
-        private ability: PureAbility
+        @Inject(PureAbility) private ability: MongoAbility
     ) {
     }
 
-    public isAuthorized(action: Actions, subject: Subjects, condition: any = null): boolean {
+    public isAuthorized(action: Actions, subjectStr: Subjects, condition: any = null): boolean {
+        // console.log("[PermissionService] isAuthorized check:", {
+        //     action,
+        //     subject: subjectStr,
+        //     condition
+        // });
+        let result: boolean;
         if (condition) {
-            return this.ability.can(action, subject, condition);
+            result = this.ability.can(action, subject(subjectStr, condition));
+        } else {
+            result = this.ability.can(action, subjectStr);
         }
-        return this.ability.can(action, subject);
+        console.log(`[PermissionService] isAuthorized result:`, {
+            action,
+            subject: subjectStr,
+            condition,
+            result
+        });
+        return result;
     }
 
 

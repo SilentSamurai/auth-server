@@ -89,7 +89,7 @@ import {CloseType, ValueHelpResult} from "../../component/value-help/value-help.
                             <ng-template pTemplate="body" let-role>
                                 <tr>
                                     <td>
-                                        <a [routerLink]="['/RL02', group.tenant.id, role.name]"
+                                        <a [routerLink]="['/RL02', group.tenant.id, role.id]"
                                            href="javascript:void(0)">
                                             {{ role.name }}
                                         </a>

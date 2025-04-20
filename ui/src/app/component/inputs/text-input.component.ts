@@ -32,7 +32,8 @@ export class InputErrorComponent implements OnInit {
                    class="form-control"
                    id="{{formName}}_{{formField}}_INPUT"
                    name="{{formField}}"
-                   type="{{type}}">
+                   type="{{type}}"
+                   [readonly]="readonly">
             <div *ngIf="field.invalid && (field.dirty || field.touched)"
                 class="text-danger"
                 role="alert">
@@ -57,6 +58,7 @@ export class TextInputComponent implements OnInit {
     @Input() label: string = '';
     @Input() value: string = '';
     @Input() type: string = 'text';
+    @Input() readonly: boolean = false;
     formControl!: UntypedFormControl;
 
     @ContentChildren(InputErrorComponent)

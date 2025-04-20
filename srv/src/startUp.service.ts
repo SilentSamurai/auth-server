@@ -63,13 +63,13 @@ export class StartUpService implements OnModuleInit {
 
             // 3) Define a list of dummy tenants to create
             const dummyTenants = [
-                {name: "Shire Tenant", domain: "shire.local"},
-                {name: "Bree Tenant", domain: "bree.local"},
-                {name: "Rivendell Tenant", domain: "rivendell.local"},
+                {name: "Shire Tenant", domain: "shire.local", signUp: true},
+                {name: "Bree Tenant", domain: "bree.local", signUp: false},
+                {name: "Rivendell Tenant", domain: "rivendell.local", signUp: false},
             ];
 
             // 4) Create each tenant and assign the existing user as owner
-            for (const {name, domain} of dummyTenants) {
+            for (const {name, domain, signUp} of dummyTenants) {
                 const adminEmail = `admin@${domain}`;
                 const isPresent = await this.usersService.existByEmail(adminContext, adminEmail);
                 if (isPresent) {
@@ -90,6 +90,12 @@ export class StartUpService implements OnModuleInit {
                     domain,
                     adminUser
                 );
+
+                if (signUp) {
+                    await this.tenantService.updateTenant(adminContext, createdTenant.id, {
+                        allowSignUp: true
+                    })
+                }
                 this.logger.log(`Created dummy tenant: ${createdTenant.name} (${createdTenant.domain})`);
                 this.logger.log("Admin user used for ownership:", adminUser.email);
             }

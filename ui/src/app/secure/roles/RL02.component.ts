@@ -189,7 +189,7 @@ export class RL02Component implements OnInit {
         effect: 'ALLOW'
     };
     usersDM = new StaticModel(['id']);
-    private roleName: string = "";
+    private roleId: string = "";
     private tenantId: string = "";
 
     constructor(private tenantService: TenantService,
@@ -207,14 +207,14 @@ export class RL02Component implements OnInit {
     async ngOnInit() {
         this.loading = true;
 
-        if (!this.actRoute.snapshot.params.hasOwnProperty("roleName") || !this.actRoute.snapshot.params.hasOwnProperty("tenantId")) {
+        if (!this.actRoute.snapshot.params.hasOwnProperty("roleId") || !this.actRoute.snapshot.params.hasOwnProperty("tenantId")) {
             await this.router.navigate(["/RL01"]);
         }
 
-        this.roleName = this.actRoute.snapshot.params['roleName'];
+        this.roleId = this.actRoute.snapshot.params['roleId'];
         this.tenantId = this.actRoute.snapshot.params['tenantId'];
 
-        await this.reloadUsers();
+        await this.loadRoleAndUser();
         await this.reloadPolicies();
 
         this.authDefaultService.setTitle("RL02: " + this.role.name);
@@ -252,9 +252,9 @@ export class RL02Component implements OnInit {
         });
     }
 
-    async reloadUsers() {
+    async loadRoleAndUser() {
         try {
-            let response = await this.roleService.getRoleDetails(this.tenantId, this.roleName);
+            let response = await this.roleService.getRoleDetails(this.tenantId, this.roleId);
             this.role = response.role;
             this.users = response.users;
         } catch (e: any) {
@@ -300,7 +300,7 @@ export class RL02Component implements OnInit {
                         user.id
                     );
                 }
-                const response = await this.roleService.getRoleDetails(this.tenantId, this.roleName);
+                const response = await this.roleService.getRoleDetails(this.tenantId, this.roleId);
                 this.users = response.users;
             } catch (e) {
                 this.messageService.add({

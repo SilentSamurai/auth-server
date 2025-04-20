@@ -10,6 +10,7 @@ import {Action, Effect} from "./actions.enum";
 import {SecurityService} from "./security.service";
 import {SubjectEnum} from "../entity/subjectEnum";
 import {CacheService} from "./cache.service";
+import {Tenant} from "../entity/tenant.entity";
 
 
 @Injectable()
@@ -20,11 +21,13 @@ export class PolicyService {
     constructor(
         private readonly configService: Environment,
         private readonly securityService: SecurityService,
+        private readonly cacheService: CacheService,
         @InjectRepository(Policy) private authorizationRepository: Repository<Policy>
     ) {
     }
 
-    public async createAuthorization(authContext: AuthContext, role: Role,
+    public async createAuthorization(authContext: AuthContext,
+                                      role: Role,
                                      effect: Effect,
                                      action: Action,
                                      subject: string,
@@ -43,18 +46,24 @@ export class PolicyService {
         return await this.authorizationRepository.save(auth);
     }
 
-    public async findByRole(authContext: AuthContext, role: Role) {
+    public async findByRole(authContext: AuthContext, role: Role, tenant: Tenant) {
+        this.securityService.isAuthorized(authContext, Action.Read, SubjectEnum.POLICY, {tenantId: tenant.id});
 
-        this.securityService.isAuthorized(authContext, Action.Read, SubjectEnum.POLICY, {roleId: role.id});
-
-        return await this.authorizationRepository.find({
-            where: {
-                role: {
-                    id: role.id
-                }
-            },
-            relations: ['role']
-        });
+        let cache_key = `POLICY:${role.id}`;
+        if (this.cacheService.has(cache_key)) {
+            return this.cacheService.get<Policy[]>(cache_key);
+        } else {
+            const policies = await this.authorizationRepository.find({
+                where: {
+                    role: {
+                        id: role.id
+                    }
+                },
+                relations: ['role']
+            });
+            this.cacheService.set(cache_key, policies);
+            return policies;
+        }
     }
 
     public async findById(authContext: AuthContext, id: string): Promise<Policy> {
@@ -105,5 +114,4 @@ export class PolicyService {
         this.securityService.isAuthorized(authContext, Action.Update, SubjectEnum.POLICY, {roleId: auth.role.id});
         return await this.authorizationRepository.delete(id);
     }
-
 }

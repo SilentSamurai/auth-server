@@ -27,6 +27,8 @@ import {InvalidTokenException} from "../exceptions/invalid-token.exception";
 import {AuthCodeService} from "../auth/auth-code.service";
 import {GRANT_TYPES, TenantToken} from "../casl/contexts";
 import {AuthUserService} from "../casl/authUser.service";
+import {request} from "express";
+import {SecurityService} from "../casl/security.service";
 
 @Controller('api/oauth')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -38,7 +40,8 @@ export class AuthController {
         private readonly tenantService: TenantService,
         private readonly mailService: MailService,
         private readonly authCodeService: AuthCodeService,
-        private readonly authUserService: AuthUserService
+        private readonly authUserService: AuthUserService,
+        private readonly securityService: SecurityService,
     ) {
     }
 
@@ -112,6 +115,10 @@ export class AuthController {
                     tenant = await this.authUserService.findTenantByClientId(body.client_id);
                 } else {
                     throw new BadRequestException("client_id is required");
+                }
+                let adminContext = await this.securityService.getAdminContextForInternalUse();
+                if (!await this.tenantService.isMember(adminContext, tenant.id, user)) {
+                    throw new BadRequestException("invalid request");
                 }
                 const {accessToken, refreshToken} = await this.authService.createUserAccessToken(user, tenant);
                 return {

@@ -28,6 +28,7 @@ export class TenantService implements OnModuleInit {
         private readonly securityService: SecurityService,
         @InjectRepository(Tenant) private tenantRepository: Repository<Tenant>,
         @InjectRepository(TenantMember) private tenantMemberRepository: Repository<TenantMember>,
+        @InjectRepository(User) private userRepository: Repository<User>,
     ) {
     }
 
@@ -170,13 +171,14 @@ export class TenantService implements OnModuleInit {
         return this.tenantRepository.find();
     }
 
-    async updateTenant(authContext: AuthContext, id: string, name: string) {
-
+    async updateTenant(authContext: AuthContext, id: string, data: { name?: string, allowSignUp?: boolean }) {
         this.securityService.isAuthorized(authContext, Action.Update, SubjectEnum.TENANT);
-
         const tenant: Tenant = await this.findById(authContext, id);
-        tenant.name = name || tenant.name;
-        return this.tenantRepository.save(tenant)
+        
+        if (data.name !== undefined) tenant.name = data.name;
+        if (data.allowSignUp !== undefined) tenant.allowSignUp = data.allowSignUp;
+
+        return this.tenantRepository.save(tenant);
     }
 
     async getMemberRoles(authContext: AuthContext, tenantId: string, user: User): Promise<Role[]> {
@@ -325,5 +327,49 @@ export class TenantService implements OnModuleInit {
         return this.roleService.getTenantRoles(authContext, tenant);
     }
 
+    async findByClientIdOrDomain(authContext: AuthContext, clientIdOrDomain: string): Promise<Tenant> {
 
+        this.securityService.isAuthorized(authContext, Action.Read, SubjectEnum.TENANT, {clientId: clientIdOrDomain});
+
+        let tenant = await this.tenantRepository.findOne({
+            where: [
+                {clientId: clientIdOrDomain,},
+                {domain: clientIdOrDomain,}
+            ], relations: {
+                members: true,
+                roles: true
+            }
+        });
+        if (tenant === null) {
+            throw new NotFoundException("tenant not found");
+        }
+        return tenant;
+    }
+
+
+    async findMember(request: AuthContext, tenant: Tenant, email: string): Promise<User> {
+        this.securityService.isAuthorized(request, Action.Read, SubjectEnum.TENANT, {id: tenant.id});
+
+        // Find the user by email
+        const user = await this.userRepository.findOneBy({
+            email
+        });
+        if (!user) {
+            throw new NotFoundException(`User with email ${email} not found`);
+        }
+
+        // Check if the user is a member of the given tenant
+        const tenantMember = await this.tenantMemberRepository.findOne({
+            where: {
+                tenantId: tenant.id,
+                userId: user.id
+            }
+        });
+
+        if (!tenantMember) {
+            throw new NotFoundException(`User with email ${email} is not a member of tenant ${tenant.id}`);
+        }
+
+        return user;
+    }
 }

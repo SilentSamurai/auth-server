@@ -42,19 +42,29 @@ export class FakeSmtpServer {
         this.setupShutdownHandlers();
     }
 
-    public listen(): FakeSmtpServer {
-        this.server.listen(this.config.port, this.config.host, () => {
-            this.log('info', `SMTP Server listening on ${this.config.host}:${this.config.port}`);
+    public async listen(): Promise<FakeSmtpServer> {
+        return new Promise((resolve, reject) => {
+            this.server.listen(this.config.port, this.config.host, () => {
+                this.log('info', `SMTP Server listening on ${this.config.host}:${this.config.port}`);
+                resolve(this);
+            });
         });
-        return this;
     }
 
-    public close(callback?: () => void): void {
+    public async close(): Promise<void> {
         this.log('info', 'Closing SMTP server...');
-        this.server.close(callback || (() => {
-            this.log('info', 'SMTP Server closed');
-        }));
+        return new Promise((resolve, reject) => {
+            this.server.close((error?: Error) => {
+                if (error) {
+                    this.log('error', 'Error closing SMTP server:', error);
+                    return reject(error);
+                }
+                this.log('info', 'SMTP Server closed');
+                resolve();
+            });
+        });
     }
+
 
     /**
      * Set custom email handler
@@ -80,8 +90,8 @@ export class FakeSmtpServer {
      */
     private getFullConfig(config: ServerConfig): Required<ServerConfig> {
         return {
-            port: config.port || parseInt(process.env.SMTP_PORT || '587', 10),
-            host: config.host || process.env.SMTP_HOST || 'localhost',
+            port: config.port || parseInt(process.env.MAIL_PORT || '587', 10),
+            host: config.host || process.env.MAIL_HOST || '127.0.0.1',
             logLevel: config.logLevel || (process.env.SMTP_LOG_LEVEL as any) || 'info'
         };
     }
@@ -115,6 +125,9 @@ export class FakeSmtpServer {
         this.log('info', 'Email received:', parsedEmail.subject);
         this.log('info', 'From:', parsedEmail.from?.text);
         this.log('info', 'To:', this.getRecipientText(parsedEmail));
+        if (parsedEmail.text) {
+            this.log('info', `Body: ${parsedEmail.text}`);
+        }
         if (parsedEmail.attachments?.length) {
             this.log('info', `Attachments: ${parsedEmail.attachments.length}`);
         }
@@ -122,18 +135,16 @@ export class FakeSmtpServer {
 
     private setupShutdownHandlers(): void {
         // Handle termination signals
-        process.on('SIGTERM', () => {
+        process.on('SIGTERM', async () => {
             this.log('info', 'SMTP Server shutting down (SIGTERM)...');
-            this.close(() => {
-                process.exit(0);
-            });
+            await this.close();
+            process.exit(0);
         });
 
-        process.on('SIGINT', () => {
+        process.on('SIGINT', async () => {
             this.log('info', 'SMTP Server shutting down (SIGINT)...');
-            this.close(() => {
-                process.exit(0);
-            });
+            await this.close();
+            process.exit(0);
         });
     }
 
@@ -161,10 +172,18 @@ export class FakeSmtpServer {
     }
 
     public searchEmails(criteria: EmailSearchCriteria): ParsedMail[] {
+        const limit = criteria.limit ?? this.emails.length;
+        const sortNewest = criteria.sort === 'newest';
+
         return this.emails
             .filter(email => this.matchEmail(email, criteria))
-            .sort((a, b) => (criteria.sort === 'newest' ? b.date?.getTime() - a.date?.getTime() : a.date?.getTime() - b.date?.getTime()))
-            .slice(0, criteria.limit);
+            .sort((a, b) => {
+                // Safely obtain epoch times, falling back to 0 if the Date is missing
+                const timeA = a.date?.getTime() ?? 0;
+                const timeB = b.date?.getTime() ?? 0;
+                return sortNewest ? timeB - timeA : timeA - timeB;
+            })
+            .slice(0, limit);
     }
 
     private matchEmail(email: ParsedMail, criteria: EmailSearchCriteria): boolean {
@@ -231,5 +250,5 @@ export const createFakeSmtpServer = (config: ServerConfig = {}): FakeSmtpServer 
 // Auto-start server if this file is executed directly
 if (require.main === module) {
     const server = createFakeSmtpServer({});
-    server.listen();
+    server.listen().catch(err => console.log(err));
 }

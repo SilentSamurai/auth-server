@@ -60,7 +60,9 @@ export class RoleService {
     async findById(authContext: AuthContext, id: string) {
         let role: Role = await this.roleRepository.findOne({
             where: {id: id},
-            relations: ['tenant']
+            relations: {
+                tenant: true,
+            }
         });
         if (role === null) {
             throw new ValidationErrorException("role not found");

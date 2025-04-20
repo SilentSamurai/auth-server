@@ -1,4 +1,5 @@
 import {TestAppFixture} from "./test-app.fixture";
+import {expect2xx} from "./api-client/client";
 
 export class TokenFixture {
 
@@ -23,7 +24,10 @@ export class TokenFixture {
             })
             .set('Accept', 'application/json');
 
-        console.log(response.body);
+        console.log("fetchAccessToken Response: ", response.body);
+
+        expect2xx(response);
+
         expect(response.status).toEqual(201);
         expect(response.body.access_token).toBeDefined();
         expect(response.body.expires_in).toBeDefined();
@@ -63,5 +67,44 @@ export class TokenFixture {
         return response.body;
     }
 
+    /**
+     * Fetch an access token using the client credentials grant.
+     * Takes clientId and clientSecret, and returns an object containing
+     * the access token, refresh token, and decoded JWT.
+     */
+    public async fetchClientCredentialsToken(clientId: string, clientSecret: string): Promise<{
+        accessToken: string,
+        refreshToken?: string,
+        jwt: any
+    }> {
+        const response = await this.app.getHttpServer()
+            .post('/api/oauth/token')
+            .send({
+                grant_type: "client_credentials",
+                client_id: clientId,
+                client_secret: clientSecret
+            })
+            .set('Accept', 'application/json');
+
+        console.log("fetchClientCredentialsToken Response: ", response.body);
+
+        expect2xx(response);
+        // Depending on your OAuth2 implementation, a 200 or 201 response code is typical
+        expect(response.status).toBeGreaterThanOrEqual(200);
+        expect(response.status).toBeLessThan(300);
+        expect(response.body.access_token).toBeDefined();
+        expect(response.body.token_type).toEqual('Bearer');
+
+        // The refresh token may or may not be present in client_credentials flows
+        const decode = this.app.jwtService().decode(response.body.access_token, {json: true}) as any;
+
+        // Additional checks on decoded token fields can be added here if needed
+
+        return {
+            accessToken: response.body.access_token,
+            refreshToken: response.body.refresh_token,
+            jwt: decode
+        };
+    }
 
 }

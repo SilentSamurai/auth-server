@@ -11,12 +11,13 @@
         "nest-cmd": "nest g class casl/casl-ability.factory",
         "build": "rimraf dist && nest build",
         "start:debug": "nest start --debug --watch",
-        "start:prod": "node dist/src/main",
-        "test": "jest --coverage  ",
-        "test:watch": "jest --watch --verbose --silent=false --detectOpenHandles",
+        "start:prod": "NODE_ENV=production node dist/src/main",
+        "test": "jest --coverage  --silent=true --runInBand",
+        "test:watch": "set CUSTOM_LOG=1 && jest --watch --verbose --silent=false --runInBand",
         "package": "node create-zip.js",
         "start:mail-server": "ts-node src/mail/FakeSmtpServer.ts",
-        "release": "npm run build && npm run test "
+        "release": "npm run build && npm run test ",
+        "smtp-server": "ts-node src/mail/FakeSmtpServer.ts"
     },
     "dependencies": {
         "@casl/ability": "^6.4.0",
@@ -33,6 +34,7 @@
         "date-fns": "^2.29.3",
         "dotenv": "^16.0.3",
         "ms": "^2.1.3",
+        "node-cache": "^5.1.2",
         "nodemailer": "^6.8.0",
         "otp-generator": "^4.0.1",
         "passport": "^0.6.0",
@@ -53,6 +55,7 @@
         "@types/jest": "^29.5.0",
         "@types/mailparser": "^3.4.5",
         "@types/node": "^18.11.15",
+        "@types/node-cache": "^4.2.5",
         "@types/nodemailer": "^6.4.6",
         "@types/smtp-server": "^3.5.10",
         "@types/supertest": "^6.0.3",

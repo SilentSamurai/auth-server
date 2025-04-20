@@ -90,7 +90,7 @@ export class RL02SelectionComponent implements OnInit {
         });
         if (this.selectedRole.length > 0) {
             await this.router.navigate([
-                '/RL02', this.selectedRole[0].tenant.id, this.selectedRole[0].name]);
+                '/RL02', this.selectedRole[0].tenant.id, this.selectedRole[0].id]);
         }
     }
 

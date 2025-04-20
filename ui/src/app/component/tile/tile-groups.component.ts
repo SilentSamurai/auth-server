@@ -4,26 +4,30 @@ import {TokenStorageService} from "../../_services/token-storage.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {AuthService} from "../../_services/auth.service";
 import {AuthDefaultService} from "../../_services/auth.default.service";
+import {PermissionService, Actions, Subjects} from "../../_services/permission.service";
+import {Tile} from "./models";
 
 @Component({
     selector: 'app-tile-group',
     template: `
         <div class="row row-cols-auto my-2">
-            <div *ngFor="let tile of internalTile; index as i;" class="col py-1">
-                <ng-container *ngIf="tile.isCallbackThere">
-                    <a (click)="tile.command()"  class="text-decoration-none">
-                        <app-tile [tile]="tile">
-                        </app-tile>
-                    </a>
-                </ng-container>
-                <ng-container *ngIf="!tile.isCallbackThere">
-                    <a [routerLink]="tile.link"
-                       class="text-decoration-none">
-                        <app-tile [tile]="tile">
-                        </app-tile>
-                    </a>
-                </ng-container>
-            </div>
+            <ng-container *ngFor="let tile of tiles; index as i;">
+                <div class="col py-1" *ngIf="tile.isAllowed()">
+                    <ng-container *ngIf="tile.isCallbackThere">
+                        <a (click)="tile.invokeCallback()" class="text-decoration-none">
+                            <app-tile [tile]="tile">
+                            </app-tile>
+                        </a>
+                    </ng-container>
+                    <ng-container *ngIf="!tile.isCallbackThere">
+                        <a [routerLink]="tile.link"
+                           class="text-decoration-none">
+                            <app-tile [tile]="tile">
+                            </app-tile>
+                        </a>
+                    </ng-container>
+                </div>
+            </ng-container>
         </div>
     `,
     styles: [`
@@ -32,56 +36,18 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
 export class TileGroupsComponent implements OnInit {
 
     @Input()
-    tiles: any;
-
-    internalTile: any[] = [];
-    sizeMap = {
-        'sm': {
-            width: '100px',
-            height: '100px'
-        },
-        'md': {
-            width: '200px',
-            height: '200px'
-        },
-        'lg': {
-            width: '425px',
-            height: '200px'
-        }
-    }
+    tiles: Tile[] = [];
 
     constructor(private userService: UserService,
                 private router: Router,
                 private route: ActivatedRoute,
                 private authService: AuthService,
                 private authDefaultService: AuthDefaultService,
-                private tokenStorage: TokenStorageService) {
+                private tokenStorage: TokenStorageService,
+                protected permissionService: PermissionService) {
     }
-
-    findSize(size: string) {
-        if (size === 'sm') {
-            return this.sizeMap.sm;
-        }
-        if (size === 'lg') {
-            return this.sizeMap.lg;
-        }
-        return this.sizeMap.md;
-    }
-
 
     ngOnInit(): void {
-        for (let tile of this.tiles) {
-            this.internalTile.push({
-                id: tile.hasOwnProperty("id") ? tile.id : "TILE_ID_" + tile.title,
-                title: tile.title,
-                link: tile.link,
-                subtitle: tile.subtitle,
-                isCallbackThere: tile.hasOwnProperty("command") && typeof tile.command === 'function',
-                command: tile.command,
-                icon: tile.icon,
-                size: tile.size || 'md',
-            })
-        }
-        console.log(this.tiles);
+
     }
 }

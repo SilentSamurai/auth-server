@@ -8,8 +8,7 @@ import {AnyAbility} from "@casl/ability/dist/types/PureAbility";
 import {Action} from "./actions.enum";
 import {subject} from "@casl/ability";
 import {AuthUserService} from "./authUser.service";
-import {AuthContext, GRANT_TYPES, OAuthToken, TenantToken, UserToken} from "./contexts";
-import {User} from "../entity/user.entity";
+import {AuthContext, GRANT_TYPES, OAuthToken, TechnicalToken, TenantToken, UserToken} from "./contexts";
 
 
 @Injectable()
@@ -61,7 +60,14 @@ export class SecurityService implements OnModuleInit {
 
     isClientCredentials(request: any) {
         let context = this.getUserOrTechnicalSecurityContext(request);
-        return context.grant_type === GRANT_TYPES.CLIENT_CREDENTIAL
+        return context.grant_type === GRANT_TYPES.CLIENT_CREDENTIAL || context.grant_type === GRANT_TYPES.CLIENT_CREDENTIALS
+    }
+
+    getTechnicalToken(authContext: AuthContext): TechnicalToken {
+        if (!this.isClientCredentials(authContext)) {
+            throw new ForbiddenException("");
+        }
+        return this.getUserOrTechnicalSecurityContext(authContext) as TechnicalToken;
     }
 
     getUserOrTechnicalSecurityContext(request: any): TenantToken {

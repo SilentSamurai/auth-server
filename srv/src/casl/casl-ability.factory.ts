@@ -25,7 +25,7 @@ export class CaslAbilityFactory {
     }
 
     public async findRole(name: string, tenantId: string) {
-        let cache_key = `${tenantId}:${name}`;
+        let cache_key = `ROLE:${tenantId}:${name}`;
         if (this.cacheService.has(cache_key)) {
             let role: Role = this.cacheService.get(cache_key);
             return role;
@@ -44,24 +44,6 @@ export class CaslAbilityFactory {
         }
     }
 
-    public async findByRole(role: Role) {
-        if (this.cacheService.has(role.id)) {
-            let policies = this.cacheService.get<Policy[]>(role.id);
-            return policies;
-        } else {
-            const policies = await this.authorizationRepository.find({
-                where: {
-                    role: {
-                        id: role.id
-                    }
-                },
-                relations: ['role']
-            });
-            this.cacheService.set(role.id, policies);
-            return policies;
-        }
-    }
-
     async createForSecurityContext(tenantToken: TenantToken): Promise<AnyAbility> {
         const {can, cannot, build} = new AbilityBuilder(createMongoAbility);
 
@@ -72,6 +54,8 @@ export class CaslAbilityFactory {
             can(Action.Read, SubjectEnum.MEMBER, {tenantId: tenantToken.tenant.id});
             can(Action.Read, SubjectEnum.ROLE, {tenantId: tenantToken.tenant.id});
             can(Action.ReadCredentials, SubjectEnum.TENANT, {id: tenantToken.tenant.id});
+            can(Action.Read, SubjectEnum.POLICY, {tenantId: tenantToken.tenant.id});
+
         } else {
 
             // User Permissions
@@ -112,33 +96,10 @@ export class CaslAbilityFactory {
                 if (!role) continue;
 
                 can(Action.Manage, SubjectEnum.POLICY, {roleId: role.id});
-
-                let policies = await this.findByRole(role);
-                if (!policies || policies.length <= 0) continue;
-                this.includePolicies(policies, can, cannot)
             }
 
         }
 
         return build();
-    }
-
-    includePolicies(policies: Policy[], can, cannot) {
-        for (let policy of policies) {
-            if (policy.effect === Effect.ALLOW) {
-                if (policy.conditions) {
-                    can(policy.action, policy.subject, policy.conditions);
-                } else {
-                    can(policy.action, policy.subject);
-                }
-            }
-            if (policy.effect === Effect.DENY) {
-                if (policy.conditions) {
-                    cannot(policy.action, policy.subject, policy.conditions);
-                } else {
-                    cannot(policy.action, policy.subject);
-                }
-            }
-        }
     }
 }

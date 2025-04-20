@@ -22,6 +22,7 @@ import {SecurityService} from "../casl/security.service";
 import {SubjectEnum} from "../entity/subjectEnum";
 import {Action} from "../casl/actions.enum";
 import {subject} from "@casl/ability";
+import * as yup from "yup";
 
 @Controller('api/tenant')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -51,23 +52,26 @@ export class TenantController {
         return tenant;
     }
 
+    static UpdateTenantSchema = yup.object().shape({
+        name: yup.string().max(128),
+        allowSignUp: yup.boolean()
+    });
+
     @Patch('/:tenantId')
     @UseGuards(JwtAuthGuard)
     async updateTenant(
         @Request() request,
         @Param('tenantId') tenantId: string,
-        @Body(new ValidationPipe(ValidationSchema.UpdateTenantSchema)) body: { name: string }
+        @Body(new ValidationPipe(TenantController.UpdateTenantSchema)) body: { name?: string, allowSignUp?: boolean }
     ): Promise<Tenant> {
         let tenant = await this.tenantService.findById(request, tenantId);
         this.securityService.check(request, Action.Update, subject(SubjectEnum.TENANT, tenant));
         return this.tenantService.updateTenant(
             request,
             tenantId,
-            body.name
+            body
         );
-
     }
-
 
     @Delete('/:tenantId')
     @UseGuards(JwtAuthGuard)
@@ -78,7 +82,6 @@ export class TenantController {
         return this.tenantService.deleteTenant(request, tenantId);
     }
 
-
     @Get('')
     @UseGuards(JwtAuthGuard)
     async getTenants(
@@ -86,7 +89,6 @@ export class TenantController {
     ): Promise<Tenant[]> {
         return await this.tenantService.getAllTenants(request);
     }
-
 
     @Get('/my/credentials')
     @UseGuards(JwtAuthGuard)
@@ -103,7 +105,6 @@ export class TenantController {
             publicKey: tenant.publicKey
         };
     }
-
 
     @Get('/:tenantId/credentials')
     @UseGuards(JwtAuthGuard)
@@ -131,6 +132,4 @@ export class TenantController {
         this.securityService.check(request, Action.Read, subject(SubjectEnum.TENANT, tenant));
         return tenant;
     }
-
-
 }
