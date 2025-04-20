@@ -4,10 +4,13 @@ import {setupConsole} from "./helper.fixture";
 
 const nodemailer = require('nodemailer');
 
+const MAIL_PORT = 7890;
+const MAIL_HOST = '127.0.0.1';
+
 async function sendTestEmail() {
     const transporter = nodemailer.createTransport({
-        host: 'localhost',
-        port: 587,
+        host: MAIL_HOST,
+        port: MAIL_PORT,
         secure: false,
         tls: {
             rejectUnauthorized: false
@@ -31,7 +34,7 @@ describe("Fake Smtp Server Test", () => {
 
     beforeAll(async () => {
         setupConsole();
-        smtpServer = createFakeSmtpServer();
+        smtpServer = createFakeSmtpServer({port: MAIL_PORT, host: MAIL_HOST});
         await smtpServer.listen();
     })
 

@@ -91,7 +91,7 @@ export class FakeSmtpServer {
     private getFullConfig(config: ServerConfig): Required<ServerConfig> {
         return {
             port: config.port || parseInt(process.env.MAIL_PORT || '587', 10),
-            host: config.host || process.env.MAIL_HOST || 'localhost',
+            host: config.host || process.env.MAIL_HOST || '127.0.0.1',
             logLevel: config.logLevel || (process.env.SMTP_LOG_LEVEL as any) || 'info'
         };
     }

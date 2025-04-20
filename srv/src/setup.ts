@@ -2,7 +2,6 @@ import {NestApplicationOptions} from "@nestjs/common/interfaces/nest-application
 import {Environment} from "./config/environment.service";
 import fs from "fs";
 import {JsonConsoleLogger} from "./log/JsonConsoleLogger";
-import {createFakeSmtpServer} from "./mail/FakeSmtpServer";
 import {NestExpressApplication} from "@nestjs/platform-express";
 import {NestFactory} from "@nestjs/core";
 import {AppModule} from "./app.module";
@@ -43,6 +42,7 @@ export async function prepareApp() {
 
     // smtp
     if (!Environment.isProduction()) {
+        const {createFakeSmtpServer} = await import("./mail/FakeSmtpServer");
         const server = createFakeSmtpServer({});
         await server.listen();
     }
