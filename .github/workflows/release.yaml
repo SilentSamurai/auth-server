@@ -30,11 +30,11 @@ jobs:
 
             -   name: Export srv image to tar
                 run: |
-                    docker save -o srv-image.tar auth-server-srv:latest
+                    docker save -o auth-srv-image.tar auth-server-srv:latest
 
             -   name: Export ui image to tar
                 run: |
-                    docker save -o ui-image.tar auth-server-ui:latest
+                    docker save -o auth-ui-image.tar auth-server-ui:latest
 
             -   name: Create GitHub Release
                 id: create_release
