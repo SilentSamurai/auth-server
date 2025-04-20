@@ -1,4 +1,4 @@
-name: Build, Test and Release Docker Images as tar
+name: Build, Test and Create Docker Image
 
 on:
     push:

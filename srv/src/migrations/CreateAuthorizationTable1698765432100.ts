@@ -2,6 +2,8 @@ import {MigrationInterface, QueryRunner, Table, TableForeignKey, TableIndex} fro
 
 export class CreateAuthorizationTable1698765432100 implements MigrationInterface {
     public async up(queryRunner: QueryRunner): Promise<void> {
+        const DB_STRING_TYPE = "VARCHAR";
+        const DB_UUID_GENERATOR = "uuid_generate_v4()";
         // Create the policy table
         await queryRunner.createTable(
             new Table({
@@ -9,19 +11,20 @@ export class CreateAuthorizationTable1698765432100 implements MigrationInterface
                 columns: [
                     {
                         name: 'id',
-                        type: 'uuid',
+                        type: DB_STRING_TYPE,
+                        length: '36',
                         isPrimary: true,
-                        isGenerated: true,
+                        default: DB_UUID_GENERATOR,
                         generationStrategy: 'uuid',
                     },
                     {
                         name: 'role_id',
-                        type: 'uuid',
+                        type: DB_STRING_TYPE,
                         isNullable: false,
                     },
                     {
                         name: 'tenant_id',
-                        type: 'uuid',
+                        type: DB_STRING_TYPE,
                         isNullable: false,
                     },
                     {

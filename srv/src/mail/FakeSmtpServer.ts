@@ -172,10 +172,18 @@ export class FakeSmtpServer {
     }
 
     public searchEmails(criteria: EmailSearchCriteria): ParsedMail[] {
+        const limit = criteria.limit ?? this.emails.length;
+        const sortNewest = criteria.sort === 'newest';
+
         return this.emails
             .filter(email => this.matchEmail(email, criteria))
-            .sort((a, b) => (criteria.sort === 'newest' ? b.date?.getTime() - a.date?.getTime() : a.date?.getTime() - b.date?.getTime()))
-            .slice(0, criteria.limit);
+            .sort((a, b) => {
+                // Safely obtain epoch times, falling back to 0 if the Date is missing
+                const timeA = a.date?.getTime() ?? 0;
+                const timeB = b.date?.getTime() ?? 0;
+                return sortNewest ? timeB - timeA : timeA - timeB;
+            })
+            .slice(0, limit);
     }
 
     private matchEmail(email: ParsedMail, criteria: EmailSearchCriteria): boolean {
