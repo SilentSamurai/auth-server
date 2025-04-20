@@ -9,6 +9,6 @@ fi
 
 
 # happiness
-just build-image-ui > ./logs/build-ui.log
-just build-image-backend > ./logs/build-backend.log
+just download-and-import-image > ./logs/download.log
+just dry-run-auth-server > ./logs/dry-run.log
 just deploy-auth-server > ./logs/deploy.log
