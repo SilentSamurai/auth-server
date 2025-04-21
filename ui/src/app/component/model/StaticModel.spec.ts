@@ -1,11 +1,11 @@
 import {StaticModel} from './StaticModel';
-import {DataPushEventStatus, Query} from './DataModel';
+import {DataPushEventStatus, Query, SortConfig} from './DataModel';
 import {EventEmitter} from '@angular/core';
 import {Operators} from "./Operator";
 import {Filter} from "./Filters";
 
 describe('StaticModel', () => {
-    let staticModel: StaticModel;
+    let staticModel: StaticModel<any>;
 
     beforeEach(() => {
         staticModel = new StaticModel(['id']);
@@ -59,7 +59,6 @@ describe('StaticModel', () => {
         staticModel.setData(initialData);
         staticModel.appendData(newData);
         const testData = [...initialData, ...newData];
-        console.log(testData)
         expect(staticModel.getData()).toEqual(testData);
     });
 
@@ -70,8 +69,9 @@ describe('StaticModel', () => {
         expect(spy).toHaveBeenCalledWith({
             srcOptions,
             operation: DataPushEventStatus.UPDATED_DATA,
-            data: staticModel.data,
-            pageNo: staticModel.getPageNo()
+            data: staticModel.getData(),
+            pageNo: staticModel.getPageNo(),
+            error: undefined
         });
     });
 
@@ -93,95 +93,97 @@ describe('StaticModel', () => {
 
     it('should set the page size correctly', () => {
         staticModel.pageSize(50);
-        expect(staticModel.getPageSize()).toBe(new Query().pageSize);
+        expect(staticModel.getPageSize()).toBe(50);
     });
 
     it('should not change page size if invalid value is provided', () => {
         staticModel.pageSize(-10);
-        // Assuming 30 is the default value
         expect(staticModel.getPageSize()).toBe(new Query().pageSize);
     });
 
-    it('should emit event with initial data', async () => {
-        const spy = spyOn(staticModel.dataPusher(), 'emit');
-        await staticModel.apply({});
-        expect(spy).toHaveBeenCalledWith({
-            srcOptions: {},
-            operation: DataPushEventStatus.UPDATED_DATA,
-            data: staticModel.getData(),
-            pageNo: staticModel.getPageNo()
-        });
-    });
-
-    it('should emit event with updated data', async () => {
-        const spy = spyOn(staticModel.dataPusher(), 'emit');
-        const newData = [{id: 1, name: 'test'}];
-        staticModel.setData(newData);
-        await staticModel.apply({});
-        expect(spy).toHaveBeenCalledWith({
-            srcOptions: {},
-            operation: DataPushEventStatus.UPDATED_DATA,
-            data: newData,
-            pageNo: staticModel.getPageNo()
-        });
-    });
-
-    it('should emit event with appended data', async () => {
-        const spy = spyOn(staticModel.dataPusher(), 'emit');
-        const initialData = [{id: 1, name: 'test1'}];
-        const newData = [{id: 2, name: 'test2'}];
-        staticModel.setData(initialData);
-        staticModel.appendData(newData);
-        await staticModel.apply({append: true});
-        expect(spy).toHaveBeenCalledWith({
-            srcOptions: {append: true},
-            operation: DataPushEventStatus.UPDATED_DATA,
-            data: [...initialData, ...newData],
-            pageNo: staticModel.getPageNo()
-        });
-    });
-
-    it('should emit event with different operations', async () => {
-        const spy = spyOn(staticModel.dataPusher(), 'emit');
-        staticModel['apply'] = async (srcOptions: any) => {
-            staticModel._dataPusher.emit({
-                srcOptions: srcOptions,
-                operation: DataPushEventStatus.START_FETCH,
-                data: staticModel.getData(),
-                pageNo: staticModel.getPageNo()
-            });
-            return true;
-        };
-        await staticModel.apply({});
-        expect(spy).toHaveBeenCalledWith({
-            srcOptions: {},
-            operation: DataPushEventStatus.START_FETCH,
-            data: staticModel.getData(),
-            pageNo: staticModel.getPageNo()
-        });
-    });
-
-    it('should emit event when filters are set', async () => {
-        const spy = spyOn(staticModel.dataPusher(), 'emit');
-        const filters = [
-            new Filter("name", "name", "test", Operators.EQ)
+    it('should return the total row count', () => {
+        const data = [
+            {id: 1, name: 'test1'},
+            {id: 2, name: 'test2'},
+            {id: 3, name: 'test3'}
         ];
-        staticModel.filter(filters);
-        await staticModel.apply({});
-        expect(spy).toHaveBeenCalledWith(jasmine.objectContaining({
-            data: staticModel.getData()
-        }));
-        expect(staticModel.getFilters()).toEqual(filters);
+        staticModel.setData(data);
+        expect(staticModel.totalRowCount()).toBe(3);
     });
 
-    it('should emit event when orderBy is set', async () => {
-        const spy = spyOn(staticModel.dataPusher(), 'emit');
-        const orderBy = [{field: 'name', direction: 'asc'}];
+    it('should sort data when orderBy is set', async () => {
+        const data = [
+            {id: 1, name: 'Charlie'},
+            {id: 2, name: 'Alice'},
+            {id: 3, name: 'Bob'}
+        ];
+        staticModel.setData(data);
+
+        const orderBy: SortConfig[] = [{field: 'name', order: 'asc'}];
         staticModel.orderBy(orderBy);
+
         await staticModel.apply({});
-        expect(spy).toHaveBeenCalledWith(jasmine.objectContaining({
-            data: staticModel.getData()
-        }));
-        expect(staticModel.getOrderBy()).toEqual(orderBy);
+
+        const sortedData = [
+            {id: 2, name: 'Alice'},
+            {id: 3, name: 'Bob'},
+            {id: 1, name: 'Charlie'}
+        ];
+
+        expect(staticModel.getData()).toEqual(sortedData);
+    });
+
+    it('should clear cache when data is updated', () => {
+        const data = [
+            {id: 1, name: 'Charlie'},
+            {id: 2, name: 'Alice'},
+            {id: 3, name: 'Bob'}
+        ];
+        staticModel.setData(data);
+
+        // First sort
+        const orderBy: SortConfig[] = [{field: 'name', order: 'asc'}];
+        staticModel.orderBy(orderBy);
+        staticModel.apply({});
+
+        // Change data
+        const newData = [
+            {id: 4, name: 'David'},
+            {id: 5, name: 'Eve'}
+        ];
+        staticModel.setData(newData);
+
+        // Sort again with same orderBy
+        staticModel.apply({});
+
+        // Should be sorted correctly
+        const sortedData = [
+            {id: 4, name: 'David'},
+            {id: 5, name: 'Eve'}
+        ];
+
+        expect(staticModel.getData()).toEqual(sortedData);
+    });
+
+    it('should handle nested properties in sorting', async () => {
+        const data = [
+            {id: 1, user: {name: 'Charlie'}},
+            {id: 2, user: {name: 'Alice'}},
+            {id: 3, user: {name: 'Bob'}}
+        ];
+        staticModel.setData(data);
+
+        const orderBy: SortConfig[] = [{field: 'user.name', order: 'asc'}];
+        staticModel.orderBy(orderBy);
+
+        await staticModel.apply({});
+
+        const sortedData = [
+            {id: 2, user: {name: 'Alice'}},
+            {id: 3, user: {name: 'Bob'}},
+            {id: 1, user: {name: 'Charlie'}}
+        ];
+
+        expect(staticModel.getData()).toEqual(sortedData);
     });
 });

@@ -172,8 +172,8 @@ export class TN02Component implements OnInit {
     members: any = []
     isTenantAdmin = false;
     roles: any = [];
-    memberDataModel: StaticModel;
-    rolesDataModel: StaticModel;
+    memberDataModel: StaticModel<any>;
+    rolesDataModel: StaticModel<any>;
 
     constructor(private tenantService: TenantService,
                 private tokenStorageService: SessionService,

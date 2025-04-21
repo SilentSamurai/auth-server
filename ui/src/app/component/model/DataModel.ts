@@ -1,12 +1,16 @@
 import {EventEmitter} from "@angular/core";
 import {Filter} from "./Filters";
 
+export interface SortConfig {
+    field: string;
+    order: 'asc' | 'desc';
+}
 
 export class Query {
     private _pageNo: number = 0;
     private _pageSize: number = 50;
     private _filters: Filter[] = [];
-    private _orderBy: any[] = [];
+    private _orderBy: SortConfig[] = [];
     private _expand: string[] = [];
 
     get pageNo(): number {
@@ -37,11 +41,11 @@ export class Query {
         this._filters = value.filter(item => item.value != null && item.value.length > 0);
     }
 
-    get orderBy(): any[] {
+    get orderBy(): SortConfig[] {
         return this._orderBy;
     }
 
-    set orderBy(value: any[]) {
+    set orderBy(value: SortConfig[]) {
         this._orderBy = value;
     }
 
@@ -66,6 +70,7 @@ export class DataPushEvent {
     operation: DataPushEventStatus = DataPushEventStatus.UPDATED_DATA;
     data: any[] | null = [];
     pageNo: number | null = null;
+    error?: Error;
 }
 
 export interface DataModel {
@@ -78,9 +83,9 @@ export interface DataModel {
 
     getFilters(): Filter[];
 
-    orderBy(sortBy: any[]): void;
+    orderBy(sortBy: SortConfig[]): void;
 
-    getOrderBy(): any[];
+    getOrderBy(): SortConfig[];
 
     getPageSize(): number;
 

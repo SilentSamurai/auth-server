@@ -1,13 +1,38 @@
 import {EventEmitter} from "@angular/core";
 import {Filter} from "./Filters";
-import {DataModel, DataPushEvent, Query} from "./DataModel";
+import {DataModel, DataPushEvent, Query, DataPushEventStatus, SortConfig} from "./DataModel";
 
-export abstract class BaseDataModel implements DataModel {
 
-    query: Query = new Query();
-    _dataPusher = new EventEmitter<DataPushEvent>();
+export abstract class BaseDataModel<T> implements DataModel {
+    protected query: Query;
+    protected _dataPusher = new EventEmitter<DataPushEvent>();
+    protected loading = false;
+    protected error: Error | null = null;
+    protected retryCount = 0;
+    protected data: T[] = [];
 
-    protected constructor(private keyFields: string[]) {
+    protected constructor(
+        protected keyFields: string[]
+    ) {
+        this.query = new Query();
+    }
+
+    protected emitDataEvent(
+        params: {
+            operation: DataPushEventStatus;
+            data?: T[] | null;
+            pageNo?: number | null;
+            error?: Error;
+            srcOptions?: any;
+        }
+    ): void {
+        this._dataPusher.emit({
+            operation: params.operation,
+            data: params.data ?? null,
+            pageNo: params.pageNo ?? null,
+            error: params.error,
+            srcOptions: params.srcOptions ?? {}
+        });
     }
 
     dataPusher(): EventEmitter<DataPushEvent> {
@@ -26,7 +51,7 @@ export abstract class BaseDataModel implements DataModel {
         return this.query.pageSize;
     }
 
-    orderBy(orderBy: any[]): void {
+    orderBy(orderBy: SortConfig[]): void {
         this.query.orderBy = orderBy;
     }
 
@@ -54,7 +79,7 @@ export abstract class BaseDataModel implements DataModel {
         return this.query.filters;
     }
 
-    getOrderBy(): any[] {
+    getOrderBy(): SortConfig[] {
         return this.query.orderBy;
     }
 
@@ -63,12 +88,20 @@ export abstract class BaseDataModel implements DataModel {
     }
 
     getPageNoFromRow(rowNo: number): number {
-        return Math.round(rowNo / this.getPageSize());
+        return Math.floor(rowNo / this.getPageSize());
+    }
+
+    isLoading(): boolean {
+        return this.loading;
+    }
+
+    getError(): Error | null {
+        return this.error;
     }
 
     abstract apply(srcOptions: any): Promise<boolean>;
 
-    abstract getData(): any[];
+    abstract getData(): T[];
 
     abstract hasPage(pageNo: number): boolean;
 

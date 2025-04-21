@@ -309,6 +309,12 @@ export class AppTableComponent implements OnInit {
                 if (event.srcOptions.append === false) {
                     this.setData(event.data!);
                 }
+                break;
+            case DataPushEventStatus.START_FETCH:
+                this.loading = true;
+                break;
+            default:
+                this.loading = false;
         }
     }
 
