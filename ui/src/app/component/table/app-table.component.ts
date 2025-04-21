@@ -96,8 +96,73 @@ export class TableAsyncLoadEvent extends Query {
 
     `,
     styles: [`
+        .a-table-caption {
+            background-color: var(--bs-card-bg);
+            color: var(--bs-body-color, #212529);
+            border-color: var(--bs-border-color);
+        }
 
-    `],
+        .a-table {
+            color: var(--bs-body-color);
+        }
+
+        .a-table thead th {
+            background-color: var(--bs-card-bg);
+            color: var(--bs-body-color);
+            border-color: var(--bs-border-color);
+        }
+
+        .a-table tbody td {
+            border-color: var(--bs-border-color);
+        }
+
+        .a-table-row:hover {
+            background-color: var(--bs-table-hover-bg, rgba(var(--bs-primary-rgb, 13, 110, 253), 0.05));
+        }
+
+        .a-table-row.selected {
+            background-color: var(--bs-table-active-bg, rgba(var(--bs-primary-rgb, 13, 110, 253), 0.1));
+        }
+
+        .btn-sm {
+            color: var(--bs-body-color);
+        }
+
+        /* Dark mode specific styles */
+        [data-bs-theme="dark"] {
+            .a-table-caption {
+                background-color: var(--bs-dark);
+                color: var(--bs-light);
+                border-color: var(--bs-border-color);
+            }
+
+            .a-table {
+                color: var(--bs-light);
+            }
+
+            .a-table thead th {
+                background-color: var(--bs-dark);
+                color: var(--bs-light);
+                border-color: var(--bs-border-color);
+            }
+
+            .a-table tbody td {
+                border-color: var(--bs-border-color);
+            }
+
+            .a-table-row:hover {
+                background-color: var(--bs-table-hover-bg, rgba(255, 255, 255, 0.075));
+            }
+
+            .a-table-row.selected {
+                background-color: var(--bs-table-active-bg, rgba(255, 255, 255, 0.1));
+            }
+
+            .btn-sm {
+                color: var(--bs-light);
+            }
+        }
+    `]
 })
 // Table for reuse
 export class AppTableComponent implements OnInit {
@@ -208,12 +273,6 @@ export class AppTableComponent implements OnInit {
                 if (event.srcOptions.append === false) {
                     this.setData(event.data!);
                 }
-                break;
-            case DataPushEventStatus.START_FETCH:
-                this.loading = true;
-                break;
-            default:
-                this.loading = false;
         }
     }
 

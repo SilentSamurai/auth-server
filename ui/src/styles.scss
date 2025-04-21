@@ -7,6 +7,61 @@
 @import "primeng/resources/primeng.css";
 @import "primeicons/primeicons.css";
 
+:root {
+    //--bs-body-bg: #E9F5FCFF;
+    //--bs-body-color: #212529;
+    //--bs-border-color: #dee2e6;
+    //--bs-card-bg: #ffffff;
+    //--bs-modal-bg: #ffffff;
+    //--bs-secondary-color: #6c757d;
+    //--bs-primary-rgb: 13, 110, 253;
+}
+
+[data-bs-theme="dark"] {
+    //--bs-body-bg: #1a1a1a;
+    //--bs-body-color: #e9ecef;
+    //--bs-border-color: #2d2d2d;
+    //--bs-card-bg: #242424;
+    //--bs-modal-bg: #242424;
+    //--bs-secondary-color: #adb5bd;
+    //--bs-primary-rgb: 13, 110, 253;
+
+    .card {
+        background-color: var(--bs-card-bg);
+        border-color: var(--bs-border-color);
+    }
+
+    .modal-content {
+        background-color: var(--bs-modal-bg);
+        border-color: var(--bs-border-color);
+    }
+
+    .p-datatable {
+        .p-datatable-thead > tr > th {
+            background-color: var(--bs-card-bg);
+            color: var(--bs-body-color);
+            border-color: var(--bs-border-color);
+        }
+
+        .p-datatable-tbody > tr > td {
+            background-color: var(--bs-body-bg);
+            color: var(--bs-body-color);
+            border-color: var(--bs-border-color);
+        }
+    }
+
+    .p-dropdown {
+        background-color: var(--bs-card-bg);
+        border-color: var(--bs-border-color);
+        color: var(--bs-body-color);
+    }
+
+    .p-inputtext {
+        background-color: var(--bs-card-bg);
+        border-color: var(--bs-border-color);
+        color: var(--bs-body-color);
+    }
+}
 
 //body{
 //    background-color: #eee;

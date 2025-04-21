@@ -34,7 +34,7 @@ import {Tile} from "./models";
     `,
     styles: [`
         .tile {
-            background: white;
+            background: var(--bs-card-bg);
             border-radius: 8px;
             padding: 20px;
             margin-bottom: 20px;
@@ -45,44 +45,59 @@ import {Tile} from "./models";
             flex-direction: column;
             min-height: 180px;
             position: relative;
+            color: var(--bs-body-color);
+            border: 1px solid var(--bs-border-color);
         }
 
         .tile:hover {
-            transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transform: translateY(-5px);
+            border-color: var(--bs-primary);
         }
 
         .tile-title {
+            margin-bottom: 10px;
+        }
+
+        .tile-title h3 {
+            margin: 0;
+            font-size: 1.2rem;
             font-weight: 600;
-            margin-bottom: 0.3rem;
+            color: var(--bs-body-color);
         }
 
         .tile-subtitle {
-            margin-bottom: 0.3rem;
-            color: #666;
+            color: var(--bs-secondary-color);
+            font-size: 0.9rem;
+            margin-bottom: 15px;
         }
 
         .tile-spacer {
-            flex: 1 1 auto;
+            flex-grow: 1;
         }
 
         .tile-bottom {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            padding-top: 0.3rem;
-            /*border-top: 1px solid #f0f2f3;*/
+            justify-content: space-between;
+            margin-top: auto;
         }
 
         .tile-icon {
-            /*color: #007bff;*/
-            display: flex;
-            align-items: center;
+            color: var(--bs-primary);
         }
 
         .tile-information {
-            font-size: 0.95rem;
-            /*color: #333;*/
+            font-size: 0.9rem;
+            color: var(--bs-secondary-color);
+        }
+
+        [data-bs-theme="dark"] .tile {
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        [data-bs-theme="dark"] .tile:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
         }
     `]
 })

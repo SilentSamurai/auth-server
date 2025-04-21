@@ -10,7 +10,7 @@ import {TileGroup} from "./models";
 @Component({
     selector: 'app-launchpad',
     template: `
-        <div class="container-fluid bg-white mb-2 px-4 shadow-sm">
+        <div class="container-fluid mb-2 px-4 shadow-sm launchpad-container">
             <ul class="nav nav-tabs nav-tab-btn ">
                 <ng-container *ngFor="let group of groups">
                     <li class="nav-item " *ngIf="group.hasVisibleTile()">
@@ -37,12 +37,21 @@ import {TileGroup} from "./models";
         </div>
     `,
     styles: [`
+        .launchpad-container {
+            background-color: var(--bs-card-bg);
+        }
+
         .nav-tab-btn:focus {
-            border-bottom: 0.25rem solid blue
+            border-bottom: 0.25rem solid var(--bs-primary);
         }
 
         .nav-tab-btn {
-            border-bottom: 0.25rem ;
+            border-bottom: 0.25rem;
+            color: var(--bs-body-color);
+        }
+
+        .h3 {
+            color: var(--bs-body-color);
         }
     `]
 })
@@ -65,11 +74,9 @@ export class LaunchPadComponent implements OnInit {
     }
 
     doScroll(elementId: string) {
-        try {
-            console.log("scrolling to", elementId);
-            let elements = document.getElementById(elementId);
-            elements?.scrollIntoView();
-        } finally {
+        const element = document.getElementById(elementId);
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth' });
         }
     }
 }

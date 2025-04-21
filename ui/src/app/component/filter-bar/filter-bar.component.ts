@@ -37,7 +37,7 @@ export class FilterBarColumnComponent implements OnInit {
 @Component({
     selector: 'app-fb',
     template: `
-        <div class="row  ">
+        <div class="row">
             <div class="col-md-11 col-sm-12 my-2">
                 <div class="row row-cols-auto">
                     <div *ngFor="let filter of columns; index as i" class="col-auto">
@@ -69,6 +69,42 @@ export class FilterBarColumnComponent implements OnInit {
             .dropdown-toggle {
                 border-top-right-radius: 0;
                 border-bottom-right-radius: 0;
+            }
+            
+            .btn {
+                transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+            }
+            
+            .btn-primary {
+                background-color: var(--bs-primary);
+                border-color: var(--bs-primary);
+                color: var(--bs-primary-text);
+            }
+            
+            .btn-primary:hover {
+                background-color: var(--bs-primary-dark);
+                border-color: var(--bs-primary-dark);
+            }
+            
+            .btn:not(.btn-primary) {
+                color: var(--bs-body-color);
+                background-color: var(--bs-body-bg);
+                border-color: var(--bs-border-color);
+            }
+            
+            .btn:not(.btn-primary):hover {
+                background-color: var(--bs-secondary-bg);
+                color: var(--bs-body-color);
+            }
+            
+            [data-bs-theme="dark"] .btn:not(.btn-primary) {
+                background-color: var(--bs-dark);
+                color: var(--bs-body-color);
+                border-color: var(--bs-border-color);
+            }
+            
+            [data-bs-theme="dark"] .btn:not(.btn-primary):hover {
+                background-color: var(--bs-secondary-bg);
             }
         `
     ],

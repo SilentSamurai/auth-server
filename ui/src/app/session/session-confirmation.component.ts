@@ -8,7 +8,7 @@ import {AuthDefaultService} from "../_services/auth.default.service";
 @Component({
     selector: 'session-confirm',
     templateUrl: './session-confirmation.component.html',
-    styleUrls: ['./session-confirmation.component.css']
+    styleUrls: ['./session-confirmation.component.scss']
 })
 export class SessionConfirmationComponent implements OnInit {
     content?: string;

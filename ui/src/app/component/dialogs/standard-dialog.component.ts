@@ -20,7 +20,7 @@ import {DialogFooterComponent} from "./dialog-footer.component";
                             <ng-container *ngIf="actions" [ngTemplateOutlet]="actions.template"></ng-container>
                             <button (click)="activeModal.close('Cross click')"
                                     aria-label="Close"
-                                    class="btn-sm btn "
+                                    class="btn-sm btn"
                                     type="button">
                                 <span aria-hidden="true">
                                     <i class="fa fa-icons fa-close"></i>
@@ -58,13 +58,43 @@ import {DialogFooterComponent} from "./dialog-footer.component";
     styles: [
         `
             .dialog-tab {
-                color: black;
+                color: var(--bs-body-color);
                 font-size: smaller !important;
+                transition: color 0.3s ease;
             }
+            
             .nav-tabs .nav-link:hover, .nav-tabs .nav-link:focus {
                 border-top-color: transparent !important;
                 border-left-color: transparent !important;
                 border-right-color: transparent !important;
+            }
+            
+            .modal-header {
+                border-bottom: 1px solid var(--bs-border-color);
+            }
+            
+            .modal-footer {
+                border-top: 1px solid var(--bs-border-color);
+            }
+            
+            .modal-body {
+                color: var(--bs-body-color);
+            }
+            
+            [data-bs-theme="dark"] .dialog-tab {
+                color: var(--bs-body-color);
+            }
+            
+            [data-bs-theme="dark"] .modal-header {
+                background-color: var(--bs-dark);
+            }
+            
+            [data-bs-theme="dark"] .modal-body {
+                background-color: var(--bs-dark);
+            }
+            
+            [data-bs-theme="dark"] .modal-footer {
+                background-color: var(--bs-dark);
             }
         `
     ],
