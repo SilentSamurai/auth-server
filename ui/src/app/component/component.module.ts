@@ -42,6 +42,7 @@ import {RadioButtonModule} from "primeng/radiobutton";
 import {ObjectPageTabComponent} from "./object-page/object-page-tab.component";
 import {ValueHelpButtonComponent} from "./button/value-help-button.component";
 import {ModalService} from "./dialogs/modal.service";
+import {ThemeToggleComponent} from "./theme-toggle/theme-toggle.component";
 
 @NgModule({
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -75,6 +76,7 @@ import {ModalService} from "./dialogs/modal.service";
         InputErrorComponent,
         ButtonLinkComponent,
         ValueHelpButtonComponent,
+        ThemeToggleComponent,
     ],
     imports: [
         TableModule,
@@ -122,6 +124,7 @@ import {ModalService} from "./dialogs/modal.service";
         ButtonLinkComponent,
         AppTableButtonComponent,
         ValueHelpButtonComponent,
+        ThemeToggleComponent
     ]
 })
 export class ComponentModule {

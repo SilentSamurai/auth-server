@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {lastValueFrom} from 'rxjs';
-import {TokenStorageService} from "./token-storage.service";
+import {SessionService} from "./session.service";
 import {DataModel} from "../component/model/DataModel";
 import {RestApiModel} from "../component/model/RestApiModel";
 
@@ -12,7 +12,7 @@ const API_URL = '/api';
     providedIn: 'root'
 })
 export class GroupService {
-    constructor(private http: HttpClient, private tokenService: TokenStorageService) {
+    constructor(private http: HttpClient, private sessionService: SessionService) {
     }
 
     getHttpOptions() {

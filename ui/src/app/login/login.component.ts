@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {AuthService} from '../_services/auth.service';
-import {TokenStorageService} from '../_services/token-storage.service';
+import {SessionService} from '../_services/session.service';
 import {ActivatedRoute, Router} from "@angular/router";
 import {lastValueFrom} from "rxjs";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
@@ -27,7 +27,7 @@ export class LoginComponent implements OnInit {
         private router: Router,
         private route: ActivatedRoute,
         private fb: FormBuilder,
-        private tokenStorage: TokenStorageService
+        private tokenStorage: SessionService
     ) {
         this.loginForm = this.fb.group({
             username: ['', Validators.required],
@@ -138,10 +138,10 @@ export class LoginComponent implements OnInit {
     private async setAccessToken(code: string) {
         try {
             let verifier = this.tokenStorage.getCodeVerifier();
-            const data = await lastValueFrom(this.authService.getAccessToken(code, verifier));
+            const data = await lastValueFrom(this.authService.fetchAccessToken(code, verifier));
             this.tokenStorage.saveToken(data.access_token);
-            const rules = await this.authService.getPermissions();
-            this.tokenStorage.updatePermissions(rules);
+            const rules = await this.authService.fetchPermissions();
+            this.tokenStorage.savePermissions(rules);
         } catch (e: any) {
             console.error(e);
         }

@@ -3,7 +3,7 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {MessageService} from "primeng/api";
 import {TenantService} from "../../_services/tenant.service";
-import {TokenStorageService} from "../../_services/token-storage.service";
+import {SessionService} from "../../_services/session.service";
 import {UpdateTenantComponent} from "./dialogs/update-tenant.component";
 import {AddMemberComponent} from "./dialogs/add-member.component";
 import {AddRoleComponent} from "./dialogs/add-role.component";
@@ -176,7 +176,7 @@ export class TN02Component implements OnInit {
     rolesDataModel: StaticModel;
 
     constructor(private tenantService: TenantService,
-                private tokenStorageService: TokenStorageService,
+                private tokenStorageService: SessionService,
                 private messageService: MessageService,
                 private actRoute: ActivatedRoute,
                 private router: Router,

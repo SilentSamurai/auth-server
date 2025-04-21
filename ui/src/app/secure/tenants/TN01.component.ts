@@ -3,7 +3,7 @@ import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {CreateTenantComponent} from "./dialogs/create-tenant.component";
 import {UpdateTenantComponent} from "./dialogs/update-tenant.component";
 import {TenantService} from "../../_services/tenant.service";
-import {TokenStorageService} from "../../_services/token-storage.service";
+import {SessionService} from "../../_services/session.service";
 import {AppTableComponent} from "../../component/table/app-table.component";
 import {AuthDefaultService} from "../../_services/auth.default.service";
 import {ConfirmationService} from "../../component/dialogs/confirmation.service";
@@ -85,7 +85,7 @@ export class TN01Component implements OnInit {
     deleteAllowed = false;
     dataModel: DataModel;
 
-    constructor(private tokenStorageService: TokenStorageService,
+    constructor(private tokenStorageService: SessionService,
                 private tenantService: TenantService,
                 private authDefaultService: AuthDefaultService,
                 private confirmationService: ConfirmationService,

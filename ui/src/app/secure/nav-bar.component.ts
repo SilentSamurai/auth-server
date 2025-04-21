@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {Router} from "@angular/router";
 import {UserService} from "../_services/user.service";
 import {AuthDefaultService} from "../_services/auth.default.service";
-import {TokenStorageService} from "../_services/token-storage.service";
+import {SessionService} from "../_services/session.service";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {ProfileComponent} from "../profile/profile.component";
 
@@ -66,7 +66,7 @@ export class AdminNavBarComponent implements OnInit {
                 private router: Router,
                 private modalService: NgbModal,
                 private authDefaultService: AuthDefaultService,
-                private tokenStorageService: TokenStorageService) {
+                private tokenStorageService: SessionService) {
 
     }
 

@@ -1,6 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {UserService} from '../../_services/user.service';
-import {TokenStorageService} from "../../_services/token-storage.service";
+import {SessionService} from "../../_services/session.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {AuthService} from "../../_services/auth.service";
 import {AuthDefaultService} from "../../_services/auth.default.service";
@@ -94,7 +94,7 @@ export class TileComponent implements OnInit {
                 private route: ActivatedRoute,
                 private authService: AuthService,
                 private authDefaultService: AuthDefaultService,
-                private tokenStorage: TokenStorageService,
+                private tokenStorage: SessionService,
                 private permissionService: PermissionService) {
     }
 

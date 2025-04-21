@@ -1,5 +1,6 @@
-import {Inject, Injectable} from '@angular/core';
-import {MongoAbility, PureAbility, subject} from "@casl/ability";
+import { Inject, Injectable } from '@angular/core';
+import { MongoAbility, PureAbility, subject } from "@casl/ability";
+import { SessionService } from './session.service';
 
 
 export enum Actions {
@@ -30,8 +31,13 @@ export class PermissionService {
     private readonly baseUrl = '/api/v1'; // match the prefix from PolicyClient
 
     constructor(
-        @Inject(PureAbility) private ability: MongoAbility
+        @Inject(PureAbility) private ability: MongoAbility,
+        private tokenStorage: SessionService
     ) {
+        const storedPermissions = this.tokenStorage.getPersistedPermissions();
+        if (storedPermissions) {
+            this.ability.update(storedPermissions);
+        }
     }
 
     public isAuthorized(action: Actions, subjectStr: Subjects, condition: any = null): boolean {

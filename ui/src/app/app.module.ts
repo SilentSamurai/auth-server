@@ -24,6 +24,7 @@ import {ConfirmDialogModule} from "primeng/confirmdialog";
 import {HttpErrorComponent} from "./error-pages/HttpError.component";
 import {AbilityModule} from "@casl/angular";
 import {Ability, createMongoAbility, MongoAbility, PureAbility} from "@casl/ability";
+import { ThemeToggleComponent } from './component/theme-toggle/theme-toggle.component';
 
 @NgModule({
     schemas: [CUSTOM_ELEMENTS_SCHEMA],

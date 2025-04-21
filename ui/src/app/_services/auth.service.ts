@@ -31,7 +31,7 @@ export class AuthService {
         );
     }
 
-    getAccessToken(code: string, verifier: string): Observable<any> {
+    fetchAccessToken(code: string, verifier: string): Observable<any> {
         return this.http.post(`${AUTH_API}/token`, {
             grant_type: "authorization_code",
             code,
@@ -39,7 +39,7 @@ export class AuthService {
         }, httpOptions);
     }
 
-    async getPermissions(): Promise<any> {
+    async fetchPermissions(): Promise<any> {
         return await lastValueFrom(this.http.get('/api/v1/my/permissions'));
     }
 

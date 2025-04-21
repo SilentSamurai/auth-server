@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from "@angular/router";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {TenantService} from "../../_services/tenant.service";
-import {TokenStorageService} from "../../_services/token-storage.service";
+import {SessionService} from "../../_services/session.service";
 import {GroupService} from "../../_services/group.service";
 import {AuthDefaultService} from "../../_services/auth.default.service";
 import {UpdateGroupComponent} from "./dialogs/update-group.component";
@@ -191,7 +191,7 @@ export class GP02Component implements OnInit {
     private group_id: any;
 
     constructor(private tenantService: TenantService,
-                private tokenStorageService: TokenStorageService,
+                private tokenStorageService: SessionService,
                 private messageService: MessageService,
                 private groupService: GroupService,
                 private actRoute: ActivatedRoute,

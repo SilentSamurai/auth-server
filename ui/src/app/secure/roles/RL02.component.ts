@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from "@angular/router";
 import {TenantService} from "../../_services/tenant.service";
-import {TokenStorageService} from "../../_services/token-storage.service";
+import {SessionService} from "../../_services/session.service";
 import {AuthDefaultService} from "../../_services/auth.default.service";
 import {RoleService} from "../../_services/role.service";
 import {MessageService} from "primeng/api";
@@ -193,7 +193,7 @@ export class RL02Component implements OnInit {
     private tenantId: string = "";
 
     constructor(private tenantService: TenantService,
-                private tokenStorageService: TokenStorageService,
+                private tokenStorageService: SessionService,
                 private messageService: MessageService,
                 private roleService: RoleService,
                 private actRoute: ActivatedRoute,

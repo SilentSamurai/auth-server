@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {lastValueFrom} from 'rxjs';
-import {TokenStorageService} from "./token-storage.service";
+import {SessionService} from "./session.service";
 import {RestApiModel} from "../component/model/RestApiModel";
 import {DataModel} from "../component/model/DataModel";
 
@@ -21,14 +21,14 @@ export class NoChangesException extends Error {
     providedIn: 'root'
 })
 export class TenantService {
-    constructor(private http: HttpClient, private tokenService: TokenStorageService) {
+    constructor(private http: HttpClient, private sessionService: SessionService) {
     }
 
     getHttpOptions() {
         return {
             headers: new HttpHeaders({
                 'Content-Type': 'application/json',
-                // 'Authorization': 'Bearer ' + this.tokenService.getToken()
+                // 'Authorization': 'Bearer ' + this.sessionService.getToken()
             })
         };
     }
@@ -43,21 +43,21 @@ export class TenantService {
     editTenant(tenantId: string, name: null | string, allowSignUp: null | boolean) {
         // Create a request body object
         const requestBody: any = {};
-        
+
         // Only add non-null parameters to the request body
         if (name !== null) {
             requestBody.name = name;
         }
-        
+
         if (allowSignUp !== null) {
             requestBody.allowSignUp = allowSignUp;
         }
-        
+
         // If all values are null, throw a specific exception
         if (Object.keys(requestBody).length === 0) {
             throw new NoChangesException();
         }
-        
+
         return this.http.patch(`${API_URL}/tenant/${tenantId}`, requestBody, this.getHttpOptions());
     }
 

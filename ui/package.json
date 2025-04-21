@@ -7,7 +7,8 @@
         "build": "ng build",
         "UI:SERVE:WATCH": "ng serve --watch --configuration development --proxy-config proxy.conf.js",
         "UI:BUILD:WATCH": "ng build --watch --configuration development",
-        "test": "ng test Angular13JwtAuth --karma-config karma.conf.js --code-coverage=true",
+        "test": "ng test --browsers=ChromeHeadless --watch=false --reporters=progress",
+        "test:watch": "ng test AuthServerUI --karma-config karma.conf.js --code-coverage=true",
         "update": "ng update @angular/core@17 @angular/cli@17"
     },
     "private": true,

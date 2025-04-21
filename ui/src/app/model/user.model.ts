@@ -5,7 +5,7 @@ export interface AuthTenant {
     client_id: string;
 }
 
-export interface AuthUser {
+export interface JwtToken {
     sub: string;
     email: string;
     name: string;
@@ -18,7 +18,7 @@ export interface AuthUser {
     iss: string;
 }
 
-export class User implements AuthUser {
+export class DecodedToken implements JwtToken {
     sub: string;
     email: string;
     name: string;
@@ -30,7 +30,7 @@ export class User implements AuthUser {
     exp: number;
     iss: string;
 
-    constructor(init?: Partial<AuthUser>) {
+    constructor(init?: Partial<JwtToken>) {
         this.sub = init?.sub ?? '';
         this.email = init?.email ?? '';
         this.name = init?.name ?? '';

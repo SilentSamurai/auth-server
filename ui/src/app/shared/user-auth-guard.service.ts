@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import { ActivatedRouteSnapshot, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
 import {Observable} from 'rxjs';
-import {TokenStorageService} from "../_services/token-storage.service";
+import {SessionService} from "../_services/session.service";
 import {AuthDefaultService} from "../_services/auth.default.service";
 
 @Injectable({
@@ -10,7 +10,7 @@ import {AuthDefaultService} from "../_services/auth.default.service";
 export class UserAuthGuard  {
 
 
-    constructor(private tokenStorageService: TokenStorageService,
+    constructor(private tokenStorageService: SessionService,
                 private authDefaultService: AuthDefaultService,
                 private router: Router) {
     }
