@@ -8,7 +8,8 @@ import {
     Output,
     QueryList,
     TemplateRef,
-    ViewChild
+    ViewChild,
+    ViewChildren
 } from '@angular/core';
 import {FilterBarComponent} from "../filter-bar/filter-bar.component";
 import {TableColumnComponent} from "./app-table-column.component";
@@ -17,6 +18,7 @@ import {AppTableButtonComponent} from "./app-table-button.component";
 import {DataModel, DataPushEvent, DataPushEventStatus, Query} from "../model/DataModel";
 import {Filter} from "../model/Filters";
 import {CheckboxChangeEvent} from "primeng/checkbox";
+import { MenuItem } from 'primeng/api';
 
 
 export class TableAsyncLoadEvent extends Query {
@@ -32,21 +34,21 @@ export class TableAsyncLoadEvent extends Query {
                 <div class="app-table-body">
                     {{ title }} <span>({{ dataModel.totalRowCount() }})</span>
                 </div>
-                <div>
+                <div class="d-flex gap-2">
                     <ng-container *ngFor="let btnTmpl of buttons">
                         <ng-container [ngTemplateOutlet]="btnTmpl.template"></ng-container>
                     </ng-container>
-                    <button type="button" class="btn btn-sm " (click)="reset()" pRipple>
-                        <i class="pi pi-refresh "></i>
+                    <button type="button" class="btn btn-sm" (click)="reset()" pRipple>
+                        <i class="pi pi-refresh"></i>
                     </button>
-                    <button type="button" class="btn btn-sm ps-2" (click)="reset()" pRipple>
-                        <i class="pi pi-sort-alt "></i>
+                    <button type="button" class="btn btn-sm" (click)="exportToCSV()" pRipple>
+                        <i class="pi pi-download"></i>
                     </button>
                 </div>
             </div>
         </div>
         <div class="table-responsive" style="max-height: {{scrollHeight}}" (scroll)="lazyLoad($event)">
-            <table class="table a-table">
+            <table class="table a-table table-striped table-hover table-sm">
                 <thead class="sticky-top top-0">
                 <tr style="min-height:35px">
                     <th style="width:40px">
@@ -55,31 +57,40 @@ export class TableAsyncLoadEvent extends Query {
                                     [(ngModel)]="_selectAll"
                                     (onChange)="onSelectAll($event)"></p-checkbox>
                     </th>
-                    <ng-container *ngFor="let col of columns">
-                        <ng-container *ngIf="col.isTemplateProvided" [ngTemplateOutlet]="col.template"></ng-container>
+                    <ng-container *ngFor="let col of columns; let i = index">
+                        <ng-container *ngIf="col.isTemplateProvided" [ngTemplateOutlet]="col.templateRef"></ng-container>
                         <ng-container *ngIf="!col.isTemplateProvided">
-                            <th scope="col">
-                                {{ col.label }}
+                            <th scope="col" [class.sortable]="col.sortable" (click)="col.sortable && sort(col.name)"
+                                [style.min-width.px]="col.width || 150">
+                                <div class="d-flex align-items-center">
+                                    {{ col.label }}
+                                    <i *ngIf="col.sortable" [class]="getSortIcon(col.name)" class="ms-1"></i>
+                                </div>
                             </th>
                         </ng-container>
-
                     </ng-container>
                 </tr>
                 </thead>
                 <tbody>
-                <tr class="a-table-row" style="height:35px" *ngFor="let row of actualRows">
-                    <td style="width:40px">
-                        <p-checkbox *ngIf="multi"
-                                    [value]="getKeyValue(row)"
-                                    [(ngModel)]="selectedItem"></p-checkbox>
-
-                        <p-radioButton *ngIf="!multi"
-                                       name="table_input"
-                                       [value]="getKeyValue(row)"
-                                       [(ngModel)]="selectedItem"></p-radioButton>
-                    </td>
-                    <ng-container *ngTemplateOutlet="body; context: {$implicit: row}"></ng-container>
-                </tr>
+                <ng-container *ngFor="let row of actualRows">
+                    <tr class="a-table-row" style="height:35px">
+                        <td style="width:40px">
+                            <p-checkbox *ngIf="multi"
+                                        [value]="getKeyValue(row)"
+                                        [(ngModel)]="selectedItem"></p-checkbox>
+                            <p-radioButton *ngIf="!multi"
+                                           name="table_input"
+                                           [value]="getKeyValue(row)"
+                                           [(ngModel)]="selectedItem"></p-radioButton>
+                        </td>
+                        <ng-container *ngIf="body">
+                            <ng-container *ngTemplateOutlet="body; context: {$implicit: row}"></ng-container>
+                        </ng-container>
+                        <ng-container *ngIf="!body">
+                            No data
+                        </ng-container>
+                    </tr>
+                </ng-container>
                 <tr style="height:40px" *ngIf="loading">
                     <td>
                         <div class="loading-text"></div>
@@ -93,13 +104,12 @@ export class TableAsyncLoadEvent extends Query {
                 </tbody>
             </table>
         </div>
-
     `,
     styles: [`
         .a-table-caption {
             background-color: var(--bs-card-bg);
-            color: var(--bs-body-color, #212529);
-            border-color: var(--bs-border-color);
+            color: var(--bs-body-color);
+            /*border-color: var(--bs-border-color);*/
         }
 
         .a-table {
@@ -128,12 +138,34 @@ export class TableAsyncLoadEvent extends Query {
             color: var(--bs-body-color);
         }
 
+        .sortable {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .sortable:hover {
+            background-color: var(--bs-table-hover-bg, rgba(var(--bs-primary-rgb, 13, 110, 253), 0.1));
+        }
+
+        .resize-handle {
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            cursor: col-resize;
+            background: transparent;
+        }
+
+        .resize-handle:hover {
+            background: var(--bs-primary);
+        }
+
         /* Dark mode specific styles */
         [data-bs-theme="dark"] {
             .a-table-caption {
                 background-color: var(--bs-dark);
                 color: var(--bs-light);
-                border-color: var(--bs-border-color);
             }
 
             .a-table {
@@ -207,6 +239,8 @@ export class AppTableComponent implements OnInit {
 
     protected nextPageNo: number = 0;
     private sortBy: any[] = [];
+    private sortDirection: { [key: string]: 'asc' | 'desc' } = {};
+    private currentSortColumn: string | null = null;
     protected idFields: string[] = [];
 
     protected pagesLoaded = new Set();
@@ -215,7 +249,6 @@ export class AppTableComponent implements OnInit {
 
 
     constructor() {
-
     }
 
     async ngOnInit(): Promise<void> {
@@ -233,9 +266,9 @@ export class AppTableComponent implements OnInit {
 
     get selectedItem() {
         if (!this._selectedKeys) {
-            this._selectedKeys = this.selection.map(this.getKeyValue.bind(this));
+            this._selectedKeys = this.selection.map(row => this.getKeyValue(row));
         }
-        return this._selectedKeys
+        return this._selectedKeys;
     }
 
     set selectedItem(selectedKeys: any[] | any) {
@@ -244,20 +277,23 @@ export class AppTableComponent implements OnInit {
             const keysSet = new Set(selectedKeys);
             this.selection = this.actualRows.filter(
                 item => keysSet.has(this.getKeyValue(item))
-            )
-            this.selectionChange.emit(this.selection);
+            );
+            this._selectAll = this.actualRows.length > 0 && this.actualRows.every(
+                item => keysSet.has(this.getKeyValue(item))
+            );
         } else {
             this.selection = this.actualRows.filter(
                 item => this.getKeyValue(item) === selectedKeys
-            )
-            this.selectionChange.emit(this.selection);
+            );
+            this._selectAll = false;
         }
+        this.selectionChange.emit(this.selection);
     }
 
     onSelectAll($event: CheckboxChangeEvent) {
         if ($event.checked) {
             this._selectAll = true;
-            this.selectedItem = this.actualRows;
+            this.selectedItem = this.actualRows.map(row => this.getKeyValue(row));
         } else {
             this._selectAll = false;
             this.selectedItem = [];
@@ -341,5 +377,44 @@ export class AppTableComponent implements OnInit {
         this.requestForData({pageNo: 0, append: false});
     }
 
+    sort(column: string) {
+        if (this.currentSortColumn !== column) {
+            // New column being sorted
+            this.currentSortColumn = column;
+            this.sortDirection[column] = 'asc';
+        } else {
+            // Same column, toggle direction
+            this.sortDirection[column] = this.sortDirection[column] === 'asc' ? 'desc' : 'asc';
+        }
+
+        this.sortBy = [{
+            field: column,
+            order: this.sortDirection[column]
+        }];
+
+        this.requestForData({ sortBy: this.sortBy, append: false });
+    }
+
+    getSortIcon(column: string): string {
+        if (this.currentSortColumn != column) return 'fa fa-sort';
+        return this.sortDirection[column] === 'asc' ? 'fa fa-sort-asc' : 'fa fa-sort-desc';
+    }
+
+    exportToCSV() {
+        const headers = this.columns.map(col => col.label);
+        const rows = this.actualRows.map(row =>
+            this.columns.map(col => row[col.name]).join(',')
+        );
+        const csvContent = [
+            headers.join(','),
+            ...rows
+        ].join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `${this.title || 'table'}_export.csv`;
+        link.click();
+    }
 
 }
