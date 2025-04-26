@@ -1,30 +1,31 @@
-import {PermissionService} from "../../_services/permission.service";
+import { PermissionService } from '../../_services/permission.service';
 
 /**
  * Optional function type for permission checks on tiles.
  * Returns true if tile should be shown (permitted).
  */
-export type TilePermissionCheck = (permissionService: PermissionService) => boolean;
+export type TilePermissionCheck = (
+    permissionService: PermissionService,
+) => boolean;
 
 export interface Models {
-
     isAllowed(): boolean;
 }
 
 const sizeMap = {
-    'sm': {
+    sm: {
         width: '100px',
-        height: '100px'
+        height: '100px',
     },
-    'md': {
+    md: {
         width: '200px',
-        height: '200px'
+        height: '200px',
     },
-    'lg': {
+    lg: {
         width: '425px',
-        height: '200px'
-    }
-}
+        height: '200px',
+    },
+};
 
 /**
  * Tile model class defines the structure and logic of a dashboard tile.
@@ -38,7 +39,7 @@ export class Tile {
     // Optional
     subtitle?: string;
     icon?: string;
-    link?: string[];      // RouterLink route
+    link?: string[]; // RouterLink route
     command?: TileCommand;
     size: 'sm' | 'md' | 'lg';
     permissions: string[];
@@ -62,7 +63,7 @@ export class Tile {
         info?: string;
         canActivate?: TilePermissionCheck;
     }) {
-        this.id = options.id ? options.id : "TILE_ID_" + options.title;
+        this.id = options.id ? options.id : 'TILE_ID_' + options.title;
         this.title = options.title;
         this.subtitle = options.subtitle;
         this.icon = options.icon;
@@ -70,8 +71,10 @@ export class Tile {
         this.command = options.command;
         this.size = options.size || 'md';
         this.permissions = options.permissions || [];
-        this.isCallbackThere = options.hasOwnProperty("command") && typeof options.command === "function";
-        this.info = options.info || "";
+        this.isCallbackThere =
+            options.hasOwnProperty('command') &&
+            typeof options.command === 'function';
+        this.info = options.info || '';
         this.canActivate = options.canActivate;
     }
 
@@ -81,7 +84,7 @@ export class Tile {
         }
     }
 
-    findSize(size: string): { width: string, height: string } {
+    findSize(size: string): { width: string; height: string } {
         if (size === 'sm') {
             return sizeMap.sm;
         }
@@ -113,7 +116,6 @@ export class Tile {
     isAllowed(): boolean {
         return this.allowed;
     }
-
 }
 
 /**
@@ -126,10 +128,10 @@ export class TileGroup {
     tiles: Tile[];
 
     constructor(options: {
-        groupName: string,
-        navName?: string,
-        id?: string,
-        tiles: Tile[]
+        groupName: string;
+        navName?: string;
+        id?: string;
+        tiles: Tile[];
     }) {
         this.groupName = options.groupName;
         this.navName = options.navName ?? options.groupName;
@@ -150,26 +152,25 @@ export class TileGroup {
  */
 export function makeLaunchPad(data: any, ps: PermissionService): TileGroup[] {
     if (!Array.isArray(data)) {
-        throw new Error("makeLaunchPad expects an array");
+        throw new Error('makeLaunchPad expects an array');
     }
 
     return data.map((group: any) => {
         // Defensive for missing or malformed tiles
         const groupTiles = Array.isArray(group.tiles)
-            ? group.tiles.map(
-                (tile: any) => new Tile(tile)
-            ).map((tile: Tile) => {
-                tile.checkPermission(ps);
-                return tile;
-            })
+            ? group.tiles
+                  .map((tile: any) => new Tile(tile))
+                  .map((tile: Tile) => {
+                      tile.checkPermission(ps);
+                      return tile;
+                  })
             : [];
 
         return new TileGroup({
-            groupName: group.groupName ?? group.name ?? "",
-            navName: group.navName ?? group.name ?? "",
-            id: group.id ?? group.name ?? "",
-            tiles: groupTiles
+            groupName: group.groupName ?? group.name ?? '',
+            navName: group.navName ?? group.name ?? '',
+            id: group.id ?? group.name ?? '',
+            tiles: groupTiles,
         });
     });
 }
-

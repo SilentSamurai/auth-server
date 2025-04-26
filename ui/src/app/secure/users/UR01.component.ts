@@ -1,14 +1,17 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
-import {UserService} from '../../_services/user.service';
-import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
-import {CreateUserModalComponent} from "./dialogs/create-user.modal.component";
-import {EditUserModalComponent} from "./dialogs/edit-user.modal.component";
-import {AppTableComponent, TableAsyncLoadEvent} from "../../component/table/app-table.component";
-import {AuthDefaultService} from "../../_services/auth.default.service";
-import {ConfirmationService} from "../../component/dialogs/confirmation.service";
-import {MessageService} from "primeng/api";
-import {DataModel, DataSource} from "../../component/model/DataModel";
-import {Filter} from "../../component/model/Filters";
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { UserService } from '../../_services/user.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { CreateUserModalComponent } from './dialogs/create-user.modal.component';
+import { EditUserModalComponent } from './dialogs/edit-user.modal.component';
+import {
+    AppTableComponent,
+    TableAsyncLoadEvent,
+} from '../../component/table/app-table.component';
+import { AuthDefaultService } from '../../_services/auth.default.service';
+import { ConfirmationService } from '../../component/dialogs/confirmation.service';
+import { MessageService } from 'primeng/api';
+import { DataModel, DataSource } from '../../component/model/DataModel';
+import { Filter } from '../../component/model/Filters';
 
 @Component({
     selector: 'app-board-user',
@@ -22,10 +25,12 @@ import {Filter} from "../../component/model/Filters";
                 </app-fb>
                 <div class="d-flex justify-content-between">
                     <span class="h4"></span>
-                    <button (click)="openCreateModal()"
-                            id="CREATE_USER_DIALOG_BTN"
-                            class="btn btn-success btn-sm"
-                            type="button">
+                    <button
+                        (click)="openCreateModal()"
+                        id="CREATE_USER_DIALOG_BTN"
+                        class="btn btn-success btn-sm"
+                        type="button"
+                    >
                         <i class="fa fa-solid fa-plus me-2"></i>Create User
                     </button>
                 </div>
@@ -35,25 +40,39 @@ import {Filter} from "../../component/model/Filters";
                     [dataSource]="usersDM"
                     title="Users"
                     multi="true"
-                    scrollHeight="65vh">
-
+                    scrollHeight="65vh"
+                >
                     <app-table-col label="Name" name="name"></app-table-col>
                     <app-table-col label="Email" name="email"></app-table-col>
-                    <app-table-col label="Create At" name="createdAt"></app-table-col>
+                    <app-table-col
+                        label="Create At"
+                        name="createdAt"
+                    ></app-table-col>
                     <app-table-col label="Action" name="action"></app-table-col>
 
                     <ng-template #table_body let-user>
                         <td>{{ user.name }} {{ user.surname }}</td>
                         <td>
-                            <a [routerLink]="['/UR02/', user.id]"
-                               href="javascript:void(0)">{{ user.email }}</a>
+                            <a
+                                [routerLink]="['/UR02/', user.id]"
+                                href="javascript:void(0)"
+                                >{{ user.email }}</a
+                            >
                         </td>
                         <td>{{ user.createdAt | date }}</td>
                         <td class="d-flex ">
-                            <button (click)="openUpdateModal(user)" class="btn " type="button">
+                            <button
+                                (click)="openUpdateModal(user)"
+                                class="btn "
+                                type="button"
+                            >
                                 <i class="fa fa-edit"></i>
                             </button>
-                            <button (click)="openDeleteModal(user)" class="btn " type="button">
+                            <button
+                                (click)="openDeleteModal(user)"
+                                class="btn "
+                                type="button"
+                            >
                                 <i class="fa fa-solid fa-trash"></i>
                             </button>
                         </td>
@@ -62,27 +81,28 @@ import {Filter} from "../../component/model/Filters";
             </app-page-view-body>
         </app-page-view>
     `,
-    styles: ['']
+    styles: [''],
 })
 export class UR01Component implements OnInit {
-
     @ViewChild(AppTableComponent)
     table!: AppTableComponent;
 
     users: any = [];
     usersDM!: DataSource<any>;
 
-    constructor(private userService: UserService,
-                private authDefaultService: AuthDefaultService,
-                private confirmationService: ConfirmationService,
-                private messageService: MessageService,
-                private modalService: NgbModal) {
+    constructor(
+        private userService: UserService,
+        private authDefaultService: AuthDefaultService,
+        private confirmationService: ConfirmationService,
+        private messageService: MessageService,
+        private modalService: NgbModal,
+    ) {
         this.usersDM = this.userService.createDataModel([]);
     }
 
     async ngOnInit(): Promise<void> {
         // this.users = await this.userService.queryUser({});
-        this.authDefaultService.setTitle("UR01: Manage Users");
+        this.authDefaultService.setTitle('UR01: Manage Users');
     }
 
     async openCreateModal() {
@@ -107,15 +127,25 @@ export class UR01Component implements OnInit {
             icon: 'pi pi-info-circle',
             accept: async () => {
                 try {
-                    let deletedUser = await this.userService.deleteUser(user.id);
-                    this.messageService.add({severity: 'success', summary: 'Success', detail: 'User Deleted'});
+                    let deletedUser = await this.userService.deleteUser(
+                        user.id,
+                    );
+                    this.messageService.add({
+                        severity: 'success',
+                        summary: 'Success',
+                        detail: 'User Deleted',
+                    });
                     return deletedUser;
                 } catch (e) {
-                    this.messageService.add({severity: 'error', summary: 'Error', detail: 'User Deletion Failed'});
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'User Deletion Failed',
+                    });
                 }
                 return null;
-            }
-        })
+            },
+        });
         console.log(deletedUser);
         this.ngOnInit();
     }

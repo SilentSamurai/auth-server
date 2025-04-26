@@ -13,7 +13,5 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 export class AppComponent implements OnInit {
     constructor(private themeService: ThemeService) {}
 
-    ngOnInit(): void {
-
-    }
+    ngOnInit(): void {}
 }

@@ -1,6 +1,12 @@
-import {DataSource, DataSourceEvents, Query, ReturnedData, SortConfig} from "./DataModel";
-import {Filter} from "./Filters";
-import {Observable, Subject} from "rxjs";
+import {
+    DataSource,
+    DataSourceEvents,
+    Query,
+    ReturnedData,
+    SortConfig,
+} from './DataModel';
+import { Filter } from './Filters';
+import { Observable, Subject } from 'rxjs';
 
 export class StaticModel<T> implements DataSource<T> {
     private data: T[] = [];
@@ -8,7 +14,8 @@ export class StaticModel<T> implements DataSource<T> {
 
     constructor(
         protected _keyFields: string[],
-        initialData: T[] = []) {
+        initialData: T[] = [],
+    ) {
         this.data = [...initialData];
     }
 
@@ -22,23 +29,28 @@ export class StaticModel<T> implements DataSource<T> {
 
     setData(data: T[]): void {
         this.data = [...data];
-        this.eventSubject.next({type: "data-updated", source: "set"});
+        this.eventSubject.next({ type: 'data-updated', source: 'set' });
     }
 
     appendData(newData: T[]): void {
         this.data.push(...newData);
-        this.eventSubject.next({type: "data-updated", source: "append"});
+        this.eventSubject.next({ type: 'data-updated', source: 'append' });
     }
 
     async fetchData(query: Query): Promise<ReturnedData<T>> {
-        const start = (query.pageNo ?? 0) * (query.pageSize ?? this.data.length);
+        const start =
+            (query.pageNo ?? 0) * (query.pageSize ?? this.data.length);
         const end = start + (query.pageSize ?? this.data.length);
 
         let filteredData = this.applyFilters(this.data, query.filters ?? []);
         let sortedData = this.applySorting(filteredData, query.orderBy ?? []);
 
         let result = sortedData.slice(start, end);
-        return {data: result, count: result.length, isLastPage: end >= filteredData.length};
+        return {
+            data: result,
+            count: result.length,
+            isLastPage: end >= filteredData.length,
+        };
     }
 
     totalCount(query: Query): Promise<number> {
@@ -46,8 +58,8 @@ export class StaticModel<T> implements DataSource<T> {
     }
 
     private applyFilters(data: T[], filters: Filter[]): T[] {
-        return data.filter(item => {
-            return filters.every(filter => {
+        return data.filter((item) => {
+            return filters.every((filter) => {
                 const value = this.getNestedValue(item, filter.name);
                 return filter.matches(value);
             });
@@ -80,7 +92,12 @@ export class StaticModel<T> implements DataSource<T> {
     }
 
     private getNestedValue(obj: any, path: string): any {
-        return path.split('.').reduce((acc, part) =>
-            acc && acc[part] !== undefined ? acc[part] : null, obj);
+        return path
+            .split('.')
+            .reduce(
+                (acc, part) =>
+                    acc && acc[part] !== undefined ? acc[part] : null,
+                obj,
+            );
     }
 }

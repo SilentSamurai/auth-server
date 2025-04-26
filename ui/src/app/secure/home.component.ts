@@ -1,12 +1,15 @@
-import {Component, OnInit} from '@angular/core';
-import {UserService} from '../_services/user.service';
-import {SessionService} from "../_services/session.service";
-import {ActivatedRoute, Router} from "@angular/router";
-import {AuthService} from "../_services/auth.service";
-import {AuthDefaultService} from "../_services/auth.default.service";
-import {makeLaunchPad} from "../component/tile/models";
-import {Actions, PermissionService, Subjects} from "../_services/permission.service";
-
+import { Component, OnInit } from '@angular/core';
+import { UserService } from '../_services/user.service';
+import { SessionService } from '../_services/session.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { AuthService } from '../_services/auth.service';
+import { AuthDefaultService } from '../_services/auth.default.service';
+import { makeLaunchPad } from '../component/tile/models';
+import {
+    Actions,
+    PermissionService,
+    Subjects,
+} from '../_services/permission.service';
 
 @Component({
     selector: 'app-home',
@@ -14,7 +17,7 @@ import {Actions, PermissionService, Subjects} from "../_services/permission.serv
         <nav-bar *ngIf="!loading"></nav-bar>
         <app-launchpad [groups]="groups"></app-launchpad>
     `,
-    styles: [``]
+    styles: [``],
 })
 export class HomeComponent implements OnInit {
     content?: string;
@@ -22,152 +25,154 @@ export class HomeComponent implements OnInit {
     loading = true;
     groups: any = [
         {
-            name: "Home",
+            name: 'Home',
             tiles: [
                 {
-                    title: "Tenant Overview",
-                    subtitle: "View Current Tenant",
-                    icon: "fa-building",
+                    title: 'Tenant Overview',
+                    subtitle: 'View Current Tenant',
+                    icon: 'fa-building',
                     command: async () => {
                         const tenant_id = this.user.tenant.id;
-                        await this.router.navigate(["/TN02", tenant_id]);
+                        await this.router.navigate(['/TN02', tenant_id]);
                     },
-                    size: 'lg'
+                    size: 'lg',
                 },
                 {
-                    title: "Members",
-                    subtitle: "Manage Members",
-                    icon: "fa-users",
+                    title: 'Members',
+                    subtitle: 'Manage Members',
+                    icon: 'fa-users',
                     command: async () => {
                         const tenant_id = this.user.tenant.id;
-                        await this.router.navigate(["/TN02", tenant_id], {
-                            fragment: "MEMBERS"
+                        await this.router.navigate(['/TN02', tenant_id], {
+                            fragment: 'MEMBERS',
                         });
-                    }
+                    },
                 },
                 {
-                    title: "Role",
-                    subtitle: "Manage Roles",
-                    icon: "fa-magic",
+                    title: 'Role',
+                    subtitle: 'Manage Roles',
+                    icon: 'fa-magic',
                     command: async () => {
                         const tenant_id = this.user.tenant.id;
-                        await this.router.navigate(["/TN02", tenant_id], {
-                            fragment: "ROLES"
+                        await this.router.navigate(['/TN02', tenant_id], {
+                            fragment: 'ROLES',
                         });
-                    }
+                    },
                 },
-            ]
+            ],
         },
         {
-            name: "Tenants",
+            name: 'Tenants',
             tiles: [
                 {
-                    title: "TN01",
-                    subtitle: "Manage All Tenants",
-                    icon: "fa-bars",
+                    title: 'TN01',
+                    subtitle: 'Manage All Tenants',
+                    icon: 'fa-bars',
                     link: ['/TN01'],
                     canActivate: (ps: PermissionService) => {
                         return ps.isAuthorized(Actions.Manage, Subjects.TENANT);
                     },
                 },
                 {
-                    title: "TN02",
-                    subtitle: "Display Tenant",
-                    icon: "fa-bars",
+                    title: 'TN02',
+                    subtitle: 'Display Tenant',
+                    icon: 'fa-bars',
                     link: ['/TN02'],
                     canActivate: (ps: PermissionService) => {
                         return ps.isAuthorized(Actions.Read, Subjects.TENANT);
                     },
                 },
                 {
-                    title: "TNRL01",
-                    subtitle: "Manage Role Assignments",
-                    icon: "fa-magic",
+                    title: 'TNRL01',
+                    subtitle: 'Manage Role Assignments',
+                    icon: 'fa-magic',
                     link: ['/TNRL01'],
                     canActivate: (ps: PermissionService) => {
                         return ps.isAuthorized(Actions.Manage, Subjects.TENANT);
                     },
-                }
-            ]
+                },
+            ],
         },
         {
-            name: "Users",
+            name: 'Users',
             tiles: [
                 {
-                    title: "UR01",
-                    subtitle: "Manage Users",
-                    icon: "fa-users",
+                    title: 'UR01',
+                    subtitle: 'Manage Users',
+                    icon: 'fa-users',
                     link: ['/UR01'],
                     canActivate: (ps: PermissionService) => {
                         return ps.isAuthorized(Actions.Manage, Subjects.USER);
                     },
                 },
                 {
-                    title: "UR02",
-                    subtitle: "Display User",
-                    icon: "fa-users",
+                    title: 'UR02',
+                    subtitle: 'Display User',
+                    icon: 'fa-users',
                     link: ['/UR02'],
                     canActivate: (ps: PermissionService) => {
                         return ps.isAuthorized(Actions.Read, Subjects.USER);
                     },
-                }
-            ]
+                },
+            ],
         },
         {
-            name: "Groups",
+            name: 'Groups',
             tiles: [
                 {
-                    title: "GP01",
-                    subtitle: "Manage Groups",
-                    icon: "fa-group",
+                    title: 'GP01',
+                    subtitle: 'Manage Groups',
+                    icon: 'fa-group',
                     link: ['/GP01'],
                     canActivate: (ps: PermissionService) => {
                         return ps.isAuthorized(Actions.Manage, Subjects.GROUP);
                     },
                 },
                 {
-                    title: "GP02",
-                    subtitle: "Display Group",
-                    icon: "fa-group",
+                    title: 'GP02',
+                    subtitle: 'Display Group',
+                    icon: 'fa-group',
                     link: ['/GP02'],
                     canActivate: (ps: PermissionService) => {
                         return ps.isAuthorized(Actions.Read, Subjects.GROUP);
                     },
-                }
-            ]
+                },
+            ],
         },
         {
-            name: "Roles",
+            name: 'Roles',
             tiles: [
                 {
-                    title: "RL01",
-                    subtitle: "Manage Roles",
-                    icon: "fa-casl",
+                    title: 'RL01',
+                    subtitle: 'Manage Roles',
+                    icon: 'fa-casl',
                     link: ['/RL01'],
                     canActivate: (ps: PermissionService) => {
                         return ps.isAuthorized(Actions.Manage, Subjects.ROLE);
                     },
                 },
                 {
-                    title: "RL02",
-                    subtitle: "Display Role",
-                    icon: "fa-role",
+                    title: 'RL02',
+                    subtitle: 'Display Role',
+                    icon: 'fa-role',
                     link: ['/RL02'],
                     canActivate: (ps: PermissionService) => {
                         return ps.isAuthorized(Actions.Read, Subjects.ROLE);
                     },
-                }
-            ]
-        }
+                },
+            ],
+        },
     ];
 
-    constructor(private userService: UserService,
-                private router: Router,
-                private route: ActivatedRoute,
-                private authService: AuthService,
-                private ps: PermissionService,
-                private authDefaultService: AuthDefaultService,
-                private tokenStorage: SessionService) {
+    constructor(
+        private userService: UserService,
+        private router: Router,
+        private route: ActivatedRoute,
+        private authService: AuthService,
+        private ps: PermissionService,
+        private authDefaultService: AuthDefaultService,
+        private tokenStorage: SessionService,
+    ) {
         this.groups = makeLaunchPad(this.groups, this.ps);
     }
 

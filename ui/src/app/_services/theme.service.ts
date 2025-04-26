@@ -1,8 +1,8 @@
-import {Injectable} from '@angular/core';
-import {BehaviorSubject, lastValueFrom} from 'rxjs';
+import { Injectable } from '@angular/core';
+import { BehaviorSubject, lastValueFrom } from 'rxjs';
 
 @Injectable({
-    providedIn: 'root'
+    providedIn: 'root',
 })
 export class ThemeService {
     private darkMode = new BehaviorSubject<boolean>(false);
@@ -15,7 +15,9 @@ export class ThemeService {
             this.darkMode.next(savedTheme === 'true');
         } else {
             // Check system preference
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const prefersDark = window.matchMedia(
+                '(prefers-color-scheme: dark)',
+            ).matches;
             this.darkMode.next(prefersDark);
         }
 
@@ -31,7 +33,7 @@ export class ThemeService {
     }
 
     private applyTheme(isDark: boolean) {
-        const rootEl = document.documentElement;  // <html> element
+        const rootEl = document.documentElement; // <html> element
         const bodyEl = document.body;
 
         if (isDark) {

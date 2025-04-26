@@ -35,7 +35,12 @@ export class DecodedToken implements JwtToken {
         this.email = init?.email ?? '';
         this.name = init?.name ?? '';
         this.userId = init?.userId ?? '';
-        this.tenant = init?.tenant ?? {id: '', name: '', domain: '', client_id: ''};
+        this.tenant = init?.tenant ?? {
+            id: '',
+            name: '',
+            domain: '',
+            client_id: '',
+        };
         this.scopes = init?.scopes ?? [];
         this.grant_type = init?.grant_type ?? '';
         this.iat = init?.iat ?? 0;
@@ -44,10 +49,16 @@ export class DecodedToken implements JwtToken {
     }
 
     public isSuperAdmin(): boolean {
-        return this.scopes.find((scope: string) => scope === "SUPER_ADMIN") !== undefined;
+        return (
+            this.scopes.find((scope: string) => scope === 'SUPER_ADMIN') !==
+            undefined
+        );
     }
 
     public isTenantAdmin(): boolean {
-        return this.scopes.find((scope: string) => scope === "TENANT_ADMIN") !== undefined;
+        return (
+            this.scopes.find((scope: string) => scope === 'TENANT_ADMIN') !==
+            undefined
+        );
     }
 }

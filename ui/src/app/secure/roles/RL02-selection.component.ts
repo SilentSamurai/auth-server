@@ -1,12 +1,11 @@
-import {Component, OnInit} from '@angular/core';
-import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
-import {ActivatedRoute, Router} from "@angular/router";
-import {TenantService} from "../../_services/tenant.service";
-import {MessageService} from "primeng/api";
-import {AuthDefaultService} from "../../_services/auth.default.service";
-import {RoleService} from "../../_services/role.service";
-import {DataModel, DataSource} from "../../component/model/DataModel";
-
+import { Component, OnInit } from '@angular/core';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ActivatedRoute, Router } from '@angular/router';
+import { TenantService } from '../../_services/tenant.service';
+import { MessageService } from 'primeng/api';
+import { AuthDefaultService } from '../../_services/auth.default.service';
+import { RoleService } from '../../_services/role.service';
+import { DataModel, DataSource } from '../../component/model/DataModel';
 
 @Component({
     selector: 'app-role-list',
@@ -17,8 +16,10 @@ import {DataModel, DataSource} from "../../component/model/DataModel";
                 <div class="col-4">
                     <h5 class="my-2">Select Role</h5>
                     <form class="form-group g-3">
-
-                        <label class="col-3 col-form-label control-label-required" for="Role">
+                        <label
+                            class="col-3 col-form-label control-label-required"
+                            for="Role"
+                        >
                             Role:
                         </label>
                         <app-value-help-input
@@ -27,71 +28,84 @@ import {DataModel, DataSource} from "../../component/model/DataModel";
                             class="col-3"
                             labelField="name"
                             multi="false"
-                            name="Role">
-
+                            name="Role"
+                        >
                             <app-fb-col name="name" label="Name"></app-fb-col>
-                            <app-fb-col name="tenant/domain" label="Tenant Domain"></app-fb-col>
+                            <app-fb-col
+                                name="tenant/domain"
+                                label="Tenant Domain"
+                            ></app-fb-col>
 
-                            <app-vh-col name="name" label="Role Name"></app-vh-col>
-                            <app-vh-col name="tenant/domain" label="Tenant Domain"></app-vh-col>
-                            <app-vh-col name="tenant/name" label="Tenant Name"></app-vh-col>
-
+                            <app-vh-col
+                                name="name"
+                                label="Role Name"
+                            ></app-vh-col>
+                            <app-vh-col
+                                name="tenant/domain"
+                                label="Tenant Domain"
+                            ></app-vh-col>
+                            <app-vh-col
+                                name="tenant/name"
+                                label="Tenant Name"
+                            ></app-vh-col>
 
                             <ng-template #vh_body let-row>
                                 <td>{{ row.name }}</td>
                                 <td>{{ row.tenant.domain }}</td>
                                 <td>{{ row.tenant.name }}</td>
                             </ng-template>
-
                         </app-value-help-input>
 
-
-                        <div class=" d-grid gap-2 py-3 d-flex justify-content-end ">
-                            <button (click)="continue()" class="btn btn-primary btn-block btn-sm">
+                        <div
+                            class=" d-grid gap-2 py-3 d-flex justify-content-end "
+                        >
+                            <button
+                                (click)="continue()"
+                                class="btn btn-primary btn-block btn-sm"
+                            >
                                 Continue
                             </button>
                         </div>
                     </form>
-
                 </div>
-
             </div>
         </div>
     `,
-    styles: [`
-    `]
+    styles: [``],
 })
 export class RL02SelectionComponent implements OnInit {
-
     roles = [];
     rolesDM: DataSource<any>;
     tenants: [] = [];
     selectedTenant: any[] = [];
     selectedRole: any[] = [];
 
-    constructor(private roleService: RoleService,
-                private tenantService: TenantService,
-                private route: ActivatedRoute,
-                private router: Router,
-                private authDefaultService: AuthDefaultService,
-                private messageService: MessageService,
-                private modalService: NgbModal) {
+    constructor(
+        private roleService: RoleService,
+        private tenantService: TenantService,
+        private route: ActivatedRoute,
+        private router: Router,
+        private authDefaultService: AuthDefaultService,
+        private messageService: MessageService,
+        private modalService: NgbModal,
+    ) {
         this.rolesDM = this.roleService.createDataModel([]);
     }
 
     async ngOnInit(): Promise<void> {
-        this.authDefaultService.setTitle("RL02: Select Role");
-
+        this.authDefaultService.setTitle('RL02: Select Role');
     }
 
     async continue() {
         console.log({
-            'roles': this.selectedRole
+            roles: this.selectedRole,
         });
         if (this.selectedRole.length > 0) {
             await this.router.navigate([
-                '/RL02', this.selectedRole[0].tenant.id, this.selectedRole[0].id]);
+                '/RL02',
+                this.selectedRole[0].tenant.id,
+                this.selectedRole[0].id,
+            ]);
         }
     }
-
 }

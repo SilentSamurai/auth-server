@@ -1,16 +1,20 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
-import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
-import {CreateTenantComponent} from "./dialogs/create-tenant.component";
-import {UpdateTenantComponent} from "./dialogs/update-tenant.component";
-import {TenantService} from "../../_services/tenant.service";
-import {SessionService} from "../../_services/session.service";
-import {AppTableComponent} from "../../component/table/app-table.component";
-import {AuthDefaultService} from "../../_services/auth.default.service";
-import {ConfirmationService} from "../../component/dialogs/confirmation.service";
-import {MessageService} from "primeng/api";
-import {Actions, PermissionService, Subjects} from "../../_services/permission.service";
-import {DataModel, DataSource} from "../../component/model/DataModel";
-import {Filter} from "../../component/model/Filters";
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { CreateTenantComponent } from './dialogs/create-tenant.component';
+import { UpdateTenantComponent } from './dialogs/update-tenant.component';
+import { TenantService } from '../../_services/tenant.service';
+import { SessionService } from '../../_services/session.service';
+import { AppTableComponent } from '../../component/table/app-table.component';
+import { AuthDefaultService } from '../../_services/auth.default.service';
+import { ConfirmationService } from '../../component/dialogs/confirmation.service';
+import { MessageService } from 'primeng/api';
+import {
+    Actions,
+    PermissionService,
+    Subjects,
+} from '../../_services/permission.service';
+import { DataModel, DataSource } from '../../component/model/DataModel';
+import { Filter } from '../../component/model/Filters';
 
 @Component({
     selector: 'app-TN01',
@@ -26,13 +30,17 @@ import {Filter} from "../../component/model/Filters";
                     </app-fb>
                     <div class="d-flex justify-content-between mt-2">
                         <div></div>
-                        <button (click)="openCreateModal()" [disabled]="!('create' | ablePure: 'Tenant') "
-                                class="btn btn-outline-success btn-sm" id="CREATE_TENANT_DIALOG_BTN"
-                                type="button">
-                            <i class="fa fa-solid fa-plus me-2"></i> Create Tenant
+                        <button
+                            (click)="openCreateModal()"
+                            [disabled]="!('create' | ablePure: 'Tenant')"
+                            class="btn btn-outline-success btn-sm"
+                            id="CREATE_TENANT_DIALOG_BTN"
+                            type="button"
+                        >
+                            <i class="fa fa-solid fa-plus me-2"></i> Create
+                            Tenant
                         </button>
                     </div>
-
                 </div>
             </app-page-view-header>
 
@@ -41,8 +49,8 @@ import {Filter} from "../../component/model/Filters";
                     title="Tenant List"
                     multi="true"
                     scrollHeight="75vh"
-                    [dataSource]="dataSource">
-
+                    [dataSource]="dataSource"
+                >
                     <app-table-col label="Domain" name="domain"></app-table-col>
                     <app-table-col label="Name" name="name"></app-table-col>
                     <app-table-col>
@@ -51,19 +59,28 @@ import {Filter} from "../../component/model/Filters";
 
                     <ng-template #table_body let-tenant>
                         <td>
-                            <a [routerLink]="['/TN02/', tenant.id]"
-                               href="javascript:void(0)">{{ tenant.domain }}</a>
+                            <a
+                                [routerLink]="['/TN02/', tenant.id]"
+                                href="javascript:void(0)"
+                                >{{ tenant.domain }}</a
+                            >
                         </td>
                         <td>{{ tenant.name }}</td>
                         <td class="" style="max-width: 100px">
-                            <button (click)="openUpdateModal(tenant)" [disabled]="!this.isTenantAdmin"
-                                    class="btn btn-sm btn-primary me-2"
-                                    type="button">
+                            <button
+                                (click)="openUpdateModal(tenant)"
+                                [disabled]="!this.isTenantAdmin"
+                                class="btn btn-sm btn-primary me-2"
+                                type="button"
+                            >
                                 <i class="fa fa-edit"></i>
                             </button>
-                            <button (click)="openDeleteModal(tenant)" [disabled]="!this.deleteAllowed"
-                                    class="btn btn-sm btn-danger"
-                                    type="button">
+                            <button
+                                (click)="openDeleteModal(tenant)"
+                                [disabled]="!this.deleteAllowed"
+                                class="btn btn-sm btn-danger"
+                                type="button"
+                            >
                                 <i class="fa fa-solid fa-trash"></i>
                             </button>
                         </td>
@@ -72,10 +89,9 @@ import {Filter} from "../../component/model/Filters";
             </app-page-view-body>
         </app-page-view>
     `,
-    styles: ['']
+    styles: [''],
 })
 export class TN01Component implements OnInit {
-
     @ViewChild(AppTableComponent)
     table!: AppTableComponent;
 
@@ -85,21 +101,24 @@ export class TN01Component implements OnInit {
     deleteAllowed = false;
     dataSource: DataSource<any>;
 
-    constructor(private tokenStorageService: SessionService,
-                private tenantService: TenantService,
-                private authDefaultService: AuthDefaultService,
-                private confirmationService: ConfirmationService,
-                private messageService: MessageService,
-                private permissionService: PermissionService,
-                private modalService: NgbModal) {
-
+    constructor(
+        private tokenStorageService: SessionService,
+        private tenantService: TenantService,
+        private authDefaultService: AuthDefaultService,
+        private confirmationService: ConfirmationService,
+        private messageService: MessageService,
+        private permissionService: PermissionService,
+        private modalService: NgbModal,
+    ) {
         this.dataSource = this.tenantService.createDataModel([]);
     }
 
     async ngOnInit() {
-        this.authDefaultService.setTitle("TN01: Manage Tenants");
+        this.authDefaultService.setTitle('TN01: Manage Tenants');
 
-        if (this.permissionService.isAuthorized(Actions.Create, Subjects.TENANT)) {
+        if (
+            this.permissionService.isAuthorized(Actions.Create, Subjects.TENANT)
+        ) {
             this.creationAllowed = true;
         }
         if (this.tokenStorageService.isTenantAdmin()) {
@@ -108,7 +127,9 @@ export class TN01Component implements OnInit {
 
         // Check for delete privileges
         // (Requires that `Actions.Delete` is defined or recognized in your application)
-        if (this.permissionService.isAuthorized(Actions.Delete, Subjects.TENANT)) {
+        if (
+            this.permissionService.isAuthorized(Actions.Delete, Subjects.TENANT)
+        ) {
             this.deleteAllowed = true;
         }
 
@@ -123,7 +144,7 @@ export class TN01Component implements OnInit {
     async openCreateModal() {
         const modalRef = this.modalService.open(CreateTenantComponent);
         const tenant = await modalRef.result;
-        console.log("returned tenant", tenant);
+        console.log('returned tenant', tenant);
         await this.refreshData();
     }
 
@@ -142,14 +163,24 @@ export class TN01Component implements OnInit {
             icon: 'pi pi-info-circle',
             accept: async () => {
                 try {
-                    let deletedTenant = await this.tenantService.deleteTenant(tenant.id);
-                    this.messageService.add({severity: 'success', summary: 'Success', detail: 'Tenant Deleted'});
+                    let deletedTenant = await this.tenantService.deleteTenant(
+                        tenant.id,
+                    );
+                    this.messageService.add({
+                        severity: 'success',
+                        summary: 'Success',
+                        detail: 'Tenant Deleted',
+                    });
                     return deletedTenant;
                 } catch (e) {
-                    this.messageService.add({severity: 'error', summary: 'Error', detail: 'Tenant Deletion Failed'});
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'Tenant Deletion Failed',
+                    });
                 }
                 return null;
-            }
+            },
         });
         console.log(deletedTenant);
         await this.refreshData();

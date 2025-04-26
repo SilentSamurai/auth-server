@@ -1,10 +1,9 @@
-import { StaticModel } from "./StaticModel";
-import { Query } from "./DataModel";
-import { Filter } from "./Filters";
-import { Operators } from "./Operator";
+import { StaticModel } from './StaticModel';
+import { Query } from './DataModel';
+import { Filter } from './Filters';
+import { Operators } from './Operator';
 
 describe('StaticModel', () => {
-
     // Constructor initializes with empty data array when no arguments provided
     it('should initialize with empty data array when no arguments provided', async () => {
         // Provide keyFields as the first argument
@@ -19,7 +18,10 @@ describe('StaticModel', () => {
 
     // Constructor initializes with provided data array when argument is provided
     it('should initialize with provided data array when argument is provided', async () => {
-        const initialData = [{ id: 1, name: 'Test' }, { id: 2, name: 'Test2' }];
+        const initialData = [
+            { id: 1, name: 'Test' },
+            { id: 2, name: 'Test2' },
+        ];
         // Provide keyFields first, then initialData
         const model = new StaticModel(['id'], initialData);
 
@@ -33,7 +35,10 @@ describe('StaticModel', () => {
     // setData replaces existing data with new data array
     it('should replace existing data with new data array when setData is called', async () => {
         const initialData = [{ id: 1, name: 'Test' }];
-        const newData = [{ id: 2, name: 'New' }, { id: 3, name: 'New2' }];
+        const newData = [
+            { id: 2, name: 'New' },
+            { id: 3, name: 'New2' },
+        ];
         // Provide keyFields first, then initialData
         const model = new StaticModel(['id'], initialData);
 
@@ -67,7 +72,7 @@ describe('StaticModel', () => {
             { id: 2, name: 'B' },
             { id: 3, name: 'C' },
             { id: 4, name: 'D' },
-            { id: 5, name: 'E' }
+            { id: 5, name: 'E' },
         ];
         // Provide keyFields first, then initialData
         const model = new StaticModel(['id'], data);
@@ -77,7 +82,10 @@ describe('StaticModel', () => {
 
         const result = await model.fetchData(query);
 
-        expect(result.data).toEqual([{ id: 3, name: 'C' }, { id: 4, name: 'D' }]);
+        expect(result.data).toEqual([
+            { id: 3, name: 'C' },
+            { id: 4, name: 'D' },
+        ]);
         expect(result.count).toBe(2);
     });
 
@@ -86,19 +94,22 @@ describe('StaticModel', () => {
         const data = [
             { id: 1, name: 'Test1' },
             { id: 2, name: 'Test2' },
-            { id: 3, name: 'Different' }
+            { id: 3, name: 'Different' },
         ];
         // Provide keyFields first, then initialData
         const model = new StaticModel(['id'], data);
 
         // Provide config object to the Query constructor
         const query = new Query({
-            filters: [new Filter('name', 'Name', 'Test', Operators.CONTAINS)]
+            filters: [new Filter('name', 'Name', 'Test', Operators.CONTAINS)],
         });
 
         const result = await model.fetchData(query);
 
-        expect(result.data).toEqual([{ id: 1, name: 'Test1' }, { id: 2, name: 'Test2' }]);
+        expect(result.data).toEqual([
+            { id: 1, name: 'Test1' },
+            { id: 2, name: 'Test2' },
+        ]);
         expect(result.count).toBe(2);
     });
 
@@ -118,12 +129,18 @@ describe('StaticModel', () => {
 
     // fetchData handles null or undefined query parameters (within the config object)
     it('should handle null or undefined query parameters', async () => {
-        const data = [{ id: 1, name: 'Test' }, { id: 2, name: 'Test2' }];
+        const data = [
+            { id: 1, name: 'Test' },
+            { id: 2, name: 'Test2' },
+        ];
         // Provide keyFields first, then initialData
         const model = new StaticModel(['id'], data);
 
         // Pass null/undefined within the config object
-        const query = new Query({ pageNo: null as any, pageSize: undefined as any });
+        const query = new Query({
+            pageNo: null as any,
+            pageSize: undefined as any,
+        });
 
         const result = await model.fetchData(query);
 
@@ -134,7 +151,10 @@ describe('StaticModel', () => {
 
     // fetchData handles empty filters array
     it('should handle empty filters array', async () => {
-        const data = [{ id: 1, name: 'Test' }, { id: 2, name: 'Test2' }];
+        const data = [
+            { id: 1, name: 'Test' },
+            { id: 2, name: 'Test2' },
+        ];
         // Provide keyFields first, then initialData
         const model = new StaticModel(['id'], data);
 
@@ -149,7 +169,10 @@ describe('StaticModel', () => {
 
     // fetchData handles empty orderBy array
     it('should handle empty orderBy array', async () => {
-        const data = [{ id: 1, name: 'Test' }, { id: 2, name: 'Test2' }];
+        const data = [
+            { id: 1, name: 'Test' },
+            { id: 2, name: 'Test2' },
+        ];
         // Provide keyFields first, then initialData
         const model = new StaticModel(['id'], data);
 
@@ -167,19 +190,21 @@ describe('StaticModel', () => {
         const data = [
             { id: 1, user: { name: 'Alice', age: 30 } },
             { id: 2, user: { name: 'Bob', age: 25 } },
-            { id: 3, user: { name: 'Charlie', age: 35 } }
+            { id: 3, user: { name: 'Charlie', age: 35 } },
         ];
         // Provide keyFields first, then initialData
         const model = new StaticModel(['id'], data);
 
         // Provide config object with filter for nested property
         const query = new Query({
-            filters: [new Filter('user.age', 'Age', '30', Operators.EQ)]
+            filters: [new Filter('user.age', 'Age', '30', Operators.EQ)],
         });
 
         const result = await model.fetchData(query);
 
-        expect(result.data).toEqual([{ id: 1, user: { name: 'Alice', age: 30 } }]);
+        expect(result.data).toEqual([
+            { id: 1, user: { name: 'Alice', age: 30 } },
+        ]);
         expect(result.count).toBe(1);
     });
 
@@ -187,14 +212,16 @@ describe('StaticModel', () => {
     it('should return null for non-existent properties in filtering', async () => {
         const data = [
             { id: 1, name: 'Test1' },
-            { id: 2, name: 'Test2' }
+            { id: 2, name: 'Test2' },
         ];
         // Provide keyFields first, then initialData
         const model = new StaticModel(['id'], data);
 
         // Provide config object with filter for non-existent property
         const query = new Query({
-            filters: [new Filter('nonExistent', 'NonExistent', 'value', Operators.EQ)]
+            filters: [
+                new Filter('nonExistent', 'NonExistent', 'value', Operators.EQ),
+            ],
         });
 
         const result = await model.fetchData(query);

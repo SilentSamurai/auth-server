@@ -1,12 +1,12 @@
-import {DataModelImpl} from './DataModelImpl';
-import {Filter} from './Filters';
-import {Operators} from './Operator';
-import {DataModel, DataSourceEvents, Query, SortConfig} from './DataModel';
-import {HttpClient} from "@angular/common/http";
-import {HttpClientTestingModule} from "@angular/common/http/testing";
-import {TestBed} from "@angular/core/testing";
-import {Subject} from "rxjs";
-import {StaticModel} from "./StaticModel";
+import { DataModelImpl } from './DataModelImpl';
+import { Filter } from './Filters';
+import { Operators } from './Operator';
+import { DataModel, DataSourceEvents, Query, SortConfig } from './DataModel';
+import { HttpClient } from '@angular/common/http';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
+import { Subject } from 'rxjs';
+import { StaticModel } from './StaticModel';
 
 describe('StaticModel + DataModelImpl (in-memory data source)', () => {
     let dataModel: DataModel<any>;
@@ -15,17 +15,12 @@ describe('StaticModel + DataModelImpl (in-memory data source)', () => {
     const API_URL = '/api';
 
     const createDataModel = (initialData: any[]): DataModel<any> => {
-        return new DataModelImpl<any>(
-            new StaticModel(
-                ['id'],
-                initialData
-            ),
-        );
+        return new DataModelImpl<any>(new StaticModel(['id'], initialData));
     };
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            imports: [HttpClientTestingModule]
+            imports: [HttpClientTestingModule],
         });
         httpClient = TestBed.inject(HttpClient);
         dataModel = createDataModel([]);
@@ -43,7 +38,7 @@ describe('StaticModel + DataModelImpl (in-memory data source)', () => {
     });
 
     it('updates orderBy on the query', async () => {
-        const sort: SortConfig[] = [{field: 'name', order: 'asc'}];
+        const sort: SortConfig[] = [{ field: 'name', order: 'asc' }];
         const query = new Query({ orderBy: sort });
         const result = await dataModel.execute(query);
         expect(result.data).toEqual([]);
@@ -64,11 +59,7 @@ describe('StaticModel + DataModelImpl (in-memory data source)', () => {
     });
 
     it('hasPage reflects totalCount after the first fetch', async () => {
-        const sampleData = [
-            {id: 1},
-            {id: 2},
-            {id: 3},
-        ];
+        const sampleData = [{ id: 1 }, { id: 2 }, { id: 3 }];
         dataModel = createDataModel(sampleData);
         const query = new Query({ pageSize: sampleData.length });
         await dataModel.execute(query);
@@ -88,9 +79,9 @@ describe('StaticModel + DataModelImpl (in-memory data source)', () => {
 
     it('totalRowCount() matches fetched data size afterwards', async () => {
         const rows = [
-            {id: 1, name: 'John'},
-            {id: 2, name: 'Jane'},
-            {id: 3, name: 'Doe'},
+            { id: 1, name: 'John' },
+            { id: 2, name: 'Jane' },
+            { id: 3, name: 'Doe' },
         ];
 
         dataModel = createDataModel(rows);
@@ -102,11 +93,46 @@ describe('StaticModel + DataModelImpl (in-memory data source)', () => {
 
     it('correctly processes and returns all data from StaticModel', async () => {
         const sampleData = [
-            {id: 1, name: 'Alice', age: 30, active: true, details: {role: 'admin'}, createdAt: new Date('2023-01-01')},
-            {id: 2, name: 'Bob', age: 25, active: false, details: {role: 'user'}, createdAt: new Date('2023-01-02')},
-            {id: 3, name: 'Charlie', age: 35, active: true, details: {role: 'editor'}, createdAt: new Date('2023-01-03')},
-            {id: 4, name: 'Diana', age: 28, active: true, details: {role: 'viewer'}, createdAt: new Date('2023-01-04')},
-            {id: 5, name: 'Evan', age: 40, active: false, details: {role: 'guest'}, createdAt: new Date('2023-01-05')},
+            {
+                id: 1,
+                name: 'Alice',
+                age: 30,
+                active: true,
+                details: { role: 'admin' },
+                createdAt: new Date('2023-01-01'),
+            },
+            {
+                id: 2,
+                name: 'Bob',
+                age: 25,
+                active: false,
+                details: { role: 'user' },
+                createdAt: new Date('2023-01-02'),
+            },
+            {
+                id: 3,
+                name: 'Charlie',
+                age: 35,
+                active: true,
+                details: { role: 'editor' },
+                createdAt: new Date('2023-01-03'),
+            },
+            {
+                id: 4,
+                name: 'Diana',
+                age: 28,
+                active: true,
+                details: { role: 'viewer' },
+                createdAt: new Date('2023-01-04'),
+            },
+            {
+                id: 5,
+                name: 'Evan',
+                age: 40,
+                active: false,
+                details: { role: 'guest' },
+                createdAt: new Date('2023-01-05'),
+            },
         ];
 
         dataModel = createDataModel(sampleData);
@@ -122,18 +148,20 @@ describe('StaticModel + DataModelImpl (in-memory data source)', () => {
 
     it('correctly separates data by different page sizes', async () => {
         const sampleData = [
-            {id: 1, name: 'Page1-Item1'},
-            {id: 2, name: 'Page1-Item2'},
-            {id: 3, name: 'Page2-Item1'},
-            {id: 4, name: 'Page2-Item2'},
-            {id: 5, name: 'Page3-Item1'}
+            { id: 1, name: 'Page1-Item1' },
+            { id: 2, name: 'Page1-Item2' },
+            { id: 3, name: 'Page2-Item1' },
+            { id: 4, name: 'Page2-Item2' },
+            { id: 5, name: 'Page3-Item1' },
         ];
 
         dataModel = createDataModel(sampleData);
         const pageSize = 2;
 
         // Page 0
-        let result = await dataModel.execute(new Query({ pageNo: 0, pageSize }));
+        let result = await dataModel.execute(
+            new Query({ pageNo: 0, pageSize }),
+        );
         expect(result.data).toEqual(sampleData.slice(0, 2));
         expect(result.isLastPage).toBeFalse();
         expect(dataModel.hasPage(1, pageSize)).toBeTrue();
@@ -168,7 +196,7 @@ describe('StaticModel + DataModelImpl (in-memory data source)', () => {
             fetchData: () => Promise.reject(new Error('Test error')),
             totalCount: () => Promise.resolve(0),
             keyFields: () => ['id'],
-            updates: () => new Subject<DataSourceEvents>()
+            updates: () => new Subject<DataSourceEvents>(),
         };
 
         dataModel = new DataModelImpl(errorSource);
@@ -182,15 +210,19 @@ describe('StaticModel + DataModelImpl (in-memory data source)', () => {
     });
 
     it('should invalidate cache when changing sort order', async () => {
-        const initialSort: SortConfig[] = [{field: 'name', order: 'asc'}];
-        const newSort: SortConfig[] = [{field: 'date', order: 'desc'}];
+        const initialSort: SortConfig[] = [{ field: 'name', order: 'asc' }];
+        const newSort: SortConfig[] = [{ field: 'date', order: 'desc' }];
 
-        const mockDataSource = jasmine.createSpyObj("DataSource", ['fetchData', 'totalCount', "updates"]);
+        const mockDataSource = jasmine.createSpyObj('DataSource', [
+            'fetchData',
+            'totalCount',
+            'updates',
+        ]);
         mockDataSource.updates.and.returnValue(new Subject());
 
         dataModel = new DataModelImpl(mockDataSource);
 
-        const data = {data: [{id: 1}]};
+        const data = { data: [{ id: 1 }] };
         // Initial sort and data fetch
         mockDataSource.fetchData.and.resolveTo(data);
         await dataModel.execute(new Query({ orderBy: initialSort }));
@@ -202,8 +234,12 @@ describe('StaticModel + DataModelImpl (in-memory data source)', () => {
     });
 
     it('should return cached data without fetching', async () => {
-        const mockDataSource = jasmine.createSpyObj('DataSource', ['fetchData', 'totalCount', 'updates']);
-        mockDataSource.fetchData.and.resolveTo({data: [{id: 1}]});
+        const mockDataSource = jasmine.createSpyObj('DataSource', [
+            'fetchData',
+            'totalCount',
+            'updates',
+        ]);
+        mockDataSource.fetchData.and.resolveTo({ data: [{ id: 1 }] });
         mockDataSource.updates.and.returnValue(new Subject());
 
         dataModel = new DataModelImpl(mockDataSource);
@@ -217,13 +253,17 @@ describe('StaticModel + DataModelImpl (in-memory data source)', () => {
     });
 
     it('should handle pagination edge cases', async () => {
-        const mockDataSource = jasmine.createSpyObj('DataSource', ['fetchData', 'totalCount', 'updates']);
+        const mockDataSource = jasmine.createSpyObj('DataSource', [
+            'fetchData',
+            'totalCount',
+            'updates',
+        ]);
         mockDataSource.updates.and.returnValue(new Subject());
 
         dataModel = new DataModelImpl(mockDataSource);
 
         mockDataSource.totalCount.and.resolveTo(0);
-        mockDataSource.fetchData.and.resolveTo({data: []});
+        mockDataSource.fetchData.and.resolveTo({ data: [] });
 
         const result = await dataModel.execute(new Query({}));
         expect(result.data).toEqual([]);
@@ -232,7 +272,11 @@ describe('StaticModel + DataModelImpl (in-memory data source)', () => {
     });
 
     it('should propagate error states correctly', async () => {
-        const mockDataSource = jasmine.createSpyObj('DataSource', ['fetchData', 'totalCount', 'updates']);
+        const mockDataSource = jasmine.createSpyObj('DataSource', [
+            'fetchData',
+            'totalCount',
+            'updates',
+        ]);
         mockDataSource.updates.and.returnValue(new Subject());
 
         const testError = new Error('Data source failure');
@@ -252,10 +296,14 @@ describe('StaticModel + DataModelImpl (in-memory data source)', () => {
     });
 
     it('should reset internal state correctly', async () => {
-        const mockDataSource = jasmine.createSpyObj('DataSource', ['fetchData', 'totalCount', 'updates']);
+        const mockDataSource = jasmine.createSpyObj('DataSource', [
+            'fetchData',
+            'totalCount',
+            'updates',
+        ]);
         mockDataSource.updates.and.returnValue(new Subject());
 
-        mockDataSource.fetchData.and.resolveTo({data: [{id: 1}]});
+        mockDataSource.fetchData.and.resolveTo({ data: [{ id: 1 }] });
 
         dataModel = new DataModelImpl(mockDataSource);
 

@@ -1,5 +1,5 @@
-import {Filter} from "./Filters";
-import {Observable} from "rxjs";
+import { Filter } from './Filters';
+import { Observable } from 'rxjs';
 
 export interface SortConfig {
     field: string;
@@ -28,9 +28,8 @@ export interface DataModelStatus {
     isLastPageReached: boolean;
 }
 
-
 export interface DataSourceEvents {
-    type: "data-updated" | "unknown";
+    type: 'data-updated' | 'unknown';
     source: string;
     data?: any;
 }
@@ -77,7 +76,7 @@ export class Query implements IQuery {
 
     set pageSize(value: number) {
         if (value < 0) {
-            console.warn("Negative number not allowed in page size");
+            console.warn('Negative number not allowed in page size');
             return;
         }
         this._pageSize = value;
@@ -88,7 +87,9 @@ export class Query implements IQuery {
     }
 
     set filters(value: Filter[]) {
-        this._filters = value.filter(item => item.value != null && item.value.length > 0);
+        this._filters = value.filter(
+            (item) => item.value != null && item.value.length > 0,
+        );
     }
 
     get orderBy(): SortConfig[] {
@@ -108,9 +109,7 @@ export class Query implements IQuery {
     }
 }
 
-
 export interface DataModel<T> {
-
     execute(query: IQuery): Promise<ReturnedData<T>>;
 
     hasPage(pageNo: number, pageSize: number): boolean;
@@ -121,10 +120,7 @@ export interface DataModel<T> {
 
     reset(): void;
 
-    dataSource() : DataSource<T>;
+    dataSource(): DataSource<T>;
 
     dataSourceEvents(): Observable<DataSourceEvents>;
-
 }
-
-

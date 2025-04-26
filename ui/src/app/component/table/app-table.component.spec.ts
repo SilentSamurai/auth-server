@@ -1,18 +1,15 @@
-import {ComponentFixture, fakeAsync, flush, TestBed, tick} from '@angular/core/testing';
-import {AppTableComponent} from './app-table.component';
-import {Component, ViewChild} from '@angular/core';
-import {CheckboxModule} from 'primeng/checkbox';
-import {RadioButtonModule} from 'primeng/radiobutton';
-import {SkeletonModule} from 'primeng/skeleton';
-import {By} from '@angular/platform-browser';
-import {Operators} from "../model/Operator";
-import {Filter} from "../model/Filters";
-import {StaticModel} from "../model/StaticModel";
-import {FormsModule} from "@angular/forms";
-import {ComponentModule} from "../component.module";
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { AppTableComponent } from './app-table.component';
+import { Component, ViewChild } from '@angular/core';
+import { CheckboxModule } from 'primeng/checkbox';
+import { RadioButtonModule } from 'primeng/radiobutton';
+import { SkeletonModule } from 'primeng/skeleton';
+import { StaticModel } from '../model/StaticModel';
+import { FormsModule } from '@angular/forms';
+import { ComponentModule } from '../component.module';
 
 function timeout(ms: number): Promise<any> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 @Component({
@@ -22,10 +19,10 @@ function timeout(ms: number): Promise<any> {
                 <td>{{ row.name }}</td>
             </ng-template>
         </app-table>
-    `
+    `,
 })
 class TestHostComponent {
-    dataSource = new StaticModel(["id"], [{id: 1, name: 'Item 1'}])
+    dataSource = new StaticModel(['id'], [{ id: 1, name: 'Item 1' }]);
 
     @ViewChild(AppTableComponent) tableComponent!: AppTableComponent;
 }
@@ -41,11 +38,9 @@ describe('AppTableComponent', () => {
                 CheckboxModule,
                 RadioButtonModule,
                 SkeletonModule,
-                ComponentModule
+                ComponentModule,
             ],
-            declarations: [
-                TestHostComponent
-            ]
+            declarations: [TestHostComponent],
         }).compileComponents();
 
         fixture = TestBed.createComponent(TestHostComponent);

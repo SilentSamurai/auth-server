@@ -1,5 +1,12 @@
-import {DataModel, DataModelStatus, DataSource, DataSourceEvents, IQuery, ReturnedData} from "./DataModel";
-import {Observable, Subscription} from "rxjs";
+import {
+    DataModel,
+    DataModelStatus,
+    DataSource,
+    DataSourceEvents,
+    IQuery,
+    ReturnedData,
+} from './DataModel';
+import { Observable, Subscription } from 'rxjs';
 
 // Helper function to create a stable string representation of the query for caching
 function getQueryCacheKey(query: IQuery): string {
@@ -7,26 +14,30 @@ function getQueryCacheKey(query: IQuery): string {
     const keyObject = {
         pageNo: query.pageNo ?? 0,
         pageSize: query.pageSize ?? 10, // Use default or actual
-        filters: query.filters ? [...query.filters].sort((a, b) => a.name.localeCompare(b.name)) : [],
-        orderBy: query.orderBy ? [...query.orderBy].sort((a, b) => a.field.localeCompare(b.field)) : [],
-        expand: query.expand ? [...query.expand].sort() : []
+        filters: query.filters
+            ? [...query.filters].sort((a, b) => a.name.localeCompare(b.name))
+            : [],
+        orderBy: query.orderBy
+            ? [...query.orderBy].sort((a, b) => a.field.localeCompare(b.field))
+            : [],
+        expand: query.expand ? [...query.expand].sort() : [],
     };
     return JSON.stringify(keyObject);
 }
 
-
 export class DataModelImpl<T> implements DataModel<T> {
-    protected status: DataModelStatus = {loading: false, isLastPageReached: false};
+    protected status: DataModelStatus = {
+        loading: false,
+        isLastPageReached: false,
+    };
     protected queryCache = new Map<string, ReturnedData<T>>();
     protected maxCacheSize = 10;
     totalCount: number | null = null; // Total count might vary based on filters
     private subscription: Subscription;
 
-    public constructor(
-        protected _dataSource: DataSource<T>,
-    ) {
+    public constructor(protected _dataSource: DataSource<T>) {
         this.subscription = this._dataSource.updates().subscribe((x) => {
-            if (x.type == "data-updated") {
+            if (x.type == 'data-updated') {
                 this.reset();
             }
         });
@@ -120,14 +131,14 @@ export class DataModelImpl<T> implements DataModel<T> {
 
             // Determine if this is the last page based on fetched data and total count
             const isEmpty = data.length === 0;
-            const isLastPageBasedOnFetch = isEmpty || (data.length < pageSize);
+            const isLastPageBasedOnFetch = isEmpty || data.length < pageSize;
             const isLastPageBasedOnTotal = this.isLastPage(page, pageSize);
             const isLastPage = isLastPageBasedOnFetch || isLastPageBasedOnTotal;
 
             const result: ReturnedData<T> = {
                 data: data,
                 count: data.length,
-                isLastPage: isLastPage
+                isLastPage: isLastPage,
             };
 
             this.cacheQueryResult(queryKey, result);
@@ -135,8 +146,8 @@ export class DataModelImpl<T> implements DataModel<T> {
 
             return result;
         } catch (error: any) {
-            console.error("Error executing query:", error);
-            this.status.error = error.message || "fetch error";
+            console.error('Error executing query:', error);
+            this.status.error = error.message || 'fetch error';
             throw error;
         } finally {
             this.status.loading = false;
@@ -154,6 +165,4 @@ export class DataModelImpl<T> implements DataModel<T> {
     destroy() {
         this.subscription.unsubscribe();
     }
-
 }
-
