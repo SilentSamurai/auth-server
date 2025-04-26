@@ -22,4 +22,8 @@ export class Filter {
             operator: this.operator.label,
         }
     }
+
+    matches(otherValue: any): boolean {
+        return this.operator.compare(otherValue?.toString() || "", this.value);
+    }
 }

@@ -9,7 +9,7 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
 import {ConfirmationService} from "../../component/dialogs/confirmation.service";
 import {MessageService} from "primeng/api";
 import {Actions, PermissionService, Subjects} from "../../_services/permission.service";
-import {DataModel} from "../../component/model/DataModel";
+import {DataModel, DataSource} from "../../component/model/DataModel";
 import {Filter} from "../../component/model/Filters";
 
 @Component({
@@ -41,7 +41,7 @@ import {Filter} from "../../component/model/Filters";
                     title="Tenant List"
                     multi="true"
                     scrollHeight="75vh"
-                    [dataModel]="dataModel">
+                    [dataSource]="dataSource">
 
                     <app-table-col label="Domain" name="domain"></app-table-col>
                     <app-table-col label="Name" name="name"></app-table-col>
@@ -83,7 +83,7 @@ export class TN01Component implements OnInit {
     creationAllowed = false;
     isTenantAdmin = false;
     deleteAllowed = false;
-    dataModel: DataModel;
+    dataSource: DataSource<any>;
 
     constructor(private tokenStorageService: SessionService,
                 private tenantService: TenantService,
@@ -93,7 +93,7 @@ export class TN01Component implements OnInit {
                 private permissionService: PermissionService,
                 private modalService: NgbModal) {
 
-        this.dataModel = this.tenantService.createDataModel([]);
+        this.dataSource = this.tenantService.createDataModel([]);
     }
 
     async ngOnInit() {
@@ -117,7 +117,7 @@ export class TN01Component implements OnInit {
 
     async refreshData() {
         // Forces a fresh load from page 0 with no filters
-        await this.dataModel.apply({ pageNo: 0, append: false });
+        // await this.dataSource.apply({ pageNo: 0, append: false });
     }
 
     async openCreateModal() {

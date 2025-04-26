@@ -10,7 +10,7 @@ import {CreateGroupComponent} from "./dialogs/create-group.component";
 import {ConfirmationService} from "../../component/dialogs/confirmation.service";
 import {MessageService} from "primeng/api";
 import {UpdateGroupComponent} from "./dialogs/update-group.component";
-import {DataModel} from "../../component/model/DataModel";
+import {DataModel, DataSource} from "../../component/model/DataModel";
 import {Filter} from "../../component/model/Filters";
 
 @Component({
@@ -36,7 +36,7 @@ import {Filter} from "../../component/model/Filters";
             <app-page-view-body>
                 <app-table
                     title="Groups"
-                    [dataModel]="groupsDM"
+                    [dataSource]="groupsDM"
                     multi="true"
                     scrollHeight="75vh">
 
@@ -78,7 +78,7 @@ export class GP01Component implements OnInit {
     tenantId: string = "";
 
     groups: any = [];
-    groupsDM: DataModel;
+    groupsDM: DataSource<any>;
 
     constructor(private userService: UserService,
                 private authDefaultService: AuthDefaultService,

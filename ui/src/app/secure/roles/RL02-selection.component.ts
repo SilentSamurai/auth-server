@@ -5,7 +5,7 @@ import {TenantService} from "../../_services/tenant.service";
 import {MessageService} from "primeng/api";
 import {AuthDefaultService} from "../../_services/auth.default.service";
 import {RoleService} from "../../_services/role.service";
-import {DataModel} from "../../component/model/DataModel";
+import {DataModel, DataSource} from "../../component/model/DataModel";
 
 
 @Component({
@@ -22,7 +22,7 @@ import {DataModel} from "../../component/model/DataModel";
                             Role:
                         </label>
                         <app-value-help-input
-                            [dataModel]="rolesDM"
+                            [dataSource]="rolesDM"
                             [(selection)]="selectedRole"
                             class="col-3"
                             labelField="name"
@@ -64,7 +64,7 @@ import {DataModel} from "../../component/model/DataModel";
 export class RL02SelectionComponent implements OnInit {
 
     roles = [];
-    rolesDM: DataModel;
+    rolesDM: DataSource<any>;
     tenants: [] = [];
     selectedTenant: any[] = [];
     selectedRole: any[] = [];

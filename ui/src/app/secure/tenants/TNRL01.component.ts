@@ -40,13 +40,13 @@ import {CloseType, ValueHelpResult} from "../../component/value-help/value-help.
                     <app-section-content>
                         <app-table
                             title="Role List"
-                            [dataModel]="rolesDataModel"
+                            [dataSource]="rolesDataModel"
                         >
 
                             <app-table-btn>
                                 <app-value-help-button
                                     classStyle="btn-sm btn-primary "
-                                    [dataModel]="tenantRolesDM"
+                                    [dataSource]="tenantRolesDM"
                                     [multi]="true"
                                     name="Assign Roles"
                                     [selection]="roles"
@@ -160,7 +160,7 @@ export class TNRL01Component implements AfterContentInit {
             this.member = await this.tenantService.getMemberDetails(this.tenantId, this.userId);
             // $event.update(this.member, false);
             this.roles = this.member.roles;
-            this.rolesDataModel.setData(this.roles);
+            (this.rolesDataModel as any as StaticModel<any>).setData(this.roles);
         }
     }
 

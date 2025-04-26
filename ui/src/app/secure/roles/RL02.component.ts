@@ -61,14 +61,14 @@ import { ModalService, ModalResult } from "../../component/dialogs/modal.service
                     </app-section-action>
                     <app-section-content>
                         <app-table
-                            [dataModel]="usersDM"
+                            [dataSource]="usersDM"
                             title="Users"
                             scrollHeight="75vh">
 
                             <app-table-btn>
                                 <app-value-help-button
                                     classStyle="btn-sm btn-primary"
-                                    [dataModel]="usersDM"
+                                    [dataSource]="usersDM"
                                     [multi]="true"
                                     [selection]="users"
                                     name="Select Users"
@@ -113,7 +113,7 @@ import { ModalService, ModalResult } from "../../component/dialogs/modal.service
                 <app-op-section name="Policies">
                     <app-section-content>
                         <app-table
-                            [dataModel]="policiesDM"
+                            [dataSource]="policiesDM"
                             title="Policies"
                             scrollHeight="75vh">
 

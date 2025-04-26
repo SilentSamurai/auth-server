@@ -1,14 +1,7 @@
-import {DataPushEventStatus} from "./DataModel";
-import {HttpClient, HttpHeaders, HttpErrorResponse} from "@angular/common/http";
-import {lastValueFrom} from "rxjs";
-import {BaseDataModel} from "./BaseDataModel";
-import {Filter} from "./Filters";
+import {DataSource, DataSourceEvents, Query, ReturnedData} from "./DataModel";
+import {HttpClient, HttpHeaders} from "@angular/common/http";
+import {lastValueFrom, Observable, Subject} from "rxjs";
 
-export interface ApiResponse<T> {
-    data: T[];
-    count?: number;
-    totalCount?: number;
-}
 
 export interface ApiRequest {
     pageNo: number;
@@ -18,98 +11,48 @@ export interface ApiRequest {
     expand: string[];
 }
 
-export interface RestApiConfig {
-    pageSize?: number;
-}
+export class RestApiModel<T> implements DataSource<T> {
 
-export class RestApiModel<T> extends BaseDataModel<T> {
-    protected override data: T[] = [];
-    private totalCount: number | null = null;
+    private eventSubject = new Subject<DataSourceEvents>();
     private readonly defaultHeaders = new HttpHeaders({
         'Content-Type': 'application/json',
     });
-    private config: Required<RestApiConfig>;
 
     constructor(
         private http: HttpClient,
         private path: string,
-        keyFields: string[],
-        initialData: T[] = [],
-        config: RestApiConfig = {}
+        protected _keyFields: string[],
+        private expands: string[] = []
     ) {
-        super(keyFields);
-        this.config = {
-            pageSize: config.pageSize ?? 50
-        };
-        this.data = initialData;
-        this.query.pageSize = this.config.pageSize;
     }
 
-    override hasPage(pageNo: number): boolean {
-        if (pageNo === 0) {
-            return true;
-        }
-        if (this.totalCount == null || isNaN(this.totalCount)) {
-            return true;
-        }
-        const pageCount = Math.ceil(this.totalCount / this.getPageSize());
-        return pageNo < pageCount;
+    keyFields(): string[] {
+        return this._keyFields;
     }
 
-    override getData(): T[] {
-        return this.data;
+    updates(): Observable<DataSourceEvents> {
+        return this.eventSubject;
     }
 
-    override filter(filters: Filter[]) {
-        super.filter(filters);
-        this.totalCount = null;
-    }
-
-    override async apply(srcOptions: any): Promise<boolean> {
-        try {
-            this.emitDataEvent({
-                operation: DataPushEventStatus.START_FETCH
-            });
-
-            const filters = this.query.filters.map(f => f.toJSON());
-
-            // Get total count if needed
-            if (this.totalCount == null || isNaN(this.totalCount)) {
-                await this.getTotalCount(filters);
-            }
-
-            const response = await this.fetchData(filters);
-            this.emitResponse(response, srcOptions);
-            return true;
-        } catch (error) {
-            this.emitError(error, srcOptions);
-            return false;
-        } finally {
-            this.emitDataEvent({
-                operation: DataPushEventStatus.END_FETCH
-            });
-        }
-    }
-
-    private async fetchData(filters: any[]): Promise<ApiResponse<T>> {
+    async fetchData(query: Query): Promise<ReturnedData<T>> {
         const body: ApiRequest = {
-            pageNo: this.query.pageNo,
-            pageSize: this.getPageSize(),
-            where: filters,
-            orderBy: this.query.orderBy,
-            expand: this.query.expand
+            pageNo: query.pageNo,
+            pageSize: query.pageSize ,
+            where: query.filters,
+            orderBy: query.orderBy,
+            expand: query.expand || this.expands
         };
 
         return await lastValueFrom(
-            this.http.post<ApiResponse<T>>(this.path, body, {
+            this.http.post<ReturnedData<T>>(this.path, body, {
                 headers: this.defaultHeaders
             })
         );
     }
 
-    private async getTotalCount(filters: any[]): Promise<void> {
+    public async totalCount(query: Query): Promise<number> {
         const body = {
-            where: filters,
+            where: query.filters,
             select: "count"
         };
 
@@ -119,38 +62,9 @@ export class RestApiModel<T> extends BaseDataModel<T> {
             })
         );
 
-        this.totalCount = response.count;
+        return response.count ? response.count : 0;
     }
 
-    private emitResponse(response: ApiResponse<T>, srcOptions: any): void {
-        this.data = response.data;
-        if (response.totalCount !== undefined) {
-            this.totalCount = response.totalCount;
-        }
 
-        this.emitDataEvent({
-            operation: DataPushEventStatus.UPDATED_DATA,
-            data: this.data,
-            pageNo: this.query.pageNo,
-            srcOptions
-        });
-    }
-
-    private emitError(error: unknown, srcOptions: any): void {
-        const httpError = error instanceof HttpErrorResponse ? error :
-            new Error(error instanceof Error ? error.message : String(error));
-
-        this.emitDataEvent({
-            operation: DataPushEventStatus.UPDATED_DATA,
-            data: null,
-            pageNo: this.query.pageNo,
-            error: httpError,
-            srcOptions
-        });
-    }
-
-    override totalRowCount(): number {
-        return this.totalCount ?? 0;
-    }
 }
 

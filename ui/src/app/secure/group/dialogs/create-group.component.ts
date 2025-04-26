@@ -3,7 +3,7 @@ import {NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
 import {MessageService} from "primeng/api";
 import {GroupService} from "../../../_services/group.service";
 import {TenantService} from "../../../_services/tenant.service";
-import {DataModel} from "../../../component/model/DataModel";
+import {DataModel, DataSource} from "../../../component/model/DataModel";
 
 @Component({
     selector: 'app-create-group',
@@ -32,7 +32,7 @@ import {DataModel} from "../../../component/model/DataModel";
                     <div class="mb-3 form-group">
                         <label class="form-label" for="create.group.domain">Tenant</label>
                         <app-value-help-input
-                            [dataModel]="tenantsDM"
+                            [dataSource]="tenantsDM"
                             [(selection)]="form.tenantId"
                             class=""
                             id="create.group.tenantId"
@@ -73,7 +73,7 @@ export class CreateGroupComponent implements OnInit {
         tenantId: [] as any[]
     }
     private tenants: any[] = [];
-    tenantsDM: DataModel;
+    tenantsDM: DataSource<any>;
     krishna: any;
 
     constructor(private groupService: GroupService,

@@ -10,7 +10,7 @@ import {
     TemplateRef
 } from '@angular/core';
 import {ValueHelpComponent, ValueHelpResult} from "../value-help/value-help.component";
-import {DataModel} from "../model/DataModel";
+import {DataModel, DataSource} from "../model/DataModel";
 import {ValueHelpColumnComponent} from "../value-help-input/value-help-column.component";
 import {FilterBarColumnComponent} from "../filter-bar/filter-bar.component";
 import {ModalResult, ModalService} from "../dialogs/modal.service";
@@ -28,7 +28,7 @@ import {ModalResult, ModalService} from "../dialogs/modal.service";
 export class ValueHelpButtonComponent implements OnInit {
 
 
-    @Input({required: true}) dataModel!: DataModel;
+    @Input({required: true}) dataSource!: DataSource<any>;
 
     @Input() multi: boolean = false;
     @Input() classStyle: string = "";
@@ -51,7 +51,7 @@ export class ValueHelpButtonComponent implements OnInit {
 
     ngOnInit(): void {
         // Ensure dataModel is provided
-        if (!this.dataModel) {
+        if (!this.dataSource) {
             console.warn('ValueHelpButtonComponent requires a valid dataModel input.');
         }
     }
@@ -64,7 +64,7 @@ export class ValueHelpButtonComponent implements OnInit {
                 body: this.body,
                 columns: this.columns,
                 filters: this.filters,
-                dataModel: this.dataModel,
+                dataModel: this.dataSource,
                 name: this.name,
                 selectedItem: this.selection,
                 multi: this.multi

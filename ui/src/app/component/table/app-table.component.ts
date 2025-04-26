@@ -1,24 +1,24 @@
 import {
+    booleanAttribute,
     Component,
     ContentChild,
     ContentChildren,
     EventEmitter,
-    Input,
+    Input, OnDestroy,
     OnInit,
     Output,
     QueryList,
     TemplateRef,
-    ViewChild,
-    ViewChildren
+    ViewChild
 } from '@angular/core';
 import {FilterBarComponent} from "../filter-bar/filter-bar.component";
 import {TableColumnComponent} from "./app-table-column.component";
-import {Util} from "../util/utils";
 import {AppTableButtonComponent} from "./app-table-button.component";
-import {DataModel, DataPushEvent, DataPushEventStatus, Query} from "../model/DataModel";
+import {DataModel, DataSource, Query} from "../model/DataModel";
 import {Filter} from "../model/Filters";
 import {CheckboxChangeEvent} from "primeng/checkbox";
-import { MenuItem } from 'primeng/api';
+import {DataModelImpl} from "../model/DataModelImpl";
+import {Subscription} from "rxjs";
 
 
 export class TableAsyncLoadEvent extends Query {
@@ -38,7 +38,7 @@ export class TableAsyncLoadEvent extends Query {
                     <ng-container *ngFor="let btnTmpl of buttons">
                         <ng-container [ngTemplateOutlet]="btnTmpl.template"></ng-container>
                     </ng-container>
-                    <button type="button" class="btn btn-sm" (click)="reset()" pRipple>
+                    <button type="button" class="btn btn-sm" (click)="refresh()" pRipple>
                         <i class="pi pi-refresh"></i>
                     </button>
                     <button type="button" class="btn btn-sm" (click)="exportToCSV()" pRipple>
@@ -58,7 +58,8 @@ export class TableAsyncLoadEvent extends Query {
                                     (onChange)="onSelectAll($event)"></p-checkbox>
                     </th>
                     <ng-container *ngFor="let col of columns; let i = index">
-                        <ng-container *ngIf="col.isTemplateProvided" [ngTemplateOutlet]="col.templateRef"></ng-container>
+                        <ng-container *ngIf="col.isTemplateProvided"
+                                      [ngTemplateOutlet]="col.templateRef"></ng-container>
                         <ng-container *ngIf="!col.isTemplateProvided">
                             <th scope="col" [class.sortable]="col.sortable" (click)="col.sortable && sort(col.name)"
                                 [style.min-width.px]="col.width || 150">
@@ -197,26 +198,25 @@ export class TableAsyncLoadEvent extends Query {
     `]
 })
 // Table for reuse
-export class AppTableComponent implements OnInit {
+export class AppTableComponent implements OnInit, OnDestroy {
 
     loading: boolean = false;
 
-    _dataModel!: DataModel;
+    _dataModel!: DataModel<any>;
 
     @Input({required: true})
-    set dataModel(dataModel: DataModel) {
-        this._dataModel = dataModel;
-        this.idFields = dataModel.getKeyFields();
-        this._dataModel.dataPusher().subscribe(this.dataPushEventHandler.bind(this))
+    set dataSource(dataSource: DataSource<any>) {
+        this._dataModel = new DataModelImpl(dataSource);
+        this.idFields = dataSource.keyFields();
     }
 
-    get dataModel(): DataModel {
+    get dataModel(): DataModel<any> {
         return this._dataModel
     }
 
     @Input() title: string = "";
     @Input() scrollHeight: string = "65vh";
-    @Input() multi: string | boolean = true;
+    @Input({transform: booleanAttribute}) multi: boolean = true;
 
     @Input() selection: any[] = [];
     @Output() selectionChange: EventEmitter<any[]> = new EventEmitter();
@@ -237,13 +237,12 @@ export class AppTableComponent implements OnInit {
 
     _selectAll: boolean = false;
 
-    protected nextPageNo: number = 0;
-    private sortBy: any[] = [];
+    private query: Query = new Query({});
     private sortDirection: { [key: string]: 'asc' | 'desc' } = {};
     private currentSortColumn: string | null = null;
-    protected idFields: string[] = [];
+    idFields: string[] = [];
+    private _subscriptions = new Subscription();
 
-    protected pagesLoaded = new Set();
     protected pagesInProgress = new Set();
     protected _selectedKeys: string[] | null = null;
 
@@ -252,16 +251,26 @@ export class AppTableComponent implements OnInit {
     }
 
     async ngOnInit(): Promise<void> {
-        if (typeof this.multi === 'string') {
-            this.multi = Util.parseBoolean(this.multi);
-        }
 
-        this.reset();
+        this._subscriptions.add(
+            this._dataModel.dataSourceEvents().subscribe(
+                (x) => {
+                    if (x.type == 'data-updated') {
+                        this.refresh();
+                    }
+                }
+            )
+        );
+
+        this.refresh();
+    }
+
+    ngOnDestroy(): void {
+        this._subscriptions.unsubscribe();
     }
 
     getKeyValue(row: any) {
-        return this.idFields.map(kf => row[kf].toString())
-            .reduce((a, b) => a + b, "");
+        return this.idFields.map(kf => row[kf]?.toString() ?? 'null').join('|');
     }
 
     get selectedItem() {
@@ -300,64 +309,57 @@ export class AppTableComponent implements OnInit {
         }
     }
 
-    dataPushEventHandler(event: DataPushEvent) {
-        switch (event.operation) {
-            case DataPushEventStatus.UPDATED_DATA:
-                if (event.srcOptions.append === true) {
-                    this.appendData(event.data!, event.pageNo!);
-                }
-                if (event.srcOptions.append === false) {
-                    this.setData(event.data!);
-                }
-                break;
-            case DataPushEventStatus.START_FETCH:
-                this.loading = true;
-                break;
-            default:
-                this.loading = false;
-        }
-    }
+    // dataPushEventHandler(event: DataPushEvent<any>, append: boolean) {
+    //     switch (event.type) {
+    //         case LoadEvent.UPDATED_DATA:
+    //             if (append) {
+    //                 this.appendData(event.data!, event.page!);
+    //             } else {
+    //                 this.setData(event.data!);
+    //             }
+    //             break;
+    //         case LoadEvent.START_FETCH:
+    //             this.loading = true;
+    //             break;
+    //         default:
+    //             this.loading = false;
+    //     }
+    // }
 
     protected setData(data: any[]) {
-        this.nextPageNo = 1;
-        this.pagesInProgress.clear();
-        this.pagesLoaded.clear();
-        // this.isLastPageReached = !isNextPageAvailable;
-        this.pagesLoaded.add(0);
         this.actualRows = data;
     }
 
-    protected appendData(data: any[], pageNo: number) {
-        this.pagesInProgress.delete(pageNo);
-        if (!this.pagesLoaded.has(pageNo)) {
-            this.pagesLoaded.add(pageNo);
-            if (data.length > 0) {
-                // this.actualRows.push(...data);
-                this.actualRows = [...this.actualRows, ...data];
-                this.nextPageNo += 1;
-            }
+    protected appendData(data: any[]) {
+        if (data.length > 0) {
+            // this.actualRows.push(...data);
+            this.actualRows = [...this.actualRows, ...data];
         }
         // this.isLastPageReached = !isNextPageAvailable;
     }
 
-    protected async requestForData(options: any) {
-        this.sortBy = options.sortBy || this.sortBy;
-        this.nextPageNo = options.pageNo || this.nextPageNo;
-        if (options.append === false) {
-            // reset next page no
-            this.nextPageNo = 0;
-        }
-        if (this.dataModel.hasPage(this.nextPageNo) &&
-            !this.pagesLoaded.has(this.nextPageNo) && !this.pagesInProgress.has(this.nextPageNo)) {
-            this.dataModel.pageNo(this.nextPageNo)
-            this.dataModel.orderBy(this.sortBy);
-            if (options.filters && options.filters.length > 0) {
-                this.dataModel.filter(options.filters)
+    async requestForData(query: Query, append: boolean) {
+        if (!this.pagesInProgress.has(query.pageNo) && this.dataModel.hasPage(query.pageNo, query.pageSize)) {
+            if (!append) {
+                this.pagesInProgress.clear();
+                query.pageNo = 0;
+            } else {
+                query.pageNo += 1;
             }
-            this.pagesInProgress.add(this.nextPageNo);
-            await this.dataModel.apply(options);
+            this.pagesInProgress.add(query.pageNo);
+            try {
+                this.loading = true;
+                const response = await this.dataModel.execute(query);
+                if (append) {
+                    this.appendData(response.data);
+                } else {
+                    this.setData(response.data);
+                }
+            } finally {
+                this.loading = false;
+                this.pagesInProgress.delete(query.pageNo);
+            }
         }
-
     }
 
     lazyLoad(event: any) {
@@ -366,21 +368,17 @@ export class AppTableComponent implements OnInit {
         // console.log(reachedEnd, event.target.offsetHeight + event.target.scrollTop, event.target.scrollHeight);
         if (reachedEnd && this.pagesInProgress.size < 1) {
             console.log("lazy", event);
-            this.requestForData({append: true})
+            this.requestForData(this.query, true).catch(err => console.error(err));
         }
 
     }
 
     filter(filters: Filter[]) {
-        this.pagesInProgress.clear();
-        this.pagesLoaded.clear();
-        this.requestForData({pageNo: 0, filters, append: false});
+        this.requestForData(this.query.update({filters, pageNo: 0}), false).catch(err => console.error(err));
     }
 
-    reset() {
-        this.pagesInProgress.clear();
-        this.pagesLoaded.clear();
-        this.requestForData({pageNo: 0, append: false});
+    refresh() {
+        this.requestForData(this.query.update({pageNo: 0}), false).catch(err => console.error(err));
     }
 
     sort(column: string) {
@@ -393,12 +391,12 @@ export class AppTableComponent implements OnInit {
             this.sortDirection[column] = this.sortDirection[column] === 'asc' ? 'desc' : 'asc';
         }
 
-        this.sortBy = [{
+        const orderBy = [{
             field: column,
             order: this.sortDirection[column]
         }];
 
-        this.requestForData({ sortBy: this.sortBy, append: false });
+        this.requestForData(this.query.update({orderBy, pageNo: 0}), false).catch(err => console.error(err));
     }
 
     getSortIcon(column: string): string {
@@ -409,7 +407,7 @@ export class AppTableComponent implements OnInit {
     exportToCSV() {
         const headers = this.columns.map(col => col.label);
         const rows = this.actualRows.map(row =>
-            this.columns.map(col => row[col.name]).join(',')
+            this.columns.map(col => `"${(row[col.name] ?? '').toString().replace(/"/g, '""')}"`).join(',')
         );
         const csvContent = [
             headers.join(','),
@@ -422,5 +420,6 @@ export class AppTableComponent implements OnInit {
         link.download = `${this.title || 'table'}_export.csv`;
         link.click();
     }
+
 
 }

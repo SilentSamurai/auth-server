@@ -68,7 +68,7 @@ import {StaticModel} from "../../component/model/StaticModel";
                     <app-section-content>
                         <app-table
                             title="Tenant List"
-                            [dataModel]="tenantsDM">
+                            [dataSource]="tenantsDM">
 
                             <app-table-col label="Name" name="name"></app-table-col>
                             <app-table-col label="Domain" name="domain"></app-table-col>

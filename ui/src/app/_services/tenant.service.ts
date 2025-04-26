@@ -3,7 +3,7 @@ import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {lastValueFrom} from 'rxjs';
 import {SessionService} from "./session.service";
 import {RestApiModel} from "../component/model/RestApiModel";
-import {DataModel} from "../component/model/DataModel";
+import {DataModel, DataSource} from "../component/model/DataModel";
 
 const API_URL = '/api';
 
@@ -134,12 +134,12 @@ export class TenantService {
         }))
     }
 
-    createDataModel(initialData: any[]): DataModel {
+    createDataModel(initialData: any[]): DataSource<any> {
         return new RestApiModel(
             this.http,
             `${API_URL}/search/Tenants`,
             ["id"],
-            initialData
+            ['Tenants'],
         );
     }
 }

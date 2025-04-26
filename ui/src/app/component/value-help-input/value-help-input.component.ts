@@ -14,7 +14,7 @@ import {ActivatedRoute} from "@angular/router";
 import {ValueHelpComponent, ValueHelpResult} from "../value-help/value-help.component";
 import {ValueHelpColumnComponent} from "./value-help-column.component";
 import {FilterBarColumnComponent} from "../filter-bar/filter-bar.component";
-import {DataModel} from "../model/DataModel";
+import {DataModel, DataSource} from "../model/DataModel";
 import {ModalResult, ModalService} from "../dialogs/modal.service";
 
 
@@ -58,7 +58,7 @@ function parseBoolean(value: string): boolean {
 })
 export class ValueHelpInputComponent implements OnInit, AfterViewInit {
 
-    @Input({required: true}) dataModel!: DataModel;
+    @Input({required: true}) dataSource!: DataSource<any>;
 
     @Input() required = false;
     @Input() name: string = '';
@@ -116,7 +116,7 @@ export class ValueHelpInputComponent implements OnInit, AfterViewInit {
                 body: this.body,
                 columns: this.columns,
                 filters: this.filters,
-                dataModel: this.dataModel,
+                dataModel: this.dataSource,
                 selectedItem: this.selection,
                 multi: this.multi as boolean,
             }

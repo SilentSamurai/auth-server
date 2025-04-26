@@ -7,7 +7,7 @@ import {AppTableComponent, TableAsyncLoadEvent} from "../../component/table/app-
 import {AuthDefaultService} from "../../_services/auth.default.service";
 import {ConfirmationService} from "../../component/dialogs/confirmation.service";
 import {MessageService} from "primeng/api";
-import {DataModel} from "../../component/model/DataModel";
+import {DataModel, DataSource} from "../../component/model/DataModel";
 import {Filter} from "../../component/model/Filters";
 
 @Component({
@@ -32,7 +32,7 @@ import {Filter} from "../../component/model/Filters";
             </app-page-view-header>
             <app-page-view-body>
                 <app-table
-                    [dataModel]="usersDM"
+                    [dataSource]="usersDM"
                     title="Users"
                     multi="true"
                     scrollHeight="65vh">
@@ -70,7 +70,7 @@ export class UR01Component implements OnInit {
     table!: AppTableComponent;
 
     users: any = [];
-    usersDM!: DataModel;
+    usersDM!: DataSource<any>;
 
     constructor(private userService: UserService,
                 private authDefaultService: AuthDefaultService,

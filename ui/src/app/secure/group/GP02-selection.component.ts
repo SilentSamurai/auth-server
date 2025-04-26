@@ -7,7 +7,7 @@ import {TableAsyncLoadEvent} from "../../component/table/app-table.component";
 import {MessageService} from "primeng/api";
 import {AuthDefaultService} from "../../_services/auth.default.service";
 import {GroupService} from "../../_services/group.service";
-import {DataModel} from "../../component/model/DataModel";
+import {DataModel, DataSource} from "../../component/model/DataModel";
 
 
 @Component({
@@ -26,7 +26,7 @@ import {DataModel} from "../../component/model/DataModel";
                             Group
                         </label>
                         <app-value-help-input
-                            [dataModel]="groupsDM"
+                            [dataSource]="groupsDM"
                             [(selection)]="selectedGroup"
                             class="col-3"
                             labelField="name"
@@ -68,7 +68,7 @@ import {DataModel} from "../../component/model/DataModel";
 export class GP02SelectionComponent implements OnInit {
 
     groups: any[] = [];
-    groupsDM!: DataModel;
+    groupsDM!: DataSource<any>;
     selectedGroup: any[] = [];
 
     constructor(private userService: UserService,

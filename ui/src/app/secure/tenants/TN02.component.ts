@@ -10,8 +10,7 @@ import {AddRoleComponent} from "./dialogs/add-role.component";
 import {AuthDefaultService} from "../../_services/auth.default.service";
 import {ConfirmationService} from "../../component/dialogs/confirmation.service";
 import {Location} from '@angular/common';
-import {TableAsyncLoadEvent} from "../../component/table/app-table.component";
-import {DataModel} from "../../component/model/DataModel";
+import {DataSource} from "../../component/model/DataModel";
 import {StaticModel} from "../../component/model/StaticModel";
 
 @Component({
@@ -75,7 +74,7 @@ import {StaticModel} from "../../component/model/StaticModel";
                     <app-section-content>
                         <app-table
                             title="Member List"
-                            [dataModel]="memberDataModel">
+                            [dataSource]="memberDataModel">
 
                             <app-table-col label="Name" name="name"></app-table-col>
                             <app-table-col label="Email" name="email"></app-table-col>
@@ -118,7 +117,7 @@ import {StaticModel} from "../../component/model/StaticModel";
                     <app-section-content>
                         <app-table
                             title="Role List"
-                            [dataModel]="rolesDataModel">
+                            [dataSource]="rolesDataModel">
 
                             <app-table-col label="Name" name="name"></app-table-col>
                             <app-table-col label="Description" name="description"></app-table-col>

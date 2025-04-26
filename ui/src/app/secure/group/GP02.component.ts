@@ -65,7 +65,7 @@ import {CloseType, ValueHelpResult} from "../../component/value-help/value-help.
                                         name="Roles"
                                         classStyle="btn-primary btn-sm"
                                         [multi]="true"
-                                        [dataModel]="rolesDM"
+                                        [dataSource]="rolesDM"
                                         [selection]="selectedRoles"
                                         (onClose)="onAddRoles($event)"
                                     >
@@ -121,7 +121,7 @@ import {CloseType, ValueHelpResult} from "../../component/value-help/value-help.
                                         name="Users"
                                         classStyle="btn-primary btn-sm"
                                         [multi]="true"
-                                        [dataModel]="usersDM"
+                                        [dataSource]="usersDM"
                                         [selection]="selectedUsers"
                                         (onClose)="onAddUsers($event)"
                                     >

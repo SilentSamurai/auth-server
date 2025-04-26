@@ -10,7 +10,7 @@ COPY ./angular.json /home/app/angular.json
 
 WORKDIR /home/app/
 RUN npm ci
-RUN npm run build
+RUN npm run release
 
 
 FROM nginx:alpine

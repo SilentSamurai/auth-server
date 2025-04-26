@@ -5,7 +5,7 @@ import {ActivatedRoute} from "@angular/router";
 import {ValueHelpColumnComponent} from "../value-help-input/value-help-column.component";
 import {AppTableComponent} from "../table/app-table.component";
 import {FilterBarColumnComponent} from "../filter-bar/filter-bar.component";
-import {DataModel} from "../model/DataModel";
+import {DataModel, DataSource} from "../model/DataModel";
 import {Filter} from "../model/Filters";
 
 export enum CloseType {
@@ -58,7 +58,7 @@ export class ValueHelpResult {
         </div>
         <div class="modal-body p-0 ">
             <app-table
-                [dataModel]="dataModel"
+                [dataSource]="dataSource"
                 [multi]="multi"
                 [(selection)]="selectedItem">
                 <app-table-col *ngFor="let col of columns"
@@ -91,7 +91,7 @@ export class ValueHelpComponent implements OnInit {
 
     name: string = "";
     multi: boolean = true;
-    dataModel!: DataModel;
+    dataSource!: DataSource<any>;
 
     body: TemplateRef<any> | null = null;
 

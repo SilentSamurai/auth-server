@@ -8,7 +8,7 @@ import {AuthDefaultService} from "../../_services/auth.default.service";
 import {AppTableComponent} from "../../component/table/app-table.component";
 import {RoleService} from "../../_services/role.service";
 import {ConfirmationService} from "../../component/dialogs/confirmation.service";
-import {DataModel} from "../../component/model/DataModel";
+import {DataSource} from "../../component/model/DataModel";
 import {Filter} from "../../component/model/Filters";
 
 
@@ -29,7 +29,7 @@ import {Filter} from "../../component/model/Filters";
             </app-page-view-header>
             <app-page-view-body>
                 <app-table
-                    [dataModel]="rolesDM"
+                    [dataSource]="rolesDM"
                     title="Roles"
                     multi="true"
                     scrollHeight="75vh">
@@ -68,7 +68,7 @@ export class RL01Component implements OnInit {
     table!: AppTableComponent;
 
     roles: any;
-    rolesDM: DataModel;
+    rolesDM: DataSource<any>;
 
     constructor(private userService: UserService,
                 private tenantService: TenantService,

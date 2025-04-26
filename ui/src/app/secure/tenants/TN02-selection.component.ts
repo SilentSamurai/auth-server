@@ -6,7 +6,7 @@ import {TenantService} from "../../_services/tenant.service";
 import {TableAsyncLoadEvent} from "../../component/table/app-table.component";
 import {MessageService} from "primeng/api";
 import {AuthDefaultService} from "../../_services/auth.default.service";
-import {DataModel} from "../../component/model/DataModel";
+import {DataModel, DataSource} from "../../component/model/DataModel";
 
 
 @Component({
@@ -26,7 +26,7 @@ import {DataModel} from "../../component/model/DataModel";
                         </label>
 
                         <app-value-help-input id="select-tenant"
-                                              [dataModel]="tenantsDM"
+                                              [dataSource]="tenantsDM"
                                               [(selection)]="selectedTenant"
                                               class="col-3"
                                               labelField="name"
@@ -69,7 +69,7 @@ export class TN02SelectionComponent implements OnInit {
 
     tenants: [] = [];
     selectedTenant: any[] = [];
-    tenantsDM!: DataModel;
+    tenantsDM!: DataSource<any>;
 
     constructor(private userService: UserService,
                 private tenantService: TenantService,

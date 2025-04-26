@@ -7,6 +7,37 @@ export class Operator {
         this.label = label;
         this.symbol = operator;
     }
+
+    compare(a: any, b: any): boolean {
+        switch (this.label) {
+            case 'equals':
+                return a === b;
+            case 'greaterThan':
+                return a > b;
+            case 'greaterThanEqual':
+                return a >= b;
+            case 'lessThan':
+                return a < b;
+            case 'lessThanEquals':
+                return a <= b;
+            case 'notEquals':
+                return a !== b;
+            case 'contains':
+                if (typeof a === 'string' && typeof b === 'string') {
+                    return a.includes(b);
+                }
+                if (Array.isArray(a)) {
+                    return a.includes(b);
+                }
+                return false;
+            case 'regex':
+
+                return false;
+            default:
+                return false;
+        }
+    }
+
 }
 
 export class Operators {
@@ -18,7 +49,7 @@ export class Operators {
     public static LT: Operator = new Operator("lessThan", "<");
     public static LTE: Operator = new Operator("lessThanEquals", "<=");
     public static NEQ: Operator = new Operator("notEquals", "!=");
-    public static CONTRAINS: Operator = new Operator("contains", "contains");
+    public static CONTAINS: Operator = new Operator("contains", "contains");
 
 
     static ALL_OPERATORS: Operator[] = [
@@ -28,7 +59,7 @@ export class Operators {
         Operators.LT,
         Operators.LTE,
         Operators.NEQ,
-        Operators.CONTRAINS,
+        Operators.CONTAINS,
         Operators.REGEX
     ]
 
