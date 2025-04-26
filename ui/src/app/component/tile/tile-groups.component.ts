@@ -1,10 +1,10 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { SessionService } from '../../_services/session.service';
-import { ActivatedRoute, Router } from '@angular/router';
-import { AuthService } from '../../_services/auth.service';
-import { AuthDefaultService } from '../../_services/auth.default.service';
-import { Tile } from './models';
-import { PermissionService } from '../../_services/permission.service';
+import {Component, Input, OnInit} from '@angular/core';
+import {SessionService} from '../../_services/session.service';
+import {ActivatedRoute, Router} from '@angular/router';
+import {AuthService} from '../../_services/auth.service';
+import {AuthDefaultService} from '../../_services/auth.default.service';
+import {Tile} from './models';
+import {PermissionService} from '../../_services/permission.service';
 
 @Component({
     selector: 'app-tile-group',

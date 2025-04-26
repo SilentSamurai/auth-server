@@ -5,11 +5,11 @@ import {
     Output,
     ViewChild,
 } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { lastValueFrom } from 'rxjs';
-import { TenantService } from '../../../_services/tenant.service';
-import { MessageService } from 'primeng/api';
-import { NgForm } from '@angular/forms';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {lastValueFrom} from 'rxjs';
+import {TenantService} from '../../../_services/tenant.service';
+import {MessageService} from 'primeng/api';
+import {NgForm} from '@angular/forms';
 
 @Component({
     selector: 'app-create-tenant',

@@ -1,6 +1,6 @@
-import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import {Component, OnInit, TemplateRef, ViewChild} from '@angular/core';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmationService, MessageService} from 'primeng/api';
 
 @Component({
     selector: 'app-page-view-header',
@@ -14,7 +14,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 })
 export class PageViewHeaderComponent implements OnInit {
     loading = true;
-    @ViewChild('PVH', { static: true }) template!: TemplateRef<any>;
+    @ViewChild('PVH', {static: true}) template!: TemplateRef<any>;
 
     constructor(
         private messageService: MessageService,

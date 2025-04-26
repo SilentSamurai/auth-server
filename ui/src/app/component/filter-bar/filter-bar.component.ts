@@ -8,9 +8,9 @@ import {
     QueryList,
     ViewChildren,
 } from '@angular/core';
-import { Operators } from '../model/Operator';
-import { FilterFieldComponent } from './filter-field.component';
-import { Filter } from '../model/Filters';
+import {Operators} from '../model/Operator';
+import {FilterFieldComponent} from './filter-field.component';
+import {Filter} from '../model/Filters';
 
 @Component({
     selector: 'app-fb-col',

@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
-import { UserService } from '../_services/user.service';
-import { SessionService } from '../_services/session.service';
-import { ActivatedRoute, Router } from '@angular/router';
-import { AuthService } from '../_services/auth.service';
-import { AuthDefaultService } from '../_services/auth.default.service';
+import {Component, OnInit} from '@angular/core';
+import {UserService} from '../_services/user.service';
+import {SessionService} from '../_services/session.service';
+import {ActivatedRoute, Router} from '@angular/router';
+import {AuthService} from '../_services/auth.service';
+import {AuthDefaultService} from '../_services/auth.default.service';
 
 @Component({
     selector: 'session-confirm',

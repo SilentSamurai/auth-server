@@ -7,10 +7,10 @@ import {
     OnInit,
     QueryList,
 } from '@angular/core';
-import { ConfirmationService, MessageService } from 'primeng/api';
-import { ActivatedRoute, Router } from '@angular/router';
-import { firstValueFrom } from 'rxjs';
-import { ObjectPageTabComponent } from './object-page-tab.component';
+import {ConfirmationService, MessageService} from 'primeng/api';
+import {ActivatedRoute, Router} from '@angular/router';
+import {firstValueFrom} from 'rxjs';
+import {ObjectPageTabComponent} from './object-page-tab.component';
 
 @Component({
     selector: 'app-object-page',
@@ -169,9 +169,9 @@ import { ObjectPageTabComponent } from './object-page-tab.component';
 })
 export class ObjectPageComponent implements OnInit, AfterViewInit {
     loading = true;
-    @Input({ transform: booleanAttribute }) singlePage = false;
+    @Input({transform: booleanAttribute}) singlePage = false;
 
-    @ContentChildren(ObjectPageTabComponent, { descendants: true })
+    @ContentChildren(ObjectPageTabComponent, {descendants: true})
     tabs!: QueryList<ObjectPageTabComponent>;
 
     currentTab: ObjectPageTabComponent | undefined;
@@ -212,7 +212,7 @@ export class ObjectPageComponent implements OnInit, AfterViewInit {
     }
 
     updateFragment(fragment: string): void {
-        this.router.navigate([], { fragment });
+        this.router.navigate([], {fragment});
     }
 
     doScroll(elementId: string): void {
@@ -221,6 +221,6 @@ export class ObjectPageComponent implements OnInit, AfterViewInit {
             console.warn(`Element with ID "${elementId}" not found.`);
             return;
         }
-        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        element.scrollIntoView({behavior: 'smooth', block: 'start'});
     }
 }

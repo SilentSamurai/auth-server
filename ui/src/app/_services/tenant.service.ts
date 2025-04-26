@@ -1,9 +1,9 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { lastValueFrom } from 'rxjs';
-import { SessionService } from './session.service';
-import { RestApiModel } from '../component/model/RestApiModel';
-import { IDataModel, DataSource } from '../component/model/IDataModel';
+import {Injectable} from '@angular/core';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {lastValueFrom} from 'rxjs';
+import {SessionService} from './session.service';
+import {RestApiModel} from '../component/model/RestApiModel';
+import {IDataModel, DataSource} from '../component/model/IDataModel';
 
 const API_URL = '/api';
 

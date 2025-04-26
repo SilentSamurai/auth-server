@@ -7,7 +7,7 @@ import {
     ReturnedData,
     IQueryConfig,
 } from './IDataModel';
-import { Observable, Subscription } from 'rxjs';
+import {Observable, Subscription} from 'rxjs';
 
 // Helper function to create a stable string representation of the query for caching
 function getQueryCacheKey(query: Query): string {

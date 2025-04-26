@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 
 /**
  * Service for handling PKCE (Proof Key for Code Exchange) functionality.

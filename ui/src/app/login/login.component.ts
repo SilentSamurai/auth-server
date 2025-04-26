@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
-import { AuthService } from '../_services/auth.service';
-import { SessionService } from '../_services/session.service';
-import { ActivatedRoute, Router } from '@angular/router';
-import { lastValueFrom } from 'rxjs';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {Component, OnInit} from '@angular/core';
+import {AuthService} from '../_services/auth.service';
+import {SessionService} from '../_services/session.service';
+import {ActivatedRoute, Router} from '@angular/router';
+import {lastValueFrom} from 'rxjs';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 
 @Component({
     selector: 'app-login',
@@ -54,7 +54,7 @@ export class LoginComponent implements OnInit {
 
         if (params.has('client_id')) {
             const cid = params.get('client_id');
-            this.loginForm.patchValue({ client_id: cid });
+            this.loginForm.patchValue({client_id: cid});
             if (cid && cid.length > 0) {
                 this.freezeClientId = true;
             }
@@ -97,7 +97,7 @@ export class LoginComponent implements OnInit {
     // redirection to home page might not work sometime,
     // check if internally anything is nav-ing to login page again
     async onSubmit(): Promise<void> {
-        const { username, password, client_id } = this.loginForm.value;
+        const {username, password, client_id} = this.loginForm.value;
         try {
             const data = await this.authService.login(
                 username,

@@ -6,13 +6,13 @@ import {
     ViewChild,
 } from '@angular/core';
 
-import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { ActivatedRoute } from '@angular/router';
-import { ValueHelpColumnComponent } from '../value-help-input/value-help-column.component';
-import { AppTableComponent } from '../table/app-table.component';
-import { FilterBarColumnComponent } from '../filter-bar/filter-bar.component';
-import { IDataModel, DataSource } from '../model/IDataModel';
-import { Filter } from '../model/Filters';
+import {NgbActiveModal, NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {ActivatedRoute} from '@angular/router';
+import {ValueHelpColumnComponent} from '../value-help-input/value-help-column.component';
+import {AppTableComponent} from '../table/app-table.component';
+import {FilterBarColumnComponent} from '../filter-bar/filter-bar.component';
+import {IDataModel, DataSource} from '../model/IDataModel';
+import {Filter} from '../model/Filters';
 
 export enum CloseType {
     Cancel,
@@ -81,7 +81,7 @@ export class ValueHelpResult {
                 </app-table-col>
                 <ng-template #table_body let-row>
                     <ng-container
-                        *ngTemplateOutlet="body; context: { $implicit: row }"
+                        *ngTemplateOutlet="body; context: {$implicit: row}"
                     ></ng-container>
                 </ng-template>
             </app-table>

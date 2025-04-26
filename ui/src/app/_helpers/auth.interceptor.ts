@@ -5,11 +5,11 @@ import {
     HttpInterceptor,
     HttpRequest,
 } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 
-import { SessionService } from '../_services/session.service';
-import { Observable } from 'rxjs';
-import { AuthDefaultService } from '../_services/auth.default.service';
+import {SessionService} from '../_services/session.service';
+import {Observable} from 'rxjs';
+import {AuthDefaultService} from '../_services/auth.default.service';
 
 // const TOKEN_HEADER_KEY = 'Authorization';       // for Spring Boot back-end
 const TOKEN_HEADER_KEY = 'Authorization'; // for Node.js Express back-end
@@ -43,5 +43,5 @@ export class AuthInterceptor implements HttpInterceptor {
 }
 
 export const authInterceptorProviders = [
-    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+    {provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},
 ];

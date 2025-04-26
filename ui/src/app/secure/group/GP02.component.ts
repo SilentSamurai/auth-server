@@ -1,14 +1,14 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { TenantService } from '../../_services/tenant.service';
-import { SessionService } from '../../_services/session.service';
-import { GroupService } from '../../_services/group.service';
-import { AuthDefaultService } from '../../_services/auth.default.service';
-import { UpdateGroupComponent } from './dialogs/update-group.component';
-import { MessageService } from 'primeng/api';
-import { ConfirmationService } from '../../component/dialogs/confirmation.service';
-import { StaticModel } from '../../component/model/StaticModel';
+import {Component, OnInit} from '@angular/core';
+import {ActivatedRoute, Router} from '@angular/router';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {TenantService} from '../../_services/tenant.service';
+import {SessionService} from '../../_services/session.service';
+import {GroupService} from '../../_services/group.service';
+import {AuthDefaultService} from '../../_services/auth.default.service';
+import {UpdateGroupComponent} from './dialogs/update-group.component';
+import {MessageService} from 'primeng/api';
+import {ConfirmationService} from '../../component/dialogs/confirmation.service';
+import {StaticModel} from '../../component/model/StaticModel';
 import {
     CloseType,
     ValueHelpResult,

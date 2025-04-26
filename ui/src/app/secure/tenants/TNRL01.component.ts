@@ -1,12 +1,12 @@
-import { AfterContentInit, Component } from '@angular/core';
-import { UserService } from '../../_services/user.service';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { ActivatedRoute, Router } from '@angular/router';
-import { TenantService } from '../../_services/tenant.service';
-import { lastValueFrom } from 'rxjs';
-import { MessageService } from 'primeng/api';
-import { AuthDefaultService } from '../../_services/auth.default.service';
-import { StaticModel } from '../../component/model/StaticModel';
+import {AfterContentInit, Component} from '@angular/core';
+import {UserService} from '../../_services/user.service';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {ActivatedRoute, Router} from '@angular/router';
+import {TenantService} from '../../_services/tenant.service';
+import {lastValueFrom} from 'rxjs';
+import {MessageService} from 'primeng/api';
+import {AuthDefaultService} from '../../_services/auth.default.service';
+import {StaticModel} from '../../component/model/StaticModel';
 import {
     CloseType,
     ValueHelpResult,

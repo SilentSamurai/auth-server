@@ -10,15 +10,15 @@ import {
     QueryList,
     TemplateRef,
 } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import {ActivatedRoute} from '@angular/router';
 import {
     ValueHelpComponent,
     ValueHelpResult,
 } from '../value-help/value-help.component';
-import { ValueHelpColumnComponent } from './value-help-column.component';
-import { FilterBarColumnComponent } from '../filter-bar/filter-bar.component';
-import { IDataModel, DataSource } from '../model/IDataModel';
-import { ModalResult, ModalService } from '../dialogs/modal.service';
+import {ValueHelpColumnComponent} from './value-help-column.component';
+import {FilterBarColumnComponent} from '../filter-bar/filter-bar.component';
+import {IDataModel, DataSource} from '../model/IDataModel';
+import {ModalResult, ModalService} from '../dialogs/modal.service';
 
 function parseBoolean(value: string): boolean {
     const lowerCaseStr = value.toLowerCase();
@@ -67,7 +67,7 @@ function parseBoolean(value: string): boolean {
     ],
 })
 export class ValueHelpInputComponent implements OnInit, AfterViewInit {
-    @Input({ required: true }) dataSource!: DataSource<any>;
+    @Input({required: true}) dataSource!: DataSource<any>;
 
     @Input() required = false;
     @Input() name: string = '';

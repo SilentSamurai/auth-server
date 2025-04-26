@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { SessionService } from '../_services/session.service';
+import {Component, OnInit} from '@angular/core';
+import {SessionService} from '../_services/session.service';
 
 @Component({
     selector: 'app-profile',

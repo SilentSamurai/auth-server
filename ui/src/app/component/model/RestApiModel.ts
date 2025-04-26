@@ -1,11 +1,6 @@
-import {
-    DataSource,
-    DataSourceEvents,
-    Query,
-    ReturnedData,
-} from './IDataModel';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { lastValueFrom, Observable, Subject } from 'rxjs';
+import {DataSource, DataSourceEvents, Query, ReturnedData} from './IDataModel';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {lastValueFrom, Observable, Subject} from 'rxjs';
 
 export interface ApiRequest {
     pageNo: number;
@@ -59,7 +54,7 @@ export class RestApiModel<T> implements DataSource<T> {
         };
 
         const response = await lastValueFrom(
-            this.http.post<{ count: number }>(this.path, body, {
+            this.http.post<{count: number}>(this.path, body, {
                 headers: this.defaultHeaders,
             }),
         );

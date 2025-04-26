@@ -1,14 +1,14 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { SessionService } from '../../_services/session.service';
-import { ActivatedRoute, Router } from '@angular/router';
-import { AuthService } from '../../_services/auth.service';
-import { AuthDefaultService } from '../../_services/auth.default.service';
+import {Component, Input, OnInit} from '@angular/core';
+import {SessionService} from '../../_services/session.service';
+import {ActivatedRoute, Router} from '@angular/router';
+import {AuthService} from '../../_services/auth.service';
+import {AuthDefaultService} from '../../_services/auth.default.service';
 import {
     PermissionService,
     Actions,
     Subjects,
 } from '../../_services/permission.service';
-import { TileGroup } from './models';
+import {TileGroup} from './models';
 
 @Component({
     selector: 'app-launchpad',
@@ -93,7 +93,7 @@ export class LaunchPadComponent implements OnInit {
     doScroll(elementId: string) {
         const element = document.getElementById(elementId);
         if (element) {
-            element.scrollIntoView({ behavior: 'smooth' });
+            element.scrollIntoView({behavior: 'smooth'});
         }
     }
 }

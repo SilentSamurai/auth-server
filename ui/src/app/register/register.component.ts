@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { AuthDefaultService } from '../_services/auth.default.service';
-import { AuthService } from '../_services/auth.service';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {Component, OnInit} from '@angular/core';
+import {ActivatedRoute, Router} from '@angular/router';
+import {AuthDefaultService} from '../_services/auth.default.service';
+import {AuthService} from '../_services/auth.service';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 
 @Component({
     selector: 'app-register',
@@ -66,7 +66,7 @@ export class RegisterComponent implements OnInit {
 
     // Move to step 2 if valid; only used when !isSignUp
     onNextClick(): void {
-        const { orgName, domain } = this.registerForm.value;
+        const {orgName, domain} = this.registerForm.value;
         if (
             !orgName ||
             !domain ||
@@ -91,7 +91,7 @@ export class RegisterComponent implements OnInit {
         }
 
         // Extract form values
-        const { name, email, password, orgName, domain } =
+        const {name, email, password, orgName, domain} =
             this.registerForm.value;
         this.isSignUpFailed = false;
 

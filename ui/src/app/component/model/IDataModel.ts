@@ -1,5 +1,5 @@
-import { Filter } from './Filters';
-import { Observable } from 'rxjs';
+import {Filter} from './Filters';
+import {Observable} from 'rxjs';
 
 export interface SortConfig {
     field: string;

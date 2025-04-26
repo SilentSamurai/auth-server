@@ -1,6 +1,6 @@
-import { Inject, Injectable } from '@angular/core';
-import { MongoAbility, PureAbility, subject } from '@casl/ability';
-import { SessionService } from './session.service';
+import {Inject, Injectable} from '@angular/core';
+import {MongoAbility, PureAbility, subject} from '@casl/ability';
+import {SessionService} from './session.service';
 
 export enum Actions {
     Manage = 'manage',

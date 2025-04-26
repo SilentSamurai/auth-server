@@ -13,10 +13,10 @@ import {
     ValueHelpComponent,
     ValueHelpResult,
 } from '../value-help/value-help.component';
-import { IDataModel, DataSource } from '../model/IDataModel';
-import { ValueHelpColumnComponent } from '../value-help-input/value-help-column.component';
-import { FilterBarColumnComponent } from '../filter-bar/filter-bar.component';
-import { ModalResult, ModalService } from '../dialogs/modal.service';
+import {IDataModel, DataSource} from '../model/IDataModel';
+import {ValueHelpColumnComponent} from '../value-help-input/value-help-column.component';
+import {FilterBarColumnComponent} from '../filter-bar/filter-bar.component';
+import {ModalResult, ModalService} from '../dialogs/modal.service';
 
 @Component({
     selector: 'app-value-help-button',
@@ -32,7 +32,7 @@ import { ModalResult, ModalService } from '../dialogs/modal.service';
     styles: [],
 })
 export class ValueHelpButtonComponent implements OnInit {
-    @Input({ required: true }) dataSource!: DataSource<any>;
+    @Input({required: true}) dataSource!: DataSource<any>;
 
     @Input() multi: boolean = false;
     @Input() classStyle: string = '';

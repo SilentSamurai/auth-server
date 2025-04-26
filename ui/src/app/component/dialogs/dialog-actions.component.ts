@@ -1,10 +1,4 @@
-import {
-    Component,
-    Input,
-    OnInit,
-    TemplateRef,
-    ViewChild,
-} from '@angular/core';
+import {Component, Input, OnInit, TemplateRef, ViewChild} from '@angular/core';
 
 @Component({
     selector: 'app-dialog-actions',
@@ -16,7 +10,7 @@ import {
     styles: [],
 })
 export class DialogActionsComponent implements OnInit {
-    @ViewChild('SDA', { static: true }) template!: TemplateRef<any>;
+    @ViewChild('SDA', {static: true}) template!: TemplateRef<any>;
 
     constructor() {}
 

@@ -18,7 +18,7 @@
         "start:mail-server": "ts-node src/mail/FakeSmtpServer.ts",
         "release": "npm run build && npm run test ",
         "smtp-server": "ts-node src/mail/FakeSmtpServer.ts",
-        "format": "prettier --write \"src/**/*.ts\""
+        "format": "prettier --write \"src/**/*.ts\" --tab-width 4 --no-bracket-spacing"
     },
     "dependencies": {
         "@casl/ability": "^6.4.0",

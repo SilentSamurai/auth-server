@@ -1,4 +1,4 @@
-import { Util } from './utils';
+import {Util} from './utils';
 
 describe('Test Util', function () {
     beforeEach(function () {});
@@ -7,7 +7,7 @@ describe('Test Util', function () {
         // Example usage:
         const jsonObj = {
             field1: {
-                innerfield: [{ attr: 'value1' }, { attr: 'value2' }],
+                innerfield: [{attr: 'value1'}, {attr: 'value2'}],
             },
         };
 

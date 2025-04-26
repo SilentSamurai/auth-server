@@ -1,7 +1,7 @@
-import { Injectable } from '@angular/core';
-import { PureAbility } from '@casl/ability';
-import { HttpClient } from '@angular/common/http';
-import { lastValueFrom } from 'rxjs';
+import {Injectable} from '@angular/core';
+import {PureAbility} from '@casl/ability';
+import {HttpClient} from '@angular/common/http';
+import {lastValueFrom} from 'rxjs';
 
 // Interface to represent policy data
 export interface Policy {

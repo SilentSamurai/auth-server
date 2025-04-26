@@ -6,11 +6,11 @@ import {
     Input,
     QueryList,
 } from '@angular/core';
-import { MessageService } from 'primeng/api';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { DialogActionsComponent } from './dialog-actions.component';
-import { DialogTabComponent } from './dialog-tab.component';
-import { DialogFooterComponent } from './dialog-footer.component';
+import {MessageService} from 'primeng/api';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {DialogActionsComponent} from './dialog-actions.component';
+import {DialogTabComponent} from './dialog-tab.component';
+import {DialogFooterComponent} from './dialog-footer.component';
 
 @Component({
     selector: 'app-standard-dialog',

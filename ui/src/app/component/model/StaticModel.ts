@@ -5,8 +5,8 @@ import {
     ReturnedData,
     SortConfig,
 } from './IDataModel';
-import { Filter } from './Filters';
-import { Observable, Subject } from 'rxjs';
+import {Filter} from './Filters';
+import {Observable, Subject} from 'rxjs';
 
 export class StaticModel<T> implements DataSource<T> {
     private data: T[] = [];
@@ -29,12 +29,12 @@ export class StaticModel<T> implements DataSource<T> {
 
     setData(data: T[]): void {
         this.data = [...data];
-        this.eventSubject.next({ type: 'data-updated', source: 'set' });
+        this.eventSubject.next({type: 'data-updated', source: 'set'});
     }
 
     appendData(newData: T[]): void {
         this.data.push(...newData);
-        this.eventSubject.next({ type: 'data-updated', source: 'append' });
+        this.eventSubject.next({type: 'data-updated', source: 'append'});
     }
 
     async fetchData(query: Query): Promise<ReturnedData<T>> {

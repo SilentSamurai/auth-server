@@ -1,4 +1,4 @@
-import { Operator, Operators } from './Operator';
+import {Operator, Operators} from './Operator';
 
 export class Filter {
     field: string;
@@ -53,41 +53,41 @@ export class Filter {
 
 // Helper to create simple equality filter
 export function eq(value: any) {
-    return { operator: Operators.EQ, value: value };
+    return {operator: Operators.EQ, value: value};
 }
 
 export function gt(value: any) {
-    return { operator: Operators.GT, value: value };
+    return {operator: Operators.GT, value: value};
 }
 
 export function gte(value: any) {
-    return { operator: Operators.GTE, value: value };
+    return {operator: Operators.GTE, value: value};
 }
 
 export function lt(value: any) {
-    return { operator: Operators.LT, value: value };
+    return {operator: Operators.LT, value: value};
 }
 
 export function lte(value: any) {
-    return { operator: Operators.LTE, value: value };
+    return {operator: Operators.LTE, value: value};
 }
 
 export function neq(value: any) {
-    return { operator: Operators.NEQ, value: value };
+    return {operator: Operators.NEQ, value: value};
 }
 
 export function contains(value: any) {
-    return { operator: Operators.CONTAINS, value: value };
+    return {operator: Operators.CONTAINS, value: value};
 }
 
 export function matches(value: any) {
-    return { operator: Operators.MATCHES, value: value };
+    return {operator: Operators.MATCHES, value: value};
 }
 
 // Helper to create a condition filter
 export function condition(
     field: string,
-    config: { operator: Operator; value: any },
+    config: {operator: Operator; value: any},
 ) {
     return new Filter(field, field, config.value, config.operator);
 }

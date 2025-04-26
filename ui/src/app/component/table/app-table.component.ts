@@ -12,14 +12,14 @@ import {
     TemplateRef,
     ViewChild,
 } from '@angular/core';
-import { FilterBarComponent } from '../filter-bar/filter-bar.component';
-import { TableColumnComponent } from './app-table-column.component';
-import { AppTableButtonComponent } from './app-table-button.component';
-import { IDataModel, DataSource, Query } from '../model/IDataModel';
-import { Filter } from '../model/Filters';
-import { CheckboxChangeEvent } from 'primeng/checkbox';
-import { DataModel } from '../model/DataModel';
-import { Subscription } from 'rxjs';
+import {FilterBarComponent} from '../filter-bar/filter-bar.component';
+import {TableColumnComponent} from './app-table-column.component';
+import {AppTableButtonComponent} from './app-table-button.component';
+import {IDataModel, DataSource, Query} from '../model/IDataModel';
+import {Filter} from '../model/Filters';
+import {CheckboxChangeEvent} from 'primeng/checkbox';
+import {DataModel} from '../model/DataModel';
+import {Subscription} from 'rxjs';
 
 export class TableAsyncLoadEvent extends Query {}
 
@@ -119,7 +119,7 @@ export class TableAsyncLoadEvent extends Query {}
                                 <ng-container
                                     *ngTemplateOutlet="
                                         body;
-                                        context: { $implicit: row }
+                                        context: {$implicit: row}
                                     "
                                 ></ng-container>
                             </ng-container>
@@ -130,13 +130,13 @@ export class TableAsyncLoadEvent extends Query {}
                         <td>
                             <div class="loading-text"></div>
                             <p-skeleton
-                                [ngStyle]="{ width: '100%' }"
+                                [ngStyle]="{width: '100%'}"
                             ></p-skeleton>
                         </td>
                         <td *ngFor="let col of columns">
                             <div class="loading-text"></div>
                             <p-skeleton
-                                [ngStyle]="{ width: '100%' }"
+                                [ngStyle]="{width: '100%'}"
                             ></p-skeleton>
                         </td>
                     </tr>
@@ -258,7 +258,7 @@ export class AppTableComponent implements OnInit, OnDestroy {
 
     _dataModel!: IDataModel<any>;
 
-    @Input({ required: true })
+    @Input({required: true})
     set dataSource(dataSource: DataSource<any>) {
         this._dataModel = new DataModel(dataSource);
         this.idFields = dataSource.keyFields();
@@ -270,7 +270,7 @@ export class AppTableComponent implements OnInit, OnDestroy {
 
     @Input() title: string = '';
     @Input() scrollHeight: string = '65vh';
-    @Input({ transform: booleanAttribute }) multi: boolean = true;
+    @Input({transform: booleanAttribute}) multi: boolean = true;
 
     @Input() selection: any[] = [];
     @Output() selectionChange: EventEmitter<any[]> = new EventEmitter();
@@ -292,7 +292,7 @@ export class AppTableComponent implements OnInit, OnDestroy {
     _selectAll: boolean = false;
 
     private query: Query = new Query({});
-    private sortDirection: { [key: string]: 'asc' | 'desc' } = {};
+    private sortDirection: {[key: string]: 'asc' | 'desc'} = {};
     private currentSortColumn: string | null = null;
     idFields: string[] = [];
     private _subscriptions = new Subscription();
@@ -438,13 +438,13 @@ export class AppTableComponent implements OnInit, OnDestroy {
 
     filter(filters: Filter[]) {
         this.requestForData(
-            this.query.update({ filters, pageNo: 0 }),
+            this.query.update({filters, pageNo: 0}),
             false,
         ).catch((err) => console.error(err));
     }
 
     refresh() {
-        this.requestForData(this.query.update({ pageNo: 0 }), false).catch(
+        this.requestForData(this.query.update({pageNo: 0}), false).catch(
             (err) => console.error(err),
         );
     }
@@ -468,7 +468,7 @@ export class AppTableComponent implements OnInit, OnDestroy {
         ];
 
         this.requestForData(
-            this.query.update({ orderBy, pageNo: 0 }),
+            this.query.update({orderBy, pageNo: 0}),
             false,
         ).catch((err) => console.error(err));
     }

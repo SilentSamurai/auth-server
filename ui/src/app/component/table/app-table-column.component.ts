@@ -1,11 +1,5 @@
-import {
-    Component,
-    Input,
-    OnInit,
-    TemplateRef,
-    ViewChild,
-} from '@angular/core';
-import { Util } from '../util/utils';
+import {Component, Input, OnInit, TemplateRef, ViewChild} from '@angular/core';
+import {Util} from '../util/utils';
 
 @Component({
     selector: 'app-table-col',
@@ -26,7 +20,7 @@ export class TableColumnComponent implements OnInit {
     @Input() template?: TemplateRef<any>;
     @Input() sortable: boolean = true;
 
-    @ViewChild('TBCLCH', { static: true }) templateRef!: TemplateRef<any>;
+    @ViewChild('TBCLCH', {static: true}) templateRef!: TemplateRef<any>;
 
     constructor() {}
 

@@ -1,7 +1,7 @@
-import { Component, Input } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { RoleService } from '../../_services/role.service';
-import { MessageService } from 'primeng/api';
+import {Component, Input} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {RoleService} from '../../_services/role.service';
+import {MessageService} from 'primeng/api';
 
 /**
  * Updated version of UpdateRoleModalComponent that uses StandardDialogComponent

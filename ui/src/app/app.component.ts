@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
-import { ThemeService } from './_services/theme.service';
-import { ThemeToggleComponent } from './component/theme-toggle/theme-toggle.component';
-import { RouterOutlet } from '@angular/router';
-import { ToastModule } from 'primeng/toast';
+import {Component, OnInit} from '@angular/core';
+import {ThemeService} from './_services/theme.service';
+import {ThemeToggleComponent} from './component/theme-toggle/theme-toggle.component';
+import {RouterOutlet} from '@angular/router';
+import {ToastModule} from 'primeng/toast';
 
 @Component({
     selector: 'app-root',

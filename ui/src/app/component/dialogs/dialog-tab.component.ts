@@ -1,10 +1,4 @@
-import {
-    Component,
-    Input,
-    OnInit,
-    TemplateRef,
-    ViewChild,
-} from '@angular/core';
+import {Component, Input, OnInit, TemplateRef, ViewChild} from '@angular/core';
 
 @Component({
     selector: 'app-dialog-tab',
@@ -18,7 +12,7 @@ import {
 export class DialogTabComponent implements OnInit {
     @Input() name: string = '';
 
-    @ViewChild('SDTB', { static: true }) template!: TemplateRef<any>;
+    @ViewChild('SDTB', {static: true}) template!: TemplateRef<any>;
 
     constructor() {}
 

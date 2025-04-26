@@ -1,15 +1,15 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { UserService } from '../../_services/user.service';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { ActivatedRoute, Router } from '@angular/router';
-import { TenantService } from '../../_services/tenant.service';
-import { MessageService } from 'primeng/api';
-import { AuthDefaultService } from '../../_services/auth.default.service';
-import { AppTableComponent } from '../../component/table/app-table.component';
-import { RoleService } from '../../_services/role.service';
-import { ConfirmationService } from '../../component/dialogs/confirmation.service';
-import { DataSource } from '../../component/model/IDataModel';
-import { Filter } from '../../component/model/Filters';
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {UserService} from '../../_services/user.service';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {ActivatedRoute, Router} from '@angular/router';
+import {TenantService} from '../../_services/tenant.service';
+import {MessageService} from 'primeng/api';
+import {AuthDefaultService} from '../../_services/auth.default.service';
+import {AppTableComponent} from '../../component/table/app-table.component';
+import {RoleService} from '../../_services/role.service';
+import {ConfirmationService} from '../../component/dialogs/confirmation.service';
+import {DataSource} from '../../component/model/IDataModel';
+import {Filter} from '../../component/model/Filters';
 
 @Component({
     selector: 'app-role-list',
