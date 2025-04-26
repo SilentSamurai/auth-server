@@ -1,17 +1,66 @@
-import {EventEmitter} from "@angular/core";
-import {Filter} from "./Filters";
+import { Filter } from './Filters';
+import { Observable } from 'rxjs';
 
 export interface SortConfig {
     field: string;
     order: 'asc' | 'desc';
 }
 
-export class Query {
+export interface ReturnedData<T> {
+    data: T[];
+    count?: number;
+    isLastPage: boolean;
+}
+
+export interface DataSource<T> {
+    fetchData(query: IQuery): Promise<ReturnedData<T>>;
+
+    totalCount(query: IQuery): Promise<number>;
+
+    keyFields(): string[];
+
+    updates(): Observable<DataSourceEvents>;
+}
+
+export interface DataModelStatus {
+    loading: boolean;
+    error?: string;
+    isLastPageReached: boolean;
+}
+
+export interface DataSourceEvents {
+    type: 'data-updated' | 'unknown';
+    source: string;
+    data?: any;
+}
+
+export interface IQuery {
+    pageNo?: number;
+    pageSize?: number;
+    filters?: Filter[];
+    orderBy?: SortConfig[];
+    expand?: string[];
+}
+
+export class Query implements IQuery {
     private _pageNo: number = 0;
     private _pageSize: number = 50;
     private _filters: Filter[] = [];
     private _orderBy: SortConfig[] = [];
     private _expand: string[] = [];
+
+    constructor(config: IQuery) {
+        this.update(config);
+    }
+
+    public update(config: IQuery) {
+        if (config.pageNo !== undefined) this.pageNo = config.pageNo;
+        if (config.pageSize !== undefined) this.pageSize = config.pageSize;
+        if (config.filters) this.filters = config.filters;
+        if (config.orderBy) this.orderBy = config.orderBy;
+        if (config.expand) this.expand = config.expand;
+        return this;
+    }
 
     get pageNo(): number {
         return this._pageNo;
@@ -27,7 +76,7 @@ export class Query {
 
     set pageSize(value: number) {
         if (value < 0) {
-            console.warn("Negative number not allowed in page size");
+            console.warn('Negative number not allowed in page size');
             return;
         }
         this._pageSize = value;
@@ -38,7 +87,9 @@ export class Query {
     }
 
     set filters(value: Filter[]) {
-        this._filters = value.filter(item => item.value != null && item.value.length > 0);
+        this._filters = value.filter(
+            (item) => item.value != null && item.value.length > 0,
+        );
     }
 
     get orderBy(): SortConfig[] {
@@ -58,54 +109,18 @@ export class Query {
     }
 }
 
+export interface DataModel<T> {
+    execute(query: IQuery): Promise<ReturnedData<T>>;
 
-export enum DataPushEventStatus {
-    UPDATED_DATA,
-    START_FETCH,
-    END_FETCH
-}
+    hasPage(pageNo: number, pageSize: number): boolean;
 
-export class DataPushEvent {
-    srcOptions: any;
-    operation: DataPushEventStatus = DataPushEventStatus.UPDATED_DATA;
-    data: any[] | null = [];
-    pageNo: number | null = null;
-    error?: Error;
-}
-
-export interface DataModel {
-
-    dataPusher(): EventEmitter<DataPushEvent>;
-
-    getKeyFields(): string[];
-
-    filter(filters: Filter[]): void;
-
-    getFilters(): Filter[];
-
-    orderBy(sortBy: SortConfig[]): void;
-
-    getOrderBy(): SortConfig[];
-
-    getPageSize(): number;
-
-    pageSize(pageSize: number): void;
-
-    pageNo(pageNo: number): void;
-
-    getPageNo(): number;
-
-    apply(srcOptions: any): Promise<boolean>;
-
-    getData(): any[];
-
-    hasNextPage(pageNo: number): boolean;
-
-    hasPage(pageNo: number): boolean;
+    getStatus(): DataModelStatus;
 
     totalRowCount(): number;
 
-    getPageNoFromRow(first: number): number;
+    reset(): void;
+
+    dataSource(): DataSource<T>;
+
+    dataSourceEvents(): Observable<DataSourceEvents>;
 }
-
-

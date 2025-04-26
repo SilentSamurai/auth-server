@@ -1,4 +1,3 @@
-
 import { Component, Input } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { RoleService } from '../../_services/role.service';
@@ -15,7 +14,6 @@ import { MessageService } from 'primeng/api';
             [title]="'Update Role'"
             [subtitle]="role?.tenant ? 'Tenant : ' + role.tenant.name : ''"
         >
-
             <app-dialog-tab name="Main">
                 <div class="mb-3">
                     <label for="roleName" class="form-label">Name</label>
@@ -28,7 +26,9 @@ import { MessageService } from 'primeng/api';
                     />
                 </div>
                 <div class="mb-3">
-                    <label for="roleDescription" class="form-label">Description</label>
+                    <label for="roleDescription" class="form-label"
+                        >Description</label
+                    >
                     <textarea
                         id="roleDescription"
                         class="form-control"
@@ -56,16 +56,16 @@ import { MessageService } from 'primeng/api';
                 </button>
             </app-dialog-footer>
         </app-standard-dialog>
-    `
+    `,
 })
 export class UpdateRoleModalComponent {
-    @Input() role: any;        // minimal shape: { id, name, description, tenantId }
+    @Input() role: any; // minimal shape: { id, name, description, tenantId }
     @Input() tenantId!: string;
 
     constructor(
         public activeModal: NgbActiveModal,
         private roleService: RoleService,
-        private messageService: MessageService
+        private messageService: MessageService,
     ) {}
 
     async onSave() {
@@ -74,12 +74,12 @@ export class UpdateRoleModalComponent {
             await this.roleService.updateRole(
                 this.role.id,
                 this.role.name,
-                this.role.description
+                this.role.description,
             );
             this.messageService.add({
                 severity: 'success',
                 summary: 'Role Updated',
-                detail: 'Role name/description updated successfully'
+                detail: 'Role name/description updated successfully',
             });
             // Return updated role object to the caller
             this.activeModal.close(this.role);
@@ -87,7 +87,7 @@ export class UpdateRoleModalComponent {
             this.messageService.add({
                 severity: 'error',
                 summary: 'Failed',
-                detail: 'Could not update role'
+                detail: 'Could not update role',
             });
         }
     }

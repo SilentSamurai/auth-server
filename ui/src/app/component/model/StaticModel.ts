@@ -1,96 +1,85 @@
-import {DataPushEventStatus, SortConfig} from "./DataModel";
-import {BaseDataModel} from "./BaseDataModel";
+import {
+    DataSource,
+    DataSourceEvents,
+    Query,
+    ReturnedData,
+    SortConfig,
+} from './DataModel';
+import { Filter } from './Filters';
+import { Observable, Subject } from 'rxjs';
 
+export class StaticModel<T> implements DataSource<T> {
+    private data: T[] = [];
+    private eventSubject = new Subject<DataSourceEvents>();
 
-export class StaticModel<T> extends BaseDataModel<T> {
-    protected override data: T[] = [];
-    private originalData: T[] = [];
-
-    constructor(keyFields: string[]) {
-        super(keyFields);
+    constructor(
+        protected _keyFields: string[],
+        initialData: T[] = [],
+    ) {
+        this.data = [...initialData];
     }
 
-    override hasPage(pageNo: number): boolean {
-        return pageNo === 0;
+    updates(): Observable<DataSourceEvents> {
+        return this.eventSubject;
     }
 
-    // override orderBy(orderBy: any[]) {
-    //     super.orderBy(orderBy);
-    //     this.apply({});
-    // }
-
-    override async apply(srcOptions: any): Promise<boolean> {
-        try {
-            // Apply sorting if orderBy is specified
-            if (this.getOrderBy() && this.getOrderBy().length > 0) {
-                await this.sortData();
-            } else {
-                // Reset to original data if no sorting
-                this.data = [...this.originalData];
-            }
-
-            this.emitDataEvent({
-                operation: DataPushEventStatus.UPDATED_DATA,
-                data: this.data,
-                pageNo: this.query.pageNo,
-                srcOptions
-            });
-            return true;
-        } catch (error) {
-            this.emitDataEvent({
-                operation: DataPushEventStatus.UPDATED_DATA,
-                pageNo: this.query.pageNo,
-                error: error instanceof Error ? error : new Error(String(error)),
-                srcOptions
-            });
-            return false;
-        } finally {
-
-        }
+    keyFields(): string[] {
+        return this._keyFields;
     }
 
-    override getData(): T[] {
-        return this.data;
+    setData(data: T[]): void {
+        this.data = [...data];
+        this.eventSubject.next({ type: 'data-updated', source: 'set' });
     }
 
     appendData(newData: T[]): void {
-        this.originalData.push(...newData);
         this.data.push(...newData);
-        this.apply({append: true});
+        this.eventSubject.next({ type: 'data-updated', source: 'append' });
     }
 
-    setData(newData: T[]): void {
-        this.originalData = [...newData];
-        this.data = [...newData];
-        this.apply({append: false});
+    async fetchData(query: Query): Promise<ReturnedData<T>> {
+        const start =
+            (query.pageNo ?? 0) * (query.pageSize ?? this.data.length);
+        const end = start + (query.pageSize ?? this.data.length);
+
+        let filteredData = this.applyFilters(this.data, query.filters ?? []);
+        let sortedData = this.applySorting(filteredData, query.orderBy ?? []);
+
+        let result = sortedData.slice(start, end);
+        return {
+            data: result,
+            count: result.length,
+            isLastPage: end >= filteredData.length,
+        };
     }
 
-    override totalRowCount(): number {
-        return this.originalData.length;
+    totalCount(query: Query): Promise<number> {
+        return Promise.resolve(this.data.length);
     }
 
-    private async sortData(): Promise<void> {
-        if (!this.getOrderBy() || this.getOrderBy().length === 0) {
-            return;
-        }
+    private applyFilters(data: T[], filters: Filter[]): T[] {
+        return data.filter((item) => {
+            return filters.every((filter) => {
+                const value = this.getNestedValue(item, filter.name);
+                return filter.matches(value);
+            });
+        });
+    }
 
-        // Create a new array for sorting to avoid mutating original
-        const sortedData = [...this.originalData];
+    private applySorting(data: T[], orderBy: SortConfig[]): T[] {
+        const sortedData = [...data];
 
         sortedData.sort((a, b) => {
-            for (const sort of this.getOrderBy()) {
-                const field = sort.field;
+            for (const sort of orderBy) {
+                const aValue = this.getNestedValue(a, sort.field);
+                const bValue = this.getNestedValue(b, sort.field);
                 const direction = sort.order === 'asc' ? 1 : -1;
 
-                const aValue = this.getNestedValue(a, field);
-                const bValue = this.getNestedValue(b, field);
-
                 if (aValue === bValue) continue;
-
                 if (aValue === null || aValue === undefined) return direction;
                 if (bValue === null || bValue === undefined) return -direction;
 
-                if (typeof aValue === 'string') {
+                if (typeof aValue === 'string' && typeof bValue === 'string') {
                     return direction * aValue.localeCompare(bValue);
                 }
 
@@ -99,12 +88,16 @@ export class StaticModel<T> extends BaseDataModel<T> {
             return 0;
         });
 
-        this.data = sortedData;
+        return sortedData;
     }
 
     private getNestedValue(obj: any, path: string): any {
-        return path.split('.').reduce((current, key) =>
-            current && current[key] !== undefined ? current[key] : null, obj);
+        return path
+            .split('.')
+            .reduce(
+                (acc, part) =>
+                    acc && acc[part] !== undefined ? acc[part] : null,
+                obj,
+            );
     }
 }
-

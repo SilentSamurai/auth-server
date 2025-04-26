@@ -1,5 +1,4 @@
-import {Operator, Operators} from "./Operator";
-
+import { Operator } from './Operator';
 
 export class Filter {
     name: string;
@@ -7,7 +6,12 @@ export class Filter {
     value: string;
     operator: Operator;
 
-    constructor(name: string, label: string, value: string, operator: Operator) {
+    constructor(
+        name: string,
+        label: string,
+        value: string,
+        operator: Operator,
+    ) {
         this.name = name;
         this.label = label;
         this.value = value;
@@ -20,6 +24,10 @@ export class Filter {
             label: this.label,
             value: this.value,
             operator: this.operator.label,
-        }
+        };
+    }
+
+    matches(otherValue: any): boolean {
+        return this.operator.compare(otherValue?.toString() || '', this.value);
     }
 }

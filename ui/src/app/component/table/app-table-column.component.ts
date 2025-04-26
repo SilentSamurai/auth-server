@@ -1,6 +1,11 @@
-import {Component, Input, OnInit, TemplateRef, ViewChild} from "@angular/core";
-import {Util} from "../util/utils";
-
+import {
+    Component,
+    Input,
+    OnInit,
+    TemplateRef,
+    ViewChild,
+} from '@angular/core';
+import { Util } from '../util/utils';
 
 @Component({
     selector: 'app-table-col',
@@ -12,7 +17,6 @@ import {Util} from "../util/utils";
     styles: [],
 })
 export class TableColumnComponent implements OnInit {
-
     @Input() label: string = '';
     @Input() name: string = '';
     @Input() field: string = '';
@@ -22,10 +26,9 @@ export class TableColumnComponent implements OnInit {
     @Input() template?: TemplateRef<any>;
     @Input() sortable: boolean = true;
 
-    @ViewChild('TBCLCH', {static: true}) templateRef!: TemplateRef<any>;
+    @ViewChild('TBCLCH', { static: true }) templateRef!: TemplateRef<any>;
 
-    constructor() {
-    }
+    constructor() {}
 
     async ngOnInit(): Promise<void> {
         if (typeof this.isId === 'string') {

@@ -1,26 +1,25 @@
-import {Injectable} from '@angular/core';
-import jwt_decode from "jwt-decode";
-import {Router} from "@angular/router";
-import {PureAbility} from "@casl/ability";
-import {DecodedToken} from "../model/user.model";
-import {TokenVerificationService} from './token-verification.service';
-import {PKCEService} from './pkce.service';
+import { Injectable } from '@angular/core';
+import jwt_decode from 'jwt-decode';
+import { Router } from '@angular/router';
+import { PureAbility } from '@casl/ability';
+import { DecodedToken } from '../model/user.model';
+import { TokenVerificationService } from './token-verification.service';
+import { PKCEService } from './pkce.service';
 
 const TOKEN_KEY = 'auth-token';
 const AUTH_CODE_KEY = 'auth-code';
 const PERMISSIONS_KEY = 'auth-permissions';
 
 @Injectable({
-    providedIn: 'root'
+    providedIn: 'root',
 })
 export class SessionService {
     constructor(
         private router: Router,
         private ability: PureAbility,
         private tokenVerificationService: TokenVerificationService,
-        private pkceService: PKCEService
-    ) {
-    }
+        private pkceService: PKCEService,
+    ) {}
 
     public clearSession(): void {
         window.sessionStorage.removeItem(TOKEN_KEY);
@@ -128,12 +127,16 @@ export class SessionService {
 
     public isSuperAdmin(): boolean {
         const user = this.getUser();
-        return user !== null && user.scopes.includes("SUPER_ADMIN");
+        return user !== null && user.scopes.includes('SUPER_ADMIN');
     }
 
     public isTenantAdmin(): boolean {
         const user = this.getUser();
-        return user !== null && (user.scopes.includes("TENANT_ADMIN") || user.scopes.includes("SUPER_ADMIN"));
+        return (
+            user !== null &&
+            (user.scopes.includes('TENANT_ADMIN') ||
+                user.scopes.includes('SUPER_ADMIN'))
+        );
     }
 
     public async getCodeChallenge(method: string): Promise<string> {
@@ -148,4 +151,3 @@ function tokenExpired(token: DecodedToken): boolean {
     const currentTs = Math.floor(Date.now() / 1000); // current time in seconds
     return token.exp <= currentTs;
 }
-

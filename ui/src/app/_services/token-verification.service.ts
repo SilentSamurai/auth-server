@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core';
-import jwt_decode from "jwt-decode";
+import jwt_decode from 'jwt-decode';
 import { DecodedToken } from '../model/user.model';
 
-
 @Injectable({
-    providedIn: 'root'
+    providedIn: 'root',
 })
 export class TokenVerificationService {
     verifyToken(token: string): boolean {
@@ -63,4 +62,4 @@ export class TokenVerificationService {
     private verifyScopes(scopes: string[]): boolean {
         return Array.isArray(scopes) && scopes.length > 0;
     }
-} 
+}

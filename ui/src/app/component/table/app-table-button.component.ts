@@ -1,5 +1,4 @@
-import {Component, OnInit, TemplateRef, ViewChild} from "@angular/core";
-
+import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 
 @Component({
     selector: 'app-table-btn',
@@ -11,12 +10,9 @@ import {Component, OnInit, TemplateRef, ViewChild} from "@angular/core";
     styles: [],
 })
 export class AppTableButtonComponent implements OnInit {
+    @ViewChild('APPTBC', { static: true }) template!: TemplateRef<any>;
 
-    @ViewChild('APPTBC', {static: true}) template!: TemplateRef<any>;
+    constructor() {}
 
-    constructor() {
-    }
-
-    async ngOnInit(): Promise<void> {
-    }
+    async ngOnInit(): Promise<void> {}
 }

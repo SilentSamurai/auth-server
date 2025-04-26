@@ -6,13 +6,13 @@ import {
     OnInit,
     QueryList,
     TemplateRef,
-    ViewChild
+    ViewChild,
 } from '@angular/core';
 
 @Component({
     selector: 'app-op-section',
     template: `
-        <div class="row my-4" id="{{name.toUpperCase()}}" >
+        <div class="row my-4" id="{{ name.toUpperCase() }}">
             <div class="col-md-8">
                 <span class="h4 text-capitalize">{{ name }}</span>
             </div>
@@ -27,22 +27,19 @@ import {
         </div>
     `,
     styles: [''],
-    providers: []
+    providers: [],
 })
 export class ObjectPageSectionComponent implements OnInit {
-
-    @Input() name: string = "";
+    @Input() name: string = '';
 
     loading = true;
 
-    @ViewChild('OPSC', {static: true}) template!: TemplateRef<any>;
+    @ViewChild('OPSC', { static: true }) template!: TemplateRef<any>;
 
-    constructor() {
-    }
+    constructor() {}
 
     async ngOnInit() {
         this.loading = true;
         this.loading = false;
     }
-
 }
