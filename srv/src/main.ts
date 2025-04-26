@@ -1,10 +1,7 @@
+import { prepareApp, run } from "./setup";
 
-import {prepareApp, run} from "./setup";
-
-const os = require('os');
-const cluster = require('cluster');
-
-
+const os = require("os");
+const cluster = require("cluster");
 
 // async function main_muti_process() {
 //     Environment.setup();
@@ -38,9 +35,8 @@ const cluster = require('cluster');
 // }
 
 async function main() {
-
-    const app = await prepareApp();
-    await run(app);
+  const app = await prepareApp();
+  await run(app);
 }
 
 main().catch(console.error);
