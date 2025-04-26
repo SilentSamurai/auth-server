@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 
 /**
  * Service for handling PKCE (Proof Key for Code Exchange) functionality.
@@ -10,18 +10,12 @@ import { Injectable } from '@angular/core';
 export class PKCEService {
     private readonly CODE_VERIFIER_KEY = 'code-verifier';
 
-    /**
-     * Generate a random code verifier.
-     * This method creates a cryptographically secure random string to be used as a code verifier.
-     * @returns A randomly generated code verifier string
-     */
     public generateCodeVerifier(): string {
         const array = new Uint32Array(56 / 2);
         const verifier = window.crypto.getRandomValues(array);
-        const codeVerifier = Array.from(array, (dec) =>
+        return Array.from(array, (dec) =>
             ('0' + dec.toString(16)).substr(-2),
         ).join('');
-        return codeVerifier;
     }
 
     public getCodeVerifier(): string {
