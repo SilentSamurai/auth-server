@@ -4,9 +4,10 @@ import {
     DataSource,
     DataSourceEvents,
     Query,
-    ReturnedData, IQueryConfig,
+    ReturnedData,
+    IQueryConfig,
 } from './IDataModel';
-import {Observable, Subscription} from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 
 // Helper function to create a stable string representation of the query for caching
 function getQueryCacheKey(query: Query): string {
@@ -15,7 +16,7 @@ function getQueryCacheKey(query: Query): string {
         pageNo: query.pageNo ?? 0,
         pageSize: query.pageSize ?? 10, // Use default or actual
         filters: query.filters
-            ? [...query.filters].sort((a, b) => a.name.localeCompare(b.name))
+            ? [...query.filters].sort((a, b) => a.field.localeCompare(b.field))
             : [],
         orderBy: query.orderBy
             ? [...query.orderBy].sort((a, b) => a.field.localeCompare(b.field))

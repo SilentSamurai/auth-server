@@ -1,4 +1,9 @@
-import { DataSource, DataSourceEvents, Query, ReturnedData } from './IDataModel';
+import {
+    DataSource,
+    DataSourceEvents,
+    Query,
+    ReturnedData,
+} from './IDataModel';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { lastValueFrom, Observable, Subject } from 'rxjs';
 

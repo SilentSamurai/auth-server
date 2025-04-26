@@ -38,7 +38,7 @@ export class Operator {
 }
 
 export class Operators {
-    public static REGEX: Operator = new Operator('regex', '=*');
+    public static MATCHES: Operator = new Operator('matches', '=*');
     public static EQ: Operator = new Operator('equals', '=');
     public static GT: Operator = new Operator('greaterThan', '>');
     public static GTE: Operator = new Operator('greaterThanEqual', '>=');
@@ -46,6 +46,8 @@ export class Operators {
     public static LTE: Operator = new Operator('lessThanEquals', '<=');
     public static NEQ: Operator = new Operator('notEquals', '!=');
     public static CONTAINS: Operator = new Operator('contains', 'contains');
+    public static AND: Operator = new Operator('and', '&&');
+    public static OR: Operator = new Operator('or', '||');
 
     static ALL_OPERATORS: Operator[] = [
         Operators.EQ,
@@ -55,7 +57,7 @@ export class Operators {
         Operators.LTE,
         Operators.NEQ,
         Operators.CONTAINS,
-        Operators.REGEX,
+        Operators.MATCHES,
     ];
 
     static operatorFromLabel(label: string): Operator {
@@ -65,7 +67,7 @@ export class Operators {
         if (found && found.length > 0) {
             return found[0];
         }
-        return Operators.REGEX;
+        return Operators.MATCHES;
     }
 
     static operatorFromSymbol(symbol: string): Operator {
@@ -75,6 +77,6 @@ export class Operators {
         if (found && found.length > 0) {
             return found[0];
         }
-        return Operators.REGEX;
+        return Operators.MATCHES;
     }
 }

@@ -60,7 +60,7 @@ export class StaticModel<T> implements DataSource<T> {
     private applyFilters(data: T[], filters: Filter[]): T[] {
         return data.filter((item) => {
             return filters.every((filter) => {
-                const value = this.getNestedValue(item, filter.name);
+                const value = this.getNestedValue(item, filter.field);
                 return filter.matches(value);
             });
         });

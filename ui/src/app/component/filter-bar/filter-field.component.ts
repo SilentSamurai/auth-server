@@ -17,7 +17,7 @@ export class Condition {
 export class InternalFilter {
     name!: string;
     label!: string;
-    conditions: Condition[] = [new Condition(Operators.REGEX, '')];
+    conditions: Condition[] = [new Condition(Operators.MATCHES, '')];
 
     constructor(name: string, label: string) {
         this.name = name;
