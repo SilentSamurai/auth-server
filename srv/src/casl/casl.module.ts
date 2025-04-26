@@ -1,4 +1,4 @@
-import {Module} from '@nestjs/common';
+import {Module} from "@nestjs/common";
 import {TypeOrmModule} from "@nestjs/typeorm";
 import {Role} from "../entity/role.entity";
 import {UserRole} from "../entity/user.roles.entity";
@@ -17,15 +17,36 @@ import {Policy} from "../entity/authorization.entity";
 import {PolicyService} from "./policy.service";
 import {CacheService} from "./cache.service";
 
-@Module(
-    {
-        imports: [
-            ConfigModule,
-            TypeOrmModule.forFeature([Tenant, User, TenantMember, Role, UserRole, AuthCode, Group, GroupRole, GroupUser, Policy])
-        ],
-        controllers: [],
-        providers: [SecurityService, CaslAbilityFactory, AuthUserService, PolicyService, CacheService ],
-        exports: [SecurityService, CaslAbilityFactory, AuthUserService, PolicyService, CacheService ]
-    })
-export class CaslModule {
-}
+@Module({
+    imports: [
+        ConfigModule,
+        TypeOrmModule.forFeature([
+            Tenant,
+            User,
+            TenantMember,
+            Role,
+            UserRole,
+            AuthCode,
+            Group,
+            GroupRole,
+            GroupUser,
+            Policy,
+        ]),
+    ],
+    controllers: [],
+    providers: [
+        SecurityService,
+        CaslAbilityFactory,
+        AuthUserService,
+        PolicyService,
+        CacheService,
+    ],
+    exports: [
+        SecurityService,
+        CaslAbilityFactory,
+        AuthUserService,
+        PolicyService,
+        CacheService,
+    ],
+})
+export class CaslModule {}

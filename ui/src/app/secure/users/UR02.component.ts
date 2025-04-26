@@ -1,14 +1,14 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { EditUserModalComponent } from './dialogs/edit-user.modal.component';
-import { UserService } from '../../_services/user.service';
-import { lastValueFrom } from 'rxjs';
-import { ConfirmationService } from '../../component/dialogs/confirmation.service';
-import { MessageService } from 'primeng/api';
-import { Location } from '@angular/common';
-import { AuthDefaultService } from '../../_services/auth.default.service';
-import { StaticModel } from '../../component/model/StaticModel';
+import {Component, OnInit} from '@angular/core';
+import {ActivatedRoute} from '@angular/router';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {EditUserModalComponent} from './dialogs/edit-user.modal.component';
+import {UserService} from '../../_services/user.service';
+import {lastValueFrom} from 'rxjs';
+import {ConfirmationService} from '../../component/dialogs/confirmation.service';
+import {MessageService} from 'primeng/api';
+import {Location} from '@angular/common';
+import {AuthDefaultService} from '../../_services/auth.default.service';
+import {StaticModel} from '../../component/model/StaticModel';
 
 @Component({
     selector: 'tenant-details',
@@ -36,7 +36,7 @@ import { StaticModel } from '../../component/model/StaticModel';
                                 type="checkbox"
                                 value=""
                                 [(ngModel)]="user.verified"
-                                [ngModelOptions]="{ standalone: true }"
+                                [ngModelOptions]="{standalone: true}"
                             />
                             <app-button-link
                                 *ngIf="!user.verified"

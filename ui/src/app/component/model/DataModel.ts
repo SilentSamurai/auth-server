@@ -1,126 +1,175 @@
-import { Filter } from './Filters';
-import { Observable } from 'rxjs';
+import {
+    IDataModel,
+    DataModelStatus,
+    DataSource,
+    DataSourceEvents,
+    Query,
+    ReturnedData,
+    IQueryConfig,
+} from './IDataModel';
+import {Observable, Subscription} from 'rxjs';
 
-export interface SortConfig {
-    field: string;
-    order: 'asc' | 'desc';
+// Helper function to create a stable string representation of the query for caching
+function getQueryCacheKey(query: Query): string {
+    // Ensure consistent property order for reliable caching
+    const keyObject = {
+        pageNo: query.pageNo ?? 0,
+        pageSize: query.pageSize ?? 10, // Use default or actual
+        filters: query.filters
+            ? [...query.filters].sort((a, b) => a.field.localeCompare(b.field))
+            : [],
+        orderBy: query.orderBy
+            ? [...query.orderBy].sort((a, b) => a.field.localeCompare(b.field))
+            : [],
+        expand: query.expand ? [...query.expand].sort() : [],
+    };
+    return JSON.stringify(keyObject);
 }
 
-export interface ReturnedData<T> {
+interface CachedValue<T> {
     data: T[];
-    count?: number;
+    count: number;
     isLastPage: boolean;
 }
 
-export interface DataSource<T> {
-    fetchData(query: IQuery): Promise<ReturnedData<T>>;
+export class DataModel<T> implements IDataModel<T> {
+    protected status: DataModelStatus = {
+        loading: false,
+        isLastPageReached: false,
+    };
+    protected queryCache = new Map<string, CachedValue<T>>();
+    protected maxCacheSize = 10;
+    totalCount: number | null = null; // Total count might vary based on filters
+    private subscription: Subscription;
 
-    totalCount(query: IQuery): Promise<number>;
-
-    keyFields(): string[];
-
-    updates(): Observable<DataSourceEvents>;
-}
-
-export interface DataModelStatus {
-    loading: boolean;
-    error?: string;
-    isLastPageReached: boolean;
-}
-
-export interface DataSourceEvents {
-    type: 'data-updated' | 'unknown';
-    source: string;
-    data?: any;
-}
-
-export interface IQuery {
-    pageNo?: number;
-    pageSize?: number;
-    filters?: Filter[];
-    orderBy?: SortConfig[];
-    expand?: string[];
-}
-
-export class Query implements IQuery {
-    private _pageNo: number = 0;
-    private _pageSize: number = 50;
-    private _filters: Filter[] = [];
-    private _orderBy: SortConfig[] = [];
-    private _expand: string[] = [];
-
-    constructor(config: IQuery) {
-        this.update(config);
+    public constructor(protected _dataSource: DataSource<T>) {
+        this.subscription = this._dataSource.updates().subscribe((x) => {
+            if (x.type == 'data-updated') {
+                this.reset();
+            }
+        });
     }
 
-    public update(config: IQuery) {
-        if (config.pageNo !== undefined) this.pageNo = config.pageNo;
-        if (config.pageSize !== undefined) this.pageSize = config.pageSize;
-        if (config.filters) this.filters = config.filters;
-        if (config.orderBy) this.orderBy = config.orderBy;
-        if (config.expand) this.expand = config.expand;
-        return this;
+    dataSourceEvents(): Observable<DataSourceEvents> {
+        return this.dataSource().updates();
     }
 
-    get pageNo(): number {
-        return this._pageNo;
+    dataSource(): DataSource<T> {
+        return this._dataSource;
     }
 
-    set pageNo(value: number) {
-        this._pageNo = value;
+    getStatus(): DataModelStatus {
+        return this.status;
     }
 
-    get pageSize(): number {
-        return this._pageSize;
-    }
-
-    set pageSize(value: number) {
-        if (value < 0) {
-            console.warn('Negative number not allowed in page size');
-            return;
+    hasPage(pageNo: number, pageSize: number): boolean {
+        if (pageNo === 0) {
+            return true; // Always assume page 0 exists
         }
-        this._pageSize = value;
+        if (this.totalCount == null || isNaN(this.totalCount)) {
+            return false;
+        }
+        const pageCount = Math.ceil(this.totalCount / pageSize);
+        return pageNo < pageCount;
     }
 
-    get filters(): Filter[] {
-        return this._filters;
+    totalRowCount(): number {
+        if (this.totalCount == null || isNaN(this.totalCount)) {
+            return 0;
+        }
+        return this.totalCount;
     }
 
-    set filters(value: Filter[]) {
-        this._filters = value.filter(
-            (item) => item.value != null && item.value.length > 0,
-        );
+    // execute(): Observable<DataPushEvent<T>> {
+    //     this.debounceTrigger$.next();
+    //     return this.debouncedExecution$;
+    // }
+
+    async execute(query: Query): Promise<ReturnedData<T>> {
+        return await this.apply(query);
     }
 
-    get orderBy(): SortConfig[] {
-        return this._orderBy;
+    private isLastPage(pageNo: number, pageSize: number) {
+        if (this.totalCount != null && !isNaN(this.totalCount)) {
+            const pageCount = Math.ceil(this.totalCount / pageSize);
+            return pageNo + 1 >= pageCount;
+        }
+        return true;
     }
 
-    set orderBy(value: SortConfig[]) {
-        this._orderBy = value;
+    // Check if the result for a specific query is cached
+    private isCached(queryKey: string): boolean {
+        return this.queryCache.has(queryKey);
     }
 
-    get expand(): string[] {
-        return this._expand;
+    // Cache the result for a specific query
+    private cacheQueryResult(queryKey: string, data: CachedValue<T>) {
+        if (this.queryCache.size >= this.maxCacheSize) {
+            // Evict the oldest entry (Map preserves insertion order)
+            const oldestKey = this.queryCache.keys().next().value;
+            this.queryCache.delete(oldestKey);
+        }
+        this.queryCache.set(queryKey, data);
     }
 
-    set expand(value: string[]) {
-        this._expand = value;
+    private async apply(query: Query): Promise<ReturnedData<T>> {
+        const queryKey = getQueryCacheKey(query);
+        const page = query.pageNo ?? 0;
+        const pageSize = query.pageSize ?? 10;
+
+        if (this.isCached(queryKey)) {
+            // Return cached data, update status if needed
+            const cachedResult = this.queryCache.get(queryKey)!;
+            this.status.isLastPageReached = cachedResult.isLastPage;
+            return cachedResult;
+        }
+
+        this.status.loading = true;
+
+        try {
+            // Fetch total count only if it's unknown for the current filter context
+            if (this.totalCount == null || isNaN(this.totalCount)) {
+                this.totalCount = await this._dataSource.totalCount(query);
+            }
+
+            // Fetch the actual data
+            let rd = await this._dataSource.fetchData(query);
+            let data = rd.data;
+
+            // Determine if this is the last page based on fetched data and total count
+            const isEmpty = data.length === 0;
+            const isLastPageBasedOnFetch = isEmpty || data.length < pageSize;
+            const isLastPageBasedOnTotal = this.isLastPage(page, pageSize);
+            const isLastPage = isLastPageBasedOnFetch || isLastPageBasedOnTotal;
+
+            const result: CachedValue<T> = {
+                data: data,
+                count: data.length,
+                isLastPage: isLastPage,
+            };
+
+            this.cacheQueryResult(queryKey, result);
+            this.status.isLastPageReached = isLastPage;
+
+            return result;
+        } catch (error: any) {
+            console.error('Error executing query:', error);
+            this.status.error = error.message || 'fetch error';
+            throw error;
+        } finally {
+            this.status.loading = false;
+        }
     }
-}
 
-export interface DataModel<T> {
-    execute(query: IQuery): Promise<ReturnedData<T>>;
+    reset(): void {
+        this.totalCount = null;
+        this.queryCache.clear(); // Clear the query cache
+        this.status.isLastPageReached = false;
+        this.status.loading = false;
+        this.status.error = undefined;
+    }
 
-    hasPage(pageNo: number, pageSize: number): boolean;
-
-    getStatus(): DataModelStatus;
-
-    totalRowCount(): number;
-
-    reset(): void;
-
-    dataSource(): DataSource<T>;
-
-    dataSourceEvents(): Observable<DataSourceEvents>;
+    destroy() {
+        this.subscription.unsubscribe();
+    }
 }

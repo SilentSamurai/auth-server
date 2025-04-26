@@ -1,17 +1,17 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { MessageService } from 'primeng/api';
-import { TenantService } from '../../_services/tenant.service';
-import { SessionService } from '../../_services/session.service';
-import { UpdateTenantComponent } from './dialogs/update-tenant.component';
-import { AddMemberComponent } from './dialogs/add-member.component';
-import { AddRoleComponent } from './dialogs/add-role.component';
-import { AuthDefaultService } from '../../_services/auth.default.service';
-import { ConfirmationService } from '../../component/dialogs/confirmation.service';
-import { Location } from '@angular/common';
-import { DataSource } from '../../component/model/DataModel';
-import { StaticModel } from '../../component/model/StaticModel';
+import {Component, OnInit} from '@angular/core';
+import {ActivatedRoute, Router} from '@angular/router';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {MessageService} from 'primeng/api';
+import {TenantService} from '../../_services/tenant.service';
+import {SessionService} from '../../_services/session.service';
+import {UpdateTenantComponent} from './dialogs/update-tenant.component';
+import {AddMemberComponent} from './dialogs/add-member.component';
+import {AddRoleComponent} from './dialogs/add-role.component';
+import {AuthDefaultService} from '../../_services/auth.default.service';
+import {ConfirmationService} from '../../component/dialogs/confirmation.service';
+import {Location} from '@angular/common';
+import {DataSource} from '../../component/model/IDataModel';
+import {StaticModel} from '../../component/model/StaticModel';
 
 @Component({
     selector: 'view-tenant',

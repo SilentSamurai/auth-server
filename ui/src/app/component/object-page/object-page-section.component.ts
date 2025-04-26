@@ -34,7 +34,7 @@ export class ObjectPageSectionComponent implements OnInit {
 
     loading = true;
 
-    @ViewChild('OPSC', { static: true }) template!: TemplateRef<any>;
+    @ViewChild('OPSC', {static: true}) template!: TemplateRef<any>;
 
     constructor() {}
 

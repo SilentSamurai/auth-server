@@ -1,10 +1,10 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import jwt_decode from 'jwt-decode';
-import { Router } from '@angular/router';
-import { PureAbility } from '@casl/ability';
-import { DecodedToken } from '../model/user.model';
-import { TokenVerificationService } from './token-verification.service';
-import { PKCEService } from './pkce.service';
+import {Router} from '@angular/router';
+import {PureAbility} from '@casl/ability';
+import {DecodedToken} from '../model/user.model';
+import {TokenVerificationService} from './token-verification.service';
+import {PKCEService} from './pkce.service';
 
 const TOKEN_KEY = 'auth-token';
 const AUTH_CODE_KEY = 'auth-code';

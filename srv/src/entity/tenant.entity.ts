@@ -1,4 +1,12 @@
-import {Column, CreateDateColumn, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn} from "typeorm";
+import {
+    Column,
+    CreateDateColumn,
+    Entity,
+    JoinTable,
+    ManyToMany,
+    OneToMany,
+    PrimaryGeneratedColumn,
+} from "typeorm";
 import {Role} from "./role.entity";
 import {Exclude} from "class-transformer";
 import {User} from "./user.entity";
@@ -34,12 +42,12 @@ export class Tenant {
     @Exclude()
     publicKey: string;
 
-    @Column({nullable: false, name: 'allow_sign_up', default: false})
+    @Column({nullable: false, name: "allow_sign_up", default: false})
     allowSignUp: boolean;
 
-    @OneToMany(type => Role, role => role.tenant, {
+    @OneToMany((type) => Role, (role) => role.tenant, {
         cascade: true,
-        onDelete: "CASCADE"
+        onDelete: "CASCADE",
     })
     roles: Role[];
 
@@ -48,21 +56,21 @@ export class Tenant {
         name: "tenant_members",
         joinColumn: {
             name: "tenant_id",
-            referencedColumnName: "id"
+            referencedColumnName: "id",
         },
         inverseJoinColumn: {
             name: "user_id",
-            referencedColumnName: "id"
-        }
+            referencedColumnName: "id",
+        },
     })
     members: User[];
 
     @CreateDateColumn({name: "created_at"})
     createdAt: Date;
 
-    @OneToMany(type => Group, group => group.tenant, {
+    @OneToMany((type) => Group, (group) => group.tenant, {
         cascade: true,
-        onDelete: "CASCADE"
+        onDelete: "CASCADE",
     })
     groups: Group[];
 }

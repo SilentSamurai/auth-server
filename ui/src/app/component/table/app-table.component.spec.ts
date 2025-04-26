@@ -1,12 +1,12 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { AppTableComponent } from './app-table.component';
-import { Component, ViewChild } from '@angular/core';
-import { CheckboxModule } from 'primeng/checkbox';
-import { RadioButtonModule } from 'primeng/radiobutton';
-import { SkeletonModule } from 'primeng/skeleton';
-import { StaticModel } from '../model/StaticModel';
-import { FormsModule } from '@angular/forms';
-import { ComponentModule } from '../component.module';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {AppTableComponent} from './app-table.component';
+import {Component, ViewChild} from '@angular/core';
+import {CheckboxModule} from 'primeng/checkbox';
+import {RadioButtonModule} from 'primeng/radiobutton';
+import {SkeletonModule} from 'primeng/skeleton';
+import {StaticModel} from '../model/StaticModel';
+import {FormsModule} from '@angular/forms';
+import {ComponentModule} from '../component.module';
 
 function timeout(ms: number): Promise<any> {
     return new Promise((resolve) => setTimeout(resolve, ms));
@@ -22,7 +22,7 @@ function timeout(ms: number): Promise<any> {
     `,
 })
 class TestHostComponent {
-    dataSource = new StaticModel(['id'], [{ id: 1, name: 'Item 1' }]);
+    dataSource = new StaticModel(['id'], [{id: 1, name: 'Item 1'}]);
 
     @ViewChild(AppTableComponent) tableComponent!: AppTableComponent;
 }

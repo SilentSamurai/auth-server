@@ -1,13 +1,13 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {
     ActivatedRouteSnapshot,
     Router,
     RouterStateSnapshot,
     UrlTree,
 } from '@angular/router';
-import { Observable } from 'rxjs';
-import { SessionService } from '../_services/session.service';
-import { AuthDefaultService } from '../_services/auth.default.service';
+import {Observable} from 'rxjs';
+import {SessionService} from '../_services/session.service';
+import {AuthDefaultService} from '../_services/auth.default.service';
 import {
     Actions,
     PermissionService,
@@ -37,7 +37,7 @@ export class TenantAdminAuthGuardService {
             !this.permissionService.isAuthorized(
                 Actions.Manage,
                 Subjects.TENANT,
-                { tenantId },
+                {tenantId},
             )
         ) {
             return true;
@@ -85,7 +85,7 @@ export class TenantAccessAuthGuard {
             !this.permissionService.isAuthorized(
                 Actions.Read,
                 Subjects.TENANT,
-                { tenantId },
+                {tenantId},
             )
         ) {
             return true;

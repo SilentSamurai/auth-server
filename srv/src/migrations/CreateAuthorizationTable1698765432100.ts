@@ -1,50 +1,58 @@
-import {MigrationInterface, QueryRunner, Table, TableForeignKey, TableIndex} from 'typeorm';
+import {
+    MigrationInterface,
+    QueryRunner,
+    Table,
+    TableForeignKey,
+    TableIndex,
+} from "typeorm";
 
-export class CreateAuthorizationTable1698765432100 implements MigrationInterface {
+export class CreateAuthorizationTable1698765432100
+    implements MigrationInterface
+{
     public async up(queryRunner: QueryRunner): Promise<void> {
         const DB_STRING_TYPE = "VARCHAR";
         const DB_UUID_GENERATOR = "uuid_generate_v4()";
         // Create the policy table
         await queryRunner.createTable(
             new Table({
-                name: 'authorization',
+                name: "authorization",
                 columns: [
                     {
-                        name: 'id',
+                        name: "id",
                         type: DB_STRING_TYPE,
-                        length: '36',
+                        length: "36",
                         isPrimary: true,
                         default: DB_UUID_GENERATOR,
-                        generationStrategy: 'uuid',
+                        generationStrategy: "uuid",
                     },
                     {
-                        name: 'role_id',
+                        name: "role_id",
                         type: DB_STRING_TYPE,
                         isNullable: false,
                     },
                     {
-                        name: 'tenant_id',
+                        name: "tenant_id",
                         type: DB_STRING_TYPE,
                         isNullable: false,
                     },
                     {
-                        name: 'effect',
-                        type: 'varchar',
+                        name: "effect",
+                        type: "varchar",
                         isNullable: false,
                     },
                     {
-                        name: 'action',
-                        type: 'varchar',
+                        name: "action",
+                        type: "varchar",
                         isNullable: false,
                     },
                     {
-                        name: 'subject',
-                        type: 'varchar',
+                        name: "subject",
+                        type: "varchar",
                         isNullable: false,
                     },
                     {
-                        name: 'conditions',
-                        type: 'json',
+                        name: "conditions",
+                        type: "json",
                         isNullable: true,
                     },
                 ],
@@ -54,55 +62,67 @@ export class CreateAuthorizationTable1698765432100 implements MigrationInterface
 
         // Create indexes
         await queryRunner.createIndex(
-            'authorization',
+            "authorization",
             new TableIndex({
-                name: 'IDX_AUTHORIZATION_ROLE_ID',
-                columnNames: ['role_id'],
+                name: "IDX_AUTHORIZATION_ROLE_ID",
+                columnNames: ["role_id"],
             }),
         );
 
         await queryRunner.createIndex(
-            'authorization',
+            "authorization",
             new TableIndex({
-                name: 'IDX_AUTHORIZATION_ROLE_TENANT',
-                columnNames: ['role_id', 'tenant_id'],
+                name: "IDX_AUTHORIZATION_ROLE_TENANT",
+                columnNames: ["role_id", "tenant_id"],
             }),
         );
 
         // Create foreign keys
         await queryRunner.createForeignKey(
-            'authorization',
+            "authorization",
             new TableForeignKey({
-                name: 'FK_AUTHORIZATION_ROLE',
-                columnNames: ['role_id'],
-                referencedTableName: 'roles',
-                referencedColumnNames: ['id'],
-                onDelete: 'CASCADE',
+                name: "FK_AUTHORIZATION_ROLE",
+                columnNames: ["role_id"],
+                referencedTableName: "roles",
+                referencedColumnNames: ["id"],
+                onDelete: "CASCADE",
             }),
         );
 
         await queryRunner.createForeignKey(
-            'authorization',
+            "authorization",
             new TableForeignKey({
-                name: 'FK_AUTHORIZATION_TENANT',
-                columnNames: ['tenant_id'],
-                referencedTableName: 'tenants', // Assuming the table name is 'tenants'
-                referencedColumnNames: ['id'],
-                onDelete: 'CASCADE',
+                name: "FK_AUTHORIZATION_TENANT",
+                columnNames: ["tenant_id"],
+                referencedTableName: "tenants", // Assuming the table name is 'tenants'
+                referencedColumnNames: ["id"],
+                onDelete: "CASCADE",
             }),
         );
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
         // Drop foreign keys first
-        await queryRunner.dropForeignKey('authorization', 'FK_AUTHORIZATION_TENANT');
-        await queryRunner.dropForeignKey('authorization', 'FK_AUTHORIZATION_ROLE');
+        await queryRunner.dropForeignKey(
+            "authorization",
+            "FK_AUTHORIZATION_TENANT",
+        );
+        await queryRunner.dropForeignKey(
+            "authorization",
+            "FK_AUTHORIZATION_ROLE",
+        );
 
         // Drop indexes
-        await queryRunner.dropIndex('authorization', 'IDX_AUTHORIZATION_ROLE_TENANT');
-        await queryRunner.dropIndex('authorization', 'IDX_AUTHORIZATION_ROLE_ID');
+        await queryRunner.dropIndex(
+            "authorization",
+            "IDX_AUTHORIZATION_ROLE_TENANT",
+        );
+        await queryRunner.dropIndex(
+            "authorization",
+            "IDX_AUTHORIZATION_ROLE_ID",
+        );
 
         // Drop the table
-        await queryRunner.dropTable('authorization');
+        await queryRunner.dropTable("authorization");
     }
 }

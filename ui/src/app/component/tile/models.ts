@@ -1,4 +1,4 @@
-import { PermissionService } from '../../_services/permission.service';
+import {PermissionService} from '../../_services/permission.service';
 
 /**
  * Optional function type for permission checks on tiles.
@@ -84,7 +84,7 @@ export class Tile {
         }
     }
 
-    findSize(size: string): { width: string; height: string } {
+    findSize(size: string): {width: string; height: string} {
         if (size === 'sm') {
             return sizeMap.sm;
         }

@@ -1,20 +1,21 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { UserService } from '../../_services/user.service';
-import { SessionService } from '../../_services/session.service';
-import { ActivatedRoute, Router } from '@angular/router';
-import { AuthService } from '../../_services/auth.service';
-import { AuthDefaultService } from '../../_services/auth.default.service';
+import {Component, Input, OnInit} from '@angular/core';
+import {SessionService} from '../../_services/session.service';
+import {ActivatedRoute, Router} from '@angular/router';
+import {AuthService} from '../../_services/auth.service';
+import {AuthDefaultService} from '../../_services/auth.default.service';
 import {
     PermissionService,
     Actions,
     Subjects,
 } from '../../_services/permission.service';
-import { TileGroup } from './models';
+import {TileGroup} from './models';
 
 @Component({
     selector: 'app-launchpad',
     template: `
-        <div class="container-fluid mb-2 px-4 shadow-sm launchpad-container">
+        <div
+            class="container-fluid mb-2 px-4 shadow-sm launchpad-container sticky-top bg-body"
+        >
             <ul class="nav nav-tabs nav-tab-btn ">
                 <ng-container *ngFor="let group of groups">
                     <li class="nav-item " *ngIf="group.hasVisibleTile()">
@@ -54,7 +55,13 @@ import { TileGroup } from './models';
             }
 
             .nav-tab-btn:focus {
+                border: 0;
+                /*border-color: var(--bs-body-color);*/
                 border-bottom: 0.25rem solid var(--bs-primary);
+            }
+
+            .nav-tab-btn {
+                border: 0;
             }
 
             .nav-tab-btn {
@@ -73,7 +80,6 @@ export class LaunchPadComponent implements OnInit {
     groups: TileGroup[] = [];
 
     constructor(
-        private userService: UserService,
         private router: Router,
         private route: ActivatedRoute,
         private authService: AuthService,
@@ -87,7 +93,7 @@ export class LaunchPadComponent implements OnInit {
     doScroll(elementId: string) {
         const element = document.getElementById(elementId);
         if (element) {
-            element.scrollIntoView({ behavior: 'smooth' });
+            element.scrollIntoView({behavior: 'smooth'});
         }
     }
 }

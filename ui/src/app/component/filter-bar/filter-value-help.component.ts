@@ -1,7 +1,7 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { Operators } from '../model/Operator';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { InternalFilter } from './filter-field.component';
+import {Component, Input, OnInit} from '@angular/core';
+import {Operators} from '../model/Operator';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {InternalFilter} from './filter-field.component';
 
 @Component({
     selector: 'app-fvh',

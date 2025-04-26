@@ -7,7 +7,7 @@ import {
     Patch,
     Request,
     UseGuards,
-    UseInterceptors
+    UseInterceptors,
 } from "@nestjs/common";
 import {Environment} from "../config/environment.service";
 import {TenantService} from "../services/tenant.service";
@@ -22,48 +22,55 @@ import {Action} from "../casl/actions.enum";
 import {subject} from "@casl/ability";
 import {SubjectEnum} from "../entity/subjectEnum";
 
-@Controller('api/role')
+@Controller("api/role")
 @UseInterceptors(ClassSerializerInterceptor)
 export class RoleControllerV2 {
-
     constructor(
         private readonly configService: Environment,
         private readonly tenantService: TenantService,
         private readonly userService: UsersService,
         private readonly roleService: RoleService,
-        private readonly securityService: SecurityService
-    ) {
-    }
+        private readonly securityService: SecurityService,
+    ) {}
 
     static UpdateRoleSchema = yup.object().shape({
-        name: yup.string().required('name is required'),
-        description: yup.string().required('description is required'),
-    })
+        name: yup.string().required("name is required"),
+        description: yup.string().required("description is required"),
+    });
 
-    @Patch('/:roleId')
+    @Patch("/:roleId")
     @UseGuards(JwtAuthGuard)
     async updateRoleDescription(
         @Request() request: any,
-        @Param('roleId') roleId: string,
-        @Body(new ValidationPipe(RoleControllerV2.UpdateRoleSchema)) body: { name: string, description: string }
+        @Param("roleId") roleId: string,
+        @Body(new ValidationPipe(RoleControllerV2.UpdateRoleSchema))
+        body: {name: string; description: string},
     ): Promise<Role> {
-        return this.roleService.updateRole(request, roleId, body.name, body.description);
+        return this.roleService.updateRole(
+            request,
+            roleId,
+            body.name,
+            body.description,
+        );
     }
 
-    @Get('/:roleId')
+    @Get("/:roleId")
     @UseGuards(JwtAuthGuard)
     async getRole(
         @Request() request,
-        @Param('roleId') roleId: string
+        @Param("roleId") roleId: string,
     ): Promise<any> {
         const role = await this.roleService.findById(request, roleId);
         const tenant = role.tenant;
-        this.securityService.check(request, Action.Read, subject(SubjectEnum.TENANT, tenant));
+        this.securityService.check(
+            request,
+            Action.Read,
+            subject(SubjectEnum.TENANT, tenant),
+        );
         let users = await this.userService.findByRole(request, role);
         return {
             role: role,
-            users: users
-        }
+            users: users,
+        };
     }
-
 }

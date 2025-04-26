@@ -1,4 +1,4 @@
-import { ConsoleLogger, LogLevel } from '@nestjs/common';
+import {ConsoleLogger, LogLevel} from "@nestjs/common";
 import * as os from "node:os";
 import * as worker_threads from "node:worker_threads";
 
@@ -17,19 +17,21 @@ export class JsonConsoleLogger extends ConsoleLogger {
         pidMessage: string,
         formattedLogLevel: string,
         contextMessage: string,
-        timestampDiff: string
+        timestampDiff: string,
     ): string {
-        return JSON.stringify({
-            "@timestamp": new Date().toISOString(), // Standardized timestamp
-            "@version": 1,
-            level: logLevel,
-            message: message instanceof Object ? message : String(message),
-            logger_name: contextMessage || undefined,
-            thread_name: worker_threads.threadId,
-            pid: Number(pidMessage.replace(/\D/g, "")) || undefined, // Extract number from pidMessage
-            host: os.hostname(), // Automatically capture hostname
-            app: "my-nest-app", // Replace with your app name
-            timestampDiff: timestampDiff || undefined, // Optional
-        }) + "\n";
+        return (
+            JSON.stringify({
+                "@timestamp": new Date().toISOString(), // Standardized timestamp
+                "@version": 1,
+                level: logLevel,
+                message: message instanceof Object ? message : String(message),
+                logger_name: contextMessage || undefined,
+                thread_name: worker_threads.threadId,
+                pid: Number(pidMessage.replace(/\D/g, "")) || undefined, // Extract number from pidMessage
+                host: os.hostname(), // Automatically capture hostname
+                app: "my-nest-app", // Replace with your app name
+                timestampDiff: timestampDiff || undefined, // Optional
+            }) + "\n"
+        );
     }
 }

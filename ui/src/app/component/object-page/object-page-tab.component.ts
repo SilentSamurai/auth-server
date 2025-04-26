@@ -22,7 +22,7 @@ export class ObjectPageTabComponent implements OnInit {
 
     loading = true;
 
-    @ViewChild('OPTC', { static: true }) template!: TemplateRef<any>;
+    @ViewChild('OPTC', {static: true}) template!: TemplateRef<any>;
 
     constructor() {}
 

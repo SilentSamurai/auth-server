@@ -5,12 +5,12 @@ import {
     Input,
     OnInit,
 } from '@angular/core';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmationService, MessageService } from 'primeng/api';
-import { ActivatedRoute } from '@angular/router';
-import { firstValueFrom } from 'rxjs';
-import { PageViewHeaderComponent } from './page-view-header.component';
-import { PageViewBodyComponent } from './page-view-body.component';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmationService, MessageService} from 'primeng/api';
+import {ActivatedRoute} from '@angular/router';
+import {firstValueFrom} from 'rxjs';
+import {PageViewHeaderComponent} from './page-view-header.component';
+import {PageViewBodyComponent} from './page-view-body.component';
 
 @Component({
     selector: 'app-page-view',

@@ -1,8 +1,8 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { UserService } from '../../../_services/user.service';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { lastValueFrom } from 'rxjs';
-import { MessageService } from 'primeng/api';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {UserService} from '../../../_services/user.service';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {lastValueFrom} from 'rxjs';
+import {MessageService} from 'primeng/api';
 
 @Component({
     selector: 'create-user-modal',

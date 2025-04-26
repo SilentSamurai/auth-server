@@ -1,25 +1,25 @@
-import {ClassSerializerInterceptor, Controller, Get, Request, UseGuards, UseInterceptors} from "@nestjs/common";
+import {
+    ClassSerializerInterceptor,
+    Controller,
+    Get,
+    Request,
+    UseGuards,
+    UseInterceptors,
+} from "@nestjs/common";
 import {Environment} from "../config/environment.service";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
 
-@Controller('api/v1')
+@Controller("api/v1")
 @UseInterceptors(ClassSerializerInterceptor)
 export class MainController {
+    constructor(private readonly configService: Environment) {}
 
-    constructor(
-        private readonly configService: Environment
-    ) {
-    }
-
-    @Get('/health-check')
-    async healthCheck(
-        @Request() request
-    ): Promise<any> {
+    @Get("/health-check")
+    async healthCheck(@Request() request): Promise<any> {
         return {
-            health: true
-        }
+            health: true,
+        };
     }
-
 
     // @Get('/check-auth')
     // @UseGuards(JwtAuthGuard)
@@ -51,10 +51,8 @@ export class MainController {
     //
     //     return {status: "ok"};
     // }
-
-
 }
 
 function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
 }

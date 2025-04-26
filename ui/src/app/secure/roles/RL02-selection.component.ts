@@ -1,11 +1,11 @@
-import { Component, OnInit } from '@angular/core';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { ActivatedRoute, Router } from '@angular/router';
-import { TenantService } from '../../_services/tenant.service';
-import { MessageService } from 'primeng/api';
-import { AuthDefaultService } from '../../_services/auth.default.service';
-import { RoleService } from '../../_services/role.service';
-import { DataModel, DataSource } from '../../component/model/DataModel';
+import {Component, OnInit} from '@angular/core';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {ActivatedRoute, Router} from '@angular/router';
+import {TenantService} from '../../_services/tenant.service';
+import {MessageService} from 'primeng/api';
+import {AuthDefaultService} from '../../_services/auth.default.service';
+import {RoleService} from '../../_services/role.service';
+import {IDataModel, DataSource} from '../../component/model/IDataModel';
 
 @Component({
     selector: 'app-role-list',

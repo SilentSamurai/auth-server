@@ -1,15 +1,10 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { UserService } from '../../_services/user.service';
-import { SessionService } from '../../_services/session.service';
-import { ActivatedRoute, Router } from '@angular/router';
-import { AuthService } from '../../_services/auth.service';
-import { AuthDefaultService } from '../../_services/auth.default.service';
-import {
-    PermissionService,
-    Actions,
-    Subjects,
-} from '../../_services/permission.service';
-import { Tile } from './models';
+import {Component, Input, OnInit} from '@angular/core';
+import {SessionService} from '../../_services/session.service';
+import {ActivatedRoute, Router} from '@angular/router';
+import {AuthService} from '../../_services/auth.service';
+import {AuthDefaultService} from '../../_services/auth.default.service';
+import {Tile} from './models';
+import {PermissionService} from '../../_services/permission.service';
 
 @Component({
     selector: 'app-tile-group',
@@ -44,7 +39,6 @@ export class TileGroupsComponent implements OnInit {
     tiles: Tile[] = [];
 
     constructor(
-        private userService: UserService,
         private router: Router,
         private route: ActivatedRoute,
         private authService: AuthService,

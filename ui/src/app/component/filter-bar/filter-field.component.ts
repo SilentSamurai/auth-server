@@ -1,8 +1,8 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { Operator, Operators } from '../model/Operator';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { FilterValueHelpComponent } from './filter-value-help.component';
-import { Filter } from '../model/Filters';
+import {Component, Input, OnInit} from '@angular/core';
+import {Operator, Operators} from '../model/Operator';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {FilterValueHelpComponent} from './filter-value-help.component';
+import {Filter} from '../model/Filters';
 
 export class Condition {
     operator: Operator;
@@ -17,7 +17,7 @@ export class Condition {
 export class InternalFilter {
     name!: string;
     label!: string;
-    conditions: Condition[] = [new Condition(Operators.REGEX, '')];
+    conditions: Condition[] = [new Condition(Operators.MATCHES, '')];
 
     constructor(name: string, label: string) {
         this.name = name;

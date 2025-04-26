@@ -1,15 +1,23 @@
-import {Injectable, Logger, OnModuleDestroy, OnModuleInit} from '@nestjs/common';
-import * as NodeCache from 'node-cache';
+import {
+    Injectable,
+    Logger,
+    OnModuleDestroy,
+    OnModuleInit,
+} from "@nestjs/common";
+import * as NodeCache from "node-cache";
 
 @Injectable()
 export class CacheService implements OnModuleInit, OnModuleDestroy {
-
-    private logger = new Logger('CacheService');
+    private logger = new Logger("CacheService");
 
     private cache: NodeCache;
 
     constructor() {
-        this.cache = new NodeCache({stdTTL: 100, checkperiod: 20, maxKeys: 100});
+        this.cache = new NodeCache({
+            stdTTL: 100,
+            checkperiod: 20,
+            maxKeys: 100,
+        });
     }
 
     onModuleInit() {

@@ -1,5 +1,11 @@
-import {Column, CreateDateColumn, Entity, ManyToMany, PrimaryGeneratedColumn} from 'typeorm';
-import {Exclude} from 'class-transformer'; // Used with ClassSerializerInterceptor to exclude from responses.
+import {
+    Column,
+    CreateDateColumn,
+    Entity,
+    ManyToMany,
+    PrimaryGeneratedColumn,
+} from "typeorm";
+import {Exclude} from "class-transformer"; // Used with ClassSerializerInterceptor to exclude from responses.
 import {Tenant} from "./tenant.entity";
 import {Role} from "./role.entity";
 
@@ -21,7 +27,7 @@ export class User {
     @ManyToMany(() => Tenant, (tenant) => tenant.members)
     tenants: Tenant[];
 
-    @ManyToMany(() => Role, role => role.users)
+    @ManyToMany(() => Role, (role) => role.users)
     roles: Role[];
 
     @Column({default: false})

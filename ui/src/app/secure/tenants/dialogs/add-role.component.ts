@@ -1,7 +1,7 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { MessageService } from 'primeng/api';
-import { TenantService } from '../../../_services/tenant.service';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {MessageService} from 'primeng/api';
+import {TenantService} from '../../../_services/tenant.service';
 
 @Component({
     selector: 'app-create-tenant',

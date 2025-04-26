@@ -1,9 +1,9 @@
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 import {
     HttpClientTestingModule,
     HttpTestingController,
 } from '@angular/common/http/testing';
-import { AuthService } from './auth.service';
+import {AuthService} from './auth.service';
 
 describe('AuthService', () => {
     let service: AuthService;
@@ -95,7 +95,7 @@ describe('AuthService', () => {
     });
 
     it('should validate auth code', async () => {
-        const mockValidation = { valid: true };
+        const mockValidation = {valid: true};
 
         const validationPromise = service.validateAuthCode('test_auth_code');
 
@@ -112,7 +112,7 @@ describe('AuthService', () => {
     });
 
     it('should sign up new user', async () => {
-        const mockSignupResponse = { success: true };
+        const mockSignupResponse = {success: true};
 
         const signupPromise = service.signUp(
             'Test User',
@@ -137,7 +137,7 @@ describe('AuthService', () => {
     });
 
     it('should register tenant', async () => {
-        const mockRegisterResponse = { success: true };
+        const mockRegisterResponse = {success: true};
 
         const registerPromise = service.registerTenant(
             'Test User',

@@ -1,20 +1,20 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { CreateTenantComponent } from './dialogs/create-tenant.component';
-import { UpdateTenantComponent } from './dialogs/update-tenant.component';
-import { TenantService } from '../../_services/tenant.service';
-import { SessionService } from '../../_services/session.service';
-import { AppTableComponent } from '../../component/table/app-table.component';
-import { AuthDefaultService } from '../../_services/auth.default.service';
-import { ConfirmationService } from '../../component/dialogs/confirmation.service';
-import { MessageService } from 'primeng/api';
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {CreateTenantComponent} from './dialogs/create-tenant.component';
+import {UpdateTenantComponent} from './dialogs/update-tenant.component';
+import {TenantService} from '../../_services/tenant.service';
+import {SessionService} from '../../_services/session.service';
+import {AppTableComponent} from '../../component/table/app-table.component';
+import {AuthDefaultService} from '../../_services/auth.default.service';
+import {ConfirmationService} from '../../component/dialogs/confirmation.service';
+import {MessageService} from 'primeng/api';
 import {
     Actions,
     PermissionService,
     Subjects,
 } from '../../_services/permission.service';
-import { DataModel, DataSource } from '../../component/model/DataModel';
-import { Filter } from '../../component/model/Filters';
+import {IDataModel, DataSource} from '../../component/model/IDataModel';
+import {Filter} from '../../component/model/Filters';
 
 @Component({
     selector: 'app-TN01',

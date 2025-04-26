@@ -7,7 +7,7 @@ import {
     TemplateRef,
     ViewChild,
 } from '@angular/core';
-import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
+import {UntypedFormControl, UntypedFormGroup} from '@angular/forms';
 
 @Component({
     selector: 'app-input-error',
@@ -20,7 +20,7 @@ import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 })
 export class InputErrorComponent implements OnInit {
     @Input() field: string = '';
-    @ViewChild('INPERR', { static: true }) template!: TemplateRef<any>;
+    @ViewChild('INPERR', {static: true}) template!: TemplateRef<any>;
 
     constructor() {}
 

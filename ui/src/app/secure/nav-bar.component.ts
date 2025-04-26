@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { UserService } from '../_services/user.service';
-import { AuthDefaultService } from '../_services/auth.default.service';
-import { SessionService } from '../_services/session.service';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { ProfileComponent } from '../profile/profile.component';
+import {Component, OnInit} from '@angular/core';
+import {Router} from '@angular/router';
+import {UserService} from '../_services/user.service';
+import {AuthDefaultService} from '../_services/auth.default.service';
+import {SessionService} from '../_services/session.service';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {ProfileComponent} from '../profile/profile.component';
 
 @Component({
     selector: 'nav-bar',

@@ -1,13 +1,13 @@
-import { RestApiModel } from './RestApiModel';
+import {RestApiModel} from './RestApiModel';
 import {
     HttpClientTestingModule,
     HttpTestingController,
 } from '@angular/common/http/testing';
-import { TestBed } from '@angular/core/testing';
-import { Filter } from './Filters';
-import { Operators } from './Operator';
-import { HttpClient } from '@angular/common/http';
-import { Query, SortConfig } from './DataModel';
+import {TestBed} from '@angular/core/testing';
+import {Filter} from './Filters';
+import {Operators} from './Operator';
+import {HttpClient} from '@angular/common/http';
+import {Query, SortConfig} from './IDataModel';
 
 describe('RestApiModel', () => {
     let httpMock: HttpTestingController;
@@ -44,7 +44,7 @@ describe('RestApiModel', () => {
             pageNo: 0,
             pageSize: 25,
             filters: [new Filter('status', 'Status', 'active', Operators.EQ)],
-            orderBy: [{ field: 'name', order: 'asc' } as SortConfig],
+            orderBy: [{field: 'name', order: 'asc'} as SortConfig],
             expand: ['details'],
         });
 
@@ -65,15 +65,15 @@ describe('RestApiModel', () => {
                     }),
                 }),
             ],
-            orderBy: [{ field: 'name', order: 'asc' }],
+            orderBy: [{field: 'name', order: 'asc'}],
             expand: ['details'],
         });
 
-        req.flush({ data: [{ id: 1 }] }); // Respond to the request
+        req.flush({data: [{id: 1}]}); // Respond to the request
 
         const result = await promise; // NOW await the promise after flush
 
-        expect(result.data).toEqual([{ id: 1 }]); // Assertions
+        expect(result.data).toEqual([{id: 1}]); // Assertions
     });
 
     it('should handle count requests', async () => {
@@ -85,11 +85,11 @@ describe('RestApiModel', () => {
 
         const req = httpMock.expectOne(apiUrl);
         verifyRequest(req, {
-            where: [jasmine.objectContaining({ value: 'true' })],
+            where: [jasmine.objectContaining({value: 'true'})],
             select: 'count',
         });
 
-        req.flush({ count: 5 });
+        req.flush({count: 5});
         const result = await promise;
         expect(result).toBe(5);
     });
@@ -107,8 +107,8 @@ describe('RestApiModel', () => {
             );
         });
 
-        requests[0].flush({ data: [] });
-        requests[1].flush({ count: 0 });
+        requests[0].flush({data: []});
+        requests[1].flush({count: 0});
 
         expect((await dataPromise).data).toEqual([]);
         expect(await countPromise).toBe(0);
@@ -129,17 +129,17 @@ describe('RestApiModel', () => {
         const mock = httpMock.expectOne(apiUrl);
         expect(mock.request.body.where).toEqual(complexFilters);
 
-        mock.flush({ data: [] });
+        mock.flush({data: []});
         expect((await promise).data).toEqual([]);
     });
 
     it('should handle empty responses', async () => {
         const dataPromise = apiModel.fetchData(new Query({}));
-        httpMock.expectOne(apiUrl).flush({ data: [] });
+        httpMock.expectOne(apiUrl).flush({data: []});
         expect((await dataPromise).data).toEqual([]);
 
         const countPromise = apiModel.totalCount(new Query({}));
-        httpMock.expectOne(apiUrl).flush({ count: 0 });
+        httpMock.expectOne(apiUrl).flush({count: 0});
         expect(await countPromise).toBe(0);
     });
 });

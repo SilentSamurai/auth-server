@@ -1,8 +1,8 @@
-import {Module} from '@nestjs/common';
-import {ConfigModule} from '../config/config.module';
-import {AuthModule} from '../auth/auth.module';
-import {MailModule} from '../mail/mail.module';
-import {UsersController} from './users.controller';
+import {Module} from "@nestjs/common";
+import {ConfigModule} from "../config/config.module";
+import {AuthModule} from "../auth/auth.module";
+import {MailModule} from "../mail/mail.module";
+import {UsersController} from "./users.controller";
 import {UsersAdminController} from "./users.admin.controller";
 import {TenantController} from "./tenant.controller";
 import {MemberController} from "./members.controller";
@@ -23,33 +23,30 @@ import {GroupController} from "./group.controller";
 import {RoleControllerV2} from "./roleV2.controller";
 import {RegisterController} from "./registration.controller";
 
-@Module(
-    {
-        imports:
-            [
-                ConfigModule,
-                AuthModule,
-                MailModule,
-                CaslModule,
-                ServiceModule,
-                TypeOrmModule.forFeature([User, Tenant, Role, TenantMember, Group])
-            ],
-        controllers: [
-            UsersController,
-            UsersAdminController,
-            TenantController,
-            MemberController,
-            RoleController,
-            MainController,
-            GenericSearchController,
-            AuthController,
-            PolicyController,
-            GroupController,
-            RoleControllerV2,
-            RegisterController
-        ],
-        providers: [],
-        exports: []
-    })
-export class ControllersModule {
-}
+@Module({
+    imports: [
+        ConfigModule,
+        AuthModule,
+        MailModule,
+        CaslModule,
+        ServiceModule,
+        TypeOrmModule.forFeature([User, Tenant, Role, TenantMember, Group]),
+    ],
+    controllers: [
+        UsersController,
+        UsersAdminController,
+        TenantController,
+        MemberController,
+        RoleController,
+        MainController,
+        GenericSearchController,
+        AuthController,
+        PolicyController,
+        GroupController,
+        RoleControllerV2,
+        RegisterController,
+    ],
+    providers: [],
+    exports: [],
+})
+export class ControllersModule {}

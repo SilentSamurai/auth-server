@@ -1,7 +1,7 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { lastValueFrom } from 'rxjs';
-import { MessageService } from 'primeng/api';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {lastValueFrom} from 'rxjs';
+import {MessageService} from 'primeng/api';
 import {
     TenantService,
     NoChangesException,

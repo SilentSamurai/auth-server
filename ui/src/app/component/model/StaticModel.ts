@@ -4,9 +4,9 @@ import {
     Query,
     ReturnedData,
     SortConfig,
-} from './DataModel';
-import { Filter } from './Filters';
-import { Observable, Subject } from 'rxjs';
+} from './IDataModel';
+import {Filter} from './Filters';
+import {Observable, Subject} from 'rxjs';
 
 export class StaticModel<T> implements DataSource<T> {
     private data: T[] = [];
@@ -29,12 +29,12 @@ export class StaticModel<T> implements DataSource<T> {
 
     setData(data: T[]): void {
         this.data = [...data];
-        this.eventSubject.next({ type: 'data-updated', source: 'set' });
+        this.eventSubject.next({type: 'data-updated', source: 'set'});
     }
 
     appendData(newData: T[]): void {
         this.data.push(...newData);
-        this.eventSubject.next({ type: 'data-updated', source: 'append' });
+        this.eventSubject.next({type: 'data-updated', source: 'append'});
     }
 
     async fetchData(query: Query): Promise<ReturnedData<T>> {
@@ -60,7 +60,7 @@ export class StaticModel<T> implements DataSource<T> {
     private applyFilters(data: T[], filters: Filter[]): T[] {
         return data.filter((item) => {
             return filters.every((filter) => {
-                const value = this.getNestedValue(item, filter.name);
+                const value = this.getNestedValue(item, filter.field);
                 return filter.matches(value);
             });
         });

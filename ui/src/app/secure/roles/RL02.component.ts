@@ -1,23 +1,20 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { TenantService } from '../../_services/tenant.service';
-import { SessionService } from '../../_services/session.service';
-import { AuthDefaultService } from '../../_services/auth.default.service';
-import { RoleService } from '../../_services/role.service';
-import { MessageService } from 'primeng/api';
-import { ConfirmationService } from '../../component/dialogs/confirmation.service';
-import { StaticModel } from '../../component/model/StaticModel';
-import { PolicyService } from '../../_services/policy.service';
-import { CreatePolicyModalComponent } from './create-policy-modal.component';
+import {Component, OnInit} from '@angular/core';
+import {ActivatedRoute, Router} from '@angular/router';
+import {TenantService} from '../../_services/tenant.service';
+import {SessionService} from '../../_services/session.service';
+import {AuthDefaultService} from '../../_services/auth.default.service';
+import {RoleService} from '../../_services/role.service';
+import {MessageService} from 'primeng/api';
+import {ConfirmationService} from '../../component/dialogs/confirmation.service';
+import {StaticModel} from '../../component/model/StaticModel';
+import {PolicyService} from '../../_services/policy.service';
+import {CreatePolicyModalComponent} from './create-policy-modal.component';
 import {
     CloseType,
     ValueHelpResult,
 } from '../../component/value-help/value-help.component';
-import { UpdateRoleModalComponent } from './update-role-modal.component';
-import {
-    ModalService,
-    ModalResult,
-} from '../../component/dialogs/modal.service';
+import {UpdateRoleModalComponent} from './update-role-modal.component';
+import {ModalService, ModalResult} from '../../component/dialogs/modal.service';
 
 @Component({
     selector: 'app-RL02',
@@ -267,7 +264,7 @@ export class RL02Component implements OnInit {
             UpdateRoleModalComponent,
             {
                 initData: {
-                    role: { ...this.role },
+                    role: {...this.role},
                     tenantId: this.tenantId,
                 },
             },
