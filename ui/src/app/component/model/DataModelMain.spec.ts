@@ -1,18 +1,18 @@
 import { StaticModel } from './StaticModel';
-import { DataModelImpl } from './DataModelImpl';
+import { DataModel } from './DataModel';
 import {
     DataModelStatus,
-    IQuery,
+    IQueryConfig,
     Query,
     SortConfig,
     ReturnedData,
-    DataModel,
-} from './DataModel';
+    IDataModel,
+} from './IDataModel';
 
 describe('DataModel', () => {
     it('main test', async () => {
         const source = new StaticModel(['id'], []);
-        const model = new DataModelImpl(source);
+        const model = new DataModel(source);
 
         let response = await model.execute(new Query({ pageNo: 0 }));
 

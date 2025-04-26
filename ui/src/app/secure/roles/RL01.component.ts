@@ -8,7 +8,7 @@ import { AuthDefaultService } from '../../_services/auth.default.service';
 import { AppTableComponent } from '../../component/table/app-table.component';
 import { RoleService } from '../../_services/role.service';
 import { ConfirmationService } from '../../component/dialogs/confirmation.service';
-import { DataSource } from '../../component/model/DataModel';
+import { DataSource } from '../../component/model/IDataModel';
 import { Filter } from '../../component/model/Filters';
 
 @Component({

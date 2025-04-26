@@ -13,7 +13,7 @@ import {
     ValueHelpComponent,
     ValueHelpResult,
 } from '../value-help/value-help.component';
-import { DataModel, DataSource } from '../model/DataModel';
+import { IDataModel, DataSource } from '../model/IDataModel';
 import { ValueHelpColumnComponent } from '../value-help-input/value-help-column.component';
 import { FilterBarColumnComponent } from '../filter-bar/filter-bar.component';
 import { ModalResult, ModalService } from '../dialogs/modal.service';

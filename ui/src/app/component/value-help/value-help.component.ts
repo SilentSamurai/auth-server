@@ -11,7 +11,7 @@ import { ActivatedRoute } from '@angular/router';
 import { ValueHelpColumnComponent } from '../value-help-input/value-help-column.component';
 import { AppTableComponent } from '../table/app-table.component';
 import { FilterBarColumnComponent } from '../filter-bar/filter-bar.component';
-import { DataModel, DataSource } from '../model/DataModel';
+import { IDataModel, DataSource } from '../model/IDataModel';
 import { Filter } from '../model/Filters';
 
 export enum CloseType {

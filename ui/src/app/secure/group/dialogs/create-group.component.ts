@@ -3,7 +3,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { MessageService } from 'primeng/api';
 import { GroupService } from '../../../_services/group.service';
 import { TenantService } from '../../../_services/tenant.service';
-import { DataModel, DataSource } from '../../../component/model/DataModel';
+import { IDataModel, DataSource } from '../../../component/model/IDataModel';
 
 @Component({
     selector: 'app-create-group',

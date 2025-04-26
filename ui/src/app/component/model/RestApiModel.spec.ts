@@ -7,7 +7,7 @@ import { TestBed } from '@angular/core/testing';
 import { Filter } from './Filters';
 import { Operators } from './Operator';
 import { HttpClient } from '@angular/common/http';
-import { Query, SortConfig } from './DataModel';
+import { Query, SortConfig } from './IDataModel';
 
 describe('RestApiModel', () => {
     let httpMock: HttpTestingController;

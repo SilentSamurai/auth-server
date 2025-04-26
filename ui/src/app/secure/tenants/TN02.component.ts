@@ -10,7 +10,7 @@ import { AddRoleComponent } from './dialogs/add-role.component';
 import { AuthDefaultService } from '../../_services/auth.default.service';
 import { ConfirmationService } from '../../component/dialogs/confirmation.service';
 import { Location } from '@angular/common';
-import { DataSource } from '../../component/model/DataModel';
+import { DataSource } from '../../component/model/IDataModel';
 import { StaticModel } from '../../component/model/StaticModel';
 
 @Component({

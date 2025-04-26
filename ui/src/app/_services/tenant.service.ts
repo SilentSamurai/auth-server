@@ -3,7 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { lastValueFrom } from 'rxjs';
 import { SessionService } from './session.service';
 import { RestApiModel } from '../component/model/RestApiModel';
-import { DataModel, DataSource } from '../component/model/DataModel';
+import { IDataModel, DataSource } from '../component/model/IDataModel';
 
 const API_URL = '/api';
 

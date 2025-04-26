@@ -13,7 +13,7 @@ import {
     PermissionService,
     Subjects,
 } from '../../_services/permission.service';
-import { DataModel, DataSource } from '../../component/model/DataModel';
+import { IDataModel, DataSource } from '../../component/model/IDataModel';
 import { Filter } from '../../component/model/Filters';
 
 @Component({

@@ -7,7 +7,7 @@ import { TableAsyncLoadEvent } from '../../component/table/app-table.component';
 import { MessageService } from 'primeng/api';
 import { AuthDefaultService } from '../../_services/auth.default.service';
 import { GroupService } from '../../_services/group.service';
-import { DataModel, DataSource } from '../../component/model/DataModel';
+import { IDataModel, DataSource } from '../../component/model/IDataModel';
 
 @Component({
     selector: 'app-group-sel',

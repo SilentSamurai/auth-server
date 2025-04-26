@@ -1,7 +1,7 @@
-import { DataModelImpl } from './DataModelImpl';
+import { DataModel } from './DataModel';
 import { Filter } from './Filters';
 import { Operators } from './Operator';
-import { DataModel, DataSourceEvents, Query, SortConfig } from './DataModel';
+import { IDataModel, DataSourceEvents, Query, SortConfig } from './IDataModel';
 import { HttpClient } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
@@ -9,13 +9,13 @@ import { Subject } from 'rxjs';
 import { StaticModel } from './StaticModel';
 
 describe('StaticModel + DataModelImpl (in-memory data source)', () => {
-    let dataModel: DataModel<any>;
+    let dataModel: IDataModel<any>;
     const defaultPageSize = 50;
     let httpClient: HttpClient;
     const API_URL = '/api';
 
-    const createDataModel = (initialData: any[]): DataModel<any> => {
-        return new DataModelImpl<any>(new StaticModel(['id'], initialData));
+    const createDataModel = (initialData: any[]): IDataModel<any> => {
+        return new DataModel<any>(new StaticModel(['id'], initialData));
     };
 
     beforeEach(() => {
@@ -199,7 +199,7 @@ describe('StaticModel + DataModelImpl (in-memory data source)', () => {
             updates: () => new Subject<DataSourceEvents>(),
         };
 
-        dataModel = new DataModelImpl(errorSource);
+        dataModel = new DataModel(errorSource);
         try {
             await dataModel.execute(new Query({}));
             fail('Expected error to be thrown');
@@ -220,7 +220,7 @@ describe('StaticModel + DataModelImpl (in-memory data source)', () => {
         ]);
         mockDataSource.updates.and.returnValue(new Subject());
 
-        dataModel = new DataModelImpl(mockDataSource);
+        dataModel = new DataModel(mockDataSource);
 
         const data = { data: [{ id: 1 }] };
         // Initial sort and data fetch
@@ -242,7 +242,7 @@ describe('StaticModel + DataModelImpl (in-memory data source)', () => {
         mockDataSource.fetchData.and.resolveTo({ data: [{ id: 1 }] });
         mockDataSource.updates.and.returnValue(new Subject());
 
-        dataModel = new DataModelImpl(mockDataSource);
+        dataModel = new DataModel(mockDataSource);
 
         await dataModel.execute(new Query({}));
         expect(mockDataSource.fetchData).toHaveBeenCalledTimes(1);
@@ -260,7 +260,7 @@ describe('StaticModel + DataModelImpl (in-memory data source)', () => {
         ]);
         mockDataSource.updates.and.returnValue(new Subject());
 
-        dataModel = new DataModelImpl(mockDataSource);
+        dataModel = new DataModel(mockDataSource);
 
         mockDataSource.totalCount.and.resolveTo(0);
         mockDataSource.fetchData.and.resolveTo({ data: [] });
@@ -282,7 +282,7 @@ describe('StaticModel + DataModelImpl (in-memory data source)', () => {
         const testError = new Error('Data source failure');
         mockDataSource.fetchData.and.rejectWith(testError);
 
-        dataModel = new DataModelImpl(mockDataSource);
+        dataModel = new DataModel(mockDataSource);
 
         try {
             await dataModel.execute(new Query({}));
@@ -305,7 +305,7 @@ describe('StaticModel + DataModelImpl (in-memory data source)', () => {
 
         mockDataSource.fetchData.and.resolveTo({ data: [{ id: 1 }] });
 
-        dataModel = new DataModelImpl(mockDataSource);
+        dataModel = new DataModel(mockDataSource);
 
         await dataModel.execute(new Query({}));
         expect(mockDataSource.fetchData).toHaveBeenCalledTimes(1);

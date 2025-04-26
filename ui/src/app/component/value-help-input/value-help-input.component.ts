@@ -17,7 +17,7 @@ import {
 } from '../value-help/value-help.component';
 import { ValueHelpColumnComponent } from './value-help-column.component';
 import { FilterBarColumnComponent } from '../filter-bar/filter-bar.component';
-import { DataModel, DataSource } from '../model/DataModel';
+import { IDataModel, DataSource } from '../model/IDataModel';
 import { ModalResult, ModalService } from '../dialogs/modal.service';
 
 function parseBoolean(value: string): boolean {

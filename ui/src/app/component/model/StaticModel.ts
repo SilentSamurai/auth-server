@@ -4,7 +4,7 @@ import {
     Query,
     ReturnedData,
     SortConfig,
-} from './DataModel';
+} from './IDataModel';
 import { Filter } from './Filters';
 import { Observable, Subject } from 'rxjs';
 

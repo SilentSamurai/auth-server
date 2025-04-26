@@ -15,10 +15,10 @@ import {
 import { FilterBarComponent } from '../filter-bar/filter-bar.component';
 import { TableColumnComponent } from './app-table-column.component';
 import { AppTableButtonComponent } from './app-table-button.component';
-import { DataModel, DataSource, Query } from '../model/DataModel';
+import { IDataModel, DataSource, Query } from '../model/IDataModel';
 import { Filter } from '../model/Filters';
 import { CheckboxChangeEvent } from 'primeng/checkbox';
-import { DataModelImpl } from '../model/DataModelImpl';
+import { DataModel } from '../model/DataModel';
 import { Subscription } from 'rxjs';
 
 export class TableAsyncLoadEvent extends Query {}
@@ -256,15 +256,15 @@ export class TableAsyncLoadEvent extends Query {}
 export class AppTableComponent implements OnInit, OnDestroy {
     loading: boolean = false;
 
-    _dataModel!: DataModel<any>;
+    _dataModel!: IDataModel<any>;
 
     @Input({ required: true })
     set dataSource(dataSource: DataSource<any>) {
-        this._dataModel = new DataModelImpl(dataSource);
+        this._dataModel = new DataModel(dataSource);
         this.idFields = dataSource.keyFields();
     }
 
-    get dataModel(): DataModel<any> {
+    get dataModel(): IDataModel<any> {
         return this._dataModel;
     }
 

@@ -10,7 +10,7 @@ import {
 import { AuthDefaultService } from '../../_services/auth.default.service';
 import { ConfirmationService } from '../../component/dialogs/confirmation.service';
 import { MessageService } from 'primeng/api';
-import { DataModel, DataSource } from '../../component/model/DataModel';
+import { IDataModel, DataSource } from '../../component/model/IDataModel';
 import { Filter } from '../../component/model/Filters';
 
 @Component({

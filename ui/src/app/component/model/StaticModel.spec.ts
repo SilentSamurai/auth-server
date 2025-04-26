@@ -1,5 +1,5 @@
 import { StaticModel } from './StaticModel';
-import { Query } from './DataModel';
+import { Query } from './IDataModel';
 import { Filter } from './Filters';
 import { Operators } from './Operator';
 
