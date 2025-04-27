@@ -1,5 +1,4 @@
 import {GroupRole} from "./group.roles.entity";
-import {UserRole} from "./user.roles.entity";
 import {Role} from "./role.entity";
 import {TenantMember} from "./tenant.members.entity";
 import {Tenant} from "./tenant.entity";
@@ -16,17 +15,15 @@ export class SubjectEnum {
     public static GROUP_ROLE = GroupRole.name;
     public static POLICY = Policy.name;
 
-
     public static entityMap = {
-        "Users": SubjectEnum.USER,
-        "Tenants": SubjectEnum.TENANT,
-        "TenantMembers": SubjectEnum.MEMBER,
-        "Roles": SubjectEnum.ROLE,
-        "Groups": SubjectEnum.GROUP
-    }
+        Users: SubjectEnum.USER,
+        Tenants: SubjectEnum.TENANT,
+        TenantMembers: SubjectEnum.MEMBER,
+        Roles: SubjectEnum.ROLE,
+        Groups: SubjectEnum.GROUP,
+    };
 
     public static getSubject(entity: string): string {
         return SubjectEnum.entityMap[entity];
     }
-
 }

@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, TemplateRef, ViewChild} from "@angular/core";
+import {Component, Input, OnInit, TemplateRef, ViewChild} from '@angular/core';
 
 @Component({
     selector: 'app-dialog-footer',
@@ -10,13 +10,9 @@ import {Component, Input, OnInit, TemplateRef, ViewChild} from "@angular/core";
     styles: [],
 })
 export class DialogFooterComponent implements OnInit {
-
     @ViewChild('SDFT', {static: true}) template!: TemplateRef<any>;
 
-    constructor() {
-    }
+    constructor() {}
 
-    async ngOnInit(): Promise<void> {
-    }
-
+    async ngOnInit(): Promise<void> {}
 }

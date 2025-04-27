@@ -1,10 +1,7 @@
 import {Column, Entity, PrimaryColumn} from "typeorm";
 
-
 @Entity({name: "user_roles"})
 export class UserRole {
-
-
     @PrimaryColumn({name: "tenant_id"})
     tenantId: string;
 
@@ -16,5 +13,4 @@ export class UserRole {
 
     @Column({name: "from_group", nullable: false, default: false})
     from_group: boolean;
-
 }

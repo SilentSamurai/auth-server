@@ -1,14 +1,11 @@
 export class Util {
-
-
     public static parseBoolean(value: string): boolean {
         const lowerCaseStr = value.toLowerCase();
         return lowerCaseStr === 'true';
     }
 
-
     public static getValueFromPath(obj: any, path: string): any {
-        const pathArray = path.split('/').filter(part => part !== '');
+        const pathArray = path.split('/').filter((part) => part !== '');
         let current: any = obj;
 
         for (const part of pathArray) {
@@ -32,9 +29,12 @@ export class Util {
         return current;
     }
 
-
-    public static updateValueAtPath(obj: any, path: string, value: any): boolean {
-        const pathArray = path.split('/').filter(part => part !== '');
+    public static updateValueAtPath(
+        obj: any,
+        path: string,
+        value: any,
+    ): boolean {
+        const pathArray = path.split('/').filter((part) => part !== '');
         let current: any = obj;
 
         for (let i = 0; i < pathArray.length; i++) {
@@ -79,8 +79,4 @@ export class Util {
 
         return true;
     }
-
-
 }
-
-

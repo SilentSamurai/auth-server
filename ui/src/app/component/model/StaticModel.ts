@@ -1,49 +1,103 @@
-import { DataPushEvent, DataPushEventStatus} from "./DataModel";
-import {BaseDataModel} from "./BaseDataModel";
+import {
+    DataSource,
+    DataSourceEvents,
+    Query,
+    ReturnedData,
+    SortConfig,
+} from './IDataModel';
+import {Filter} from './Filters';
+import {Observable, Subject} from 'rxjs';
 
+export class StaticModel<T> implements DataSource<T> {
+    private data: T[] = [];
+    private eventSubject = new Subject<DataSourceEvents>();
 
-export class StaticModel extends BaseDataModel {
-
-    data: any[] = []
-
-    constructor(keyFields: string[]) {
-        super(keyFields);
+    constructor(
+        protected _keyFields: string[],
+        initialData: T[] = [],
+    ) {
+        this.data = [...initialData];
     }
 
-    hasPage(pageNo: number): boolean {
-        return pageNo == 0;
+    updates(): Observable<DataSourceEvents> {
+        return this.eventSubject;
     }
 
-    async apply(srcOptions: any): Promise<boolean> {
-        const event: DataPushEvent = {
-            srcOptions: srcOptions,
-            operation: DataPushEventStatus.UPDATED_DATA,
-            data: this.data,
-            pageNo: this.query.pageNo
-        };
-        this._dataPusher.emit(event)
-        return true;
-        // this.query = query;
+    keyFields(): string[] {
+        return this._keyFields;
     }
 
-    getData(): any[] {
-        return this.data;
-    }
-
-    appendData(data: any[]): void {
-        this.data.push(...data);
-        this.apply({append: true});
-    }
-
-    setData(data: any[]): void {
+    setData(data: T[]): void {
         this.data = [...data];
-        this.apply({append: false})
+        this.eventSubject.next({type: 'data-updated', source: 'set'});
     }
 
-    totalRowCount(): number {
-        return this.data.length;
+    appendData(newData: T[]): void {
+        this.data.push(...newData);
+        this.eventSubject.next({type: 'data-updated', source: 'append'});
     }
 
+    async fetchData(query: Query): Promise<ReturnedData<T>> {
+        const start =
+            (query.pageNo ?? 0) * (query.pageSize ?? this.data.length);
+        const end = start + (query.pageSize ?? this.data.length);
 
+        let filteredData = this.applyFilters(this.data, query.filters ?? []);
+        let sortedData = this.applySorting(filteredData, query.orderBy ?? []);
+
+        let result = sortedData.slice(start, end);
+        return {
+            data: result,
+            count: result.length,
+            isLastPage: end >= filteredData.length,
+        };
+    }
+
+    totalCount(query: Query): Promise<number> {
+        return Promise.resolve(this.data.length);
+    }
+
+    private applyFilters(data: T[], filters: Filter[]): T[] {
+        return data.filter((item) => {
+            return filters.every((filter) => {
+                const value = this.getNestedValue(item, filter.field);
+                return filter.matches(value);
+            });
+        });
+    }
+
+    private applySorting(data: T[], orderBy: SortConfig[]): T[] {
+        const sortedData = [...data];
+
+        sortedData.sort((a, b) => {
+            for (const sort of orderBy) {
+                const aValue = this.getNestedValue(a, sort.field);
+                const bValue = this.getNestedValue(b, sort.field);
+                const direction = sort.order === 'asc' ? 1 : -1;
+
+                if (aValue === bValue) continue;
+                if (aValue === null || aValue === undefined) return direction;
+                if (bValue === null || bValue === undefined) return -direction;
+
+                if (typeof aValue === 'string' && typeof bValue === 'string') {
+                    return direction * aValue.localeCompare(bValue);
+                }
+
+                return direction * (aValue < bValue ? -1 : 1);
+            }
+            return 0;
+        });
+
+        return sortedData;
+    }
+
+    private getNestedValue(obj: any, path: string): any {
+        return path
+            .split('.')
+            .reduce(
+                (acc, part) =>
+                    acc && acc[part] !== undefined ? acc[part] : null,
+                obj,
+            );
+    }
 }
-

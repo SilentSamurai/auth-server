@@ -6,11 +6,10 @@ import {
     JoinTable,
     ManyToMany,
     ManyToOne,
-    PrimaryGeneratedColumn
+    PrimaryGeneratedColumn,
 } from "typeorm";
 import {Tenant} from "./tenant.entity";
 import {User} from "./user.entity"; // Used with ClassSerializerInterceptor to exclude from responses.
-
 
 @Entity({name: "roles"})
 export class Role {
@@ -23,27 +22,32 @@ export class Role {
     @Column({nullable: true})
     description?: string;
 
-    @ManyToOne(type => Tenant, tenant => tenant.roles)
+    @ManyToOne((type) => Tenant, (tenant) => tenant.roles)
     @JoinColumn({
         name: "tenant_id",
-        referencedColumnName: "id"
+        referencedColumnName: "id",
     })
     tenant: Tenant;
 
-    @ManyToMany(() => User, user => user.roles)
+    @ManyToMany(() => User, (user) => user.roles)
     @JoinTable({
         name: "user_roles",
-        joinColumns: [{
-            name: "role_id",
-            referencedColumnName: "id"
-        }, {
-            name: "tenant_id",
-            referencedColumnName: "tenant"
-        }],
-        inverseJoinColumns: [{
-            name: "user_id",
-            referencedColumnName: "id"
-        }]
+        joinColumns: [
+            {
+                name: "role_id",
+                referencedColumnName: "id",
+            },
+            {
+                name: "tenant_id",
+                referencedColumnName: "tenant",
+            },
+        ],
+        inverseJoinColumns: [
+            {
+                name: "user_id",
+                referencedColumnName: "id",
+            },
+        ],
     })
     users: User[];
 

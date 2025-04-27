@@ -7,7 +7,7 @@ import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 @Component({
     selector: 'app-register',
     templateUrl: './register.component.html',
-    styleUrls: ['./register.component.scss']
+    styleUrls: ['./register.component.scss'],
 })
 export class RegisterComponent implements OnInit {
     // Reactive form
@@ -30,17 +30,23 @@ export class RegisterComponent implements OnInit {
         private authDefaultService: AuthDefaultService,
         private router: Router,
         private actRoute: ActivatedRoute,
-        private fb: FormBuilder
-    ) {
-    }
+        private fb: FormBuilder,
+    ) {}
 
     ngOnInit(): void {
         // Initialize form controls with validation
         const controls: any = {
-            name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(20)]],
+            name: [
+                '',
+                [
+                    Validators.required,
+                    Validators.minLength(3),
+                    Validators.maxLength(20),
+                ],
+            ],
             email: ['', [Validators.required, Validators.email]],
-            password: ['', [Validators.required, Validators.minLength(6)]]
-        }
+            password: ['', [Validators.required, Validators.minLength(6)]],
+        };
 
         // Check for client_id in URL query params
         this.clientId = this.actRoute.snapshot.queryParamMap.get('client_id')!;
@@ -61,9 +67,12 @@ export class RegisterComponent implements OnInit {
     // Move to step 2 if valid; only used when !isSignUp
     onNextClick(): void {
         const {orgName, domain} = this.registerForm.value;
-        if (!orgName || !domain
-            || this.registerForm.get('orgName')!.invalid
-            || this.registerForm.get('domain')!.invalid) {
+        if (
+            !orgName ||
+            !domain ||
+            this.registerForm.get('orgName')!.invalid ||
+            this.registerForm.get('domain')!.invalid
+        ) {
             return; // remain on step 1 if invalid
         }
         this.currentStep = 2;
@@ -82,15 +91,27 @@ export class RegisterComponent implements OnInit {
         }
 
         // Extract form values
-        const {name, email, password, orgName, domain} = this.registerForm.value;
+        const {name, email, password, orgName, domain} =
+            this.registerForm.value;
         this.isSignUpFailed = false;
 
         try {
             // If we have a clientId, treat it as sign up
             if (this.isSignUp) {
-                await this.authService.signUp(name, email, password, this.clientId!);
+                await this.authService.signUp(
+                    name,
+                    email,
+                    password,
+                    this.clientId!,
+                );
             } else {
-                await this.authService.registerTenant(name, email, password, orgName, domain);
+                await this.authService.registerTenant(
+                    name,
+                    email,
+                    password,
+                    orgName,
+                    domain,
+                );
             }
 
             // Sign out or redirect after successful registration

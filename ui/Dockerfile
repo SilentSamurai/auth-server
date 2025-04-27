@@ -4,9 +4,13 @@ LABEL author="Sourav Das"
 COPY  ./package-lock.json /home/app/
 COPY ./package.json /home/app/
 COPY ./src /home/app/src
+#COPY ./tests /home/app/tests
+#COPY ./karma.conf.js /home/app/karma.conf.js
+#COPY ./tsconfig.spec.json /home/app/tsconfig.spec.json
 COPY ./tsconfig.json /home/app/tsconfig.json
 COPY ./tsconfig.app.json /home/app/tsconfig.app.json
 COPY ./angular.json /home/app/angular.json
+
 
 WORKDIR /home/app/
 RUN npm ci

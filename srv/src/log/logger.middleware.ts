@@ -1,11 +1,11 @@
-import {Injectable, Logger, NestMiddleware} from '@nestjs/common';
-import {NextFunction, Request, Response} from 'express';
+import {Injectable, Logger, NestMiddleware} from "@nestjs/common";
+import {NextFunction, Request, Response} from "express";
 
-const WHITE_COLOR: string = '\x1b[0m';
-const GREEN_COLOR: string = '\x1b[32m';
-const YELLOW_COLOR: string = '\x1b[33m';
-const RED_COLOR: string = '\x1b[31m';
-const BRIGHT_CYAN_COLOR: string = '\x1b[36m';
+const WHITE_COLOR: string = "\x1b[0m";
+const GREEN_COLOR: string = "\x1b[32m";
+const YELLOW_COLOR: string = "\x1b[33m";
+const RED_COLOR: string = "\x1b[31m";
+const BRIGHT_CYAN_COLOR: string = "\x1b[36m";
 
 const BASE_COLOR: string = WHITE_COLOR;
 const POST_COLOR: string = GREEN_COLOR;
@@ -17,19 +17,19 @@ const DELETE_COLOR: string = RED_COLOR;
 const METHOD_TAG = (method: string, url: string): string => {
     let color: string = BASE_COLOR;
     switch (method) {
-        case 'POST':
+        case "POST":
             color = POST_COLOR;
             break;
-        case 'GET':
+        case "GET":
             color = GET_COLOR;
             break;
-        case 'PUT':
+        case "PUT":
             color = PUT_COLOR;
             break;
-        case 'PATCH':
+        case "PATCH":
             color = PATCH_COLOR;
             break;
-        case 'DELETE':
+        case "DELETE":
             color = DELETE_COLOR;
             break;
     }
@@ -48,15 +48,15 @@ const STATUS_TAG = (code: number): string => {
 
 @Injectable()
 export class LoggerMiddleware implements NestMiddleware {
-    private logger: Logger = new Logger('API');
+    private logger: Logger = new Logger("API");
 
     use(request: Request, response: Response, next: NextFunction) {
         const ip: any = request.ip;
         const method: any = request.method;
         const originalUrl: any = request.originalUrl;
-        const userAgent: any = request.get('user-agent') || '';
+        const userAgent: any = request.get("user-agent") || "";
 
-        response.on('finish', () => {
+        response.on("finish", () => {
             const statusCode: number = response.statusCode;
 
             let message: string = METHOD_TAG(method, originalUrl);

@@ -1,7 +1,6 @@
-import {MigrationInterface, QueryRunner, Table} from "typeorm"
+import {MigrationInterface, QueryRunner, Table} from "typeorm";
 
 export class SessionMigration1684308185392 implements MigrationInterface {
-
     public async up(queryRunner: QueryRunner): Promise<void> {
         const DB_STRING_TYPE = "VARCHAR";
 
@@ -14,27 +13,27 @@ export class SessionMigration1684308185392 implements MigrationInterface {
                         name: "code",
                         type: DB_STRING_TYPE,
                         length: "16",
-                        isPrimary: true
+                        isPrimary: true,
                     },
                     {
                         name: "code_challenge",
                         type: DB_STRING_TYPE,
-                        isNullable: false
+                        isNullable: false,
                     },
                     {
                         name: "method",
                         type: DB_STRING_TYPE,
-                        isNullable: false
+                        isNullable: false,
                     },
                     {
                         name: "user_id",
                         type: DB_STRING_TYPE,
-                        isNullable: false
+                        isNullable: false,
                     },
                     {
                         name: "tenant_id",
                         type: DB_STRING_TYPE,
-                        isNullable: false
+                        isNullable: false,
                     },
                     {
                         name: "created_at",
@@ -50,5 +49,4 @@ export class SessionMigration1684308185392 implements MigrationInterface {
     public async down(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.dropTable("auth_code");
     }
-
 }

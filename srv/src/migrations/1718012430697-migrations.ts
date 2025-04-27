@@ -1,13 +1,12 @@
 import {MigrationInterface, QueryRunner, Table} from "typeorm";
 
 export class Migrations1718012430697 implements MigrationInterface {
-
     public async up(queryRunner: QueryRunner): Promise<void> {
         const DB_STRING_TYPE = "VARCHAR";
         const DB_UUID_GENERATOR = "uuid_generate_v4()";
 
-        await queryRunner.createTable(new Table(
-            {
+        await queryRunner.createTable(
+            new Table({
                 name: "groups",
                 columns: [
                     {
@@ -16,17 +15,17 @@ export class Migrations1718012430697 implements MigrationInterface {
                         length: "36",
                         generationStrategy: "uuid",
                         isPrimary: true,
-                        default: DB_UUID_GENERATOR
+                        default: DB_UUID_GENERATOR,
                     },
                     {
                         name: "name",
                         type: DB_STRING_TYPE,
-                        isNullable: false
+                        isNullable: false,
                     },
                     {
                         name: "tenant_id",
                         type: DB_STRING_TYPE,
-                        isNullable: false
+                        isNullable: false,
                     },
                     {
                         name: "created_at",
@@ -37,17 +36,15 @@ export class Migrations1718012430697 implements MigrationInterface {
                 uniques: [
                     {
                         name: "tenant_group_name_unq_constrain",
-                        columnNames: [
-                            "tenant_id",
-                            "name"
-                        ]
-                    }
-                ]
-            }
-        ), true);
+                        columnNames: ["tenant_id", "name"],
+                    },
+                ],
+            }),
+            true,
+        );
 
-        await queryRunner.createTable(new Table(
-            {
+        await queryRunner.createTable(
+            new Table({
                 name: "group_users",
                 columns: [
                     {
@@ -60,13 +57,13 @@ export class Migrations1718012430697 implements MigrationInterface {
                         name: "tenant_id",
                         type: DB_STRING_TYPE,
                         isPrimary: true,
-                        isNullable: false
+                        isNullable: false,
                     },
                     {
                         name: "user_id",
                         type: DB_STRING_TYPE,
                         isPrimary: true,
-                        isNullable: false
+                        isNullable: false,
                     },
                     {
                         name: "created_at",
@@ -91,13 +88,14 @@ export class Migrations1718012430697 implements MigrationInterface {
                         columnNames: ["group_id"],
                         referencedColumnNames: ["id"],
                         referencedTableName: "groups",
-                    }
-                ]
-            }
-        ), true);
+                    },
+                ],
+            }),
+            true,
+        );
 
-        await queryRunner.createTable(new Table(
-            {
+        await queryRunner.createTable(
+            new Table({
                 name: "group_roles",
                 columns: [
                     {
@@ -110,13 +108,13 @@ export class Migrations1718012430697 implements MigrationInterface {
                         name: "tenant_id",
                         type: DB_STRING_TYPE,
                         isPrimary: true,
-                        isNullable: false
+                        isNullable: false,
                     },
                     {
                         name: "role_id",
                         type: DB_STRING_TYPE,
                         isPrimary: true,
-                        isNullable: false
+                        isNullable: false,
                     },
                     {
                         name: "created_at",
@@ -141,10 +139,11 @@ export class Migrations1718012430697 implements MigrationInterface {
                         columnNames: ["role_id"],
                         referencedColumnNames: ["id"],
                         referencedTableName: "roles",
-                    }
-                ]
-            }
-        ), true)
+                    },
+                ],
+            }),
+            true,
+        );
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
@@ -152,5 +151,4 @@ export class Migrations1718012430697 implements MigrationInterface {
         await queryRunner.dropTable("group_users");
         await queryRunner.dropTable("group_roles");
     }
-
 }

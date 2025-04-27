@@ -1,20 +1,23 @@
-import {CanActivate, ExecutionContext, Injectable, Logger} from '@nestjs/common';
+import {
+    CanActivate,
+    ExecutionContext,
+    Injectable,
+    Logger,
+} from "@nestjs/common";
 import {UnauthorizedException} from "../exceptions/unauthorized.exception";
-import {ExtractJwt} from 'passport-jwt';
+import {ExtractJwt} from "passport-jwt";
 import {AuthService} from "./auth.service";
 import {CaslAbilityFactory} from "../casl/casl-ability.factory";
 import {GRANT_TYPES, TenantToken} from "../casl/contexts";
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
-
     private static readonly LOGGER = new Logger("JwtAuthGuard");
 
     constructor(
         private readonly authService: AuthService,
         private readonly caslAbilityFactory: CaslAbilityFactory,
-    ) {
-    }
+    ) {}
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
         const request = context.switchToHttp().getRequest();
@@ -24,7 +27,11 @@ export class JwtAuthGuard implements CanActivate {
             // so that we can access it in our route handlers
             const payload = await this.setSecurityContextFromRequest(request);
         } catch (e) {
-            JwtAuthGuard.LOGGER.error("Error occurred in Security Context", e.message, e.stack);
+            JwtAuthGuard.LOGGER.error(
+                "Error occurred in Security Context",
+                e.message,
+                e.stack,
+            );
             throw new UnauthorizedException(e);
         }
         return true;
@@ -34,7 +41,9 @@ export class JwtAuthGuard implements CanActivate {
         const authHeader = request.headers.authorization;
 
         if (!authHeader) {
-            throw new UnauthorizedException("No authentication credentials provided");
+            throw new UnauthorizedException(
+                "No authentication credentials provided",
+            );
         }
 
         let payload: TenantToken;
@@ -52,52 +61,69 @@ export class JwtAuthGuard implements CanActivate {
         } else if (authHeader.startsWith("Basic ")) {
             const credentials = extractBasicAuthCredentials(authHeader);
             if (!credentials) {
-                throw new UnauthorizedException("Invalid Basic Authentication credentials");
+                throw new UnauthorizedException(
+                    "Invalid Basic Authentication credentials",
+                );
             }
 
             try {
-                payload = await this.validateBasicAuth(credentials.username, credentials.password);
+                payload = await this.validateBasicAuth(
+                    credentials.username,
+                    credentials.password,
+                );
                 JwtAuthGuard.LOGGER.log("basic authentication credentials in");
             } catch (error) {
-                throw new UnauthorizedException("Invalid Basic Authentication credentials");
+                throw new UnauthorizedException(
+                    "Invalid Basic Authentication credentials",
+                );
             }
         } else {
             throw new UnauthorizedException("Unsupported authentication type");
         }
 
         if (payload.grant_type === GRANT_TYPES.PASSWORD) {
-            request['user'] = payload;
+            request["user"] = payload;
         }
-        const ability = await this.caslAbilityFactory.createForSecurityContext(payload);
+        const ability =
+            await this.caslAbilityFactory.createForSecurityContext(payload);
         request["SECURITY_CONTEXT"] = payload;
         request["SCOPE_ABILITIES"] = ability;
         return payload;
     }
 
-    private async validateBasicAuth(id: string, secret: string): Promise<TenantToken> {
+    private async validateBasicAuth(
+        id: string,
+        secret: string,
+    ): Promise<TenantToken> {
         if (!id || !secret) {
             throw new UnauthorizedException("Invalid Basic Auth format");
         }
 
-        if (id.includes('@')) {
+        if (id.includes("@")) {
             // Email-based authentication (Username/Password)
-            throw new UnauthorizedException("basic auth not supported for user login");
+            throw new UnauthorizedException(
+                "basic auth not supported for user login",
+            );
         } else {
             // Client ID/Secret authentication
-            const tenant = await this.authService.validateClientCredentials(id, secret);
+            const tenant = await this.authService.validateClientCredentials(
+                id,
+                secret,
+            );
 
             return this.authService.createTechnicalToken(tenant, []);
         }
     }
-
 }
 
 function extractTokenFromHeader(request: any) {
     let extractor = ExtractJwt.fromAuthHeaderAsBearerToken();
-    return extractor(request)
+    return extractor(request);
 }
 
-function extractBasicAuthCredentials(authHeader: string): { username: string; password: string } | null {
+function extractBasicAuthCredentials(
+    authHeader: string,
+): {username: string; password: string} | null {
     const base64Credentials = authHeader.split(" ")[1];
     const decoded = Buffer.from(base64Credentials, "base64").toString("utf-8");
     const [username, password] = decoded.split(":");

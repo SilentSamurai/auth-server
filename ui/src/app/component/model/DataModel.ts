@@ -1,106 +1,175 @@
-import {EventEmitter} from "@angular/core";
-import {Filter} from "./Filters";
+import {
+    IDataModel,
+    DataModelStatus,
+    DataSource,
+    DataSourceEvents,
+    Query,
+    ReturnedData,
+    IQueryConfig,
+} from './IDataModel';
+import {Observable, Subscription} from 'rxjs';
 
+// Helper function to create a stable string representation of the query for caching
+function getQueryCacheKey(query: Query): string {
+    // Ensure consistent property order for reliable caching
+    const keyObject = {
+        pageNo: query.pageNo ?? 0,
+        pageSize: query.pageSize ?? 10, // Use default or actual
+        filters: query.filters
+            ? [...query.filters].sort((a, b) => a.field.localeCompare(b.field))
+            : [],
+        orderBy: query.orderBy
+            ? [...query.orderBy].sort((a, b) => a.field.localeCompare(b.field))
+            : [],
+        expand: query.expand ? [...query.expand].sort() : [],
+    };
+    return JSON.stringify(keyObject);
+}
 
-export class Query {
-    private _pageNo: number = 0;
-    private _pageSize: number = 50;
-    private _filters: Filter[] = [];
-    private _orderBy: any[] = [];
-    private _expand: string[] = [];
+interface CachedValue<T> {
+    data: T[];
+    count: number;
+    isLastPage: boolean;
+}
 
-    get pageNo(): number {
-        return this._pageNo;
+export class DataModel<T> implements IDataModel<T> {
+    protected status: DataModelStatus = {
+        loading: false,
+        isLastPageReached: false,
+    };
+    protected queryCache = new Map<string, CachedValue<T>>();
+    protected maxCacheSize = 10;
+    totalCount: number | null = null; // Total count might vary based on filters
+    private subscription: Subscription;
+
+    public constructor(protected _dataSource: DataSource<T>) {
+        this.subscription = this._dataSource.updates().subscribe((x) => {
+            if (x.type == 'data-updated') {
+                this.reset();
+            }
+        });
     }
 
-    set pageNo(value: number) {
-        this._pageNo = value;
+    dataSourceEvents(): Observable<DataSourceEvents> {
+        return this.dataSource().updates();
     }
 
-    get pageSize(): number {
-        return this._pageSize;
+    dataSource(): DataSource<T> {
+        return this._dataSource;
     }
 
-    set pageSize(value: number) {
-        if (value < 0) {
-            console.warn("Negative number not allowed in page size");
-            return;
+    getStatus(): DataModelStatus {
+        return this.status;
+    }
+
+    hasPage(pageNo: number, pageSize: number): boolean {
+        if (pageNo === 0) {
+            return true; // Always assume page 0 exists
         }
-        this._pageSize = value;
+        if (this.totalCount == null || isNaN(this.totalCount)) {
+            return false;
+        }
+        const pageCount = Math.ceil(this.totalCount / pageSize);
+        return pageNo < pageCount;
     }
 
-    get filters(): Filter[] {
-        return this._filters;
+    totalRowCount(): number {
+        if (this.totalCount == null || isNaN(this.totalCount)) {
+            return 0;
+        }
+        return this.totalCount;
     }
 
-    set filters(value: Filter[]) {
-        this._filters = value.filter(item => item.value != null && item.value.length > 0);
+    // execute(): Observable<DataPushEvent<T>> {
+    //     this.debounceTrigger$.next();
+    //     return this.debouncedExecution$;
+    // }
+
+    async execute(query: Query): Promise<ReturnedData<T>> {
+        return await this.apply(query);
     }
 
-    get orderBy(): any[] {
-        return this._orderBy;
+    private isLastPage(pageNo: number, pageSize: number) {
+        if (this.totalCount != null && !isNaN(this.totalCount)) {
+            const pageCount = Math.ceil(this.totalCount / pageSize);
+            return pageNo + 1 >= pageCount;
+        }
+        return true;
     }
 
-    set orderBy(value: any[]) {
-        this._orderBy = value;
+    // Check if the result for a specific query is cached
+    private isCached(queryKey: string): boolean {
+        return this.queryCache.has(queryKey);
     }
 
-    get expand(): string[] {
-        return this._expand;
+    // Cache the result for a specific query
+    private cacheQueryResult(queryKey: string, data: CachedValue<T>) {
+        if (this.queryCache.size >= this.maxCacheSize) {
+            // Evict the oldest entry (Map preserves insertion order)
+            const oldestKey = this.queryCache.keys().next().value;
+            this.queryCache.delete(oldestKey);
+        }
+        this.queryCache.set(queryKey, data);
     }
 
-    set expand(value: string[]) {
-        this._expand = value;
+    private async apply(query: Query): Promise<ReturnedData<T>> {
+        const queryKey = getQueryCacheKey(query);
+        const page = query.pageNo ?? 0;
+        const pageSize = query.pageSize ?? 10;
+
+        if (this.isCached(queryKey)) {
+            // Return cached data, update status if needed
+            const cachedResult = this.queryCache.get(queryKey)!;
+            this.status.isLastPageReached = cachedResult.isLastPage;
+            return cachedResult;
+        }
+
+        this.status.loading = true;
+
+        try {
+            // Fetch total count only if it's unknown for the current filter context
+            if (this.totalCount == null || isNaN(this.totalCount)) {
+                this.totalCount = await this._dataSource.totalCount(query);
+            }
+
+            // Fetch the actual data
+            let rd = await this._dataSource.fetchData(query);
+            let data = rd.data;
+
+            // Determine if this is the last page based on fetched data and total count
+            const isEmpty = data.length === 0;
+            const isLastPageBasedOnFetch = isEmpty || data.length < pageSize;
+            const isLastPageBasedOnTotal = this.isLastPage(page, pageSize);
+            const isLastPage = isLastPageBasedOnFetch || isLastPageBasedOnTotal;
+
+            const result: CachedValue<T> = {
+                data: data,
+                count: data.length,
+                isLastPage: isLastPage,
+            };
+
+            this.cacheQueryResult(queryKey, result);
+            this.status.isLastPageReached = isLastPage;
+
+            return result;
+        } catch (error: any) {
+            console.error('Error executing query:', error);
+            this.status.error = error.message || 'fetch error';
+            throw error;
+        } finally {
+            this.status.loading = false;
+        }
+    }
+
+    reset(): void {
+        this.totalCount = null;
+        this.queryCache.clear(); // Clear the query cache
+        this.status.isLastPageReached = false;
+        this.status.loading = false;
+        this.status.error = undefined;
+    }
+
+    destroy() {
+        this.subscription.unsubscribe();
     }
 }
-
-
-export enum DataPushEventStatus {
-    UPDATED_DATA,
-    START_FETCH,
-    END_FETCH
-}
-
-export class DataPushEvent {
-    srcOptions: any;
-    operation: DataPushEventStatus = DataPushEventStatus.UPDATED_DATA;
-    data: any[] | null = [];
-    pageNo: number | null = null;
-}
-
-export interface DataModel {
-
-    dataPusher(): EventEmitter<DataPushEvent>;
-
-    getKeyFields(): string[];
-
-    filter(filters: Filter[]): void;
-
-    getFilters(): Filter[];
-
-    orderBy(sortBy: any[]): void;
-
-    getOrderBy(): any[];
-
-    getPageSize(): number;
-
-    pageSize(pageSize: number): void;
-
-    pageNo(pageNo: number): void;
-
-    getPageNo(): number;
-
-    apply(srcOptions: any): Promise<boolean>;
-
-    getData(): any[];
-
-    hasNextPage(pageNo: number): boolean;
-
-    hasPage(pageNo: number): boolean;
-
-    totalRowCount(): number;
-
-    getPageNoFromRow(first: number): number;
-}
-
-

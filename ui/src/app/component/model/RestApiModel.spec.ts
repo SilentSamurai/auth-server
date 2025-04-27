@@ -1,158 +1,145 @@
 import {RestApiModel} from './RestApiModel';
-import {HttpClient} from '@angular/common/http';
-import {of} from 'rxjs';
-import {DataPushEventStatus} from './DataModel';
+import {
+    HttpClientTestingModule,
+    HttpTestingController,
+} from '@angular/common/http/testing';
+import {TestBed} from '@angular/core/testing';
 import {Filter} from './Filters';
-import {Operators} from './Operator'; // Assuming Operator is imported from a module
+import {Operators} from './Operator';
+import {HttpClient} from '@angular/common/http';
+import {Query, SortConfig} from './IDataModel';
 
 describe('RestApiModel', () => {
-    let restApiModel: RestApiModel;
-    let httpClientSpy: jasmine.SpyObj<HttpClient>;
+    let httpMock: HttpTestingController;
+    let httpClient: HttpClient;
+    let apiModel: RestApiModel<any>;
+    const apiUrl = '/api/data';
 
     beforeEach(() => {
-        httpClientSpy = jasmine.createSpyObj('HttpClient', ['post']);
-        restApiModel = new RestApiModel(httpClientSpy, '/api/data', ['id'], []);
+        TestBed.configureTestingModule({
+            imports: [HttpClientTestingModule],
+        });
+
+        httpMock = TestBed.inject(HttpTestingController);
+        httpClient = TestBed.inject(HttpClient);
+        apiModel = new RestApiModel(httpClient, apiUrl, ['id']);
     });
 
-    it('should create an instance', () => {
-        expect(restApiModel).toBeTruthy();
+    afterEach(() => {
+        httpMock.verify();
     });
 
-    it('should emit events when apply is called', async () => {
-        const spy = spyOn(restApiModel.dataPusher(), 'emit');
-        httpClientSpy.post.and.returnValue(of({data: [], totalCount: 0}));
+    const verifyRequest = (req: any, expectedBody: any) => {
+        expect(req.request.method).toBe('POST');
+        expect(req.request.headers.get('Content-Type')).toBe(
+            'application/json',
+        );
+        expect(req.request.body).toEqual(
+            jasmine.objectContaining(expectedBody),
+        );
+    };
 
-        await restApiModel.apply({});
+    it('should make correct data fetch requests', async () => {
+        const testQuery = new Query({
+            pageNo: 0,
+            pageSize: 25,
+            filters: [new Filter('status', 'Status', 'active', Operators.EQ)],
+            orderBy: [{field: 'name', order: 'asc'} as SortConfig],
+            expand: ['details'],
+        });
 
-        expect(spy.calls.allArgs()).toEqual([
-            [{
-                srcOptions: {},
-                operation: DataPushEventStatus.START_FETCH,
-                data: null,
-                pageNo: null
-            }],
-            [{
-                srcOptions: {},
-                operation: DataPushEventStatus.UPDATED_DATA,
-                data: [],
-                pageNo: 0
-            }],
-            [{
-                srcOptions: {},
-                operation: DataPushEventStatus.END_FETCH,
-                data: null,
-                pageNo: null
-            }]
-        ]);
+        const promise = apiModel.fetchData(testQuery); // Start the call, don't await yet!
+
+        const req = httpMock.expectOne(apiUrl); // Match the outgoing request
+
+        verifyRequest(req, {
+            pageNo: 0,
+            pageSize: 25,
+            where: [
+                jasmine.objectContaining({
+                    field: 'status',
+                    value: 'active',
+                    operator: jasmine.objectContaining({
+                        label: 'equals',
+                        symbol: '=',
+                    }),
+                }),
+            ],
+            orderBy: [{field: 'name', order: 'asc'}],
+            expand: ['details'],
+        });
+
+        req.flush({data: [{id: 1}]}); // Respond to the request
+
+        const result = await promise; // NOW await the promise after flush
+
+        expect(result.data).toEqual([{id: 1}]); // Assertions
     });
 
-    it('should set data and totalCount when apply is called', async () => {
-        const mockResponse = {data: [{id: 1, name: 'test'}]};
-        const countResponse = {count: 1};
-        httpClientSpy.post.and.returnValues(of(countResponse), of(mockResponse) );
+    it('should handle count requests', async () => {
+        const testQuery = new Query({
+            filters: [new Filter('active', 'Active', 'true', Operators.EQ)],
+        });
 
-        await restApiModel.apply({});
+        const promise = apiModel.totalCount(testQuery);
 
-        expect(restApiModel.getData()).toEqual(mockResponse.data);
-        expect(restApiModel.totalCount).toBe(countResponse.count);
+        const req = httpMock.expectOne(apiUrl);
+        verifyRequest(req, {
+            where: [jasmine.objectContaining({value: 'true'})],
+            select: 'count',
+        });
+
+        req.flush({count: 5});
+        const result = await promise;
+        expect(result).toBe(5);
     });
 
-    it('should update filters correctly', () => {
-        const filters: Filter[] = [
-            new Filter('name', 'Name', 'test', Operators.EQ)
-        ];
-        restApiModel.filter(filters);
+    it('should maintain consistent content headers', async () => {
+        const dataPromise = apiModel.fetchData(new Query({}));
+        const countPromise = apiModel.totalCount(new Query({}));
 
-        expect(restApiModel.getFilters()).toEqual(filters);
+        const requests = httpMock.match(apiUrl);
+        expect(requests.length).toBe(2);
+
+        requests.forEach((req) => {
+            expect(req.request.headers.get('Content-Type')).toBe(
+                'application/json',
+            );
+        });
+
+        requests[0].flush({data: []});
+        requests[1].flush({count: 0});
+
+        expect((await dataPromise).data).toEqual([]);
+        expect(await countPromise).toBe(0);
     });
 
-    it('should return correct page size', () => {
-        restApiModel.pageSize(50);
-
-        expect(restApiModel.getPageSize()).toBe(50);
-    });
-
-    it('should update page number correctly', () => {
-        restApiModel.pageNo(2);
-
-        expect(restApiModel.getPageNo()).toBe(2);
-    });
-
-    it('should return true for hasPage if totalCount is null', () => {
-        restApiModel.totalCount = null;
-
-        expect(restApiModel.hasPage(1)).toBeTrue();
-    });
-
-    it('should return false for hasNextPage if there are no more pages', () => {
-        restApiModel.totalCount = 30;
-        restApiModel.pageSize(10);
-
-        expect(restApiModel.hasNextPage(2)).toBeFalse();
-    });
-
-    it('should return true for hasNextPage if there are more pages', () => {
-        restApiModel.totalCount = 30;
-        restApiModel.pageSize(10);
-
-        expect(restApiModel.hasNextPage(1)).toBeTrue();
-    });
-
-    it('should update orderBy correctly', () => {
-        const orderBy = [{field: 'name', direction: 'asc'}];
-        restApiModel.orderBy(orderBy);
-
-        expect(restApiModel.getOrderBy()).toEqual(orderBy);
-    });
-
-    it('should update expand options correctly', () => {
-        const expand = ['details'];
-        restApiModel.expands(expand);
-
-        expect(restApiModel.getExpand()).toEqual(expand);
-    });
-
-    it('should emit event when filters are set', async () => {
-        const spy = spyOn(restApiModel.dataPusher(), 'emit');
-        const filters: Filter[] = [
-            new Filter('name', 'Name', 'test', Operators.EQ)
+    it('should process complex filter combinations', async () => {
+        const complexFilters = [
+            new Filter('price', 'Price', '100', Operators.GT),
+            new Filter('name', 'Name', 'test', Operators.CONTAINS),
         ];
 
-        const newData = [{id: 1, name: 'test'}]
+        const testQuery = new Query({
+            filters: complexFilters,
+        });
 
-        httpClientSpy.post.and.returnValue(of({data: newData, totalCount: 1}));
+        const promise = apiModel.fetchData(testQuery);
 
-        restApiModel.filter(filters);
-        await restApiModel.apply({});
+        const mock = httpMock.expectOne(apiUrl);
+        expect(mock.request.body.where).toEqual(complexFilters);
 
-        expect(httpClientSpy.post).toHaveBeenCalledWith("/api/data", jasmine.objectContaining({
-            where: filters.map(i => i.toJSON())
-        }), jasmine.any(Object))
-
-        expect(spy).toHaveBeenCalledWith(jasmine.objectContaining({
-            operation: DataPushEventStatus.UPDATED_DATA,
-            data: newData
-        }));
+        mock.flush({data: []});
+        expect((await promise).data).toEqual([]);
     });
 
-    it('should emit event when orderBy is set', async () => {
-        const spy = spyOn(restApiModel.dataPusher(), 'emit');
-        const orderBy = [{field: 'name', direction: 'asc'}];
-        const newData = [{id: 1, name: 'test'}]
+    it('should handle empty responses', async () => {
+        const dataPromise = apiModel.fetchData(new Query({}));
+        httpMock.expectOne(apiUrl).flush({data: []});
+        expect((await dataPromise).data).toEqual([]);
 
-        httpClientSpy.post.and.returnValue(of({data: newData, totalCount: 1}));
-
-        restApiModel.orderBy(orderBy);
-        await restApiModel.apply({});
-
-        expect(httpClientSpy.post).toHaveBeenCalledWith("/api/data", jasmine.objectContaining({
-            orderBy: orderBy
-        }), jasmine.any(Object))
-
-
-        expect(spy).toHaveBeenCalledWith(jasmine.objectContaining({
-            operation: DataPushEventStatus.UPDATED_DATA,
-            data: newData
-        }));
+        const countPromise = apiModel.totalCount(new Query({}));
+        httpMock.expectOne(apiUrl).flush({count: 0});
+        expect(await countPromise).toBe(0);
     });
 });

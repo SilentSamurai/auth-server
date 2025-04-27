@@ -1,3 +1,4 @@
+
 {
     "records": [
         {
@@ -117,6 +118,726 @@
             "name": "Boromir",
             "surname": "",
             "birthdate": "2000-01-01",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "jstone",
+            "password": "jstone9000",
+            "email": "john.stone@example.com",
+            "avatar": "",
+            "name": "John",
+            "surname": "Stone",
+            "birthdate": "1985-06-15",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "pponnappa",
+            "password": "pponnappa9000",
+            "email": "ponnappa.priya@example.com",
+            "avatar": "",
+            "name": "Priya",
+            "surname": "Ponnappa",
+            "birthdate": "1990-09-22",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "mwong",
+            "password": "mwong9000",
+            "email": "mia.wong@example.com",
+            "avatar": "",
+            "name": "Mia",
+            "surname": "Wong",
+            "birthdate": "1992-03-10",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "pstanbridge",
+            "password": "pstanbridge9000",
+            "email": "peter.stanbridge@example.com",
+            "avatar": "",
+            "name": "Peter",
+            "surname": "Stanbridge",
+            "birthdate": "1988-11-05",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "nleewalsh",
+            "password": "nleewalsh9000",
+            "email": "natalie.leewalsh@example.com",
+            "avatar": "",
+            "name": "Natalie",
+            "surname": "Lee-Walsh",
+            "birthdate": "1995-07-19",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "ali",
+            "password": "ali9000",
+            "email": "ang.li@example.com",
+            "avatar": "",
+            "name": "Ang",
+            "surname": "Li",
+            "birthdate": "1987-12-03",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "nguta",
+            "password": "nguta9000",
+            "email": "ithya.nguta@example.com",
+            "avatar": "",
+            "name": "Ithya",
+            "surname": "Nguta",
+            "birthdate": "1993-04-27",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "tfrench",
+            "password": "tfrench9000",
+            "email": "tamzyn.french@example.com",
+            "avatar": "",
+            "name": "Tamzyn",
+            "surname": "French",
+            "birthdate": "1991-08-14",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "ssimoes",
+            "password": "ssimoes9000",
+            "email": "salome.simoes@example.com",
+            "avatar": "",
+            "name": "Salome",
+            "surname": "Simoes",
+            "birthdate": "1989-02-20",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "tvirtue",
+            "password": "tvirtue9000",
+            "email": "trevor.virtue@example.com",
+            "avatar": "",
+            "name": "Trevor",
+            "surname": "Virtue",
+            "birthdate": "1986-10-30",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "user21",
+            "password": "password21",
+            "email": "user21@example.com",
+            "avatar": "",
+            "name": "FirstName21",
+            "surname": "LastName21",
+            "birthdate": "1990-01-21",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "user22",
+            "password": "password22",
+            "email": "user22@example.com",
+            "avatar": "",
+            "name": "FirstName22",
+            "surname": "LastName22",
+            "birthdate": "1990-01-22",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "user23",
+            "password": "password23",
+            "email": "user23@example.com",
+            "avatar": "",
+            "name": "FirstName23",
+            "surname": "LastName23",
+            "birthdate": "1990-01-23",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "user24",
+            "password": "password24",
+            "email": "user24@example.com",
+            "avatar": "",
+            "name": "FirstName24",
+            "surname": "LastName24",
+            "birthdate": "1990-01-24",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "user25",
+            "password": "password25",
+            "email": "user25@example.com",
+            "avatar": "",
+            "name": "FirstName25",
+            "surname": "LastName25",
+            "birthdate": "1990-01-25",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "user26",
+            "password": "password26",
+            "email": "user26@example.com",
+            "avatar": "",
+            "name": "FirstName26",
+            "surname": "LastName26",
+            "birthdate": "1990-01-26",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "user27",
+            "password": "password27",
+            "email": "user27@example.com",
+            "avatar": "",
+            "name": "FirstName27",
+            "surname": "LastName27",
+            "birthdate": "1990-01-27",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "user28",
+            "password": "password28",
+            "email": "user28@example.com",
+            "avatar": "",
+            "name": "FirstName28",
+            "surname": "LastName28",
+            "birthdate": "1990-01-28",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "user29",
+            "password": "password29",
+            "email": "user29@example.com",
+            "avatar": "",
+            "name": "FirstName29",
+            "surname": "LastName29",
+            "birthdate": "1990-01-29",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "user30",
+            "password": "password30",
+            "email": "user30@example.com",
+            "avatar": "",
+            "name": "FirstName30",
+            "surname": "LastName30",
+            "birthdate": "1990-01-30",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "user31",
+            "password": "password31",
+            "email": "user31@example.com",
+            "avatar": "",
+            "name": "FirstName31",
+            "surname": "LastName31",
+            "birthdate": "1990-01-31",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "user32",
+            "password": "password32",
+            "email": "user32@example.com",
+            "avatar": "",
+            "name": "FirstName32",
+            "surname": "LastName32",
+            "birthdate": "1990-02-01",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "user33",
+            "password": "password33",
+            "email": "user33@example.com",
+            "avatar": "",
+            "name": "FirstName33",
+            "surname": "LastName33",
+            "birthdate": "1990-02-02",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "user34",
+            "password": "password34",
+            "email": "user34@example.com",
+            "avatar": "",
+            "name": "FirstName34",
+            "surname": "LastName34",
+            "birthdate": "1990-02-03",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "user35",
+            "password": "password35",
+            "email": "user35@example.com",
+            "avatar": "",
+            "name": "FirstName35",
+            "surname": "LastName35",
+            "birthdate": "1990-02-04",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "user36",
+            "password": "password36",
+            "email": "user36@example.com",
+            "avatar": "",
+            "name": "FirstName36",
+            "surname": "LastName36",
+            "birthdate": "1990-02-05",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "user37",
+            "password": "password37",
+            "email": "user37@example.com",
+            "avatar": "",
+            "name": "FirstName37",
+            "surname": "LastName37",
+            "birthdate": "1990-02-06",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "user38",
+            "password": "password38",
+            "email": "user38@example.com",
+            "avatar": "",
+            "name": "FirstName38",
+            "surname": "LastName38",
+            "birthdate": "1990-02-07",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "user39",
+            "password": "password39",
+            "email": "user39@example.com",
+            "avatar": "",
+            "name": "FirstName39",
+            "surname": "LastName39",
+            "birthdate": "1990-02-08",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "user40",
+            "password": "password40",
+            "email": "user40@example.com",
+            "avatar": "",
+            "name": "FirstName40",
+            "surname": "LastName40",
+            "birthdate": "1990-02-09",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "user41",
+            "password": "password41",
+            "email": "user41@example.com",
+            "avatar": "",
+            "name": "FirstName41",
+            "surname": "LastName41",
+            "birthdate": "1990-02-10",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "user42",
+            "password": "password42",
+            "email": "user42@example.com",
+            "avatar": "",
+            "name": "FirstName42",
+            "surname": "LastName42",
+            "birthdate": "1990-02-11",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "user43",
+            "password": "password43",
+            "email": "user43@example.com",
+            "avatar": "",
+            "name": "FirstName43",
+            "surname": "LastName43",
+            "birthdate": "1990-02-12",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "user44",
+            "password": "password44",
+            "email": "user44@example.com",
+            "avatar": "",
+            "name": "FirstName44",
+            "surname": "LastName44",
+            "birthdate": "1990-02-13",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "user45",
+            "password": "password45",
+            "email": "user45@example.com",
+            "avatar": "",
+            "name": "FirstName45",
+            "surname": "LastName45",
+            "birthdate": "1990-02-14",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "user46",
+            "password": "password46",
+            "email": "user46@example.com",
+            "avatar": "",
+            "name": "FirstName46",
+            "surname": "LastName46",
+            "birthdate": "1990-02-15",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "user47",
+            "password": "password47",
+            "email": "user47@example.com",
+            "avatar": "",
+            "name": "FirstName47",
+            "surname": "LastName47",
+            "birthdate": "1990-02-16",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "user48",
+            "password": "password48",
+            "email": "user48@example.com",
+            "avatar": "",
+            "name": "FirstName48",
+            "surname": "LastName48",
+            "birthdate": "1990-02-17",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "user49",
+            "password": "password49",
+            "email": "user49@example.com",
+            "avatar": "",
+            "name": "FirstName49",
+            "surname": "LastName49",
+            "birthdate": "1990-02-18",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "user50",
+            "password": "password50",
+            "email": "user50@example.com",
+            "avatar": "",
+            "name": "FirstName50",
+            "surname": "LastName50",
+            "birthdate": "1990-02-19",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "user51",
+            "password": "password51",
+            "email": "user51@example.com",
+            "avatar": "",
+            "name": "FirstName51",
+            "surname": "LastName51",
+            "birthdate": "1990-02-20",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "user52",
+            "password": "password52",
+            "email": "user52@example.com",
+            "avatar": "",
+            "name": "FirstName52",
+            "surname": "LastName52",
+            "birthdate": "1990-02-21",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "user53",
+            "password": "password53",
+            "email": "user53@example.com",
+            "avatar": "",
+            "name": "FirstName53",
+            "surname": "LastName53",
+            "birthdate": "1990-02-22",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "user54",
+            "password": "password54",
+            "email": "user54@example.com",
+            "avatar": "",
+            "name": "FirstName54",
+            "surname": "LastName54",
+            "birthdate": "1990-02-23",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "user55",
+            "password": "password55",
+            "email": "user55@example.com",
+            "avatar": "",
+            "name": "FirstName55",
+            "surname": "LastName55",
+            "birthdate": "1990-02-24",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "user56",
+            "password": "password56",
+            "email": "user56@example.com",
+            "avatar": "",
+            "name": "FirstName56",
+            "surname": "LastName56",
+            "birthdate": "1990-02-25",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "user57",
+            "password": "password57",
+            "email": "user57@example.com",
+            "avatar": "",
+            "name": "FirstName57",
+            "surname": "LastName57",
+            "birthdate": "1990-02-26",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "user58",
+            "password": "password58",
+            "email": "user58@example.com",
+            "avatar": "",
+            "name": "FirstName58",
+            "surname": "LastName58",
+            "birthdate": "1990-02-27",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "user59",
+            "password": "password59",
+            "email": "user59@example.com",
+            "avatar": "",
+            "name": "FirstName59",
+            "surname": "LastName59",
+            "birthdate": "1990-02-28",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "user60",
+            "password": "password60",
+            "email": "user60@example.com",
+            "avatar": "",
+            "name": "FirstName60",
+            "surname": "LastName60",
+            "birthdate": "1990-03-01",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "user61",
+            "password": "password61",
+            "email": "user61@example.com",
+            "avatar": "",
+            "name": "FirstName61",
+            "surname": "LastName61",
+            "birthdate": "1990-03-02",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "user62",
+            "password": "password62",
+            "email": "user62@example.com",
+            "avatar": "",
+            "name": "FirstName62",
+            "surname": "LastName62",
+            "birthdate": "1990-03-03",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "user63",
+            "password": "password63",
+            "email": "user63@example.com",
+            "avatar": "",
+            "name": "FirstName63",
+            "surname": "LastName63",
+            "birthdate": "1990-03-04",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "user64",
+            "password": "password64",
+            "email": "user64@example.com",
+            "avatar": "",
+            "name": "FirstName64",
+            "surname": "LastName64",
+            "birthdate": "1990-03-05",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "user65",
+            "password": "password65",
+            "email": "user65@example.com",
+            "avatar": "",
+            "name": "FirstName65",
+            "surname": "LastName65",
+            "birthdate": "1990-03-06",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "user66",
+            "password": "password66",
+            "email": "user66@example.com",
+            "avatar": "",
+            "name": "FirstName66",
+            "surname": "LastName66",
+            "birthdate": "1990-03-07",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "user67",
+            "password": "password67",
+            "email": "user67@example.com",
+            "avatar": "",
+            "name": "FirstName67",
+            "surname": "LastName67",
+            "birthdate": "1990-03-08",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "user68",
+            "password": "password68",
+            "email": "user68@example.com",
+            "avatar": "",
+            "name": "FirstName68",
+            "surname": "LastName68",
+            "birthdate": "1990-03-09",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "user69",
+            "password": "password69",
+            "email": "user69@example.com",
+            "avatar": "",
+            "name": "FirstName69",
+            "surname": "LastName69",
+            "birthdate": "1990-03-10",
+            "roles": [
+                "user"
+            ]
+        },
+        {
+            "username": "user70",
+            "password": "password70",
+            "email": "user70@example.com",
+            "avatar": "",
+            "name": "FirstName70",
+            "surname": "LastName70",
+            "birthdate": "1990-03-11",
             "roles": [
                 "user"
             ]

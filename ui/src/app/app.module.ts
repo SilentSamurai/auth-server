@@ -10,20 +10,30 @@ import {RegisterComponent} from './register/register.component';
 import {ProfileComponent} from './profile/profile.component';
 
 import {authInterceptorProviders} from './_helpers/auth.interceptor';
-import {NgbCollapseModule, NgbDropdown, NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {
+    NgbCollapseModule,
+    NgbDropdown,
+    NgbModule,
+} from '@ng-bootstrap/ng-bootstrap';
 import {TableModule} from 'primeng/table';
-import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
-import {ToastModule} from "primeng/toast";
-import {ConfirmationService, MessageService} from "primeng/api";
-import {RouterModule} from "@angular/router";
-import {SessionConfirmationComponent} from "./session/session-confirmation.component";
-import {SecureModule} from "./secure/secure.module";
-import {CardModule} from "primeng/card";
-import {ComponentModule} from "./component/component.module";
-import {ConfirmDialogModule} from "primeng/confirmdialog";
-import {HttpErrorComponent} from "./error-pages/HttpError.component";
-import {AbilityModule} from "@casl/angular";
-import {Ability, createMongoAbility, MongoAbility, PureAbility} from "@casl/ability";
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {ToastModule} from 'primeng/toast';
+import {ConfirmationService, MessageService} from 'primeng/api';
+import {RouterModule} from '@angular/router';
+import {SessionConfirmationComponent} from './session/session-confirmation.component';
+import {SecureModule} from './secure/secure.module';
+import {CardModule} from 'primeng/card';
+import {ComponentModule} from './component/component.module';
+import {ConfirmDialogModule} from 'primeng/confirmdialog';
+import {HttpErrorComponent} from './error-pages/HttpError.component';
+import {AbilityModule} from '@casl/angular';
+import {
+    Ability,
+    createMongoAbility,
+    MongoAbility,
+    PureAbility,
+} from '@casl/ability';
+import {ThemeToggleComponent} from './component/theme-toggle/theme-toggle.component';
 
 @NgModule({
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -33,7 +43,7 @@ import {Ability, createMongoAbility, MongoAbility, PureAbility} from "@casl/abil
         RegisterComponent,
         ProfileComponent,
         SessionConfirmationComponent,
-        HttpErrorComponent
+        HttpErrorComponent,
     ],
     imports: [
         BrowserModule,
@@ -51,18 +61,17 @@ import {Ability, createMongoAbility, MongoAbility, PureAbility} from "@casl/abil
         CardModule,
         ComponentModule,
         ConfirmDialogModule,
-        AbilityModule
+        AbilityModule,
     ],
     providers: [
         authInterceptorProviders,
         NgbDropdown,
         MessageService,
         ConfirmationService,
-        { provide: PureAbility, useValue:  createMongoAbility() },
-        { provide: Ability, useExisting: PureAbility }
+        {provide: PureAbility, useValue: createMongoAbility()},
+        {provide: Ability, useExisting: PureAbility},
     ],
     exports: [],
-    bootstrap: [AppComponent]
+    bootstrap: [AppComponent],
 })
-export class AppModule {
-}
+export class AppModule {}
