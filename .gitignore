@@ -102,3 +102,19 @@ dist
 
 # TernJS port file
 .tern-port
+
+*.iml
+
+.idea
+
+db
+
+keys
+
+nginx/static
+nginx/logs
+nginx/temp
+
+.qodo
+
+.qodo

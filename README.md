@@ -1,47 +1,174 @@
-# Auth Server
+# Auth Server (Nest JS)
 
-General-purpose HTTP-based authentication and authorization server. Built with [Node.js](https://nodejs.org/) and [Nest.js](https://nestjs.com/).
+[![Build, Test & Create Docker Image](https://github.com/SilentSamurai/auth-server/actions/workflows/build.yaml/badge.svg)](https://github.com/SilentSamurai/auth-server/actions/workflows/build.yaml)
+[![Build & Release Docker Image](https://github.com/SilentSamurai/auth-server/actions/workflows/release.yaml/badge.svg)](https://github.com/SilentSamurai/auth-server/actions/workflows/release.yaml)
 
-**Features**
-- User registration and verification via email.
-- Basic authentication using email and password.
-- Authorization using [JSON Web Tokens](https://jwt.io/).
-- Delete not verified users after the verification token expires.
-- Reset password via email.
-- Change email address via email.
-- API [documentation](https://adcimon.github.io/auth-server/api/) available.
+A production‑ready, OAuth Authorization service built with  
+[Nest JS](https://nestjs.com) and [TypeScript](https://www.typescriptlang.org/).
 
-## Installation
-
-1. Configure the `.env` file.
-
-2. Install `Node 16`.
-
-3. Install packages.
 ```
-cd auth-server
+.
+├── srv                 → Nest‑based back‑end service
+│   ├── src/            → Nest modules, controllers, services, etc.
+│   ├── tests/          → Jest test suites
+│   ├── db/             → Migration & seed files
+│   ├── keys/           → (Local‑only) TLS keys
+│   ├── Dockerfile      → Container image definition
+│   ├── jest.config.js  → Test runner config
+│   ├── nest-cli.json   → Nest CLI config
+│   ├── package.json    → Project metadata & scripts
+│   └── tsconfig*.json  → Build configurations
+└── ui                  → Angular front‑end workspace
+    ├── src/            → Angular app source (components, services, etc.)
+    ├── nginx/          → Minimal Nginx setup for containerised static hosting
+    ├── Dockerfile      → Container image definition
+    ├── angular.json    → Angular CLI config
+    ├── package.json    → Project metadata & scripts
+    └── tsconfig*.json  → TypeScript build configurations
+```
+
+---
+
+## ✨  Features
+
+* User registration with e‑mail verification
+* Password‑based login & JWT issuance
+* Token refresh & revocation
+* Password reset workflow
+* Change e‑mail workflow
+* Role & permission system powered by **CASL**
+* Cron jobs via **@nestjs/schedule** (e.g. prune expired tokens)
+* Database migrations via **TypeORM**
+* Fake SMTP server for local development (no external e‑mail required)
+* JSON‑structured production logging, compatible with ELK/EFK stacks
+* Docker & Helm charts provided for easy deployment
+
+---
+
+## ⚡️  Quick start
+
+```bash
+# 1. Install dependencies
+cd srv
 npm install
+
+# 2. Copy or create an environment file
+cp envs/.env.example envs/.env.development   # or point ENV_FILE yourself
+
+# 3. Run the service in watch mode
+npm run start:debug          # http://localhost:9000 by default
+
+# In another terminal you can tail the fake SMTP output:
+npm run smtp-server
 ```
 
-## Run
+---
 
-Run the server for development, debug or production.
-```
-cd auth-server
-npm run start:dev
-npm run start:debug
-npm run start:prod
+## 🛠️  Configuration
+
+`src/config/environment.service.ts` loads variables from the file referenced by
+`ENV_FILE` (defaults to `./envs/.env.development`).  
+Important keys:
+
+| Variable                | Purpose                               | Example                |
+|-------------------------|---------------------------------------|------------------------|
+| `NODE_ENV`              | `development` \| `production`        | development            |
+| `PORT`                  | HTTP listen port                      | 9000                   |
+| `ENABLE_HTTPS`          | Enable TLS                            | `false`                |
+| `KEY_PATH` / `CERT_PATH`| TLS key / cert paths                  | `keys/key.pem`         |
+| `ENABLE_CORS`           | Allow CORS                            | `true`                 |
+| `MAX_REQUEST_SIZE`      | Body‑parser limit (e.g. `1mb`)        | `1mb`                  |
+| `DATABASE_*`            | TypeORM connection settings           | see `.env.example`     |
+| `DATABASE_SSL`          | Enable DB SSL (`true`/`false`)        | false                  |
+
+Add anything else you need—the service simply reads from `process.env`.
+
+---
+
+## 🏗️  Useful npm scripts
+
+| Script                 | Description                                                                |
+|------------------------|----------------------------------------------------------------------------|
+| `npm run build`        | Clean `dist/` and compile with `tsc`                                       |
+| `npm run start:debug`  | Start Nest in watch/debug mode                                             |
+| `npm run start:prod`   | Run the already‑built JS from `dist/`                                      |
+| `npm run test`         | Run Jest with coverage (CI friendly)                                       |
+| `npm run test:watch`   | Jest in watch mode (sets `CUSTOM_LOG=1`)                                   |
+| `npm run package`      | Archive a ZIP of the compiled output via `create-zip.js`                   |
+| `npm run typeorm`      | Expose `typeorm` CLI                                                       |
+| `npm run generate-migration "<name>"` | Create a skeleton migration in `src/migrations/`            |
+| `npm run smtp-server`  | Run the dev‑only fake SMTP server (same as `start:mail-server`)            |
+| `npm run release`      | `build` + `test` – CI release helper                                       |
+
+---
+
+## 🧪  Testing
+
+```bash
+# unit & integration tests
+npm test
+
+# watch mode
+npm run test:watch
 ```
 
-## Build
+Jest is configured via `jest.config.js`; e2e Cypress tests live in the project
+root under `e2e/`.
 
-Build the project, compiling it to JavaScript.
-```
-cd auth-server
-npm run build
+---
+
+## 🐳  Docker
+
+Build and run locally:
+
+```bash
+docker build -t auth-server:dev ./srv
+docker run -p 9000:9000 --env-file ./envs/.env.development auth-server:dev
 ```
 
-Once the `dist` folder is created start the application.
+---
+
+## ☸️  Kubernetes / Helm
+
+A reusable chart is provided in `helm/auth-server/`. Basic usage:
+
+```bash
+helm dependency update ./helm/auth-server
+helm install auth ./helm/auth-server \
+  --set image.tag=1.0.0 \
+  --set env.NODE_ENV=production \
+  --values=my-values.yaml
 ```
-node dist/main.js
+
+---
+
+## 📝  Development notes
+
+### Skipping dev‑only code in prod builds
+
+`src/mail/FakeSmtpServer.ts` is imported **dynamically**, ensuring production
+builds exclude the file entirely (see `prepareApp()` in `src/setup.ts`).
+
+### Migrating the database
+
+```bash
+npm run typeorm migration:generate -- -n add_user_preferences
+npm run typeorm migration:run
 ```
+
+---
+
+## 🤝  Contributing
+
+1. Fork & clone
+2. Create a branch (`feat/awesome-stuff`)
+3. Commit & push
+4. Open a PR
+
+Please accompany code changes with unit tests where feasible.
+
+---
+
+## © License
+
+[MIT](LICENSE) – © 2024 Silent Samurai

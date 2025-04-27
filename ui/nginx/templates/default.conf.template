@@ -1,0 +1,20 @@
+
+include mime.types;
+
+server {
+    listen ${PORT};
+    server_name GL-INGRESS;
+
+
+    location ^~ /api {
+        proxy_pass ${AUTH_SERVER};
+    }
+
+    location / {
+        # servers static files
+        alias /home/static/;
+        # sends all uri to html
+        try_files $uri /index.html;
+    }
+
+}

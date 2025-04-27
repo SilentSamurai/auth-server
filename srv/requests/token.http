@@ -1,0 +1,18 @@
+### Authorization by token, part 1. Retrieve and save token.
+POST http://localhost:9001/api/oauth/token
+Content-Type: application/json
+
+{
+    "grant_type": "password",
+    "email": "admin@auth.server.com",
+    "password": "admin9000",
+    "domain": "auth.server.com"
+}
+> {%
+    client.global.set("auth_token", response.body.access_token);
+%}
+
+### GET Authorization
+GET http://localhost:9001/api/v1/check-auth
+Authorization: Bearer {{auth_token}}
+

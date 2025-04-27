@@ -1,0 +1,38 @@
+POST http://localhost:9001/api/oauth/token
+Content-Type: application/json
+
+{
+    "grant_type": "password",
+    "username": "admin@auth.server.com",
+    "password": "admin9000",
+    "client_id": "auth.server.com"
+}
+
+> {%
+    client.global.set("access_token", response.body.access_token)
+%}
+
+### Search Api
+POST  http://localhost:9001/api/search/Tenants
+Authorization: Bearer {{ access_token }}
+
+###
+
+POST  http://localhost:9001/api/search/Users
+Authorization: Bearer {{ access_token }}
+Content-Type: application/json
+
+{
+    "pageNo": 0,
+    "pageSize": 50,
+    "where": [
+        {
+            "name": "email",
+            "label": "Email",
+            "value": "legolas@mail.com",
+            "operator": "equals"
+        }
+    ],
+    "orderBy": [],
+    "expand": []
+}

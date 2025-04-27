@@ -1,0 +1,74 @@
+version: '3'
+
+services:
+    auth_ui:
+        build: ./ui
+        container_name: auth_ui
+        environment:
+            PORT: 80
+            AUTH_SERVER: http://auth_srv:8080/api
+        #        volumes:
+        #            - ./nginx/conf/nginx.conf.template:/etc/nginx/nginx.conf
+        #            - ./ui/nginx/mime.types:/etc/nginx/mime.types
+        #            - ./ui/nginx/templates:/etc/nginx/templates
+        #            - ./srv/dist/static:/home/static/
+        ports:
+            - "9001:80"
+        depends_on:
+            - auth_srv
+
+    auth_srv:
+        build: ./srv
+        container_name: auth_srv
+        environment:
+            ENV_FILE: dist/envs/.env.development
+            PORT: 8080
+            DATABASE_TYPE: postgres
+            DATABASE_HOST: db
+            DATABASE_PORT: 5432
+            DATABASE_NAME: myidentity_db
+            DATABASE_USERNAME: root
+            DATABASE_PASSWORD: root
+            DATABASE_SSL: false
+            MAIL_HOST: smtp
+            MAIL_PORT: 578
+        depends_on:
+            - db
+            - smtp
+
+    smtp:
+        image: node:20.19.0-alpine
+        working_dir: /app
+        volumes:
+            - ./srv/package.json:/app/package.json
+            - ./srv/src/mail/FakeSmtpServer.ts:/app/src/mail/FakeSmtpServer.ts
+        command: >
+            sh -c "npm i &&
+                   npm run smtp-server"
+
+    db:
+        container_name: myidentity_db
+        image: postgres
+        restart: always
+        volumes:
+            - myidentity_db_volume:/var/lib/postgresql/data
+#        ports:
+#            - 5420:5432
+        environment:
+            POSTGRES_USER: root
+            POSTGRES_DB: myidentity_db
+            POSTGRES_PASSWORD: root
+
+#    pgadmin:
+#        image: dpage/pgadmin4
+#        container_name: pgadmin4_container
+#        restart: always
+#        ports:
+#            - "8888:80"
+#        environment:
+#            PGADMIN_DEFAULT_EMAIL: postgres@mail.com
+#            PGADMIN_DEFAULT_PASSWORD: password@1234
+
+
+volumes:
+    myidentity_db_volume:

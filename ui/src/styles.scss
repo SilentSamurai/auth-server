@@ -1,0 +1,96 @@
+/* You can add global styles to this file, and also import other style files */
+//@import "~bootstrap/dist/css/bootstrap.css";
+
+/* Importing Bootstrap SCSS file. */
+@import 'bootstrap/scss/bootstrap';
+@import "primeng/resources/themes/lara-light-blue/theme.css";
+@import "primeng/resources/primeng.css";
+@import "primeicons/primeicons.css";
+
+
+//body{
+//    background-color: #eee;
+//}
+
+.p-chip-text {
+    margin: 0 !important;
+}
+
+//.modal-content {
+//    background-color: var(--bs-secondary-bg);
+//}
+
+//.p-datatable .p-datatable-thead > tr > th {
+//    padding: 0.3rem 0.5rem;
+//}
+//.p-datatable .p-datatable-tbody > tr > td {
+//    padding: 0.3rem 0.5rem;
+//}
+
+.tile:hover {
+    box-shadow: var(--bs-box-shadow-lg) !important;
+    transition: 0.5s;
+    cursor: pointer;
+}
+
+.tile-sm {
+    min-width: 100px;
+    max-width: 100px;
+    min-height: 100px;
+    max-height: 100px;
+}
+
+.tile-body-sm {
+    min-height: 45px;
+    max-height: 45px;
+}
+
+.tile-md {
+    min-width: 200px;
+    max-width: 200px;
+    min-height: 200px;
+    max-height: 200px;
+}
+
+.tile-body-md {
+    min-height: 90px;
+    max-height: 90px;
+}
+
+.tile-lg {
+    min-width: 425px;
+    max-width: 425px;
+    min-height: 200px;
+    max-height: 200px;
+}
+
+.tile-body-lg {
+    min-height: 90px;
+    max-height: 90px;
+}
+
+.control-label-required:after {
+    content: "*";
+    color: red;
+}
+
+.p-datatable.p-datatable-sm .p-datatable-tbody > tr > td {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+div.modal-body .p-datatable.p-datatable-sm .p-datatable-tbody > tr > td {
+    padding-top: 0.2rem;
+    padding-bottom: 0.2rem;
+}
+
+.tab-bottom-color {
+    border-bottom-color: steelblue !important;
+    border-bottom-width: medium !important;
+}
+
+td , tr.a-table-row > td{
+    vertical-align: middle;
+    padding-top: 0;
+    padding-bottom: 0;
+}

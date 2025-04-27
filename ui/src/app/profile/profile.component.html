@@ -1,0 +1,60 @@
+<div class="container">
+    <div *ngIf="currentUser; else loggedOut" class="card my-2">
+        <div class="card-body">
+            <header class="jumbotron">
+                <div class="display-6">
+                    <strong>{{ currentUser.name }}</strong>'s Profile
+                </div>
+            </header>
+            <br>
+            <ul class="list-group">
+                <li class="list-group-item">
+                    Email
+                    <div>
+                        <strong>{{ currentUser.email }}</strong>
+                    </div>
+                </li>
+                <li class="list-group-item">
+                    Name
+                    <div>
+                        <strong>{{ currentUser.name }}</strong>
+                    </div>
+                </li>
+                <li class="list-group-item">
+                    Tenant Id
+                    <div>
+                        <strong>{{ currentUser.tenant.id }}</strong>
+                    </div>
+                </li>
+                <li class="list-group-item">
+                    Tenant Name
+                    <div>
+                        <strong>{{ currentUser.tenant.name }}</strong>
+                    </div>
+                </li>
+                <li class="list-group-item">
+                    Tenant Domain
+                    <div>
+                        <strong>{{ currentUser.tenant.domain }}</strong>
+                    </div>
+                </li>
+                <li class="list-group-item">
+                    Roles
+                    <div>
+                        <ul>
+                            <li *ngFor="let role of currentUser.scopes">
+                                <strong><code>{{ currentUser.tenant.name }}::{{ role }}</code></strong>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+    </div>
+</div>
+
+
+<ng-template #loggedOut>
+    Please login.
+</ng-template>
