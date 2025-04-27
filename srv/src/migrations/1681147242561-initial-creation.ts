@@ -1,9 +1,7 @@
-import {MigrationInterface, QueryRunner, Table} from "typeorm"
+import {MigrationInterface, QueryRunner, Table} from "typeorm";
 
 export class CreateInitialTables1681147242561 implements MigrationInterface {
-
     public async up(queryRunner: QueryRunner): Promise<void> {
-
         const DB_STRING_TYPE = "VARCHAR";
         const DB_UUID_GENERATOR = "uuid_generate_v4()";
 
@@ -18,26 +16,26 @@ export class CreateInitialTables1681147242561 implements MigrationInterface {
                         length: "36",
                         generationStrategy: "uuid",
                         isPrimary: true,
-                        default: DB_UUID_GENERATOR
+                        default: DB_UUID_GENERATOR,
                     },
                     {
                         name: "name",
                         type: DB_STRING_TYPE,
                         length: "128",
-                        isNullable: false
+                        isNullable: false,
                     },
                     {
                         name: "password",
                         type: DB_STRING_TYPE,
                         length: "128",
-                        isNullable: false
+                        isNullable: false,
                     },
                     {
                         name: "email",
                         type: DB_STRING_TYPE,
                         isUnique: true,
                         length: "128",
-                        isNullable: false
+                        isNullable: false,
                     },
                     {
                         name: "verified",
@@ -64,44 +62,44 @@ export class CreateInitialTables1681147242561 implements MigrationInterface {
                         length: "36",
                         generationStrategy: "uuid",
                         isPrimary: true,
-                        default: DB_UUID_GENERATOR
+                        default: DB_UUID_GENERATOR,
                     },
                     {
                         name: "name",
                         type: DB_STRING_TYPE,
-                        isNullable: false
+                        isNullable: false,
                     },
                     {
                         name: "domain",
                         type: DB_STRING_TYPE,
                         isUnique: true,
-                        isNullable: false
+                        isNullable: false,
                     },
                     {
                         name: "client_id",
                         type: DB_STRING_TYPE,
                         isUnique: true,
-                        isNullable: false
+                        isNullable: false,
                     },
                     {
                         name: "client_secret",
                         type: DB_STRING_TYPE,
-                        isNullable: false
+                        isNullable: false,
                     },
                     {
                         name: "secret_salt",
                         type: DB_STRING_TYPE,
-                        isNullable: false
+                        isNullable: false,
                     },
                     {
                         name: "private_key",
                         type: DB_STRING_TYPE,
-                        isNullable: false
+                        isNullable: false,
                     },
                     {
                         name: "public_key",
                         type: DB_STRING_TYPE,
-                        isNullable: false
+                        isNullable: false,
                     },
                     {
                         name: "created_at",
@@ -123,23 +121,23 @@ export class CreateInitialTables1681147242561 implements MigrationInterface {
                         length: "36",
                         generationStrategy: "uuid",
                         isPrimary: true,
-                        default: DB_UUID_GENERATOR
+                        default: DB_UUID_GENERATOR,
                     },
                     {
                         name: "name",
                         type: DB_STRING_TYPE,
-                        isNullable: false
+                        isNullable: false,
                     },
                     {
                         name: "tenant_id",
                         type: DB_STRING_TYPE,
                         length: "36",
-                        isNullable: false
+                        isNullable: false,
                     },
                     {
                         name: "is_removable",
                         type: "boolean",
-                        default: true
+                        default: true,
                     },
                     {
                         name: "created_at",
@@ -150,12 +148,9 @@ export class CreateInitialTables1681147242561 implements MigrationInterface {
                 uniques: [
                     {
                         name: "tenant_role_constrain",
-                        columnNames: [
-                            "tenant_id",
-                            "name"
-                        ]
-                    }
-                ]
+                        columnNames: ["tenant_id", "name"],
+                    },
+                ],
             }),
             true,
         );
@@ -169,15 +164,15 @@ export class CreateInitialTables1681147242561 implements MigrationInterface {
                         type: DB_STRING_TYPE,
                         length: "36",
                         isPrimary: true,
-                        isNullable: false
+                        isNullable: false,
                     },
                     {
                         name: "user_id",
                         type: DB_STRING_TYPE,
                         length: "36",
                         isPrimary: true,
-                        isNullable: false
-                    }
+                        isNullable: false,
+                    },
                 ],
                 foreignKeys: [
                     {
@@ -193,8 +188,8 @@ export class CreateInitialTables1681147242561 implements MigrationInterface {
                         referencedColumnNames: ["id"],
                         referencedTableName: "users",
                         onDelete: "CASCADE",
-                    }
-                ]
+                    },
+                ],
             }),
             true,
         );
@@ -208,27 +203,27 @@ export class CreateInitialTables1681147242561 implements MigrationInterface {
                         type: DB_STRING_TYPE,
                         length: "36",
                         isPrimary: true,
-                        isNullable: false
+                        isNullable: false,
                     },
                     {
                         name: "user_id",
                         type: DB_STRING_TYPE,
                         length: "36",
                         isPrimary: true,
-                        isNullable: false
+                        isNullable: false,
                     },
                     {
                         name: "role_id",
                         type: DB_STRING_TYPE,
                         length: "36",
                         isPrimary: true,
-                        isNullable: false
+                        isNullable: false,
                     },
                     {
                         name: "from_group",
                         type: "BOOLEAN",
                         isNullable: false,
-                        default: "FALSE"
+                        default: "FALSE",
                     },
                 ],
                 foreignKeys: [
@@ -248,8 +243,8 @@ export class CreateInitialTables1681147242561 implements MigrationInterface {
                         columnNames: ["role_id"],
                         referencedColumnNames: ["id"],
                         referencedTableName: "roles",
-                    }
-                ]
+                    },
+                ],
             }),
             true,
         );
@@ -262,5 +257,4 @@ export class CreateInitialTables1681147242561 implements MigrationInterface {
         await queryRunner.dropTable("user_roles");
         await queryRunner.dropTable("tenant_members");
     }
-
 }

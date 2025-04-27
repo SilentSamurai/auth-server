@@ -1,10 +1,9 @@
 import {Injectable} from '@angular/core';
-import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
 export enum ModalReturnStatus {
     OK,
     USER_CLOSED,
-
 }
 
 export class ModalResult<T> {
@@ -30,13 +29,10 @@ export interface AfterModalInit {
 }
 
 @Injectable({
-    providedIn: 'root'
+    providedIn: 'root',
 })
 export class ModalService {
-
-    constructor(private modalService: NgbModal) {
-
-    }
+    constructor(private modalService: NgbModal) {}
 
     initialize(initData: any, componentRef: any) {
         for (let key in initData) {
@@ -44,7 +40,10 @@ export class ModalService {
         }
     }
 
-    async open<R>(content: any, options?: ModalConfig): Promise<ModalResult<R>> {
+    async open<R>(
+        content: any,
+        options?: ModalConfig,
+    ): Promise<ModalResult<R>> {
         const modal = this.modalService.open(content, {
             backdrop: 'static',
             size: 'lg',
@@ -58,10 +57,12 @@ export class ModalService {
         }
         // result
         const result: R = await modal.result;
-        if (result === "Cross click" || result == ModalReturnStatus.USER_CLOSED) {
+        if (
+            result === 'Cross click' ||
+            result == ModalReturnStatus.USER_CLOSED
+        ) {
             return new ModalResult(result, ModalReturnStatus.USER_CLOSED);
         }
         return new ModalResult(result, ModalReturnStatus.OK);
     }
-
 }

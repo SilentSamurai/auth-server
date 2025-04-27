@@ -1,6 +1,6 @@
-import {CanActivate, ExecutionContext, Injectable} from '@nestjs/common';
-import {Reflector} from '@nestjs/core';
-import {UsersService} from '../services/users.service';
+import {CanActivate, ExecutionContext, Injectable} from "@nestjs/common";
+import {Reflector} from "@nestjs/core";
+import {UsersService} from "../services/users.service";
 import {RoleService} from "../services/role.service";
 import {SecurityService} from "../casl/security.service";
 import {TenantService} from "../services/tenant.service";
@@ -16,16 +16,13 @@ export class RoleGuard implements CanActivate {
         private readonly securityService: SecurityService,
         private readonly roleService: RoleService,
         private readonly tenantService: TenantService,
-        private readonly usersService: UsersService
-    ) {
-    }
+        private readonly usersService: UsersService,
+    ) {}
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
-        const requiredRoles: RoleRule[] = this.reflector.getAllAndOverride<RoleRule[]>('rules',
-            [
-                context.getHandler(),
-                context.getClass()
-            ]);
+        const requiredRoles: RoleRule[] = this.reflector.getAllAndOverride<
+            RoleRule[]
+        >("rules", [context.getHandler(), context.getClass()]);
 
         if (!requiredRoles) {
             return true;
@@ -38,10 +35,20 @@ export class RoleGuard implements CanActivate {
 
         // let securityContext: SecurityContext = this.securityService.getUserOrTechnicalSecurityContext(request);
         const ability = this.securityService.getAbility(request);
-        const cas = ability.can(Action.Read, subject(SubjectEnum.USER, {id: '6aeccc50-2f92-4368-9ae5-e0f24aaae2a6'}));
+        const cas = ability.can(
+            Action.Read,
+            subject(SubjectEnum.USER, {
+                id: "6aeccc50-2f92-4368-9ae5-e0f24aaae2a6",
+            }),
+        );
         console.log("cas ", cas);
         for (const requiredRole of requiredRoles) {
-            if (!ability.can(requiredRole.action, subject(requiredRole.subject, {}))) {
+            if (
+                !ability.can(
+                    requiredRole.action,
+                    subject(requiredRole.subject, {}),
+                )
+            ) {
                 return false;
             }
         }

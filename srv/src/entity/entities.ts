@@ -9,7 +9,6 @@ import {GroupRole} from "./group.roles.entity";
 import {GroupUser} from "./group.users.entity";
 import {Policy} from "./authorization.entity";
 
-
 export const entities = [
     Tenant,
     User,
@@ -20,5 +19,5 @@ export const entities = [
     Group,
     GroupRole,
     GroupUser,
-    Policy
+    Policy,
 ];

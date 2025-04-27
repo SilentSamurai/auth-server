@@ -1,17 +1,16 @@
-import {Injectable} from '@nestjs/common';
-import {config} from 'dotenv';
-import * as path from 'path';
-import {join} from 'path';
+import {Injectable} from "@nestjs/common";
+import {config} from "dotenv";
+import * as path from "path";
+import {join} from "path";
 import * as process from "node:process";
 import * as fs from "node:fs";
 
 @Injectable()
 export class Environment {
-    constructor() {
-    }
+    constructor() {}
 
     static setup(): any {
-        const envFile = process.env.ENV_FILE || './envs/.env.development';
+        const envFile = process.env.ENV_FILE || "./envs/.env.development";
         let envPath = path.resolve(process.cwd(), envFile);
         if (!fs.existsSync(envPath)) {
             console.log("Environment does not exist", envPath);
@@ -19,12 +18,12 @@ export class Environment {
         }
         console.log("Environment path :", envPath);
         config({
-            path: envPath
-        })
+            path: envPath,
+        });
 
         console.log("Environment variables:");
         Object.keys(process.env).forEach(function (key) {
-            console.log(key + '=' + process.env[key]);
+            console.log(key + "=" + process.env[key]);
         });
     }
 
@@ -52,10 +51,10 @@ export class Environment {
             let value: string = process.env[key];
             switch (value) {
                 // case '1':
-                case 'true':
+                case "true":
                     return true;
                 // case '0':
-                case 'false':
+                case "false":
                     return false;
                 default:
                     return value;
@@ -76,11 +75,11 @@ export class Environment {
      * Get the service name.
      */
     getServiceName(): string {
-        const key: string = 'SERVICE_NAME';
+        const key: string = "SERVICE_NAME";
         if (key in process.env) {
             return process.env[key];
         } else {
-            return 'Auth Server';
+            return "Auth Server";
         }
     }
 
@@ -95,7 +94,7 @@ export class Environment {
      * Is a production environment?
      */
     static isProduction(): boolean {
-        return process.env.NODE_ENV === 'production';
+        return process.env.NODE_ENV === "production";
     }
 
     isProduction() {

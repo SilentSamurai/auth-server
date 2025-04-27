@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute} from "@angular/router";
+import {ActivatedRoute} from '@angular/router';
 
 @Component({
     selector: 'app-error-page',
@@ -11,18 +11,14 @@ import {ActivatedRoute} from "@angular/router";
             </header>
         </div>
     `,
-    styles: ['']
+    styles: [''],
 })
 export class HttpErrorComponent implements OnInit {
+    msg: string = '';
 
-    msg: string = "";
-
-    constructor(private actRoute: ActivatedRoute) {
-    }
+    constructor(private actRoute: ActivatedRoute) {}
 
     ngOnInit(): void {
         this.msg = this.actRoute.snapshot.params['msg'];
     }
-
-
 }

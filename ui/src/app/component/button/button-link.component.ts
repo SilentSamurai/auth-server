@@ -1,11 +1,15 @@
-import {Component, EventEmitter, Input, Output} from "@angular/core";
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 
 @Component({
     selector: 'app-button-link',
     template: `
-        <span *ngIf="isDisabled" class="disabled" (click)="_haltDisabledEvents($event)">
-			<ng-container *ngTemplateOutlet="content"></ng-container>
-		</span>
+        <span
+            *ngIf="isDisabled"
+            class="disabled"
+            (click)="_haltDisabledEvents($event)"
+        >
+            <ng-container *ngTemplateOutlet="content"></ng-container>
+        </span>
         <a *ngIf="!isDisabled" href="javascript:void(0)">
             <ng-container *ngTemplateOutlet="content"></ng-container>
         </a>
@@ -14,10 +18,9 @@ import {Component, EventEmitter, Input, Output} from "@angular/core";
             <ng-content></ng-content>
         </ng-template>
     `,
-    styles: ['.disabled { color: gray; }']
+    styles: ['.disabled { color: gray; }'],
 })
 export class ButtonLinkComponent {
-
     @Input() disabled: any = null;
 
     @Output() click: EventEmitter<any> = new EventEmitter();
@@ -33,5 +36,4 @@ export class ButtonLinkComponent {
             event.stopImmediatePropagation();
         }
     }
-
 }

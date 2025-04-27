@@ -10,24 +10,20 @@ import {ForbiddenException} from "../exceptions/forbidden.exception";
 import {TenantMember} from "../entity/tenant.members.entity";
 import {Environment} from "../config/environment.service";
 
-
 @Injectable()
 export class AuthUserService {
-
     constructor(
         private readonly configService: Environment,
         @InjectRepository(User) private usersRepository: Repository<User>,
         @InjectRepository(Tenant) private tenantRepository: Repository<Tenant>,
-        @InjectRepository(TenantMember) private tenantMemberRepository: Repository<TenantMember>,
+        @InjectRepository(TenantMember)
+        private tenantMemberRepository: Repository<TenantMember>,
         @InjectRepository(Role) private roleRepository: Repository<Role>,
-    ) {
-    }
+    ) {}
 
-    async findUserById(
-        id: string
-    ): Promise<User> {
+    async findUserById(id: string): Promise<User> {
         const user: User = await this.usersRepository.findOne({
-            where: {id: id}
+            where: {id: id},
         });
         if (user === null) {
             throw new UserNotFoundException();
@@ -36,11 +32,9 @@ export class AuthUserService {
         return user;
     }
 
-    async findUserByEmail(
-        email: string
-    ): Promise<User> {
+    async findUserByEmail(email: string): Promise<User> {
         const user: User = await this.usersRepository.findOne({
-            where: {email: email}
+            where: {email: email},
         });
         if (user === null) {
             throw new UserNotFoundException();
@@ -51,19 +45,21 @@ export class AuthUserService {
 
     async tenantExistsByDomain(domain: string): Promise<boolean> {
         return await this.tenantRepository.exists({
-            where: {domain: domain}, relations: {
+            where: {domain: domain},
+            relations: {
                 members: true,
-                roles: true
-            }
+                roles: true,
+            },
         });
     }
 
     async findTenantByDomain(domain: string) {
         let tenant = await this.tenantRepository.findOne({
-            where: {domain: domain}, relations: {
+            where: {domain: domain},
+            relations: {
                 members: true,
-                roles: true
-            }
+                roles: true,
+            },
         });
         if (tenant === null) {
             throw new NotFoundException("tenant not found");
@@ -83,8 +79,8 @@ export class AuthUserService {
         return this.tenantMemberRepository.exists({
             where: {
                 tenantId: tenantId,
-                userId: userId
-            }
+                userId: userId,
+            },
         });
     }
 
@@ -92,26 +88,28 @@ export class AuthUserService {
         return this.roleRepository.find({
             where: {
                 tenant: {id: tenant.id},
-                users: {id: user.id}
+                users: {id: user.id},
             },
         });
     }
 
     async tenantExistsByClientId(clientId: string): Promise<boolean> {
         return await this.tenantRepository.exists({
-            where: {clientId}, relations: {
+            where: {clientId},
+            relations: {
                 members: true,
-                roles: true
-            }
+                roles: true,
+            },
         });
     }
 
     async findTenantByClientId(clientId: string): Promise<Tenant> {
         let tenant = await this.tenantRepository.findOne({
-            where: {clientId}, relations: {
+            where: {clientId},
+            relations: {
                 members: true,
-                roles: true
-            }
+                roles: true,
+            },
         });
         if (tenant === null) {
             throw new NotFoundException("tenant not found");
@@ -121,10 +119,11 @@ export class AuthUserService {
 
     async findTenantById(id: string) {
         let tenant = await this.tenantRepository.findOne({
-            where: {id: id}, relations: {
+            where: {id: id},
+            relations: {
                 members: true,
-                roles: true
-            }
+                roles: true,
+            },
         });
         if (tenant === null) {
             throw new NotFoundException("tenant not found");
@@ -133,6 +132,8 @@ export class AuthUserService {
     }
 
     async findGlobalTenant(): Promise<Tenant> {
-        return this.findTenantByDomain(this.configService.get("SUPER_TENANT_DOMAIN"));
+        return this.findTenantByDomain(
+            this.configService.get("SUPER_TENANT_DOMAIN"),
+        );
     }
 }

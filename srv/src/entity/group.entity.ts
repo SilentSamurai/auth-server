@@ -1,6 +1,12 @@
-import {Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn} from "typeorm";
+import {
+    Column,
+    CreateDateColumn,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    PrimaryGeneratedColumn,
+} from "typeorm";
 import {Tenant} from "./tenant.entity";
-
 
 @Entity({name: "groups"})
 export class Group {
@@ -13,10 +19,10 @@ export class Group {
     @Column({name: "tenant_id"})
     tenantId: string;
 
-    @ManyToOne(type => Tenant, tenant => tenant.groups)
+    @ManyToOne((type) => Tenant, (tenant) => tenant.groups)
     @JoinColumn({
         name: "tenant_id",
-        referencedColumnName: "id"
+        referencedColumnName: "id",
     })
     tenant: Tenant;
 

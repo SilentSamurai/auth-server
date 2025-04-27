@@ -5,7 +5,7 @@ export enum GRANT_TYPES {
     CLIENT_CREDENTIALS = "client_credentials",
     CLIENT_CREDENTIAL = "client_credential",
     REFRESH_TOKEN = "refresh_token",
-    CODE = "authorization_code"
+    CODE = "authorization_code",
 }
 
 export class ChangeEmailToken {
@@ -23,13 +23,13 @@ export class EmailVerificationToken {
 
 export class RefreshToken {
     email: string;
-    domain: string
+    domain: string;
 }
 
 export class OAuthToken {
     sub: string;
     scopes: string[];
-    grant_type: GRANT_TYPES
+    grant_type: GRANT_TYPES;
 }
 
 export class UserToken extends OAuthToken {
@@ -45,7 +45,6 @@ export class TenantToken extends UserToken {
         domain: string;
     };
 }
-
 
 export class TechnicalToken extends TenantToken {
     isTechnical: boolean = true;

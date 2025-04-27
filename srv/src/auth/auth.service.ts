@@ -1,13 +1,13 @@
-import {Injectable, Logger} from '@nestjs/common';
-import {Environment} from '../config/environment.service';
-import {UsersService} from '../services/users.service';
-import {JwtService} from '@nestjs/jwt';
-import {User} from '../entity/user.entity';
-import {UserNotFoundException} from '../exceptions/user-not-found.exception';
-import {InvalidCredentialsException} from '../exceptions/invalid-credentials.exception';
-import {EmailNotVerifiedException} from '../exceptions/email-not-verified.exception';
-import {InvalidTokenException} from '../exceptions/invalid-token.exception';
-import * as argon2 from 'argon2';
+import {Injectable, Logger} from "@nestjs/common";
+import {Environment} from "../config/environment.service";
+import {UsersService} from "../services/users.service";
+import {JwtService} from "@nestjs/jwt";
+import {User} from "../entity/user.entity";
+import {UserNotFoundException} from "../exceptions/user-not-found.exception";
+import {InvalidCredentialsException} from "../exceptions/invalid-credentials.exception";
+import {EmailNotVerifiedException} from "../exceptions/email-not-verified.exception";
+import {InvalidTokenException} from "../exceptions/invalid-token.exception";
+import * as argon2 from "argon2";
 import {Tenant} from "../entity/tenant.entity";
 import {TenantService} from "../services/tenant.service";
 import {CryptUtil} from "../util/crypt.util";
@@ -23,14 +23,12 @@ import {
     RefreshToken,
     ResetPasswordToken,
     TechnicalToken,
-    TenantToken
+    TenantToken,
 } from "../casl/contexts";
 import {AuthUserService} from "../casl/authUser.service";
 
-
 @Injectable()
 export class AuthService {
-
     private readonly LOGGER = new Logger("AuthService");
 
     constructor(
@@ -39,9 +37,8 @@ export class AuthService {
         private readonly authUserService: AuthUserService,
         private readonly userService: UsersService,
         private readonly tenantService: TenantService,
-        private readonly jwtService: JwtService
-    ) {
-    }
+        private readonly jwtService: JwtService,
+    ) {}
 
     /**
      * Validate the email and password.
@@ -55,36 +52,52 @@ export class AuthService {
         return user;
     }
 
-    async validateRefreshToken(refreshToken: string): Promise<{ tenant: Tenant, user: User }> {
-        let validationPipe = new ValidationPipe(ValidationSchema.RefreshTokenSchema);
-        let payload: RefreshToken = await validationPipe.transform(
+    async validateRefreshToken(
+        refreshToken: string,
+    ): Promise<{tenant: Tenant; user: User}> {
+        let validationPipe = new ValidationPipe(
+            ValidationSchema.RefreshTokenSchema,
+        );
+        let payload: RefreshToken = (await validationPipe.transform(
             this.jwtService.decode(refreshToken, {json: true}),
-            null
-        ) as RefreshToken;
+            null,
+        )) as RefreshToken;
 
-        let tenant = await this.authUserService.findTenantByDomain(payload.domain);
+        let tenant = await this.authUserService.findTenantByDomain(
+            payload.domain,
+        );
         let user = await this.authUserService.findUserByEmail(payload.email);
-        await this.jwtService
-            .verifyAsync(refreshToken, {publicKey: tenant.publicKey});
+        await this.jwtService.verifyAsync(refreshToken, {
+            publicKey: tenant.publicKey,
+        });
         return {tenant, user};
     }
 
     async validateAccessToken(token: string): Promise<TenantToken> {
         try {
-            let validationPipe = new ValidationPipe(ValidationSchema.SecurityContextSchema);
-            let payload: TenantToken = await validationPipe.transform(
+            let validationPipe = new ValidationPipe(
+                ValidationSchema.SecurityContextSchema,
+            );
+            let payload: TenantToken = (await validationPipe.transform(
                 this.jwtService.decode(token, {json: true}),
-                null) as TenantToken;
+                null,
+            )) as TenantToken;
 
-            let tenant = await this.authUserService.findTenantByDomain(payload.tenant.domain);
-            payload = await this.jwtService.verifyAsync(token, {publicKey: tenant.publicKey});
+            let tenant = await this.authUserService.findTenantByDomain(
+                payload.tenant.domain,
+            );
+            payload = await this.jwtService.verifyAsync(token, {
+                publicKey: tenant.publicKey,
+            });
             this.LOGGER.log("token verified with public Key");
             if (payload.grant_type === GRANT_TYPES.CLIENT_CREDENTIAL) {
                 if (payload.sub !== "oauth") {
                     throw "Invalid Token";
                 }
             } else {
-                let user = await this.authUserService.findUserByEmail(payload.email);
+                let user = await this.authUserService.findUserByEmail(
+                    payload.email,
+                );
             }
             return payload;
         } catch (e) {
@@ -93,9 +106,17 @@ export class AuthService {
         }
     }
 
-    async validateClientCredentials(clientId: string, clientSecret: string): Promise<Tenant> {
-        const tenant: Tenant = await this.authUserService.findTenantByClientId(clientId);
-        let valid: boolean = CryptUtil.verifyClientId(tenant.clientSecret, clientId, tenant.secretSalt);
+    async validateClientCredentials(
+        clientId: string,
+        clientSecret: string,
+    ): Promise<Tenant> {
+        const tenant: Tenant =
+            await this.authUserService.findTenantByClientId(clientId);
+        let valid: boolean = CryptUtil.verifyClientId(
+            tenant.clientSecret,
+            clientId,
+            tenant.secretSalt,
+        );
         if (!valid) {
             throw new InvalidCredentialsException();
         }
@@ -112,7 +133,7 @@ export class AuthService {
             sub: "oauth",
             email: "oauth@" + tenant.domain,
             name: "oauth",
-            userId: 'na',
+            userId: "na",
             tenant: {
                 id: tenant.id,
                 name: tenant.name,
@@ -120,22 +141,30 @@ export class AuthService {
             },
             scopes: [RoleEnum.TENANT_VIEWER, ...roles],
             grant_type: GRANT_TYPES.CLIENT_CREDENTIAL,
-            isTechnical: true
+            isTechnical: true,
         };
         return payload;
     }
 
-    async createTechnicalAccessToken(tenant: Tenant, roles: string[]): Promise<string> {
+    async createTechnicalAccessToken(
+        tenant: Tenant,
+        roles: string[],
+    ): Promise<string> {
         roles = roles instanceof Array ? roles : [];
-        const payload: TechnicalToken = this.createTechnicalToken(tenant, roles);
-        return this.jwtService.sign(payload, {privateKey: tenant.privateKey,});
+        const payload: TechnicalToken = this.createTechnicalToken(
+            tenant,
+            roles,
+        );
+        return this.jwtService.sign(payload, {privateKey: tenant.privateKey});
     }
 
     /**
      * Create an access token for the user.
      */
-    async createUserAccessToken(user: User, tenant: Tenant):
-        Promise<{ accessToken: string, refreshToken: string }> {
+    async createUserAccessToken(
+        user: User,
+        tenant: Tenant,
+    ): Promise<{accessToken: string; refreshToken: string}> {
         if (!user.verified) {
             throw new EmailNotVerifiedException();
         }
@@ -152,27 +181,33 @@ export class AuthService {
                 name: tenant.name,
                 domain: tenant.domain,
             },
-            scopes: roles.map(role => role.name),
-            grant_type: GRANT_TYPES.PASSWORD
+            scopes: roles.map((role) => role.name),
+            grant_type: GRANT_TYPES.PASSWORD,
         };
 
         const refreshTokenPayload: RefreshToken = {
             email: user.email,
-            domain: tenant.domain
-        }
+            domain: tenant.domain,
+        };
 
-        const accessToken = await this.jwtService
-            .signAsync(accessTokenPayload, {
+        const accessToken = await this.jwtService.signAsync(
+            accessTokenPayload,
+            {
                 privateKey: tenant.privateKey,
-                issuer: this.configService.get("SUPER_TENANT_DOMAIN")
-            });
+                issuer: this.configService.get("SUPER_TENANT_DOMAIN"),
+            },
+        );
 
-        const refreshToken = await this.jwtService
-            .signAsync(refreshTokenPayload, {
+        const refreshToken = await this.jwtService.signAsync(
+            refreshTokenPayload,
+            {
                 privateKey: tenant.privateKey,
-                expiresIn: this.configService.get("REFRESH_TOKEN_EXPIRATION_TIME"),
-                issuer: this.configService.get("SUPER_TENANT_DOMAIN")
-            });
+                expiresIn: this.configService.get(
+                    "REFRESH_TOKEN_EXPIRATION_TIME",
+                ),
+                issuer: this.configService.get("SUPER_TENANT_DOMAIN"),
+            },
+        );
 
         return {accessToken, refreshToken};
     }
@@ -187,7 +222,9 @@ export class AuthService {
         let globalTenant = await this.authUserService.findGlobalTenant();
         return this.jwtService.sign(payload, {
             privateKey: globalTenant.privateKey,
-            expiresIn: this.configService.get('TOKEN_VERIFICATION_EXPIRATION_TIME')
+            expiresIn: this.configService.get(
+                "TOKEN_VERIFICATION_EXPIRATION_TIME",
+            ),
         });
     }
 
@@ -199,15 +236,20 @@ export class AuthService {
         try {
             let globalTenant = await this.authUserService.findGlobalTenant();
             payload = this.jwtService.verify(token, {
-                publicKey: globalTenant.publicKey
+                publicKey: globalTenant.publicKey,
             }) as EmailVerificationToken;
         } catch (exception: any) {
             throw new InvalidTokenException();
         }
 
-        const authContext = await this.securityService.getUserAuthContext(payload.sub);
+        const authContext = await this.securityService.getUserAuthContext(
+            payload.sub,
+        );
 
-        const user: User = await this.userService.findByEmail(authContext, payload.sub);
+        const user: User = await this.userService.findByEmail(
+            authContext,
+            payload.sub,
+        );
         if (user.verified) {
             return false;
         }
@@ -222,16 +264,17 @@ export class AuthService {
      */
     async createResetPasswordToken(user: User): Promise<string> {
         const payload: ResetPasswordToken = {
-            sub: user.email
+            sub: user.email,
         };
 
         // Use the user's current password's hash for signing the token.
         // All tokens generated before a successful password change would get invalidated.
-        return this.jwtService.sign(payload,
-            {
-                secret: user.password,
-                expiresIn: this.configService.get('TOKEN_RESET_PASSWORD_EXPIRATION_TIME')
-            });
+        return this.jwtService.sign(payload, {
+            secret: user.password,
+            expiresIn: this.configService.get(
+                "TOKEN_RESET_PASSWORD_EXPIRATION_TIME",
+            ),
+        });
     }
 
     /**
@@ -239,9 +282,13 @@ export class AuthService {
      */
     async resetPassword(token: string, password: string): Promise<boolean> {
         // Get the user.
-        let payload: ResetPasswordToken = this.jwtService.decode(token) as ResetPasswordToken;
+        let payload: ResetPasswordToken = this.jwtService.decode(
+            token,
+        ) as ResetPasswordToken;
 
-        const user: User = await this.authUserService.findUserByEmail(payload.sub);
+        const user: User = await this.authUserService.findUserByEmail(
+            payload.sub,
+        );
         if (!user) {
             throw new UserNotFoundException();
         }
@@ -255,7 +302,9 @@ export class AuthService {
             throw new InvalidTokenException();
         }
 
-        const authContext = await this.securityService.getUserAuthContext(payload.sub);
+        const authContext = await this.securityService.getUserAuthContext(
+            payload.sub,
+        );
 
         if (!user.verified) {
             throw new EmailNotVerifiedException();
@@ -280,7 +329,9 @@ export class AuthService {
         // All tokens generated before a successful email change would get invalidated.
         return this.jwtService.sign(payload, {
             secret: globalTenant.privateKey,
-            expiresIn: this.configService.get('TOKEN_CHANGE_EMAIL_EXPIRATION_TIME')
+            expiresIn: this.configService.get(
+                "TOKEN_CHANGE_EMAIL_EXPIRATION_TIME",
+            ),
         });
     }
 
@@ -289,9 +340,13 @@ export class AuthService {
      */
     async confirmEmailChange(token: string): Promise<boolean> {
         // Get the user.
-        let payload: ChangeEmailToken = this.jwtService.decode(token) as ChangeEmailToken;
+        let payload: ChangeEmailToken = this.jwtService.decode(
+            token,
+        ) as ChangeEmailToken;
 
-        const user: User = await this.authUserService.findUserByEmail(payload.sub);
+        const user: User = await this.authUserService.findUserByEmail(
+            payload.sub,
+        );
         if (!user) {
             throw new UserNotFoundException();
         }
@@ -301,17 +356,23 @@ export class AuthService {
         let globalTenant = await this.authUserService.findGlobalTenant();
         payload = null;
         try {
-            payload = this.jwtService.verify(token, {secret: globalTenant.publicKey}) as ChangeEmailToken;
+            payload = this.jwtService.verify(token, {
+                secret: globalTenant.publicKey,
+            }) as ChangeEmailToken;
         } catch (exception: any) {
             throw new InvalidTokenException();
         }
 
-        const authContext = await this.securityService.getUserAuthContext(payload.sub);
+        const authContext = await this.securityService.getUserAuthContext(
+            payload.sub,
+        );
 
-        await this.userService.updateEmail(authContext, user.id, payload.updatedEmail);
+        await this.userService.updateEmail(
+            authContext,
+            user.id,
+            payload.updatedEmail,
+        );
 
         return true;
     }
-
-
 }

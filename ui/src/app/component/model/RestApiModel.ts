@@ -1,112 +1,64 @@
-import {DataPushEventStatus} from "./DataModel";
-import {HttpClient, HttpHeaders} from "@angular/common/http";
-import {lastValueFrom} from "rxjs";
-import {BaseDataModel} from "./BaseDataModel";
-import {Filter} from "./Filters";
+import {DataSource, DataSourceEvents, Query, ReturnedData} from './IDataModel';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {lastValueFrom, Observable, Subject} from 'rxjs';
 
-
-export class RestApiModel extends BaseDataModel {
-
-    totalCount: number | null = null;
-
-    constructor(private http: HttpClient,
-                private path: string,
-                keyFields: string[],
-                private data: any[]) {
-        super(keyFields);
-        // this.getTotalCount([]);
-    }
-
-    hasPage(pageNo: number): boolean {
-        if (pageNo == 0) {
-            return true;
-        }
-        if (this.totalCount == null || isNaN(this.totalCount)) {
-            return true;
-        }
-        const pageCount = this.totalCount / this.query.pageSize;
-        return pageNo < pageCount;
-    }
-
-    getData(): any[] {
-        return this.data;
-    }
-
-    override filter(filters: Filter[]) {
-        super.filter(filters);
-        this.totalCount = null;
-    }
-
-    async apply(srcOptions: any): Promise<boolean> {
-        this._dataPusher.emit({
-            srcOptions: srcOptions,
-            operation: DataPushEventStatus.START_FETCH,
-            data: null,
-            pageNo: null
-        })
-
-        const options = {
-            headers: new HttpHeaders({
-                'Content-Type': 'application/json',
-            })
-        }
-        const filters = this.query.filters.map(f => f.toJSON());
-
-        if (this.totalCount == null || isNaN(this.totalCount)) {
-            await this.getTotalCount(filters);
-        }
-
-        const body = {
-            "pageNo": this.query.pageNo,
-            "pageSize": this.query.pageSize,
-            "where": filters,
-            "orderBy": this.query.orderBy,
-            "expand": this.query.expand
-        }
-        let objectObservable = this.http.post(this.path, body, options);
-        let response = await lastValueFrom(objectObservable) as any;
-        this.data = response.data;
-        // this.totalCount = response.totalCount;
-
-
-        this._dataPusher.emit({
-            srcOptions: srcOptions,
-            operation: DataPushEventStatus.UPDATED_DATA,
-            data: this.data,
-            pageNo: this.query.pageNo
-        })
-
-        this._dataPusher.emit({
-            srcOptions: srcOptions,
-            operation: DataPushEventStatus.END_FETCH,
-            data: null,
-            pageNo: null
-        })
-        return true;
-    }
-
-    async getTotalCount(filters: any[]) {
-        const options = {
-            headers: new HttpHeaders({
-                'Content-Type': 'application/json',
-            })
-        }
-        const body = {
-            where: filters,
-            select: "count"
-        }
-        let objectObservable = this.http.post(this.path, body, options);
-        let response = await lastValueFrom(objectObservable) as any;
-        this.totalCount = response.count;
-    }
-
-    totalRowCount(): number {
-        if (this.totalCount == null || isNaN(this.totalCount)) {
-            return 0;
-        }
-        return this.totalCount;
-    }
-
-
+export interface ApiRequest {
+    pageNo: number;
+    pageSize: number;
+    where: any[];
+    orderBy: any[];
+    expand: string[];
 }
 
+export class RestApiModel<T> implements DataSource<T> {
+    private eventSubject = new Subject<DataSourceEvents>();
+    private readonly defaultHeaders = new HttpHeaders({
+        'Content-Type': 'application/json',
+    });
+
+    constructor(
+        private http: HttpClient,
+        private path: string,
+        protected _keyFields: string[],
+        private expands: string[] = [],
+    ) {}
+
+    keyFields(): string[] {
+        return this._keyFields;
+    }
+
+    updates(): Observable<DataSourceEvents> {
+        return this.eventSubject;
+    }
+
+    async fetchData(query: Query): Promise<ReturnedData<T>> {
+        const body: ApiRequest = {
+            pageNo: query.pageNo,
+            pageSize: query.pageSize,
+            where: query.filters,
+            orderBy: query.orderBy,
+            expand: query.expand || this.expands,
+        };
+
+        return await lastValueFrom(
+            this.http.post<ReturnedData<T>>(this.path, body, {
+                headers: this.defaultHeaders,
+            }),
+        );
+    }
+
+    public async totalCount(query: Query): Promise<number> {
+        const body = {
+            where: query.filters,
+            select: 'count',
+        };
+
+        const response = await lastValueFrom(
+            this.http.post<{count: number}>(this.path, body, {
+                headers: this.defaultHeaders,
+            }),
+        );
+
+        return response.count ? response.count : 0;
+    }
+}

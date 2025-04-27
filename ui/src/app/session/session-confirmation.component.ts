@@ -1,39 +1,39 @@
 import {Component, OnInit} from '@angular/core';
 import {UserService} from '../_services/user.service';
-import {TokenStorageService} from "../_services/token-storage.service";
-import {ActivatedRoute, Router} from "@angular/router";
-import {AuthService} from "../_services/auth.service";
-import {AuthDefaultService} from "../_services/auth.default.service";
+import {SessionService} from '../_services/session.service';
+import {ActivatedRoute, Router} from '@angular/router';
+import {AuthService} from '../_services/auth.service';
+import {AuthDefaultService} from '../_services/auth.default.service';
 
 @Component({
     selector: 'session-confirm',
     templateUrl: './session-confirmation.component.html',
-    styleUrls: ['./session-confirmation.component.css']
+    styleUrls: ['./session-confirmation.component.scss'],
 })
 export class SessionConfirmationComponent implements OnInit {
     content?: string;
     user: any;
     loading = true;
-    authCode = "";
-    redirectUri = "";
-    username = "";
-    code_challenge = "";
-    client_id = "";
+    authCode = '';
+    redirectUri = '';
+    username = '';
+    code_challenge = '';
+    client_id = '';
 
-    constructor(private userService: UserService,
-                private router: Router,
-                private route: ActivatedRoute,
-                private authService: AuthService,
-                private authDefaultService: AuthDefaultService,
-                private tokenStorage: TokenStorageService) {
-    }
+    constructor(
+        private userService: UserService,
+        private router: Router,
+        private route: ActivatedRoute,
+        private authService: AuthService,
+        private authDefaultService: AuthDefaultService,
+        private tokenStorage: SessionService,
+    ) {}
 
     async ngOnInit(): Promise<void> {
         let params = this.route.snapshot.queryParamMap;
-        this.redirectUri = params.get("redirect_uri")!;
-        this.client_id = params.get("client_id")!;
-        this.code_challenge = params.get("code_challenge")!;
-
+        this.redirectUri = params.get('redirect_uri')!;
+        this.client_id = params.get('client_id')!;
+        this.code_challenge = params.get('code_challenge')!;
 
         const authCode = this.tokenStorage.getAuthCode();
         if (authCode) {
@@ -61,10 +61,9 @@ export class SessionConfirmationComponent implements OnInit {
             queryParams: {
                 redirect_uri: this.redirectUri,
                 client_id: this.client_id,
-                code_challenge: this.code_challenge
-            }
+                code_challenge: this.code_challenge,
+            },
         });
-
     }
 
     async redirect(code: string) {
@@ -73,8 +72,8 @@ export class SessionConfirmationComponent implements OnInit {
         } else {
             await this.router.navigate([this.redirectUri], {
                 queryParams: {
-                    code: code
-                }
+                    code: code,
+                },
             });
         }
     }
@@ -87,6 +86,4 @@ export class SessionConfirmationComponent implements OnInit {
             return false;
         }
     }
-
-
 }

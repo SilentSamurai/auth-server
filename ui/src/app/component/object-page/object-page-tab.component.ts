@@ -4,7 +4,7 @@ import {
     OnInit,
     QueryList,
     TemplateRef,
-    ViewChild
+    ViewChild,
 } from '@angular/core';
 
 @Component({
@@ -15,22 +15,19 @@ import {
         </ng-template>
     `,
     styles: [''],
-    providers: []
+    providers: [],
 })
 export class ObjectPageTabComponent implements OnInit {
-
-    @Input() name: string = "";
+    @Input() name: string = '';
 
     loading = true;
 
     @ViewChild('OPTC', {static: true}) template!: TemplateRef<any>;
 
-    constructor() {
-    }
+    constructor() {}
 
     async ngOnInit() {
         this.loading = true;
         this.loading = false;
     }
-
 }
