@@ -4,9 +4,23 @@ FROM node:20.19.0-alpine AS build
 # Set work directory
 WORKDIR /home/app
 
-# Copy source files
-COPY ./srv ./srv
-COPY ./ui ./ui
+# SRV
+COPY ./srv/package.json             /home/app/srv/
+COPY ./srv/package-lock.json        /home/app/srv/
+COPY ./srv/src                      /home/app/srv/src
+COPY ./srv/tsconfig.build.json      /home/app/srv/
+COPY ./srv/tsconfig.json            /home/app/srv/
+COPY ./srv/nest-cli.json            /home/app/srv/
+COPY ./srv/users.json               /home/app/srv/
+COPY ./srv/envs                     /home/app/srv/envs
+
+# UI
+COPY ./ui/package-lock.json     /home/app/ui/
+COPY ./ui/package.json          /home/app/ui/
+COPY ./ui/src                   /home/app/ui/src/
+COPY ./ui/tsconfig.json         /home/app/ui/tsconfig.json
+COPY ./ui/tsconfig.app.json     /home/app/ui/tsconfig.app.json
+COPY ./ui/angular.json          /home/app/ui/angular.json
 
 # Build backend
 WORKDIR /home/app/srv

@@ -6,10 +6,19 @@ server {
     server_name GL-INGRESS;
 
     root /home/static/;
-    index index.html index.html index.php;
+    index index.html;
 
     location ^~ /api {
         proxy_pass ${AUTH_SERVER};
     }
+
+    location / {
+        try_files $uri$args $uri$args/ /index.html;
+    }
+
+    # Optional: serve compressed files when available
+    gzip on;
+    gzip_types text/plain application/javascript application/x-javascript text/javascript text/css application/json;
+    gzip_min_length 1000;
 
 }
