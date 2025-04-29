@@ -1,4 +1,3 @@
-version: '3'
 
 services:
     auth_ui:
@@ -68,6 +67,17 @@ services:
 #        environment:
 #            PGADMIN_DEFAULT_EMAIL: postgres@mail.com
 #            PGADMIN_DEFAULT_PASSWORD: password@1234
+
+    standalone:
+        build:
+            dockerfile: standalone.dockerfile
+        environment:
+            TEST: tes
+            PORT: 4200
+        volumes:
+            - ./ui/nginx/templates:/etc/nginx/templates
+        ports:
+            - 4200:4200
 
 
 volumes:
