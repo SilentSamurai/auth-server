@@ -1,5 +1,5 @@
 
-
+export AUTH_SERVER=http://localhost:9001/api
 cat /etc/nginx/templates/default.conf.template | envsubst > /etc/nginx/http.d/default.conf
 
 cat /etc/nginx/http.d/default.conf
