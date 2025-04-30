@@ -5,7 +5,7 @@ import {ActivatedRoute} from '@angular/router';
 import {ValueHelpColumnComponent} from '../value-help-input/value-help-column.component';
 import {AppTableComponent} from '../table/app-table.component';
 import {FilterBarColumnComponent} from '../filter-bar/filter-bar.component';
-import {DataSource} from '../model/IDataModel';
+import {DataSource} from '../model/DataSource';
 import {Filter} from '../model/Filters';
 
 export enum CloseType {

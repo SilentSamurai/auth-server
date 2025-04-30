@@ -1,24 +1,13 @@
-import {DataSource, DataSourceEvents, Query, ReturnedData, SortConfig,} from './IDataModel';
 import {Filter} from './Filters';
-import {Observable, Subject} from 'rxjs';
+import {BaseDataSource, ReturnedData} from "./DataSource";
+import {Query, SortConfig} from "./Query";
 
-export class StaticModel<T> implements DataSource<T> {
+export class StaticSource<T> extends BaseDataSource<T> {
     private data: T[] = [];
-    private eventSubject = new Subject<DataSourceEvents>();
 
-    constructor(
-        protected _keyFields: string[],
-        initialData: T[] = [],
-    ) {
+    constructor(keyFields: string[], initialData: T[] = []) {
+        super(keyFields);
         this.data = [...initialData];
-    }
-
-    updates(): Observable<DataSourceEvents> {
-        return this.eventSubject;
-    }
-
-    keyFields(): string[] {
-        return this._keyFields;
     }
 
     setData(data: T[]): void {
@@ -31,7 +20,7 @@ export class StaticModel<T> implements DataSource<T> {
         this.eventSubject.next({type: 'data-updated', source: 'append'});
     }
 
-    async fetchData(query: Query): Promise<ReturnedData<T>> {
+    async queryData(query: Query): Promise<ReturnedData<T>> {
         const start =
             (query.pageNo ?? 0) * (query.pageSize ?? this.data.length);
         const end = start + (query.pageSize ?? this.data.length);
@@ -43,11 +32,10 @@ export class StaticModel<T> implements DataSource<T> {
         return {
             data: result,
             count: result.length,
-            isLastPage: end >= filteredData.length,
         };
     }
 
-    totalCount(query: Query): Promise<number> {
+    queryCount(query: Query): Promise<number> {
         return Promise.resolve(this.data.length);
     }
 

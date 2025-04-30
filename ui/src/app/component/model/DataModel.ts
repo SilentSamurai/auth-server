@@ -1,8 +1,10 @@
-import {DataModelStatus, DataSource, DataSourceEvents, IDataModel, Query, ReturnedData,} from './IDataModel';
 import {Observable, Subscription} from 'rxjs';
+import {IQueryConfig, Query} from "./Query";
+import {DataModelStatus, IDataModel} from "./IDataModel";
+import {DataSource, DataSourceEvents, ReturnedData} from "./DataSource";
 
 // Helper function to create a stable string representation of the query for caching
-function getQueryCacheKey(query: Query): string {
+function getQueryCacheKey(query: IQueryConfig): string {
     // Ensure consistent property order for reliable caching
     const keyObject = {
         pageNo: query.pageNo ?? 0,

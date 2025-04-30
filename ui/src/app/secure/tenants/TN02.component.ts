@@ -10,7 +10,7 @@ import {AddRoleComponent} from './dialogs/add-role.component';
 import {AuthDefaultService} from '../../_services/auth.default.service';
 import {ConfirmationService} from '../../component/dialogs/confirmation.service';
 import {Location} from '@angular/common';
-import {StaticModel} from '../../component/model/StaticModel';
+import {StaticSource} from "../../component/model/StaticSource";
 
 @Component({
     selector: 'view-tenant',
@@ -224,8 +224,8 @@ export class TN02Component implements OnInit {
     members: any = [];
     isTenantAdmin = false;
     roles: any = [];
-    memberDataModel: StaticModel<any>;
-    rolesDataModel: StaticModel<any>;
+    memberDataModel: StaticSource<any>;
+    rolesDataModel: StaticSource<any>;
 
     constructor(
         private tenantService: TenantService,
@@ -238,8 +238,8 @@ export class TN02Component implements OnInit {
         private authDefaultService: AuthDefaultService,
         private modalService: NgbModal,
     ) {
-        this.memberDataModel = new StaticModel(['id']);
-        this.rolesDataModel = new StaticModel(['id']);
+        this.memberDataModel = new StaticSource(['id']);
+        this.rolesDataModel = new StaticSource(['id']);
     }
 
     async ngOnInit() {

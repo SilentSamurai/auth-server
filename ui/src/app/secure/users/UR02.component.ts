@@ -8,7 +8,7 @@ import {ConfirmationService} from '../../component/dialogs/confirmation.service'
 import {MessageService} from 'primeng/api';
 import {Location} from '@angular/common';
 import {AuthDefaultService} from '../../_services/auth.default.service';
-import {StaticModel} from '../../component/model/StaticModel';
+import {StaticSource} from "../../component/model/StaticSource";
 
 @Component({
     selector: 'tenant-details',
@@ -136,7 +136,7 @@ export class UR02Component implements OnInit {
         createdAt: '',
     };
     tenants: any = [];
-    tenantsDM = new StaticModel(['id']);
+    tenantsDM = new StaticSource<any>(['id']);
 
     constructor(
         private userService: UserService,

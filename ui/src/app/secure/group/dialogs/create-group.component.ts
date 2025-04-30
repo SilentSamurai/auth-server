@@ -3,7 +3,7 @@ import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {MessageService} from 'primeng/api';
 import {GroupService} from '../../../_services/group.service';
 import {TenantService} from '../../../_services/tenant.service';
-import {DataSource} from '../../../component/model/IDataModel';
+import {DataSource} from '../../../component/model/DataSource';
 
 @Component({
     selector: 'app-create-group',
@@ -101,7 +101,7 @@ export class CreateGroupComponent implements OnInit {
         private messageService: MessageService,
         public activeModal: NgbActiveModal,
     ) {
-        this.tenantsDM = this.tenantService.createDataModel([]);
+        this.tenantsDM = this.tenantService.createDataModel();
     }
 
     ngOnInit(): void {

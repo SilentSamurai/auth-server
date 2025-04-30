@@ -2,8 +2,9 @@ import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {lastValueFrom} from 'rxjs';
 import {SessionService} from './session.service';
-import {DataSource} from '../component/model/IDataModel';
-import {RestApiModel} from '../component/model/RestApiModel';
+import {query} from "../component/model/Query";
+import {DataSource} from "../component/model/DataSource";
+import {RestApiModel} from "../component/model/RestApiModel";
 
 const API_URL = '/api';
 
@@ -96,12 +97,12 @@ export class UserService {
         );
     }
 
-    createDataModel(initialData: any[]): DataSource<any> {
+    createDataModel(): DataSource<any> {
         return new RestApiModel(
             this.http,
             `${API_URL}/search/Users`,
             ['id'],
-            ['Tenants'],
+            query({expand: ["Tenants"]}),
         );
     }
 }

@@ -5,7 +5,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {TenantService} from '../../_services/tenant.service';
 import {MessageService} from 'primeng/api';
 import {AuthDefaultService} from '../../_services/auth.default.service';
-import {DataSource} from '../../component/model/IDataModel';
+import {DataSource} from "../../component/model/DataSource";
 
 @Component({
     selector: 'app-UR02-SEL',
@@ -82,7 +82,7 @@ export class UR02SelectionComponent implements OnInit {
 
     async ngOnInit(): Promise<void> {
         this.authDefaultService.setTitle('UR02: Select User');
-        this.usersDM = this.userService.createDataModel([]);
+        this.usersDM = this.userService.createDataModel();
     }
 
     async continue() {

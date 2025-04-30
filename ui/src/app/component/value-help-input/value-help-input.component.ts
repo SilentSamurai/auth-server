@@ -14,8 +14,8 @@ import {ActivatedRoute} from '@angular/router';
 import {ValueHelpComponent, ValueHelpResult,} from '../value-help/value-help.component';
 import {ValueHelpColumnComponent} from './value-help-column.component';
 import {FilterBarColumnComponent} from '../filter-bar/filter-bar.component';
-import {DataSource} from '../model/IDataModel';
-import {ModalResult, ModalService} from '../dialogs/modal.service';
+import {DataSource} from '../model/DataModels';
+import {ModalResult, ModalService} from "../dialogs/modal.service";
 
 function parseBoolean(value: string): boolean {
     const lowerCaseStr = value.toLowerCase();
@@ -123,7 +123,7 @@ export class ValueHelpInputComponent implements OnInit, AfterViewInit {
                     body: this.body,
                     columns: this.columns,
                     filters: this.filters,
-                    dataModel: this.dataSource,
+                    dataSource: this.dataSource,
                     selectedItem: this.selection,
                     multi: this.multi as boolean,
                 },

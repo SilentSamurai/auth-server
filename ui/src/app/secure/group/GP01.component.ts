@@ -10,7 +10,7 @@ import {CreateGroupComponent} from './dialogs/create-group.component';
 import {ConfirmationService} from '../../component/dialogs/confirmation.service';
 import {MessageService} from 'primeng/api';
 import {UpdateGroupComponent} from './dialogs/update-group.component';
-import {DataSource} from '../../component/model/IDataModel';
+import {DataSource} from '../../component/model/DataSource';
 import {Filter} from '../../component/model/Filters';
 
 @Component({

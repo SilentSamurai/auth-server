@@ -15,11 +15,11 @@ import {
 import {FilterBarComponent} from '../filter-bar/filter-bar.component';
 import {TableColumnComponent} from './app-table-column.component';
 import {AppTableButtonComponent} from './app-table-button.component';
-import {DataSource, IDataModel, Query} from '../model/IDataModel';
+import {DataSource, IDataModel, Query} from '../model/DataModels';
 import {Filter} from '../model/Filters';
 import {CheckboxChangeEvent} from 'primeng/checkbox';
-import {DataModel} from '../model/DataModel';
 import {Subscription} from 'rxjs';
+import {DataModel} from "../model/DataModel";
 
 export class TableAsyncLoadEvent extends Query {
 }
@@ -59,7 +59,7 @@ export class TableAsyncLoadEvent extends Query {
         </div>
         <div
             class="table-responsive"
-            style="max-height: {{ scrollHeight }}"
+            [style.max-height]="scrollHeight"
             (scroll)="lazyLoad($event)"
         >
             <table class="table a-table table-striped table-hover table-sm">

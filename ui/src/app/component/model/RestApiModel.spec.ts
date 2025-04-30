@@ -54,7 +54,7 @@ describe('RestApiModel', () => {
             pageSize: 25,
             where: [
                 jasmine.objectContaining({
-                    field: 'status',
+                    name: 'status',
                     value: 'active',
                     operator: jasmine.objectContaining({
                         label: 'equals',

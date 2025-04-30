@@ -6,7 +6,7 @@ import {TenantService} from '../../_services/tenant.service';
 import {MessageService} from 'primeng/api';
 import {AuthDefaultService} from '../../_services/auth.default.service';
 import {GroupService} from '../../_services/group.service';
-import {DataSource} from '../../component/model/IDataModel';
+import {DataSource} from '../../component/model/DataSource';
 
 @Component({
     selector: 'app-group-sel',

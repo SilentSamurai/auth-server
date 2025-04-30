@@ -5,7 +5,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {TenantService} from '../../_services/tenant.service';
 import {MessageService} from 'primeng/api';
 import {AuthDefaultService} from '../../_services/auth.default.service';
-import {DataSource} from '../../component/model/IDataModel';
+import {DataSource} from "../../component/model/DataSource";
 
 @Component({
     selector: 'app-role-list',
@@ -84,7 +84,7 @@ export class TN02SelectionComponent implements OnInit {
 
     async ngOnInit(): Promise<void> {
         this.authDefaultService.setTitle('TN02: Select Tenant');
-        this.tenantsDM = this.tenantService.createDataModel([]);
+        this.tenantsDM = this.tenantService.createDataModel();
     }
 
     async continue() {

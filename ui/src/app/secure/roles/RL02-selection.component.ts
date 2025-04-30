@@ -5,7 +5,7 @@ import {TenantService} from '../../_services/tenant.service';
 import {MessageService} from 'primeng/api';
 import {AuthDefaultService} from '../../_services/auth.default.service';
 import {RoleService} from '../../_services/role.service';
-import {DataSource} from '../../component/model/IDataModel';
+import {DataSource} from "../../component/model/DataSource";
 
 @Component({
     selector: 'app-role-list',
@@ -89,7 +89,7 @@ export class RL02SelectionComponent implements OnInit {
         private messageService: MessageService,
         private modalService: NgbModal,
     ) {
-        this.rolesDM = this.roleService.createDataModel([]);
+        this.rolesDM = this.roleService.createDataModel();
     }
 
     async ngOnInit(): Promise<void> {

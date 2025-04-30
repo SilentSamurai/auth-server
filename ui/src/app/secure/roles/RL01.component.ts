@@ -8,7 +8,7 @@ import {AuthDefaultService} from '../../_services/auth.default.service';
 import {AppTableComponent} from '../../component/table/app-table.component';
 import {RoleService} from '../../_services/role.service';
 import {ConfirmationService} from '../../component/dialogs/confirmation.service';
-import {DataSource} from '../../component/model/IDataModel';
+import {DataSource} from '../../component/model/DataSource';
 import {Filter} from '../../component/model/Filters';
 
 @Component({
@@ -74,6 +74,9 @@ import {Filter} from '../../component/model/Filters';
                         </td>
                         <td>{{ role.tenant.name }}</td>
                         <td class="d-flex ">
+                            <button class="btn ">
+                                <i class="fa fa-solid fa-eye"></i>
+                            </button>
                             <button
                                 (click)="openDeleteModal(role)"
                                 class="btn "
@@ -108,7 +111,7 @@ export class RL01Component implements OnInit {
         private confirmationService: ConfirmationService,
         private modalService: NgbModal,
     ) {
-        this.rolesDM = this.roleService.createDataModel([]);
+        this.rolesDM = this.roleService.createDataModel();
     }
 
     async ngOnInit(): Promise<void> {
