@@ -9,11 +9,7 @@ import {MenuModule} from 'primeng/menu';
 import {PanelMenuModule} from 'primeng/panelmenu';
 import {HomeComponent} from './home.component';
 import {AdminNavBarComponent} from './nav-bar.component';
-import {
-    NgbCollapseModule,
-    NgbDropdownModule,
-    NgbNavModule,
-} from '@ng-bootstrap/ng-bootstrap';
+import {NgbCollapseModule, NgbDropdownModule, NgbNavModule,} from '@ng-bootstrap/ng-bootstrap';
 import {TN01Component} from './tenants/TN01.component';
 import {UpdateTenantComponent} from './tenants/dialogs/update-tenant.component';
 import {CreateTenantComponent} from './tenants/dialogs/create-tenant.component';
@@ -99,4 +95,5 @@ import {UpdateRoleModalComponent} from './roles/update-role-modal.component';
     providers: [ConfirmationService, MessageService],
     exports: [AdminNavBarComponent],
 })
-export class SecureModule {}
+export class SecureModule {
+}

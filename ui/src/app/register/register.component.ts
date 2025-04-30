@@ -31,7 +31,8 @@ export class RegisterComponent implements OnInit {
         private router: Router,
         private actRoute: ActivatedRoute,
         private fb: FormBuilder,
-    ) {}
+    ) {
+    }
 
     ngOnInit(): void {
         // Initialize form controls with validation

@@ -22,7 +22,8 @@ export class TableColumnComponent implements OnInit {
 
     @ViewChild('TBCLCH', {static: true}) templateRef!: TemplateRef<any>;
 
-    constructor() {}
+    constructor() {
+    }
 
     async ngOnInit(): Promise<void> {
         if (typeof this.isId === 'string') {

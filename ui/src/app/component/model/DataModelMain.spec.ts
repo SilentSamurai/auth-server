@@ -1,13 +1,6 @@
 import {StaticModel} from './StaticModel';
 import {DataModel} from './DataModel';
-import {
-    DataModelStatus,
-    IQueryConfig,
-    Query,
-    SortConfig,
-    ReturnedData,
-    IDataModel,
-} from './IDataModel';
+import {Query,} from './IDataModel';
 
 describe('DataModel', () => {
     it('main test', async () => {

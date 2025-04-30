@@ -10,7 +10,6 @@
         "test": "ng test --browsers=ChromeHeadless --watch=false --reporters=progress",
         "test:watch": "ng test AuthServerUI --karma-config karma.conf.js --code-coverage=true",
         "update": "ng update @angular/core@17 @angular/cli@17",
-        "format": "prettier --write \"src/**/*.ts\" --tab-width 4 --no-bracket-spacing",
         "release": "npm run build && npm run test"
     },
     "private": true,
@@ -53,7 +52,6 @@
         "karma-coverage": "~2.0.3",
         "karma-jasmine": "~4.0.0",
         "karma-jasmine-html-reporter": "~1.7.0",
-        "prettier": "^3.5.3",
         "typescript": "^5.4.5"
     }
 }

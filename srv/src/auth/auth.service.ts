@@ -38,7 +38,8 @@ export class AuthService {
         private readonly userService: UsersService,
         private readonly tenantService: TenantService,
         private readonly jwtService: JwtService,
-    ) {}
+    ) {
+    }
 
     /**
      * Validate the email and password.
@@ -54,7 +55,7 @@ export class AuthService {
 
     async validateRefreshToken(
         refreshToken: string,
-    ): Promise<{tenant: Tenant; user: User}> {
+    ): Promise<{ tenant: Tenant; user: User }> {
         let validationPipe = new ValidationPipe(
             ValidationSchema.RefreshTokenSchema,
         );
@@ -164,7 +165,7 @@ export class AuthService {
     async createUserAccessToken(
         user: User,
         tenant: Tenant,
-    ): Promise<{accessToken: string; refreshToken: string}> {
+    ): Promise<{ accessToken: string; refreshToken: string }> {
         if (!user.verified) {
             throw new EmailNotVerifiedException();
         }

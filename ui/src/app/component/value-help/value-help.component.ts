@@ -1,17 +1,11 @@
-import {
-    Component,
-    OnInit,
-    QueryList,
-    TemplateRef,
-    ViewChild,
-} from '@angular/core';
+import {Component, OnInit, QueryList, TemplateRef, ViewChild,} from '@angular/core';
 
 import {NgbActiveModal, NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {ActivatedRoute} from '@angular/router';
 import {ValueHelpColumnComponent} from '../value-help-input/value-help-column.component';
 import {AppTableComponent} from '../table/app-table.component';
 import {FilterBarColumnComponent} from '../filter-bar/filter-bar.component';
-import {IDataModel, DataSource} from '../model/IDataModel';
+import {DataSource} from '../model/IDataModel';
 import {Filter} from '../model/Filters';
 
 export enum CloseType {
@@ -124,7 +118,8 @@ export class ValueHelpComponent implements OnInit {
         private route: ActivatedRoute,
         private activeModal: NgbActiveModal,
         private modalService: NgbModal,
-    ) {}
+    ) {
+    }
 
     async ngOnInit(): Promise<void> {
         // this.data = await lastValueFrom(this.userService.getAllUsers())

@@ -21,7 +21,8 @@ export class RestApiModel<T> implements DataSource<T> {
         private path: string,
         protected _keyFields: string[],
         private expands: string[] = [],
-    ) {}
+    ) {
+    }
 
     keyFields(): string[] {
         return this._keyFields;
@@ -54,7 +55,7 @@ export class RestApiModel<T> implements DataSource<T> {
         };
 
         const response = await lastValueFrom(
-            this.http.post<{count: number}>(this.path, body, {
+            this.http.post<{ count: number }>(this.path, body, {
                 headers: this.defaultHeaders,
             }),
         );

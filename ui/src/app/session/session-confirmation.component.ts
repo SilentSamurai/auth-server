@@ -27,7 +27,8 @@ export class SessionConfirmationComponent implements OnInit {
         private authService: AuthService,
         private authDefaultService: AuthDefaultService,
         private tokenStorage: SessionService,
-    ) {}
+    ) {
+    }
 
     async ngOnInit(): Promise<void> {
         let params = this.route.snapshot.queryParamMap;

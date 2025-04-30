@@ -31,6 +31,24 @@ export class PKCEService {
         return this.generateCodeChallenge(codeVerifier, method);
     }
 
+    public clearCodeVerifier(): void {
+        window.sessionStorage.removeItem(this.CODE_VERIFIER_KEY);
+    }
+
+    public base64urlencode(a: ArrayBuffer): string {
+        let str = '';
+        const bytes = new Uint8Array(a);
+        const len = bytes.byteLength;
+        for (let i = 0; i < len; i++) {
+            str += String.fromCharCode(bytes[i]);
+        }
+        return btoa(str)
+            .replace(/\+/g, '-')
+            .replace(/\//g, '_')
+            .replace(/=+$/, '')
+            .toString();
+    }
+
     private generateCodeChallenge(verifier: string, method: string): string {
         if (method === 'S256') {
             // S256 method is commented out as it requires HTTPS
@@ -42,10 +60,6 @@ export class PKCEService {
             return this.oneWayHash(verifier);
         }
         return verifier;
-    }
-
-    public clearCodeVerifier(): void {
-        window.sessionStorage.removeItem(this.CODE_VERIFIER_KEY);
     }
 
     private oneWayHash(plain: string): string {
@@ -61,19 +75,5 @@ export class PKCEService {
         }
         const finalHash = hash >>> 0;
         return `${finalHash}`; // Convert to unsigned 32-bit integer
-    }
-
-    public base64urlencode(a: ArrayBuffer): string {
-        let str = '';
-        const bytes = new Uint8Array(a);
-        const len = bytes.byteLength;
-        for (let i = 0; i < len; i++) {
-            str += String.fromCharCode(bytes[i]);
-        }
-        return btoa(str)
-            .replace(/\+/g, '-')
-            .replace(/\//g, '_')
-            .replace(/=+$/, '')
-            .toString();
     }
 }

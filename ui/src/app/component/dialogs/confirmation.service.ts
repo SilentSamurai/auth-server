@@ -15,7 +15,8 @@ export interface ConfirmationOptions<Type> {
     providedIn: 'root',
 })
 export class ConfirmationService {
-    constructor(private modalService: NgbModal) {}
+    constructor(private modalService: NgbModal) {
+    }
 
     async confirm<Type>(
         options: ConfirmationOptions<Type>,
@@ -89,9 +90,11 @@ export class ConfirmationDialogComponent implements OnInit {
     acceptIcon: string | null = null;
     rejectIcon: string | null = null;
 
-    constructor(public activeModal: NgbActiveModal) {}
+    constructor(public activeModal: NgbActiveModal) {
+    }
 
-    async ngOnInit(): Promise<void> {}
+    async ngOnInit(): Promise<void> {
+    }
 
     onYes() {
         this.activeModal.close('YES');

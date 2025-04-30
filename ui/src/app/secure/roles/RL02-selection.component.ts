@@ -5,7 +5,7 @@ import {TenantService} from '../../_services/tenant.service';
 import {MessageService} from 'primeng/api';
 import {AuthDefaultService} from '../../_services/auth.default.service';
 import {RoleService} from '../../_services/role.service';
-import {IDataModel, DataSource} from '../../component/model/IDataModel';
+import {DataSource} from '../../component/model/IDataModel';
 
 @Component({
     selector: 'app-role-list',

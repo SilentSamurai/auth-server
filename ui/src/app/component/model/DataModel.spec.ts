@@ -1,7 +1,7 @@
 import {DataModel} from './DataModel';
 import {Filter} from './Filters';
 import {Operators} from './Operator';
-import {IDataModel, DataSourceEvents, Query, SortConfig} from './IDataModel';
+import {DataSourceEvents, IDataModel, Query, SortConfig} from './IDataModel';
 import {HttpClient} from '@angular/common/http';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {TestBed} from '@angular/core/testing';

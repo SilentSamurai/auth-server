@@ -1,10 +1,4 @@
-import {
-    AfterViewInit,
-    Component,
-    ContentChild,
-    Input,
-    OnInit,
-} from '@angular/core';
+import {AfterViewInit, Component, ContentChild, Input, OnInit,} from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmationService, MessageService} from 'primeng/api';
 import {ActivatedRoute} from '@angular/router';
@@ -77,7 +71,8 @@ export class PageViewComponent implements OnInit, AfterViewInit {
         private confirmationService: ConfirmationService,
         private actRoute: ActivatedRoute,
         private modalService: NgbModal,
-    ) {}
+    ) {
+    }
 
     async ngOnInit() {
         this.loading = true;

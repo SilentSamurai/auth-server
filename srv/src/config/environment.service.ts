@@ -7,7 +7,8 @@ import * as fs from "node:fs";
 
 @Injectable()
 export class Environment {
-    constructor() {}
+    constructor() {
+    }
 
     static setup(): any {
         const envFile = process.env.ENV_FILE || "./envs/.env.development";
@@ -81,13 +82,6 @@ export class Environment {
         } else {
             return "Auth Server";
         }
-    }
-
-    /**
-     * Get the static path.
-     */
-    getStaticPath(): string {
-        return join(process.cwd(), process.env.STATIC_PATH);
     }
 
     /**

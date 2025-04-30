@@ -32,14 +32,15 @@ export class TenantController {
         private readonly tenantService: TenantService,
         private readonly usersService: UsersService,
         private readonly securityService: SecurityService,
-    ) {}
+    ) {
+    }
 
     @Post("/create")
     @UseGuards(JwtAuthGuard)
     async createTenant(
         @Request() request,
         @Body(new ValidationPipe(ValidationSchema.CreateTenantSchema))
-        body: any,
+            body: any,
     ): Promise<Tenant> {
         const user = await this.usersService.findByEmail(
             request,
@@ -65,7 +66,7 @@ export class TenantController {
         @Request() request,
         @Param("tenantId") tenantId: string,
         @Body(new ValidationPipe(TenantController.UpdateTenantSchema))
-        body: {name?: string; allowSignUp?: boolean},
+            body: { name?: string; allowSignUp?: boolean },
     ): Promise<Tenant> {
         let tenant = await this.tenantService.findById(request, tenantId);
         this.securityService.check(

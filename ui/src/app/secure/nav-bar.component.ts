@@ -101,7 +101,8 @@ export class AdminNavBarComponent implements OnInit {
         private modalService: NgbModal,
         private authDefaultService: AuthDefaultService,
         private tokenStorageService: SessionService,
-    ) {}
+    ) {
+    }
 
     async ngOnInit(): Promise<void> {
         this.isLoggedIn = !!this.tokenStorageService.getToken();

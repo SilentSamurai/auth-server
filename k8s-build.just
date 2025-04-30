@@ -40,17 +40,16 @@ download-and-import-image:
     echo "✅ Current k3s auth-server images:"
     $SUDO k3s ctr images ls | grep auth-server || echo "No images found"
 
-
 # Deploy the auth-server using Helm to the Kubernetes cluster
 [group('k8s')]
-[working-directory: 'helm']
+[working-directory('helm')]
 deploy-auth-server:
     # Install or upgrade the auth-server Helm chart
     helm upgrade --install auth-server ./auth-server --namespace auth-server --create-namespace
 
 # Perform a Helm dry-run deployment with debug for the auth-server
 [group('k8s')]
-[working-directory: 'helm']
+[working-directory('helm')]
 dry-run-auth-server:
     # Simulate deployment without making actual changes
     helm upgrade --install auth-server ./auth-server --namespace auth-server --create-namespace --dry-run --debug

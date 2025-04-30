@@ -35,4 +35,5 @@ import {CaslModule} from "../casl/casl.module";
     providers: [UsersService, GroupService, TenantService, RoleService],
     exports: [UsersService, GroupService, TenantService, RoleService],
 })
-export class ServiceModule {}
+export class ServiceModule {
+}

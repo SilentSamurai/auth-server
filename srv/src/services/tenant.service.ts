@@ -29,9 +29,11 @@ export class TenantService implements OnModuleInit {
         @InjectRepository(TenantMember)
         private tenantMemberRepository: Repository<TenantMember>,
         @InjectRepository(User) private userRepository: Repository<User>,
-    ) {}
+    ) {
+    }
 
-    async onModuleInit() {}
+    async onModuleInit() {
+    }
 
     async create(
         authContext: AuthContext,
@@ -240,7 +242,7 @@ export class TenantService implements OnModuleInit {
     async updateTenant(
         authContext: AuthContext,
         id: string,
-        data: {name?: string; allowSignUp?: boolean},
+        data: { name?: string; allowSignUp?: boolean },
     ) {
         this.securityService.isAuthorized(
             authContext,

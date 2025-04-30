@@ -22,7 +22,8 @@ export class PolicyService {
         private readonly cacheService: CacheService,
         @InjectRepository(Policy)
         private authorizationRepository: Repository<Policy>,
-    ) {}
+    ) {
+    }
 
     public async createAuthorization(
         authContext: AuthContext,
@@ -110,7 +111,7 @@ export class PolicyService {
             effect?: Effect;
             action?: Action;
             subject?: string;
-            conditions?: {[string: string]: string} | null;
+            conditions?: { [string: string]: string } | null;
         },
     ): Promise<any> {
         const auth = await this.findById(authContext, id);

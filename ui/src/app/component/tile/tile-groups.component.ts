@@ -45,7 +45,9 @@ export class TileGroupsComponent implements OnInit {
         private authDefaultService: AuthDefaultService,
         private tokenStorage: SessionService,
         protected permissionService: PermissionService,
-    ) {}
+    ) {
+    }
 
-    ngOnInit(): void {}
+    ngOnInit(): void {
+    }
 }

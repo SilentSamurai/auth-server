@@ -5,11 +5,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {AuthService} from '../_services/auth.service';
 import {AuthDefaultService} from '../_services/auth.default.service';
 import {makeLaunchPad} from '../component/tile/models';
-import {
-    Actions,
-    PermissionService,
-    Subjects,
-} from '../_services/permission.service';
+import {Actions, PermissionService, Subjects,} from '../_services/permission.service';
 
 @Component({
     selector: 'app-home',

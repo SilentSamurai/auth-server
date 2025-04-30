@@ -49,4 +49,5 @@ import {RegisterController} from "./registration.controller";
     providers: [],
     exports: [],
 })
-export class ControllersModule {}
+export class ControllersModule {
+}

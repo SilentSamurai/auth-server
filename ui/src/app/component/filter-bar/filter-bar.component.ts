@@ -1,13 +1,4 @@
-import {
-    Component,
-    ContentChildren,
-    EventEmitter,
-    Input,
-    OnInit,
-    Output,
-    QueryList,
-    ViewChildren,
-} from '@angular/core';
+import {Component, ContentChildren, EventEmitter, Input, OnInit, Output, QueryList, ViewChildren,} from '@angular/core';
 import {Operators} from '../model/Operator';
 import {FilterFieldComponent} from './filter-field.component';
 import {Filter} from '../model/Filters';
@@ -21,7 +12,8 @@ export class FilterBarColumnComponent implements OnInit {
     @Input() label: string = '';
     @Input() name: string = ''; // Identifier for the filter field
 
-    constructor() {}
+    constructor() {
+    }
 
     ngOnInit(): void {
         // Initialization logic for a column if needed in the future
@@ -144,7 +136,8 @@ export class FilterBarComponent implements OnInit {
 
     goButtonId: string = '';
 
-    constructor() {}
+    constructor() {
+    }
 
     ngOnInit(): void {
         this.goButtonId = `${this.name}_FILTER_BAR_GO_BTN`;

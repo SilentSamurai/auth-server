@@ -15,13 +15,14 @@ import {
 import {FilterBarComponent} from '../filter-bar/filter-bar.component';
 import {TableColumnComponent} from './app-table-column.component';
 import {AppTableButtonComponent} from './app-table-button.component';
-import {IDataModel, DataSource, Query} from '../model/IDataModel';
+import {DataSource, IDataModel, Query} from '../model/IDataModel';
 import {Filter} from '../model/Filters';
 import {CheckboxChangeEvent} from 'primeng/checkbox';
 import {DataModel} from '../model/DataModel';
 import {Subscription} from 'rxjs';
 
-export class TableAsyncLoadEvent extends Query {}
+export class TableAsyncLoadEvent extends Query {
+}
 
 @Component({
     selector: 'app-table',
@@ -63,83 +64,83 @@ export class TableAsyncLoadEvent extends Query {}
         >
             <table class="table a-table table-striped table-hover table-sm">
                 <thead class="sticky-top top-0">
-                    <tr style="min-height:35px">
-                        <th style="width:40px">
-                            <p-checkbox
-                                *ngIf="multi"
-                                [binary]="true"
-                                [(ngModel)]="_selectAll"
-                                (onChange)="onSelectAll($event)"
-                            ></p-checkbox>
-                        </th>
+                <tr style="min-height:35px">
+                    <th style="width:40px">
+                        <p-checkbox
+                            *ngIf="multi"
+                            [binary]="true"
+                            [(ngModel)]="_selectAll"
+                            (onChange)="onSelectAll($event)"
+                        ></p-checkbox>
+                    </th>
+                    <ng-container
+                        *ngFor="let col of columns; let i = index"
+                    >
                         <ng-container
-                            *ngFor="let col of columns; let i = index"
-                        >
-                            <ng-container
-                                *ngIf="col.isTemplateProvided"
-                                [ngTemplateOutlet]="col.templateRef"
-                            ></ng-container>
-                            <ng-container *ngIf="!col.isTemplateProvided">
-                                <th
-                                    scope="col"
-                                    [class.sortable]="col.sortable"
-                                    (click)="col.sortable && sort(col.name)"
-                                    [style.min-width.px]="col.width || 150"
-                                >
-                                    <div class="d-flex align-items-center">
-                                        {{ col.label }}
-                                        <i
-                                            *ngIf="col.sortable"
-                                            [class]="getSortIcon(col.name)"
-                                            class="ms-1"
-                                        ></i>
-                                    </div>
-                                </th>
-                            </ng-container>
+                            *ngIf="col.isTemplateProvided"
+                            [ngTemplateOutlet]="col.templateRef"
+                        ></ng-container>
+                        <ng-container *ngIf="!col.isTemplateProvided">
+                            <th
+                                scope="col"
+                                [class.sortable]="col.sortable"
+                                (click)="col.sortable && sort(col.name)"
+                                [style.min-width.px]="col.width || 150"
+                            >
+                                <div class="d-flex align-items-center">
+                                    {{ col.label }}
+                                    <i
+                                        *ngIf="col.sortable"
+                                        [class]="getSortIcon(col.name)"
+                                        class="ms-1"
+                                    ></i>
+                                </div>
+                            </th>
                         </ng-container>
-                    </tr>
+                    </ng-container>
+                </tr>
                 </thead>
                 <tbody>
-                    <ng-container *ngFor="let row of actualRows">
-                        <tr class="a-table-row" style="height:35px">
-                            <td style="width:40px">
-                                <p-checkbox
-                                    *ngIf="multi"
-                                    [value]="getKeyValue(row)"
-                                    [(ngModel)]="selectedItem"
-                                ></p-checkbox>
-                                <p-radioButton
-                                    *ngIf="!multi"
-                                    name="table_input"
-                                    [value]="getKeyValue(row)"
-                                    [(ngModel)]="selectedItem"
-                                ></p-radioButton>
-                            </td>
-                            <ng-container *ngIf="body">
-                                <ng-container
-                                    *ngTemplateOutlet="
+                <ng-container *ngFor="let row of actualRows">
+                    <tr class="a-table-row" style="height:35px">
+                        <td style="width:40px">
+                            <p-checkbox
+                                *ngIf="multi"
+                                [value]="getKeyValue(row)"
+                                [(ngModel)]="selectedItem"
+                            ></p-checkbox>
+                            <p-radioButton
+                                *ngIf="!multi"
+                                name="table_input"
+                                [value]="getKeyValue(row)"
+                                [(ngModel)]="selectedItem"
+                            ></p-radioButton>
+                        </td>
+                        <ng-container *ngIf="body">
+                            <ng-container
+                                *ngTemplateOutlet="
                                         body;
                                         context: {$implicit: row}
                                     "
-                                ></ng-container>
-                            </ng-container>
-                            <ng-container *ngIf="!body"> No data </ng-container>
-                        </tr>
-                    </ng-container>
-                    <tr style="height:40px" *ngIf="loading">
-                        <td>
-                            <div class="loading-text"></div>
-                            <p-skeleton
-                                [ngStyle]="{width: '100%'}"
-                            ></p-skeleton>
-                        </td>
-                        <td *ngFor="let col of columns">
-                            <div class="loading-text"></div>
-                            <p-skeleton
-                                [ngStyle]="{width: '100%'}"
-                            ></p-skeleton>
-                        </td>
+                            ></ng-container>
+                        </ng-container>
+                        <ng-container *ngIf="!body"> No data</ng-container>
                     </tr>
+                </ng-container>
+                <tr style="height:40px" *ngIf="loading">
+                    <td>
+                        <div class="loading-text"></div>
+                        <p-skeleton
+                            [ngStyle]="{width: '100%'}"
+                        ></p-skeleton>
+                    </td>
+                    <td *ngFor="let col of columns">
+                        <div class="loading-text"></div>
+                        <p-skeleton
+                            [ngStyle]="{width: '100%'}"
+                        ></p-skeleton>
+                    </td>
+                </tr>
                 </tbody>
             </table>
         </div>
@@ -255,73 +256,42 @@ export class TableAsyncLoadEvent extends Query {}
 // Table for reuse
 export class AppTableComponent implements OnInit, OnDestroy {
     loading: boolean = false;
+    @Input() title: string = '';
+    @Input() scrollHeight: string = '65vh';
+    @Input({transform: booleanAttribute}) multi: boolean = true;
+    @Input() selection: any[] = [];
+    @Output() selectionChange: EventEmitter<any[]> = new EventEmitter();
+    @ContentChild('table_body')
+    body: TemplateRef<any> | null = null;
+    actualRows: any[] = [];
+    @ContentChildren(TableColumnComponent)
+    columns!: QueryList<TableColumnComponent>;
+    @ContentChildren(AppTableButtonComponent)
+    buttons!: QueryList<AppTableButtonComponent>;
+    @ViewChild(FilterBarComponent)
+    filterBar!: FilterBarComponent;
+    _selectAll: boolean = false;
+    idFields: string[] = [];
+    protected pagesInProgress = new Set();
+    protected _selectedKeys: string[] | null = null;
+    private query: Query = new Query({});
+    private sortDirection: { [key: string]: 'asc' | 'desc' } = {};
+    private currentSortColumn: string | null = null;
+    private _subscriptions = new Subscription();
+
+    constructor() {
+    }
 
     _dataModel!: IDataModel<any>;
-
-    @Input({required: true})
-    set dataSource(dataSource: DataSource<any>) {
-        this._dataModel = new DataModel(dataSource);
-        this.idFields = dataSource.keyFields();
-    }
 
     get dataModel(): IDataModel<any> {
         return this._dataModel;
     }
 
-    @Input() title: string = '';
-    @Input() scrollHeight: string = '65vh';
-    @Input({transform: booleanAttribute}) multi: boolean = true;
-
-    @Input() selection: any[] = [];
-    @Output() selectionChange: EventEmitter<any[]> = new EventEmitter();
-
-    @ContentChild('table_body')
-    body: TemplateRef<any> | null = null;
-
-    actualRows: any[] = [];
-
-    @ContentChildren(TableColumnComponent)
-    columns!: QueryList<TableColumnComponent>;
-
-    @ContentChildren(AppTableButtonComponent)
-    buttons!: QueryList<AppTableButtonComponent>;
-
-    @ViewChild(FilterBarComponent)
-    filterBar!: FilterBarComponent;
-
-    _selectAll: boolean = false;
-
-    private query: Query = new Query({});
-    private sortDirection: {[key: string]: 'asc' | 'desc'} = {};
-    private currentSortColumn: string | null = null;
-    idFields: string[] = [];
-    private _subscriptions = new Subscription();
-
-    protected pagesInProgress = new Set();
-    protected _selectedKeys: string[] | null = null;
-
-    constructor() {}
-
-    async ngOnInit(): Promise<void> {
-        this._subscriptions.add(
-            this._dataModel.dataSourceEvents().subscribe((x) => {
-                if (x.type == 'data-updated') {
-                    this.refresh();
-                }
-            }),
-        );
-
-        this.refresh();
-    }
-
-    ngOnDestroy(): void {
-        this._subscriptions.unsubscribe();
-    }
-
-    getKeyValue(row: any) {
-        return this.idFields
-            .map((kf) => row[kf]?.toString() ?? 'null')
-            .join('|');
+    @Input({required: true})
+    set dataSource(dataSource: DataSource<any>) {
+        this._dataModel = new DataModel(dataSource);
+        this.idFields = dataSource.keyFields();
     }
 
     get selectedItem() {
@@ -354,6 +324,28 @@ export class AppTableComponent implements OnInit, OnDestroy {
         this.selectionChange.emit(this.selection);
     }
 
+    async ngOnInit(): Promise<void> {
+        this._subscriptions.add(
+            this._dataModel.dataSourceEvents().subscribe((x) => {
+                if (x.type == 'data-updated') {
+                    this.refresh();
+                }
+            }),
+        );
+
+        this.refresh();
+    }
+
+    ngOnDestroy(): void {
+        this._subscriptions.unsubscribe();
+    }
+
+    getKeyValue(row: any) {
+        return this.idFields
+            .map((kf) => row[kf]?.toString() ?? 'null')
+            .join('|');
+    }
+
     onSelectAll($event: CheckboxChangeEvent) {
         if ($event.checked) {
             this._selectAll = true;
@@ -382,18 +374,6 @@ export class AppTableComponent implements OnInit, OnDestroy {
     //             this.loading = false;
     //     }
     // }
-
-    protected setData(data: any[]) {
-        this.actualRows = data;
-    }
-
-    protected appendData(data: any[]) {
-        if (data.length > 0) {
-            // this.actualRows.push(...data);
-            this.actualRows = [...this.actualRows, ...data];
-        }
-        // this.isLastPageReached = !isNextPageAvailable;
-    }
 
     async requestForData(query: Query, append: boolean) {
         if (
@@ -499,5 +479,17 @@ export class AppTableComponent implements OnInit, OnDestroy {
         link.href = URL.createObjectURL(blob);
         link.download = `${this.title || 'table'}_export.csv`;
         link.click();
+    }
+
+    protected setData(data: any[]) {
+        this.actualRows = data;
+    }
+
+    protected appendData(data: any[]) {
+        if (data.length > 0) {
+            // this.actualRows.push(...data);
+            this.actualRows = [...this.actualRows, ...data];
+        }
+        // this.isLastPageReached = !isNextPageAvailable;
     }
 }

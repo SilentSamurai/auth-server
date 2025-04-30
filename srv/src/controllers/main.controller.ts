@@ -12,7 +12,8 @@ import {JwtAuthGuard} from "../auth/jwt-auth.guard";
 @Controller("api/v1")
 @UseInterceptors(ClassSerializerInterceptor)
 export class MainController {
-    constructor(private readonly configService: Environment) {}
+    constructor(private readonly configService: Environment) {
+    }
 
     @Get("/health-check")
     async healthCheck(@Request() request): Promise<any> {

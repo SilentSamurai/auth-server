@@ -87,7 +87,7 @@ export function matches(value: any) {
 // Helper to create a condition filter
 export function condition(
     field: string,
-    config: {operator: Operator; value: any},
+    config: { operator: Operator; value: any },
 ) {
     return new Filter(field, field, config.value, config.operator);
 }

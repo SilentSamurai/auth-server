@@ -1,4 +1,3 @@
-
 describe('login', () => {
     beforeEach(() => {
         // Cypress starts out with a blank slate for each test

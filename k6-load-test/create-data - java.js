@@ -27,30 +27,28 @@ async function createUser(name, email) {
 USERS = []
 
 async function main() {
-	
-	console.log("starting");
-	
-	for (let j = 0; j < 20 ; j++) {
-		let promises = []
-		for (let i = 0; i < 50; i++) {
-			const firstName = faker.person.firstName();
-			const lastName = faker.person.lastName();
-			const name = faker.person.fullName({firstName, lastName});
-			const randomEmail = faker.internet.email({firstName, lastName, allowSpecialCharacters: false}); // Kassandra.Haley@erich.biz
 
-			USERS.push({
-				firstName: firstName,
-				lastName: lastName,
-				name: name,
-				email: randomEmail,
-			})
-			promises.push(createUser(name, randomEmail));
-		}
-		await Promise.all(promises);
-		console.log("batch completed " , j)
-	}
+    console.log("starting");
 
-    
+    for (let j = 0; j < 20; j++) {
+        let promises = []
+        for (let i = 0; i < 50; i++) {
+            const firstName = faker.person.firstName();
+            const lastName = faker.person.lastName();
+            const name = faker.person.fullName({firstName, lastName});
+            const randomEmail = faker.internet.email({firstName, lastName, allowSpecialCharacters: false}); // Kassandra.Haley@erich.biz
+
+            USERS.push({
+                firstName: firstName,
+                lastName: lastName,
+                name: name,
+                email: randomEmail,
+            })
+            promises.push(createUser(name, randomEmail));
+        }
+        await Promise.all(promises);
+        console.log("batch completed ", j)
+    }
 
 
     const content = JSON.stringify(USERS);

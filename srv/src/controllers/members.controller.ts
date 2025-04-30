@@ -39,7 +39,8 @@ export class MemberController {
         private readonly roleService: RoleService,
         private readonly securityService: SecurityService,
         @InjectRepository(User) private usersRepository: Repository<User>,
-    ) {}
+    ) {
+    }
 
     @Get("/:tenantId/members")
     @UseGuards(JwtAuthGuard)
@@ -81,7 +82,7 @@ export class MemberController {
         @Request() request,
         @Param("tenantId") tenantId: string,
         @Body(new ValidationPipe(ValidationSchema.MemberOperationSchema))
-        body: {emails: string[]},
+            body: { emails: string[] },
     ): Promise<Tenant> {
         let tenant = await this.tenantService.findById(request, tenantId);
         this.securityService.check(
@@ -110,7 +111,7 @@ export class MemberController {
         @Request() request,
         @Param("tenantId") tenantId: string,
         @Body(new ValidationPipe(ValidationSchema.MemberOperationSchema))
-        body: {emails: string[]},
+            body: { emails: string[] },
     ): Promise<Tenant> {
         let tenant = await this.tenantService.findById(request, tenantId);
         this.securityService.check(
@@ -161,7 +162,7 @@ export class MemberController {
         @Param("tenantId") tenantId: string,
         @Param("userId") userId: string,
         @Body(new ValidationPipe(ValidationSchema.OperatingRoleSchema))
-        body: {roles: string[]},
+            body: { roles: string[] },
     ): Promise<Role[]> {
         const user = await this.usersService.findById(request, userId);
         let tenant = await this.tenantService.findById(request, tenantId);
@@ -188,7 +189,7 @@ export class MemberController {
         @Param("tenantId") tenantId: string,
         @Param("userId") userId: string,
         @Body(new ValidationPipe(ValidationSchema.OperatingRoleSchema))
-        body: {roles: string[]},
+            body: { roles: string[] },
     ): Promise<Role[]> {
         const user = await this.usersService.findById(request, userId);
         const tenant = await this.tenantService.findById(request, tenantId);
@@ -215,7 +216,7 @@ export class MemberController {
         @Param("tenantId") tenantId: string,
         @Param("userId") userId: string,
         @Body(new ValidationPipe(ValidationSchema.OperatingRoleSchema))
-        body: {roles: string[]},
+            body: { roles: string[] },
     ): Promise<Role[]> {
         const user = await this.usersService.findById(request, userId);
         const tenant = await this.tenantService.findById(request, tenantId);

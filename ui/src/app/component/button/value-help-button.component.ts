@@ -9,11 +9,8 @@ import {
     QueryList,
     TemplateRef,
 } from '@angular/core';
-import {
-    ValueHelpComponent,
-    ValueHelpResult,
-} from '../value-help/value-help.component';
-import {IDataModel, DataSource} from '../model/IDataModel';
+import {ValueHelpComponent, ValueHelpResult,} from '../value-help/value-help.component';
+import {DataSource} from '../model/IDataModel';
 import {ValueHelpColumnComponent} from '../value-help-input/value-help-column.component';
 import {FilterBarColumnComponent} from '../filter-bar/filter-bar.component';
 import {ModalResult, ModalService} from '../dialogs/modal.service';
@@ -51,7 +48,8 @@ export class ValueHelpButtonComponent implements OnInit {
     @ContentChildren(FilterBarColumnComponent)
     filters!: QueryList<FilterBarColumnComponent>;
 
-    constructor(private modalService: ModalService) {}
+    constructor(private modalService: ModalService) {
+    }
 
     ngOnInit(): void {
         // Ensure dataModel is provided

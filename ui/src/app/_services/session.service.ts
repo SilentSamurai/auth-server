@@ -19,7 +19,8 @@ export class SessionService {
         private ability: PureAbility,
         private tokenVerificationService: TokenVerificationService,
         private pkceService: PKCEService,
-    ) {}
+    ) {
+    }
 
     public clearSession(): void {
         window.sessionStorage.removeItem(TOKEN_KEY);

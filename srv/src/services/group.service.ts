@@ -31,7 +31,8 @@ export class GroupService {
         private groupUserRepository: Repository<GroupUser>,
         @InjectRepository(GroupRole)
         private groupRoleRepository: Repository<GroupRole>,
-    ) {}
+    ) {
+    }
 
     async create(
         authContext: AuthContext,
@@ -441,7 +442,7 @@ export class GroupService {
     async updateGroup(
         authContext: AuthContext,
         group: Group,
-        body: {name: string},
+        body: { name: string },
     ) {
         this.securityService.isAuthorized(
             authContext,

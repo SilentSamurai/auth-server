@@ -9,12 +9,9 @@ import {ConfirmationService} from '../../component/dialogs/confirmation.service'
 import {StaticModel} from '../../component/model/StaticModel';
 import {PolicyService} from '../../_services/policy.service';
 import {CreatePolicyModalComponent} from './create-policy-modal.component';
-import {
-    CloseType,
-    ValueHelpResult,
-} from '../../component/value-help/value-help.component';
+import {CloseType, ValueHelpResult,} from '../../component/value-help/value-help.component';
 import {UpdateRoleModalComponent} from './update-role-modal.component';
-import {ModalService, ModalResult} from '../../component/dialogs/modal.service';
+import {ModalResult, ModalService} from '../../component/dialogs/modal.service';
 
 @Component({
     selector: 'app-RL02',
@@ -61,7 +58,7 @@ import {ModalService, ModalResult} from '../../component/dialogs/modal.service';
             </app-op-header>
             <app-op-tab name="Users">
                 <app-op-section name="Users">
-                    <app-section-action> </app-section-action>
+                    <app-section-action></app-section-action>
                     <app-section-content>
                         <app-table
                             [dataSource]="usersDM"
@@ -236,7 +233,8 @@ export class RL02Component implements OnInit {
         private confirmationService: ConfirmationService,
         private modalService: ModalService,
         private policyService: PolicyService,
-    ) {}
+    ) {
+    }
 
     async ngOnInit() {
         this.loading = true;

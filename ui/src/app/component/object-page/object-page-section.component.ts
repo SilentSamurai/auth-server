@@ -1,13 +1,4 @@
-import {
-    Component,
-    ContentChild,
-    ContentChildren,
-    Input,
-    OnInit,
-    QueryList,
-    TemplateRef,
-    ViewChild,
-} from '@angular/core';
+import {Component, Input, OnInit, TemplateRef, ViewChild,} from '@angular/core';
 
 @Component({
     selector: 'app-op-section',
@@ -36,7 +27,8 @@ export class ObjectPageSectionComponent implements OnInit {
 
     @ViewChild('OPSC', {static: true}) template!: TemplateRef<any>;
 
-    constructor() {}
+    constructor() {
+    }
 
     async ngOnInit() {
         this.loading = true;

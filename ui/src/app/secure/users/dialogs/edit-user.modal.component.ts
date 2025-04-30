@@ -103,7 +103,8 @@ export class EditUserModalComponent implements OnInit {
         private userService: UserService,
         private messageService: MessageService,
         public activeModal: NgbActiveModal,
-    ) {}
+    ) {
+    }
 
     ngOnInit() {
         this.form = {

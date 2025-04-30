@@ -8,4 +8,5 @@ import {Environment} from "./environment.service";
     providers: [Environment],
     exports: [Environment],
 })
-export class ConfigModule {}
+export class ConfigModule {
+}

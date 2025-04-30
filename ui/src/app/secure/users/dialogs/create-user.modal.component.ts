@@ -84,9 +84,11 @@ export class CreateUserModalComponent implements OnInit {
         private messageService: MessageService,
         private formBuilder: UntypedFormBuilder,
         public activeModal: NgbActiveModal,
-    ) {}
+    ) {
+    }
 
-    ngOnInit() {}
+    ngOnInit() {
+    }
 
     async onSubmit() {
         let data = this.form.value;

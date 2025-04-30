@@ -65,9 +65,11 @@ export class AddRoleComponent implements OnInit {
         private tenantService: TenantService,
         private messageService: MessageService,
         public activeModal: NgbActiveModal,
-    ) {}
+    ) {
+    }
 
-    ngOnInit(): void {}
+    ngOnInit(): void {
+    }
 
     async onSubmit() {
         try {

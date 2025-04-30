@@ -1,10 +1,4 @@
-import {
-    DataSource,
-    DataSourceEvents,
-    Query,
-    ReturnedData,
-    SortConfig,
-} from './IDataModel';
+import {DataSource, DataSourceEvents, Query, ReturnedData, SortConfig,} from './IDataModel';
 import {Filter} from './Filters';
 import {Observable, Subject} from 'rxjs';
 

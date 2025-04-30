@@ -43,24 +43,11 @@ export interface IQueryConfig {
 }
 
 export class Query implements IQueryConfig {
-    private _pageNo: number = 0;
-    private _pageSize: number = 50;
-    private _filters: Filter[] = [];
-    private _orderBy: SortConfig[] = [];
-    private _expand: string[] = [];
-
     constructor(config: IQueryConfig) {
         this.update(config);
     }
 
-    public update(config: IQueryConfig) {
-        if (config.pageNo !== undefined) this.pageNo = config.pageNo;
-        if (config.pageSize !== undefined) this.pageSize = config.pageSize;
-        if (config.filters) this.filters = config.filters;
-        if (config.orderBy) this.orderBy = config.orderBy;
-        if (config.expand) this.expand = config.expand;
-        return this;
-    }
+    private _pageNo: number = 0;
 
     get pageNo(): number {
         return this._pageNo;
@@ -69,6 +56,8 @@ export class Query implements IQueryConfig {
     set pageNo(value: number) {
         this._pageNo = value;
     }
+
+    private _pageSize: number = 50;
 
     get pageSize(): number {
         return this._pageSize;
@@ -82,6 +71,8 @@ export class Query implements IQueryConfig {
         this._pageSize = value;
     }
 
+    private _filters: Filter[] = [];
+
     get filters(): Filter[] {
         return this._filters;
     }
@@ -92,6 +83,8 @@ export class Query implements IQueryConfig {
         );
     }
 
+    private _orderBy: SortConfig[] = [];
+
     get orderBy(): SortConfig[] {
         return this._orderBy;
     }
@@ -100,12 +93,23 @@ export class Query implements IQueryConfig {
         this._orderBy = value;
     }
 
+    private _expand: string[] = [];
+
     get expand(): string[] {
         return this._expand;
     }
 
     set expand(value: string[]) {
         this._expand = value;
+    }
+
+    public update(config: IQueryConfig) {
+        if (config.pageNo !== undefined) this.pageNo = config.pageNo;
+        if (config.pageSize !== undefined) this.pageSize = config.pageSize;
+        if (config.filters) this.filters = config.filters;
+        if (config.orderBy) this.orderBy = config.orderBy;
+        if (config.expand) this.expand = config.expand;
+        return this;
     }
 }
 

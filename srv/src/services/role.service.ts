@@ -21,7 +21,8 @@ export class RoleService {
         @InjectRepository(Role) private roleRepository: Repository<Role>,
         @InjectRepository(UserRole)
         private userRoleRepository: Repository<UserRole>,
-    ) {}
+    ) {
+    }
 
     async create(
         authContext: AuthContext,

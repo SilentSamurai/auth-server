@@ -20,7 +20,8 @@ export class CaslAbilityFactory {
         @InjectRepository(Role) private roleRepository: Repository<Role>,
         @InjectRepository(Policy)
         private authorizationRepository: Repository<Policy>,
-    ) {}
+    ) {
+    }
 
     public async findRole(name: string, tenantId: string) {
         let cache_key = `ROLE:${tenantId}:${name}`;
@@ -114,7 +115,7 @@ export class CaslAbilityFactory {
             if (
                 roles.includes(RoleEnum.SUPER_ADMIN) &&
                 tenantToken.tenant.domain ===
-                    this.configService.get("SUPER_TENANT_DOMAIN")
+                this.configService.get("SUPER_TENANT_DOMAIN")
             ) {
                 can(Action.Manage, "all");
                 can(Action.ReadCredentials, "all");

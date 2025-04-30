@@ -146,7 +146,8 @@ export class UR02Component implements OnInit {
         private _location: Location,
         private authDefaultService: AuthDefaultService,
         private modalService: NgbModal,
-    ) {}
+    ) {
+    }
 
     async ngOnInit(): Promise<void> {
         this.authDefaultService.setTitle('UR02: Manage User');

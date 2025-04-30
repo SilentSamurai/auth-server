@@ -117,7 +117,9 @@ export class TileComponent implements OnInit {
         private authDefaultService: AuthDefaultService,
         private tokenStorage: SessionService,
         private permissionService: PermissionService,
-    ) {}
+    ) {
+    }
 
-    ngOnInit() {}
+    ngOnInit() {
+    }
 }

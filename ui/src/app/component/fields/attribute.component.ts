@@ -19,7 +19,9 @@ export class AttributeComponent implements OnInit {
     @Input() value: string = '';
     @Input() valueClass: string = '';
 
-    constructor() {}
+    constructor() {
+    }
 
-    async ngOnInit(): Promise<void> {}
+    async ngOnInit(): Promise<void> {
+    }
 }

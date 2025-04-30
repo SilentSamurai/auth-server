@@ -181,11 +181,11 @@ export class FakeSmtpServer {
                 level === "error"
                     ? "error"
                     : level === "warn"
-                      ? "warn"
-                      : level === "info"
-                        ? "info"
-                        : "log"
-            ](...args);
+                        ? "warn"
+                        : level === "info"
+                            ? "info"
+                            : "log"
+                ](...args);
         }
     }
 

@@ -10,11 +10,7 @@ import {RegisterComponent} from './register/register.component';
 import {ProfileComponent} from './profile/profile.component';
 
 import {authInterceptorProviders} from './_helpers/auth.interceptor';
-import {
-    NgbCollapseModule,
-    NgbDropdown,
-    NgbModule,
-} from '@ng-bootstrap/ng-bootstrap';
+import {NgbCollapseModule, NgbDropdown, NgbModule,} from '@ng-bootstrap/ng-bootstrap';
 import {TableModule} from 'primeng/table';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {ToastModule} from 'primeng/toast';
@@ -27,13 +23,7 @@ import {ComponentModule} from './component/component.module';
 import {ConfirmDialogModule} from 'primeng/confirmdialog';
 import {HttpErrorComponent} from './error-pages/HttpError.component';
 import {AbilityModule} from '@casl/angular';
-import {
-    Ability,
-    createMongoAbility,
-    MongoAbility,
-    PureAbility,
-} from '@casl/ability';
-import {ThemeToggleComponent} from './component/theme-toggle/theme-toggle.component';
+import {Ability, createMongoAbility, PureAbility,} from '@casl/ability';
 
 @NgModule({
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -74,4 +64,5 @@ import {ThemeToggleComponent} from './component/theme-toggle/theme-toggle.compon
     exports: [],
     bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule {
+}

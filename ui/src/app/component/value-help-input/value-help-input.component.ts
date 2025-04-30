@@ -11,13 +11,10 @@ import {
     TemplateRef,
 } from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
-import {
-    ValueHelpComponent,
-    ValueHelpResult,
-} from '../value-help/value-help.component';
+import {ValueHelpComponent, ValueHelpResult,} from '../value-help/value-help.component';
 import {ValueHelpColumnComponent} from './value-help-column.component';
 import {FilterBarColumnComponent} from '../filter-bar/filter-bar.component';
-import {IDataModel, DataSource} from '../model/IDataModel';
+import {DataSource} from '../model/IDataModel';
 import {ModalResult, ModalService} from '../dialogs/modal.service';
 
 function parseBoolean(value: string): boolean {
@@ -92,7 +89,8 @@ export class ValueHelpInputComponent implements OnInit, AfterViewInit {
     constructor(
         private route: ActivatedRoute,
         private modalService: ModalService,
-    ) {}
+    ) {
+    }
 
     async ngOnInit(): Promise<void> {
         if (typeof this.multi === 'string') {

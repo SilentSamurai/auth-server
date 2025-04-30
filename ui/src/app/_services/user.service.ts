@@ -14,7 +14,8 @@ export class UserService {
     constructor(
         private http: HttpClient,
         private tokenService: SessionService,
-    ) {}
+    ) {
+    }
 
     getHttpOptions() {
         return {

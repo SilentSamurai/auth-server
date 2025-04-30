@@ -55,17 +55,6 @@ export class CryptUtil {
         );
     }
 
-    private static generateClientId() {
-        const buffer = randomBytes(16);
-        return buffer.toString("hex");
-    }
-
-    private static generateClientSecret(clientId: string) {
-        const salt = randomBytes(8).toString("hex");
-        const buffer = scryptSync(clientId, salt, 64) as Buffer;
-        return {clientSecret: buffer.toString("hex"), salt};
-    }
-
     public static generateCodeVerifier(length: number = 64): string {
         const verifier = randomBytes(length);
         return base64UrlEncode(verifier).substring(0, length);
@@ -116,5 +105,16 @@ export class CryptUtil {
             upperCaseAlphabets: false,
             specialChars: false,
         });
+    }
+
+    private static generateClientId() {
+        const buffer = randomBytes(16);
+        return buffer.toString("hex");
+    }
+
+    private static generateClientSecret(clientId: string) {
+        const salt = randomBytes(8).toString("hex");
+        const buffer = scryptSync(clientId, salt, 64) as Buffer;
+        return {clientSecret: buffer.toString("hex"), salt};
     }
 }

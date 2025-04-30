@@ -8,19 +8,19 @@
                 </div>
             </div>
 
-            <div class="card card-container p-fluid" *ngIf="!loading">
+            <div *ngIf="!loading" class="card card-container p-fluid">
                 <img
+                    alt="logo"
                     class="profile-img-card"
                     id="profile-img"
-                    alt="logo"
                     src="/assets/logo-img.jpg"
                 />
 
                 <!-- Show registration form if user has not registered successfully yet -->
                 <form
-                    [formGroup]="registerForm"
                     (ngSubmit)="onSubmit()"
                     *ngIf="!isSuccessful"
+                    [formGroup]="registerForm"
                     class="mt-3"
                     novalidate
                 >
@@ -28,29 +28,29 @@
                     <!-- STEP 1: Company fields (only if NOT signUp && currentStep=1) -->
                     <div *ngIf="!isSignUp">
                         <app-text-input
-                            [readonly]="currentStep != 1"
-                            [form]="registerForm"
-                            [formName]="'register'"
                             [formField]="'orgName'"
+                            [formName]="'register'"
+                            [form]="registerForm"
                             [label]="'Org Name'"
+                            [readonly]="currentStep != 1"
                             type="text"
                         >
                         </app-text-input>
 
                         <app-text-input
-                            [form]="registerForm"
-                            [formName]="'register'"
                             [formField]="'domain'"
+                            [formName]="'register'"
+                            [form]="registerForm"
                             [label]="'Domain'"
                             type="text"
                         >
                         </app-text-input>
 
-                        <div class="d-grid gap-2 py-3" *ngIf="currentStep==1">
+                        <div *ngIf="currentStep==1" class="d-grid gap-2 py-3">
                             <button
-                                type="button"
                                 (click)="onNextClick()"
                                 class="btn btn-primary btn-block btn-lg"
+                                type="button"
                             >
                                 Next
                             </button>
@@ -61,9 +61,9 @@
                     <div *ngIf="isSignUp || currentStep === 2">
                         <!-- Name Field -->
                         <app-text-input
-                            [form]="registerForm"
-                            [formName]="'register'"
                             [formField]="'name'"
+                            [formName]="'register'"
+                            [form]="registerForm"
                             [label]="'Name'"
                             type="text"
                         >
@@ -77,9 +77,9 @@
 
                         <!-- Email Field -->
                         <app-text-input
-                            [form]="registerForm"
-                            [formName]="'register'"
                             [formField]="'email'"
+                            [formName]="'register'"
+                            [form]="registerForm"
                             [label]="'Email'"
                             type="email"
                         >
@@ -90,9 +90,9 @@
 
                         <!-- Password Field -->
                         <app-text-input
-                            [form]="registerForm"
-                            [formName]="'register'"
                             [formField]="'password'"
+                            [formName]="'register'"
+                            [form]="registerForm"
                             [label]="'Password'"
                             type="password"
                         >
@@ -104,8 +104,8 @@
 
                         <div class="d-grid gap-2 py-3">
                             <button
-                                class="btn btn-primary btn-block btn-lg"
                                 [disabled]="registerForm.invalid"
+                                class="btn btn-primary btn-block btn-lg"
                             >
                                 {{ isSignUp ? 'Sign Up' : 'Create Tenant' }}
                             </button>

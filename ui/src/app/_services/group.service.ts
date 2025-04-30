@@ -14,7 +14,8 @@ export class GroupService {
     constructor(
         private http: HttpClient,
         private sessionService: SessionService,
-    ) {}
+    ) {
+    }
 
     getHttpOptions() {
         return {

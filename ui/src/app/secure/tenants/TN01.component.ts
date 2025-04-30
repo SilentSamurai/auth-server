@@ -8,12 +8,8 @@ import {AppTableComponent} from '../../component/table/app-table.component';
 import {AuthDefaultService} from '../../_services/auth.default.service';
 import {ConfirmationService} from '../../component/dialogs/confirmation.service';
 import {MessageService} from 'primeng/api';
-import {
-    Actions,
-    PermissionService,
-    Subjects,
-} from '../../_services/permission.service';
-import {IDataModel, DataSource} from '../../component/model/IDataModel';
+import {Actions, PermissionService, Subjects,} from '../../_services/permission.service';
+import {DataSource} from '../../component/model/IDataModel';
 import {Filter} from '../../component/model/Filters';
 
 @Component({

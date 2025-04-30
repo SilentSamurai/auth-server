@@ -14,7 +14,8 @@ export class RoleService {
     constructor(
         private http: HttpClient,
         private sessionService: SessionService,
-    ) {}
+    ) {
+    }
 
     getHttpOptions() {
         return {

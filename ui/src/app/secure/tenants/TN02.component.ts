@@ -10,7 +10,6 @@ import {AddRoleComponent} from './dialogs/add-role.component';
 import {AuthDefaultService} from '../../_services/auth.default.service';
 import {ConfirmationService} from '../../component/dialogs/confirmation.service';
 import {Location} from '@angular/common';
-import {DataSource} from '../../component/model/IDataModel';
 import {StaticModel} from '../../component/model/StaticModel';
 
 @Component({
@@ -62,22 +61,22 @@ import {StaticModel} from '../../component/model/StaticModel';
                         <app-attribute label="Client Id">
                             <code>
                                 <pre class="text-wrap text-break">{{
-                                    credentials.clientId
-                                }}</pre>
+                                        credentials.clientId
+                                    }}</pre>
                             </code>
                         </app-attribute>
                         <app-attribute label="Client Secret">
                             <code>
                                 <pre class="text-wrap text-break">{{
-                                    credentials.clientSecret
-                                }}</pre>
+                                        credentials.clientSecret
+                                    }}</pre>
                             </code>
                         </app-attribute>
                         <app-attribute label="Public Key">
                             <code>
                                 <pre class="text-wrap text-break">{{
-                                    credentials.publicKey
-                                }}</pre>
+                                        credentials.publicKey
+                                    }}</pre>
                             </code>
                         </app-attribute>
                     </div>
@@ -129,7 +128,7 @@ import {StaticModel} from '../../component/model/StaticModel';
                                             user.id,
                                         ]"
                                         href="javascript:void(0)"
-                                        >View Role Assignments
+                                    >View Role Assignments
                                     </a>
                                 </td>
                                 <td class="">
@@ -189,7 +188,7 @@ import {StaticModel} from '../../component/model/StaticModel';
                                             role.id,
                                         ]"
                                         href="javascript:void(0)"
-                                        >{{ role.name }}
+                                    >{{ role.name }}
                                     </a>
                                 </td>
                                 <td>{{ role.description }}</td>

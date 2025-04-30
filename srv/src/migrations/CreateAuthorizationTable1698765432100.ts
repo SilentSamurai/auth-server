@@ -7,8 +7,7 @@ import {
 } from "typeorm";
 
 export class CreateAuthorizationTable1698765432100
-    implements MigrationInterface
-{
+    implements MigrationInterface {
     public async up(queryRunner: QueryRunner): Promise<void> {
         const DB_STRING_TYPE = "VARCHAR";
         const DB_UUID_GENERATOR = "uuid_generate_v4()";

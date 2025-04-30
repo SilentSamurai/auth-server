@@ -9,10 +9,7 @@ import {UpdateGroupComponent} from './dialogs/update-group.component';
 import {MessageService} from 'primeng/api';
 import {ConfirmationService} from '../../component/dialogs/confirmation.service';
 import {StaticModel} from '../../component/model/StaticModel';
-import {
-    CloseType,
-    ValueHelpResult,
-} from '../../component/value-help/value-help.component';
+import {CloseType, ValueHelpResult,} from '../../component/value-help/value-help.component';
 
 @Component({
     selector: 'app-group-object',
@@ -229,7 +226,8 @@ export class GP02Component implements OnInit {
         private authDefaultService: AuthDefaultService,
         private confirmationService: ConfirmationService,
         private modalService: NgbModal,
-    ) {}
+    ) {
+    }
 
     async ngOnInit() {
         this.loading = true;

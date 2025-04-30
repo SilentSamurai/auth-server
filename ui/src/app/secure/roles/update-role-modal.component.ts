@@ -66,7 +66,8 @@ export class UpdateRoleModalComponent {
         public activeModal: NgbActiveModal,
         private roleService: RoleService,
         private messageService: MessageService,
-    ) {}
+    ) {
+    }
 
     async onSave() {
         try {

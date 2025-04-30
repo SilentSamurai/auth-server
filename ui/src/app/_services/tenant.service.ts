@@ -3,7 +3,7 @@ import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {lastValueFrom} from 'rxjs';
 import {SessionService} from './session.service';
 import {RestApiModel} from '../component/model/RestApiModel';
-import {IDataModel, DataSource} from '../component/model/IDataModel';
+import {DataSource} from '../component/model/IDataModel';
 
 const API_URL = '/api';
 
@@ -24,7 +24,8 @@ export class TenantService {
     constructor(
         private http: HttpClient,
         private sessionService: SessionService,
-    ) {}
+    ) {
+    }
 
     getHttpOptions() {
         return {

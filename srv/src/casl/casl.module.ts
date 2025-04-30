@@ -49,4 +49,5 @@ import {CacheService} from "./cache.service";
         CacheService,
     ],
 })
-export class CaslModule {}
+export class CaslModule {
+}

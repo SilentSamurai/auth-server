@@ -1,6 +1,5 @@
 ### OAuth Token (Password Grant Type)
 
-
 ```http
 [POST] /api/oauth/token
 ```

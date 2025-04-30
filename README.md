@@ -29,7 +29,7 @@ A production‑ready, OAuth Authorization service built with
 
 ---
 
-## ✨  Features
+## ✨ Features
 
 * User registration with e‑mail verification
 * Password‑based login & JWT issuance
@@ -45,7 +45,7 @@ A production‑ready, OAuth Authorization service built with
 
 ---
 
-## ⚡️  Quick start
+## ⚡️ Quick start
 
 ```bash
 # 1. Install dependencies
@@ -64,45 +64,45 @@ npm run smtp-server
 
 ---
 
-## 🛠️  Configuration
+## 🛠️ Configuration
 
 `src/config/environment.service.ts` loads variables from the file referenced by
 `ENV_FILE` (defaults to `./envs/.env.development`).  
 Important keys:
 
-| Variable                | Purpose                               | Example                |
-|-------------------------|---------------------------------------|------------------------|
-| `NODE_ENV`              | `development` \| `production`        | development            |
-| `PORT`                  | HTTP listen port                      | 9000                   |
-| `ENABLE_HTTPS`          | Enable TLS                            | `false`                |
-| `KEY_PATH` / `CERT_PATH`| TLS key / cert paths                  | `keys/key.pem`         |
-| `ENABLE_CORS`           | Allow CORS                            | `true`                 |
-| `MAX_REQUEST_SIZE`      | Body‑parser limit (e.g. `1mb`)        | `1mb`                  |
-| `DATABASE_*`            | TypeORM connection settings           | see `.env.example`     |
-| `DATABASE_SSL`          | Enable DB SSL (`true`/`false`)        | false                  |
+| Variable                 | Purpose                        | Example            |
+|--------------------------|--------------------------------|--------------------|
+| `NODE_ENV`               | `development` \| `production`  | development        |
+| `PORT`                   | HTTP listen port               | 9000               |
+| `ENABLE_HTTPS`           | Enable TLS                     | `false`            |
+| `KEY_PATH` / `CERT_PATH` | TLS key / cert paths           | `keys/key.pem`     |
+| `ENABLE_CORS`            | Allow CORS                     | `true`             |
+| `MAX_REQUEST_SIZE`       | Body‑parser limit (e.g. `1mb`) | `1mb`              |
+| `DATABASE_*`             | TypeORM connection settings    | see `.env.example` |
+| `DATABASE_SSL`           | Enable DB SSL (`true`/`false`) | false              |
 
 Add anything else you need—the service simply reads from `process.env`.
 
 ---
 
-## 🏗️  Useful npm scripts
+## 🏗️ Useful npm scripts
 
-| Script                 | Description                                                                |
-|------------------------|----------------------------------------------------------------------------|
-| `npm run build`        | Clean `dist/` and compile with `tsc`                                       |
-| `npm run start:debug`  | Start Nest in watch/debug mode                                             |
-| `npm run start:prod`   | Run the already‑built JS from `dist/`                                      |
-| `npm run test`         | Run Jest with coverage (CI friendly)                                       |
-| `npm run test:watch`   | Jest in watch mode (sets `CUSTOM_LOG=1`)                                   |
-| `npm run package`      | Archive a ZIP of the compiled output via `create-zip.js`                   |
-| `npm run typeorm`      | Expose `typeorm` CLI                                                       |
-| `npm run generate-migration "<name>"` | Create a skeleton migration in `src/migrations/`            |
-| `npm run smtp-server`  | Run the dev‑only fake SMTP server (same as `start:mail-server`)            |
-| `npm run release`      | `build` + `test` – CI release helper                                       |
+| Script                                | Description                                                     |
+|---------------------------------------|-----------------------------------------------------------------|
+| `npm run build`                       | Clean `dist/` and compile with `tsc`                            |
+| `npm run start:debug`                 | Start Nest in watch/debug mode                                  |
+| `npm run start:prod`                  | Run the already‑built JS from `dist/`                           |
+| `npm run test`                        | Run Jest with coverage (CI friendly)                            |
+| `npm run test:watch`                  | Jest in watch mode (sets `CUSTOM_LOG=1`)                        |
+| `npm run package`                     | Archive a ZIP of the compiled output via `create-zip.js`        |
+| `npm run typeorm`                     | Expose `typeorm` CLI                                            |
+| `npm run generate-migration "<name>"` | Create a skeleton migration in `src/migrations/`                |
+| `npm run smtp-server`                 | Run the dev‑only fake SMTP server (same as `start:mail-server`) |
+| `npm run release`                     | `build` + `test` – CI release helper                            |
 
 ---
 
-## 🧪  Testing
+## 🧪 Testing
 
 ```bash
 # unit & integration tests
@@ -117,7 +117,7 @@ root under `e2e/`.
 
 ---
 
-## 🐳  Docker
+## 🐳 Docker
 
 Build and run locally:
 
@@ -128,7 +128,7 @@ docker run -p 9000:9000 --env-file ./envs/.env.development auth-server:dev
 
 ---
 
-## ☸️  Kubernetes / Helm
+## ☸️ Kubernetes / Helm
 
 A reusable chart is provided in `helm/auth-server/`. Basic usage:
 
@@ -142,7 +142,7 @@ helm install auth ./helm/auth-server \
 
 ---
 
-## 📝  Development notes
+## 📝 Development notes
 
 ### Skipping dev‑only code in prod builds
 
@@ -158,7 +158,7 @@ npm run typeorm migration:run
 
 ---
 
-## 🤝  Contributing
+## 🤝 Contributing
 
 1. Fork & clone
 2. Create a branch (`feat/awesome-stuff`)
