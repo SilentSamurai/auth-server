@@ -14,8 +14,6 @@ describe('StaticModel + DataModelImpl (in-memory data source)', () => {
     let dataModel: IDataModel<any>;
     const defaultPageSize = 50;
     let httpClient: HttpClient;
-    const API_URL = '/api';
-
     const createDataModel = (initialData: any[]): IDataModel<any> => {
         return new DataModel<any>(new StaticSource(['id'], initialData));
     };
@@ -192,16 +190,17 @@ describe('StaticModel + DataModelImpl (in-memory data source)', () => {
     });
 
     it('properly handles data source errors', async () => {
+        const testError = new Error('Test error');
         const errorSource = {
-            fetchData: () => Promise.reject(new Error('Test error')),
+            fetchData: () => Promise.reject(testError),
             totalCount: () => Promise.resolve(0),
             keyFields: () => ['id'],
             updates: () => new Subject<DataSourceEvents>(),
-            filter: () => {
-            }
+            filter: () => {}
         };
 
         dataModel = new DataModel(errorSource);
+
         try {
             await dataModel.execute(new Query({}));
             fail('Expected error to be thrown');

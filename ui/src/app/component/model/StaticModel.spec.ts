@@ -1,7 +1,7 @@
 import {StaticSource} from './StaticSource';
-import {Query} from './IDataModel';
 import {Filter} from './Filters';
 import {Operators} from './Operator';
+import {Query} from "./Query";
 
 describe('StaticModel', () => {
     // Constructor initializes with empty data array when no arguments provided

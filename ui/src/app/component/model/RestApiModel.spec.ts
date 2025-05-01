@@ -4,7 +4,7 @@ import {TestBed} from '@angular/core/testing';
 import {Filter} from './Filters';
 import {Operators} from './Operator';
 import {HttpClient} from '@angular/common/http';
-import {Query, SortConfig} from './IDataModel';
+import {Query, SortConfig} from "./Query";
 
 describe('RestApiModel', () => {
     let httpMock: HttpTestingController;
@@ -54,7 +54,7 @@ describe('RestApiModel', () => {
             pageSize: 25,
             where: [
                 jasmine.objectContaining({
-                    name: 'status',
+                    field: 'status',
                     value: 'active',
                     operator: jasmine.objectContaining({
                         label: 'equals',
