@@ -21,7 +21,8 @@ export class PageViewBodyComponent implements OnInit {
         private messageService: MessageService,
         private confirmationService: ConfirmationService,
         private modalService: NgbModal,
-    ) {}
+    ) {
+    }
 
     async ngOnInit() {
         this.loading = true;

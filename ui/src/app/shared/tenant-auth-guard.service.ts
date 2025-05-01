@@ -1,18 +1,9 @@
 import {Injectable} from '@angular/core';
-import {
-    ActivatedRouteSnapshot,
-    Router,
-    RouterStateSnapshot,
-    UrlTree,
-} from '@angular/router';
+import {ActivatedRouteSnapshot, Router, RouterStateSnapshot, UrlTree,} from '@angular/router';
 import {Observable} from 'rxjs';
 import {SessionService} from '../_services/session.service';
 import {AuthDefaultService} from '../_services/auth.default.service';
-import {
-    Actions,
-    PermissionService,
-    Subjects,
-} from '../_services/permission.service';
+import {Actions, PermissionService, Subjects,} from '../_services/permission.service';
 
 @Injectable({
     providedIn: 'root',
@@ -23,7 +14,8 @@ export class TenantAdminAuthGuardService {
         private authDefaultService: AuthDefaultService,
         private permissionService: PermissionService,
         private router: Router,
-    ) {}
+    ) {
+    }
 
     check(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
         if (!this.tokenStorageService.isLoggedIn()) {
@@ -70,7 +62,8 @@ export class TenantAccessAuthGuard {
         private authDefaultService: AuthDefaultService,
         private permissionService: PermissionService,
         private router: Router,
-    ) {}
+    ) {
+    }
 
     check(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
         if (!this.tokenStorageService.isLoggedIn()) {

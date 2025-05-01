@@ -1,10 +1,10 @@
-import { TestAppFixture } from "../test-app.fixture";
-import { TokenFixture } from "../token.fixture";
-import { HelperFixture } from "../helper.fixture";
+import {TestAppFixture} from "../test-app.fixture";
+import {TokenFixture} from "../token.fixture";
+import {HelperFixture} from "../helper.fixture";
 
 describe("E2E Tenant Management", () => {
     let app: TestAppFixture;
-    let tenant = { id: "", clientId: "", name: "", domain: "" };
+    let tenant = {id: "", clientId: "", name: "", domain: ""};
     let refreshToken = "", accessToken = "";
     let helper: HelperFixture;
 
@@ -140,7 +140,7 @@ describe("E2E Tenant Management", () => {
         console.log("Verify Member Role Update Response:", verifyMemberUpdate);
         expect(verifyMemberUpdate).toBeInstanceOf(Array);
         expect(verifyMemberUpdate.length).toBeGreaterThanOrEqual(1);
-        expect(verifyMemberUpdate.map(i => i.id )).toContain(legolasId);
+        expect(verifyMemberUpdate.map(i => i.id)).toContain(legolasId);
 
         // 13) Remove Members
         let removeMemberResp = await helper.tenant.removeMembers(tenant.id, ["legolas@mail.com"]);

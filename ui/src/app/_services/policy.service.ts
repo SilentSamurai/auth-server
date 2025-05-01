@@ -22,7 +22,8 @@ export class PolicyService {
     constructor(
         private ability: PureAbility,
         private http: HttpClient,
-    ) {}
+    ) {
+    }
 
     // EXACT ENDPOINTS as used in PolicyClient:
 

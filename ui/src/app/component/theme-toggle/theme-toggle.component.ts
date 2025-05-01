@@ -27,7 +27,8 @@ import {ThemeService} from '../../_services/theme.service';
     ],
 })
 export class ThemeToggleComponent {
-    constructor(public themeService: ThemeService) {}
+    constructor(public themeService: ThemeService) {
+    }
 
     toggleTheme() {
         this.themeService.toggleTheme();

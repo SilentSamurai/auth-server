@@ -1,7 +1,8 @@
 import {Util} from './utils';
 
 describe('Test Util', function () {
-    beforeEach(function () {});
+    beforeEach(function () {
+    });
 
     it('test path retrieval', function () {
         // Example usage:

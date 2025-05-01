@@ -19,7 +19,8 @@ export class AuthUserService {
         @InjectRepository(TenantMember)
         private tenantMemberRepository: Repository<TenantMember>,
         @InjectRepository(Role) private roleRepository: Repository<Role>,
-    ) {}
+    ) {
+    }
 
     async findUserById(id: string): Promise<User> {
         const user: User = await this.usersRepository.findOne({

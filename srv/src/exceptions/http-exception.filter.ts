@@ -18,7 +18,8 @@ export class HttpExceptionFilter implements ExceptionFilter {
     private static readonly LOGGER = new Logger(HttpExceptionFilter.name);
     static exceptionResolver: Map<Type, Function> = new Map<Type, Function>();
 
-    static {}
+    static {
+    }
 
     // Exception may not be an HttpException.
     catch(exception: HttpException, host: ArgumentsHost) {

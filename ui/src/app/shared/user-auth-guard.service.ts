@@ -1,10 +1,5 @@
 import {Injectable} from '@angular/core';
-import {
-    ActivatedRouteSnapshot,
-    Router,
-    RouterStateSnapshot,
-    UrlTree,
-} from '@angular/router';
+import {ActivatedRouteSnapshot, Router, RouterStateSnapshot, UrlTree,} from '@angular/router';
 import {Observable} from 'rxjs';
 import {SessionService} from '../_services/session.service';
 import {AuthDefaultService} from '../_services/auth.default.service';
@@ -17,7 +12,8 @@ export class UserAuthGuard {
         private tokenStorageService: SessionService,
         private authDefaultService: AuthDefaultService,
         private router: Router,
-    ) {}
+    ) {
+    }
 
     canActivate(
         route: ActivatedRouteSnapshot,

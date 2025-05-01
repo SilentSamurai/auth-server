@@ -17,7 +17,8 @@ export class JwtAuthGuard implements CanActivate {
     constructor(
         private readonly authService: AuthService,
         private readonly caslAbilityFactory: CaslAbilityFactory,
-    ) {}
+    ) {
+    }
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
         const request = context.switchToHttp().getRequest();
@@ -123,7 +124,7 @@ function extractTokenFromHeader(request: any) {
 
 function extractBasicAuthCredentials(
     authHeader: string,
-): {username: string; password: string} | null {
+): { username: string; password: string } | null {
     const base64Credentials = authHeader.split(" ")[1];
     const decoded = Buffer.from(base64Credentials, "base64").toString("utf-8");
     const [username, password] = decoded.split(":");

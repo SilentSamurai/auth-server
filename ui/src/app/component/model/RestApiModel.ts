@@ -1,6 +1,7 @@
-import {DataSource, DataSourceEvents, Query, ReturnedData} from './IDataModel';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {lastValueFrom, Observable, Subject} from 'rxjs';
+import {lastValueFrom} from 'rxjs';
+import {BaseDataSource, ReturnedData} from "./DataSource";
+import {Query} from "./Query";
 
 export interface ApiRequest {
     pageNo: number;
@@ -10,8 +11,7 @@ export interface ApiRequest {
     expand: string[];
 }
 
-export class RestApiModel<T> implements DataSource<T> {
-    private eventSubject = new Subject<DataSourceEvents>();
+export class RestApiModel<T> extends BaseDataSource<T> {
     private readonly defaultHeaders = new HttpHeaders({
         'Content-Type': 'application/json',
     });
@@ -19,25 +19,19 @@ export class RestApiModel<T> implements DataSource<T> {
     constructor(
         private http: HttpClient,
         private path: string,
-        protected _keyFields: string[],
-        private expands: string[] = [],
-    ) {}
-
-    keyFields(): string[] {
-        return this._keyFields;
+        keyFields: string[],
+        query: Query = new Query({}),
+    ) {
+        super(keyFields, query);
     }
 
-    updates(): Observable<DataSourceEvents> {
-        return this.eventSubject;
-    }
-
-    async fetchData(query: Query): Promise<ReturnedData<T>> {
+    async queryData(query: Query): Promise<ReturnedData<T>> {
         const body: ApiRequest = {
             pageNo: query.pageNo,
             pageSize: query.pageSize,
             where: query.filters,
             orderBy: query.orderBy,
-            expand: query.expand || this.expands,
+            expand: query.expand,
         };
 
         return await lastValueFrom(
@@ -47,14 +41,14 @@ export class RestApiModel<T> implements DataSource<T> {
         );
     }
 
-    public async totalCount(query: Query): Promise<number> {
+    public async queryCount(query: Query): Promise<number> {
         const body = {
             where: query.filters,
             select: 'count',
         };
 
         const response = await lastValueFrom(
-            this.http.post<{count: number}>(this.path, body, {
+            this.http.post<{ count: number }>(this.path, body, {
                 headers: this.defaultHeaders,
             }),
         );

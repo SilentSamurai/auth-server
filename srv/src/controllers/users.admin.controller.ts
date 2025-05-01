@@ -32,14 +32,15 @@ export class UsersAdminController {
         private readonly tenantService: TenantService,
         private readonly mailService: MailService,
         private readonly securityService: SecurityService,
-    ) {}
+    ) {
+    }
 
     @Post("/create")
     @UseGuards(JwtAuthGuard)
     async createUser(
         @Request() request,
         @Body(new ValidationPipe(ValidationSchema.CreateUserSchema))
-        body: {
+            body: {
             name: string;
             email: string;
             password: string;
@@ -61,7 +62,7 @@ export class UsersAdminController {
     async updateUser(
         @Request() request,
         @Body(new ValidationPipe(ValidationSchema.UpdateUserSchema))
-        body: {
+            body: {
             id: string;
             name: string;
             email: string;
@@ -126,7 +127,7 @@ export class UsersAdminController {
     async updateVerification(
         @Request() request,
         @Body(new ValidationPipe(ValidationSchema.verifyUser))
-        body: {
+            body: {
             email: string;
             verify: boolean;
         },

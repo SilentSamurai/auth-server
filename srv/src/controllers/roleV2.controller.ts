@@ -31,7 +31,8 @@ export class RoleControllerV2 {
         private readonly userService: UsersService,
         private readonly roleService: RoleService,
         private readonly securityService: SecurityService,
-    ) {}
+    ) {
+    }
 
     static UpdateRoleSchema = yup.object().shape({
         name: yup.string().required("name is required"),
@@ -44,7 +45,7 @@ export class RoleControllerV2 {
         @Request() request: any,
         @Param("roleId") roleId: string,
         @Body(new ValidationPipe(RoleControllerV2.UpdateRoleSchema))
-        body: {name: string; description: string},
+            body: { name: string; description: string },
     ): Promise<Role> {
         return this.roleService.updateRole(
             request,

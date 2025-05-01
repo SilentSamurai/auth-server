@@ -10,7 +10,8 @@ import {ValidationErrorException} from "../exceptions/validation-error.exception
 export class ValidationPipe implements PipeTransform {
     private readonly logger = new Logger("ValidationPipe");
 
-    constructor(private readonly schema: any) {}
+    constructor(private readonly schema: any) {
+    }
 
     async transform(value: any, metadata: ArgumentMetadata): Promise<any> {
         try {

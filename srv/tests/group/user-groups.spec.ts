@@ -90,7 +90,7 @@ describe('e2e Groups Check', () => {
         let user = await helper.user.getUserByEmail("frodo@mail.com");
 
         await helper.group.addUser(group.id, ["frodo@mail.com"])
-        let roles = await helper.tenant.getMemberRoles( tenant.id, user.id);
+        let roles = await helper.tenant.getMemberRoles(tenant.id, user.id);
         for (let role of roles) {
             expect(role.name).toMatch(/ABC_ROLE|DEF_ROLE/);
         }
@@ -107,7 +107,7 @@ describe('e2e Groups Check', () => {
         }
         let user = await helper.user.getUserByEmail("frodo@mail.com");
 
-        let roles = await helper.tenant.getMemberRoles(tenant.id, user.id );
+        let roles = await helper.tenant.getMemberRoles(tenant.id, user.id);
 
         for (let role of roles) {
             expect(role.name).toMatch(/DEF_ROLE/);

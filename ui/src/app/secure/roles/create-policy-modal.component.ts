@@ -151,7 +151,24 @@ export class CreatePolicyModalComponent implements OnInit {
         private policyService: PolicyService,
         private messageService: MessageService,
         public activeModal: NgbActiveModal,
-    ) {}
+    ) {
+    }
+
+    get actionCtrl() {
+        return this.policyForm.get('action');
+    }
+
+    get subjectCtrl() {
+        return this.policyForm.get('subject');
+    }
+
+    get effectCtrl() {
+        return this.policyForm.get('effect');
+    }
+
+    get conditionsCtrl() {
+        return this.policyForm.get('conditions');
+    }
 
     ngOnInit(): void {
         if (this.policyId) {
@@ -202,22 +219,6 @@ export class CreatePolicyModalComponent implements OnInit {
                 detail: 'Could not load existing policy data',
             });
         }
-    }
-
-    get actionCtrl() {
-        return this.policyForm.get('action');
-    }
-
-    get subjectCtrl() {
-        return this.policyForm.get('subject');
-    }
-
-    get effectCtrl() {
-        return this.policyForm.get('effect');
-    }
-
-    get conditionsCtrl() {
-        return this.policyForm.get('conditions');
     }
 
     onCancel(): void {

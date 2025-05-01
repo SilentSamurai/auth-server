@@ -1,15 +1,8 @@
-import {
-    Component,
-    EventEmitter,
-    OnInit,
-    Output,
-    ViewChild,
-} from '@angular/core';
+import {Component, EventEmitter, OnInit, Output,} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {lastValueFrom} from 'rxjs';
 import {TenantService} from '../../../_services/tenant.service';
 import {MessageService} from 'primeng/api';
-import {NgForm} from '@angular/forms';
 
 @Component({
     selector: 'app-create-tenant',
@@ -102,9 +95,11 @@ export class CreateTenantComponent implements OnInit {
         private tenantService: TenantService,
         private messageService: MessageService,
         public activeModal: NgbActiveModal,
-    ) {}
+    ) {
+    }
 
-    ngOnInit(): void {}
+    ngOnInit(): void {
+    }
 
     async onSubmit() {
         try {

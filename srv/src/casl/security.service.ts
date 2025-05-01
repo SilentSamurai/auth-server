@@ -24,9 +24,11 @@ export class SecurityService implements OnModuleInit {
         private readonly authUserService: AuthUserService,
         @Inject(forwardRef(() => CaslAbilityFactory))
         private readonly caslAbilityFactory: CaslAbilityFactory,
-    ) {}
+    ) {
+    }
 
-    async onModuleInit() {}
+    async onModuleInit() {
+    }
 
     getAbility(authContext: AuthContext): AnyAbility {
         return authContext.SCOPE_ABILITIES;
@@ -99,7 +101,7 @@ export class SecurityService implements OnModuleInit {
                 (scope) => scope === RoleEnum.SUPER_ADMIN,
             ) &&
             securityContext.tenant.domain ===
-                this.configService.get("SUPER_TENANT_DOMAIN")
+            this.configService.get("SUPER_TENANT_DOMAIN")
         );
     }
 

@@ -17,36 +17,36 @@
 
                 <!-- Use one FormGroup with conditional fields -->
                 <form
-                    [formGroup]="loginForm"
                     (ngSubmit)="loginForm.valid && onSubmit()"
                     *ngIf="!isLoggedIn"
-                    novalidate
+                    [formGroup]="loginForm"
                     class="mt-3"
+                    novalidate
                 >
                     <!-- If client_id is NOT yet frozen, show client_id input + Continue button -->
                     <div *ngIf="!freezeClientId">
                         <div class="form-group">
                             <label for="client_id">Client Id</label>
                             <input
-                                formControlName="client_id"
                                 class="form-control"
+                                formControlName="client_id"
                                 id="client_id"
-                                type="text"
                                 placeholder="Enter Client ID"
+                                type="text"
                             />
                         </div>
-                        <div class="alert alert-danger mt-2" role="alert"
-                             *ngIf="loginForm.get('client_id')?.invalid && (loginForm.get('client_id')?.touched || loginForm.get('client_id')?.dirty)">
+                        <div *ngIf="loginForm.get('client_id')?.invalid && (loginForm.get('client_id')?.touched || loginForm.get('client_id')?.dirty)" class="alert alert-danger mt-2"
+                             role="alert">
                             Client Id is required (min length: 6).
                         </div>
 
                         <div class="form-group d-grid gap-2 py-3">
                             <button
-                                id="continue-btn"
+                                (click)="onContinue()"
                                 [disabled]="loginForm.get('client_id')?.invalid"
                                 class="btn btn-primary btn-block btn-lg"
+                                id="continue-btn"
                                 type="button"
-                                (click)="onContinue()"
                             >
                                 Continue
                             </button>
@@ -60,15 +60,15 @@
                             <div class="input-group">
                                 <span class="input-group-text">&#64;</span>
                                 <input
-                                    formControlName="username"
                                     class="form-control"
+                                    formControlName="username"
                                     id="username"
-                                    type="text"
                                     placeholder="Enter Username / Email"
+                                    type="text"
                                 />
                             </div>
-                            <div class="alert alert-danger mt-2" role="alert"
-                                 *ngIf="loginForm.get('username')?.errors && (loginForm.get('username')?.touched || loginForm.get('username')?.dirty)">
+                            <div *ngIf="loginForm.get('username')?.errors && (loginForm.get('username')?.touched || loginForm.get('username')?.dirty)" class="alert alert-danger mt-2"
+                                 role="alert">
                                 Username is required
                             </div>
                         </div>
@@ -77,23 +77,23 @@
                             <label for="password">Password</label>
                             <div class="input-group">
                                 <input
-                                    formControlName="password"
+                                    [type]="isPasswordVisible ? 'text' : 'password'"
                                     class="form-control"
+                                    formControlName="password"
                                     id="password"
                                     minlength="6"
                                     placeholder="Password"
-                                    [type]="isPasswordVisible ? 'text' : 'password'"
                                 />
                                 <button
+                                    (click)="isPasswordVisible = !isPasswordVisible"
                                     class="input-group-text"
                                     type="button"
-                                    (click)="isPasswordVisible = !isPasswordVisible"
                                 >
                                     <i class="fa fas {{ !isPasswordVisible ? 'fa-eye' : 'fa-eye-slash' }}"></i>
                                 </button>
                             </div>
-                            <div class="alert alert-danger mt-2" role="alert"
-                                 *ngIf="loginForm.get('password')?.errors && (loginForm.get('password')?.touched || loginForm.get('password')?.dirty)">
+                            <div *ngIf="loginForm.get('password')?.errors && (loginForm.get('password')?.touched || loginForm.get('password')?.dirty)" class="alert alert-danger mt-2"
+                                 role="alert">
                                 <div *ngIf="loginForm.get('password')?.errors?.['required']">
                                     Password is required
                                 </div>
@@ -104,27 +104,27 @@
                         </div>
 
                         <!-- Show the hidden client_id field if needed -->
-                        <div class="form-group mt-3" *ngIf="freezeClientId">
+                        <div *ngIf="freezeClientId" class="form-group mt-3">
                             <label for="client_id_frozen">Client Id</label>
                             <input
-                                formControlName="client_id"
                                 class="form-control"
+                                formControlName="client_id"
                                 id="client_id_frozen"
-                                type="text"
                                 readonly="true"
+                                type="text"
 
                             />
                         </div>
 
                         <div class="form-group d-grid gap-2 py-3">
-                            <button id="login-btn"
-                                    [disabled]="loginForm.invalid"
-                                    class="btn btn-primary btn-block btn-lg">
+                            <button [disabled]="loginForm.invalid"
+                                    class="btn btn-primary btn-block btn-lg"
+                                    id="login-btn">
                                 Login
                             </button>
                         </div>
 
-                        <div class="alert alert-danger" role="alert" *ngIf="isLoginFailed">
+                        <div *ngIf="isLoginFailed" class="alert alert-danger" role="alert">
                             Login failed: {{ errorMessage }}
                         </div>
                     </div>
@@ -140,7 +140,7 @@
                         Api Docs
                     </a>
 
-                    <a class="mt-1" *ngIf="freezeClientId" (click)="onSigUpClick()">
+                    <a (click)="onSigUpClick()" *ngIf="freezeClientId" class="mt-1">
                         Sign Up
                     </a>
                 </div>

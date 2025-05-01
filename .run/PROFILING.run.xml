@@ -1,8 +1,9 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="PROFILING" type="NodeJSConfigurationType" path-to-js-file="dist/src/main.js" working-dir="$PROJECT_DIR$/srv">
-    <EXTENSION ID="com.jetbrains.nodejs.run.NodeJSProfilingRunConfigurationExtension">
-      <profiling log-folder="srv/prof" do-profile="true" />
-    </EXTENSION>
-    <method v="2" />
-  </configuration>
+    <configuration default="false" name="PROFILING" type="NodeJSConfigurationType" path-to-js-file="dist/src/main.js"
+                   working-dir="$PROJECT_DIR$/srv">
+        <EXTENSION ID="com.jetbrains.nodejs.run.NodeJSProfilingRunConfigurationExtension">
+            <profiling log-folder="srv/prof" do-profile="true"/>
+        </EXTENSION>
+        <method v="2"/>
+    </configuration>
 </component>

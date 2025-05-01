@@ -112,7 +112,8 @@ export class FilterFieldComponent implements OnInit {
 
     internalFilter!: InternalFilter;
 
-    constructor(private modalService: NgbModal) {}
+    constructor(private modalService: NgbModal) {
+    }
 
     async ngOnInit(): Promise<void> {
         this.internalFilter = new InternalFilter(this.name, this.label);

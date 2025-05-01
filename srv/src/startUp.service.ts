@@ -21,7 +21,8 @@ export class StartUpService implements OnModuleInit {
         private readonly roleService: RoleService,
         private readonly securityService: SecurityService,
         private dataSource: DataSource,
-    ) {}
+    ) {
+    }
 
     async onModuleInit(): Promise<any> {
         await this.dataSource.runMigrations({

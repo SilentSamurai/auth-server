@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, TemplateRef, ViewChild} from '@angular/core';
+import {Component, OnInit, TemplateRef, ViewChild} from '@angular/core';
 
 @Component({
     selector: 'app-dialog-actions',
@@ -12,7 +12,9 @@ import {Component, Input, OnInit, TemplateRef, ViewChild} from '@angular/core';
 export class DialogActionsComponent implements OnInit {
     @ViewChild('SDA', {static: true}) template!: TemplateRef<any>;
 
-    constructor() {}
+    constructor() {
+    }
 
-    async ngOnInit(): Promise<void> {}
+    async ngOnInit(): Promise<void> {
+    }
 }

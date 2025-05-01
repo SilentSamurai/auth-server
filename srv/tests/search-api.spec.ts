@@ -384,7 +384,6 @@ describe('GenericSearchController (e2e)', () => {
     });
 
 
-
     describe('Search with Relations and Pagination', () => {
         it('should search users with tenant relations expanded', async () => {
             const response = await httpServer

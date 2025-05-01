@@ -1,12 +1,4 @@
-import {
-    Component,
-    ContentChildren,
-    Input,
-    OnInit,
-    QueryList,
-    TemplateRef,
-    ViewChild,
-} from '@angular/core';
+import {Component, ContentChildren, Input, OnInit, QueryList, TemplateRef, ViewChild,} from '@angular/core';
 import {UntypedFormControl, UntypedFormGroup} from '@angular/forms';
 
 @Component({
@@ -22,9 +14,11 @@ export class InputErrorComponent implements OnInit {
     @Input() field: string = '';
     @ViewChild('INPERR', {static: true}) template!: TemplateRef<any>;
 
-    constructor() {}
+    constructor() {
+    }
 
-    async ngOnInit(): Promise<void> {}
+    async ngOnInit(): Promise<void> {
+    }
 }
 
 @Component({
@@ -34,7 +28,7 @@ export class InputErrorComponent implements OnInit {
             <label
                 class="form-label"
                 for="{{ formName }}_{{ formField }}_INPUT"
-                >{{ label }}</label
+            >{{ label }}</label
             >
             <input
                 [formControl]="formControl"
@@ -77,16 +71,17 @@ export class TextInputComponent implements OnInit {
     @ContentChildren(InputErrorComponent)
     inputErrors!: QueryList<InputErrorComponent>;
 
-    constructor() {}
+    constructor() {
+    }
+
+    get field() {
+        return this.form.get(this.formField)!;
+    }
 
     async ngOnInit(): Promise<void> {
         this.formControl = this.form.get(this.formField) as UntypedFormControl;
         if (this.value && this.value.length > 0) {
             this.field.setValue(this.value);
         }
-    }
-
-    get field() {
-        return this.form.get(this.formField)!;
     }
 }

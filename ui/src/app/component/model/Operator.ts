@@ -29,7 +29,7 @@ export class Operator {
                     return a.includes(b);
                 }
                 return false;
-            case 'regex':
+            case 'matches':
                 return false;
             default:
                 return false;

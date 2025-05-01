@@ -8,13 +8,9 @@ import {AppTableComponent} from '../../component/table/app-table.component';
 import {AuthDefaultService} from '../../_services/auth.default.service';
 import {ConfirmationService} from '../../component/dialogs/confirmation.service';
 import {MessageService} from 'primeng/api';
-import {
-    Actions,
-    PermissionService,
-    Subjects,
-} from '../../_services/permission.service';
-import {IDataModel, DataSource} from '../../component/model/IDataModel';
+import {Actions, PermissionService, Subjects,} from '../../_services/permission.service';
 import {Filter} from '../../component/model/Filters';
+import {DataSource} from "../../component/model/DataSource";
 
 @Component({
     selector: 'app-TN01',
@@ -62,7 +58,7 @@ import {Filter} from '../../component/model/Filters';
                             <a
                                 [routerLink]="['/TN02/', tenant.id]"
                                 href="javascript:void(0)"
-                                >{{ tenant.domain }}</a
+                            >{{ tenant.domain }}</a
                             >
                         </td>
                         <td>{{ tenant.name }}</td>
@@ -110,7 +106,7 @@ export class TN01Component implements OnInit {
         private permissionService: PermissionService,
         private modalService: NgbModal,
     ) {
-        this.dataSource = this.tenantService.createDataModel([]);
+        this.dataSource = this.tenantService.createDataModel();
     }
 
     async ngOnInit() {

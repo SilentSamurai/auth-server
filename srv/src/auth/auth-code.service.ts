@@ -26,7 +26,8 @@ export class AuthCodeService {
         @InjectRepository(AuthCode)
         private authCodeRepository: Repository<AuthCode>,
         @InjectRepository(User) private usersRepository: Repository<User>,
-    ) {}
+    ) {
+    }
 
     async existByCode(code: string): Promise<boolean> {
         return this.authCodeRepository.exist({
@@ -113,7 +114,8 @@ export class AuthCodeService {
                 try {
                     await this.authCodeRepository.delete(authCode.code);
                     this.LOGGER.log("auth codes " + authCode.code + " deleted");
-                } catch (exception) {}
+                } catch (exception) {
+                }
             }
         }
     }

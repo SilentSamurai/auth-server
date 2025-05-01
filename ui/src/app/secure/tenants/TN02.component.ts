@@ -10,8 +10,7 @@ import {AddRoleComponent} from './dialogs/add-role.component';
 import {AuthDefaultService} from '../../_services/auth.default.service';
 import {ConfirmationService} from '../../component/dialogs/confirmation.service';
 import {Location} from '@angular/common';
-import {DataSource} from '../../component/model/IDataModel';
-import {StaticModel} from '../../component/model/StaticModel';
+import {StaticSource} from "../../component/model/StaticSource";
 
 @Component({
     selector: 'view-tenant',
@@ -62,22 +61,22 @@ import {StaticModel} from '../../component/model/StaticModel';
                         <app-attribute label="Client Id">
                             <code>
                                 <pre class="text-wrap text-break">{{
-                                    credentials.clientId
-                                }}</pre>
+                                        credentials.clientId
+                                    }}</pre>
                             </code>
                         </app-attribute>
                         <app-attribute label="Client Secret">
                             <code>
                                 <pre class="text-wrap text-break">{{
-                                    credentials.clientSecret
-                                }}</pre>
+                                        credentials.clientSecret
+                                    }}</pre>
                             </code>
                         </app-attribute>
                         <app-attribute label="Public Key">
                             <code>
                                 <pre class="text-wrap text-break">{{
-                                    credentials.publicKey
-                                }}</pre>
+                                        credentials.publicKey
+                                    }}</pre>
                             </code>
                         </app-attribute>
                     </div>
@@ -129,7 +128,7 @@ import {StaticModel} from '../../component/model/StaticModel';
                                             user.id,
                                         ]"
                                         href="javascript:void(0)"
-                                        >View Role Assignments
+                                    >View Role Assignments
                                     </a>
                                 </td>
                                 <td class="">
@@ -189,7 +188,7 @@ import {StaticModel} from '../../component/model/StaticModel';
                                             role.id,
                                         ]"
                                         href="javascript:void(0)"
-                                        >{{ role.name }}
+                                    >{{ role.name }}
                                     </a>
                                 </td>
                                 <td>{{ role.description }}</td>
@@ -225,8 +224,8 @@ export class TN02Component implements OnInit {
     members: any = [];
     isTenantAdmin = false;
     roles: any = [];
-    memberDataModel: StaticModel<any>;
-    rolesDataModel: StaticModel<any>;
+    memberDataModel: StaticSource<any>;
+    rolesDataModel: StaticSource<any>;
 
     constructor(
         private tenantService: TenantService,
@@ -239,8 +238,8 @@ export class TN02Component implements OnInit {
         private authDefaultService: AuthDefaultService,
         private modalService: NgbModal,
     ) {
-        this.memberDataModel = new StaticModel(['id']);
-        this.rolesDataModel = new StaticModel(['id']);
+        this.memberDataModel = new StaticSource(['id']);
+        this.rolesDataModel = new StaticSource(['id']);
     }
 
     async ngOnInit() {

@@ -1,12 +1,4 @@
-import {
-    AfterViewInit,
-    booleanAttribute,
-    Component,
-    ContentChildren,
-    Input,
-    OnInit,
-    QueryList,
-} from '@angular/core';
+import {AfterViewInit, booleanAttribute, Component, ContentChildren, Input, OnInit, QueryList,} from '@angular/core';
 import {ConfirmationService, MessageService} from 'primeng/api';
 import {ActivatedRoute, Router} from '@angular/router';
 import {firstValueFrom} from 'rxjs';
@@ -181,7 +173,8 @@ export class ObjectPageComponent implements OnInit, AfterViewInit {
         private messageService: MessageService,
         private confirmationService: ConfirmationService,
         private actRoute: ActivatedRoute,
-    ) {}
+    ) {
+    }
 
     async ngOnInit() {
         this.loading = true;

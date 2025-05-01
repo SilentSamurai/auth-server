@@ -13,7 +13,7 @@
                     id="profile-img"
                     src="/assets/logo-img.jpg"/>
 
-                <div >
+                <div>
                     <div class="text-center">
                         Logged in as
                     </div>
@@ -23,7 +23,7 @@
                     </div>
 
                     <div class="form-group d-grid gap-2 py-3 ">
-                        <button class="btn btn-primary btn-block btn-lg" (click)="onContinue()">
+                        <button (click)="onContinue()" class="btn btn-primary btn-block btn-lg">
                             Continue
                         </button>
                     </div>
@@ -31,7 +31,7 @@
                     <hr>
 
                     <div class="form-group d-grid gap-2 ">
-                        <button class="btn btn-danger btn-block btn-lg" (click)="onLogout()">
+                        <button (click)="onLogout()" class="btn btn-danger btn-block btn-lg">
                             Logout
                         </button>
                     </div>

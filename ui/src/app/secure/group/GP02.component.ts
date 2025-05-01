@@ -8,11 +8,8 @@ import {AuthDefaultService} from '../../_services/auth.default.service';
 import {UpdateGroupComponent} from './dialogs/update-group.component';
 import {MessageService} from 'primeng/api';
 import {ConfirmationService} from '../../component/dialogs/confirmation.service';
-import {StaticModel} from '../../component/model/StaticModel';
-import {
-    CloseType,
-    ValueHelpResult,
-} from '../../component/value-help/value-help.component';
+import {StaticSource} from '../../component/model/StaticSource';
+import {CloseType, ValueHelpResult,} from '../../component/value-help/value-help.component';
 
 @Component({
     selector: 'app-group-object',
@@ -212,9 +209,9 @@ export class GP02Component implements OnInit {
     loading = true;
     group: any;
     users: any[] = [];
-    usersDM = new StaticModel(['id']);
+    usersDM = new StaticSource(['id']);
     roles: any[] = [];
-    rolesDM = new StaticModel(['id']);
+    rolesDM = new StaticSource(['id']);
     selectedRoles: any[] = [];
     selectedUsers: any[] = [];
     private group_id: any;
@@ -229,7 +226,8 @@ export class GP02Component implements OnInit {
         private authDefaultService: AuthDefaultService,
         private confirmationService: ConfirmationService,
         private modalService: NgbModal,
-    ) {}
+    ) {
+    }
 
     async ngOnInit() {
         this.loading = true;

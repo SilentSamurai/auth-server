@@ -6,15 +6,12 @@ import {AuthDefaultService} from '../../_services/auth.default.service';
 import {RoleService} from '../../_services/role.service';
 import {MessageService} from 'primeng/api';
 import {ConfirmationService} from '../../component/dialogs/confirmation.service';
-import {StaticModel} from '../../component/model/StaticModel';
 import {PolicyService} from '../../_services/policy.service';
 import {CreatePolicyModalComponent} from './create-policy-modal.component';
-import {
-    CloseType,
-    ValueHelpResult,
-} from '../../component/value-help/value-help.component';
+import {CloseType, ValueHelpResult,} from '../../component/value-help/value-help.component';
 import {UpdateRoleModalComponent} from './update-role-modal.component';
-import {ModalService, ModalResult} from '../../component/dialogs/modal.service';
+import {ModalResult, ModalService} from '../../component/dialogs/modal.service';
+import {StaticSource} from "../../component/model/StaticSource";
 
 @Component({
     selector: 'app-RL02',
@@ -61,7 +58,7 @@ import {ModalService, ModalResult} from '../../component/dialogs/modal.service';
             </app-op-header>
             <app-op-tab name="Users">
                 <app-op-section name="Users">
-                    <app-section-action> </app-section-action>
+                    <app-section-action></app-section-action>
                     <app-section-content>
                         <app-table
                             [dataSource]="usersDM"
@@ -220,8 +217,8 @@ export class RL02Component implements OnInit {
         subject: '',
         effect: 'ALLOW',
     };
-    usersDM = new StaticModel(['id']);
-    policiesDM = new StaticModel(['id']);
+    usersDM = new StaticSource(['id']);
+    policiesDM = new StaticSource(['id']);
     private roleId: string = '';
     private tenantId: string = '';
 
@@ -236,7 +233,8 @@ export class RL02Component implements OnInit {
         private confirmationService: ConfirmationService,
         private modalService: ModalService,
         private policyService: PolicyService,
-    ) {}
+    ) {
+    }
 
     async ngOnInit() {
         this.loading = true;

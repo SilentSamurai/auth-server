@@ -38,4 +38,5 @@ import {User} from "../entity/user.entity";
     providers: [JwtAuthGuard, AuthService, AuthCodeService],
     exports: [JwtAuthGuard, AuthService, AuthCodeService],
 })
-export class AuthModule {}
+export class AuthModule {
+}

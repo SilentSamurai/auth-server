@@ -1,10 +1,4 @@
-import {
-    HTTP_INTERCEPTORS,
-    HttpEvent,
-    HttpHandler,
-    HttpInterceptor,
-    HttpRequest,
-} from '@angular/common/http';
+import {HTTP_INTERCEPTORS, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest,} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
 import {SessionService} from '../_services/session.service';
@@ -19,7 +13,8 @@ export class AuthInterceptor implements HttpInterceptor {
     constructor(
         private tokenService: SessionService,
         private authDefaultService: AuthDefaultService,
-    ) {}
+    ) {
+    }
 
     intercept(
         req: HttpRequest<any>,

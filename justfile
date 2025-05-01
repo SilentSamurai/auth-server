@@ -1,13 +1,17 @@
 # Import Kubernetes build recipes
+
 import './k8s-build.just'
 
 # Import UI commands
+
 import './ui/ui.just'
 
 # Import server commands
+
 import './srv/srv.just'
 
 # Use PowerShell on Windows
+
 set windows-shell := ["powershell.exe", "-c"]
 
 # Show help by default
@@ -30,4 +34,4 @@ run-e2e-tests:
 
 # Show this help listing available commands
 help:
-  just --list
+    just --list

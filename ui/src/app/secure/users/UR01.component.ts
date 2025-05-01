@@ -3,15 +3,12 @@ import {UserService} from '../../_services/user.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {CreateUserModalComponent} from './dialogs/create-user.modal.component';
 import {EditUserModalComponent} from './dialogs/edit-user.modal.component';
-import {
-    AppTableComponent,
-    TableAsyncLoadEvent,
-} from '../../component/table/app-table.component';
+import {AppTableComponent,} from '../../component/table/app-table.component';
 import {AuthDefaultService} from '../../_services/auth.default.service';
 import {ConfirmationService} from '../../component/dialogs/confirmation.service';
 import {MessageService} from 'primeng/api';
-import {IDataModel, DataSource} from '../../component/model/IDataModel';
-import {Filter} from '../../component/model/Filters';
+import {DataSource} from "../../component/model/DataSource";
+import {Filter} from "../../component/model/Filters";
 
 @Component({
     selector: 'app-board-user',
@@ -97,7 +94,7 @@ export class UR01Component implements OnInit {
         private messageService: MessageService,
         private modalService: NgbModal,
     ) {
-        this.usersDM = this.userService.createDataModel([]);
+        this.usersDM = this.userService.createDataModel();
     }
 
     async ngOnInit(): Promise<void> {

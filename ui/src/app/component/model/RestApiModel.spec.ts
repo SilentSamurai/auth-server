@@ -1,13 +1,10 @@
 import {RestApiModel} from './RestApiModel';
-import {
-    HttpClientTestingModule,
-    HttpTestingController,
-} from '@angular/common/http/testing';
+import {HttpClientTestingModule, HttpTestingController,} from '@angular/common/http/testing';
 import {TestBed} from '@angular/core/testing';
 import {Filter} from './Filters';
 import {Operators} from './Operator';
 import {HttpClient} from '@angular/common/http';
-import {Query, SortConfig} from './IDataModel';
+import {Query, SortConfig} from "./Query";
 
 describe('RestApiModel', () => {
     let httpMock: HttpTestingController;

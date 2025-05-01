@@ -90,11 +90,14 @@ export class FilterValueHelpComponent implements OnInit {
 
     readonly Operators = Operators;
 
-    constructor(private activeModal: NgbActiveModal) {}
+    constructor(private activeModal: NgbActiveModal) {
+    }
 
-    async ngOnInit(): Promise<void> {}
+    async ngOnInit(): Promise<void> {
+    }
 
-    openValueHelp() {}
+    openValueHelp() {
+    }
 
     cancel() {
         this.activeModal.close();

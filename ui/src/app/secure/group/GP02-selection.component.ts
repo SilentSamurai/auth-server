@@ -3,11 +3,10 @@ import {UserService} from '../../_services/user.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {ActivatedRoute, Router} from '@angular/router';
 import {TenantService} from '../../_services/tenant.service';
-import {TableAsyncLoadEvent} from '../../component/table/app-table.component';
 import {MessageService} from 'primeng/api';
 import {AuthDefaultService} from '../../_services/auth.default.service';
 import {GroupService} from '../../_services/group.service';
-import {IDataModel, DataSource} from '../../component/model/IDataModel';
+import {DataSource} from '../../component/model/DataSource';
 
 @Component({
     selector: 'app-group-sel',
@@ -84,7 +83,8 @@ export class GP02SelectionComponent implements OnInit {
         private authDefaultService: AuthDefaultService,
         private messageService: MessageService,
         private modalService: NgbModal,
-    ) {}
+    ) {
+    }
 
     async ngOnInit(): Promise<void> {
         this.authDefaultService.setTitle('GP02: Select Group');

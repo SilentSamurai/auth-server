@@ -11,7 +11,8 @@ export class AuthDefaultService {
     constructor(
         private router: Router,
         private sessionService: SessionService,
-    ) {}
+    ) {
+    }
 
     async signOut(redirect: string): Promise<void> {
         const userInfo = this.sessionService.getUser();

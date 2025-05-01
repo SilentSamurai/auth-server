@@ -1,13 +1,13 @@
-import {StaticModel} from './StaticModel';
-import {Query} from './IDataModel';
+import {StaticSource} from './StaticSource';
 import {Filter} from './Filters';
 import {Operators} from './Operator';
+import {Query} from "./Query";
 
 describe('StaticModel', () => {
     // Constructor initializes with empty data array when no arguments provided
     it('should initialize with empty data array when no arguments provided', async () => {
         // Provide keyFields as the first argument
-        const model = new StaticModel(['id']);
+        const model = new StaticSource(['id']);
 
         // Provide an empty config object to the Query constructor
         const result = await model.fetchData(new Query({}));
@@ -23,7 +23,7 @@ describe('StaticModel', () => {
             {id: 2, name: 'Test2'},
         ];
         // Provide keyFields first, then initialData
-        const model = new StaticModel(['id'], initialData);
+        const model = new StaticSource(['id'], initialData);
 
         // Provide an empty config object to the Query constructor
         const result = await model.fetchData(new Query({}));
@@ -40,7 +40,7 @@ describe('StaticModel', () => {
             {id: 3, name: 'New2'},
         ];
         // Provide keyFields first, then initialData
-        const model = new StaticModel(['id'], initialData);
+        const model = new StaticSource(['id'], initialData);
 
         model.setData(newData);
         // Provide an empty config object to the Query constructor
@@ -55,7 +55,7 @@ describe('StaticModel', () => {
         const initialData = [{id: 1, name: 'Test'}];
         const additionalData = [{id: 2, name: 'Additional'}];
         // Provide keyFields first, then initialData
-        const model = new StaticModel(['id'], initialData);
+        const model = new StaticSource(['id'], initialData);
 
         model.appendData(additionalData);
         // Provide an empty config object to the Query constructor
@@ -75,7 +75,7 @@ describe('StaticModel', () => {
             {id: 5, name: 'E'},
         ];
         // Provide keyFields first, then initialData
-        const model = new StaticModel(['id'], data);
+        const model = new StaticSource(['id'], data);
 
         // Provide config object to the Query constructor
         const query = new Query({pageNo: 1, pageSize: 2});
@@ -97,7 +97,7 @@ describe('StaticModel', () => {
             {id: 3, name: 'Different'},
         ];
         // Provide keyFields first, then initialData
-        const model = new StaticModel(['id'], data);
+        const model = new StaticSource(['id'], data);
 
         // Provide config object to the Query constructor
         const query = new Query({
@@ -116,7 +116,7 @@ describe('StaticModel', () => {
     // fetchData handles empty data array
     it('should handle empty data array when fetching data', async () => {
         // Provide keyFields first, then initialData (empty array)
-        const model = new StaticModel(['id'], []);
+        const model = new StaticSource(['id'], []);
 
         // Provide config object to the Query constructor
         const query = new Query({pageNo: 0, pageSize: 10});
@@ -134,7 +134,7 @@ describe('StaticModel', () => {
             {id: 2, name: 'Test2'},
         ];
         // Provide keyFields first, then initialData
-        const model = new StaticModel(['id'], data);
+        const model = new StaticSource(['id'], data);
 
         // Pass null/undefined within the config object
         const query = new Query({
@@ -156,7 +156,7 @@ describe('StaticModel', () => {
             {id: 2, name: 'Test2'},
         ];
         // Provide keyFields first, then initialData
-        const model = new StaticModel(['id'], data);
+        const model = new StaticSource(['id'], data);
 
         // Provide config object with empty filters array
         const query = new Query({filters: []});
@@ -174,7 +174,7 @@ describe('StaticModel', () => {
             {id: 2, name: 'Test2'},
         ];
         // Provide keyFields first, then initialData
-        const model = new StaticModel(['id'], data);
+        const model = new StaticSource(['id'], data);
 
         // Provide config object with empty orderBy array
         const query = new Query({orderBy: []});
@@ -193,7 +193,7 @@ describe('StaticModel', () => {
             {id: 3, user: {name: 'Charlie', age: 35}},
         ];
         // Provide keyFields first, then initialData
-        const model = new StaticModel(['id'], data);
+        const model = new StaticSource(['id'], data);
 
         // Provide config object with filter for nested property
         const query = new Query({
@@ -213,7 +213,7 @@ describe('StaticModel', () => {
             {id: 2, name: 'Test2'},
         ];
         // Provide keyFields first, then initialData
-        const model = new StaticModel(['id'], data);
+        const model = new StaticSource(['id'], data);
 
         // Provide config object with filter for non-existent property
         const query = new Query({

@@ -1,11 +1,4 @@
-import {
-    AfterViewInit,
-    Component,
-    ContentChild,
-    ContentChildren,
-    Input,
-    QueryList,
-} from '@angular/core';
+import {AfterViewInit, Component, ContentChild, ContentChildren, Input, QueryList,} from '@angular/core';
 import {MessageService} from 'primeng/api';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {DialogActionsComponent} from './dialog-actions.component';
@@ -156,9 +149,11 @@ export class StandardDialogComponent implements AfterViewInit {
     constructor(
         private messageService: MessageService,
         public activeModal: NgbActiveModal,
-    ) {}
+    ) {
+    }
 
-    async ngOnInit(): Promise<void> {}
+    async ngOnInit(): Promise<void> {
+    }
 
     ngAfterViewInit(): void {
         console.log(this.tabs);

@@ -42,12 +42,13 @@ export class AuthController {
         private readonly authCodeService: AuthCodeService,
         private readonly authUserService: AuthUserService,
         private readonly securityService: SecurityService,
-    ) {}
+    ) {
+    }
 
     @Post("/login")
     async login(
         @Body(new ValidationPipe(ValidationSchema.LoginSchema))
-        body: {
+            body: {
             client_id: string;
             password: string;
             email: string;
@@ -89,7 +90,7 @@ export class AuthController {
     @Post("/token")
     async oauthToken(
         @Body()
-        body: {
+            body: {
             client_id: string;
             client_secret: string;
             password: string;
@@ -224,7 +225,7 @@ export class AuthController {
     }
 
     @Post("/verify-auth-code")
-    async authCode(@Body() body: {auth_code: string}) {
+    async authCode(@Body() body: { auth_code: string }) {
         const authCodeObj = await this.authCodeService.findByCode(
             body.auth_code,
         );
@@ -241,7 +242,7 @@ export class AuthController {
     @Post("/verify")
     async verifyAccessToken(
         @Body(new ValidationPipe(ValidationSchema.VerifyTokenSchema))
-        body: {
+            body: {
             access_token: string;
             client_id: string;
             client_secret: string;
@@ -262,7 +263,7 @@ export class AuthController {
     @Post("/exchange")
     async exchangeAccessToken(
         @Body(new ValidationPipe(ValidationSchema.ExchangeTokenSchema))
-        body: {
+            body: {
             access_token: string;
             client_id: string;
             client_secret: string;
@@ -315,7 +316,7 @@ export class AuthController {
     async forgotPassword(
         @Headers() headers,
         @Body(new ValidationPipe(ValidationSchema.ForgotPasswordSchema))
-        body: any,
+            body: any,
     ): Promise<object> {
         const user: User = await this.authUserService.findUserByEmail(
             body.email,
@@ -345,7 +346,7 @@ export class AuthController {
     async resetPassword(
         @Param("token") token: string,
         @Body(new ValidationPipe(ValidationSchema.ResetPasswordSchema))
-        body: any,
+            body: any,
     ): Promise<object> {
         const reset: boolean = await this.authService.resetPassword(
             token,

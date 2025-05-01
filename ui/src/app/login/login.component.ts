@@ -133,6 +133,23 @@ export class LoginComponent implements OnInit {
         }
     }
 
+    async onSigUpClick() {
+        await this.router.navigate(['/register'], {
+            queryParams: {
+                client_id: this.loginForm.get('client_id')?.value!,
+            },
+        });
+    }
+
+    protected isAbsoluteUrl(url: string): boolean {
+        try {
+            new URL(url);
+            return true;
+        } catch (error) {
+            return false;
+        }
+    }
+
     private async setAccessToken(code: string) {
         try {
             let verifier = this.tokenStorage.getCodeVerifier();
@@ -145,22 +162,5 @@ export class LoginComponent implements OnInit {
         } catch (e: any) {
             console.error(e);
         }
-    }
-
-    protected isAbsoluteUrl(url: string): boolean {
-        try {
-            new URL(url);
-            return true;
-        } catch (error) {
-            return false;
-        }
-    }
-
-    async onSigUpClick() {
-        await this.router.navigate(['/register'], {
-            queryParams: {
-                client_id: this.loginForm.get('client_id')?.value!,
-            },
-        });
     }
 }

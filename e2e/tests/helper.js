@@ -6,7 +6,7 @@ class LoginHelper {
 
     static async getBrowser() {
         let executablePath;
-        if(process.platform === 'win32') {
+        if (process.platform === 'win32') {
             executablePath = `C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe`
         } else if (process.platform === 'linux') {
             executablePath = '/usr/bin/google-chrome'

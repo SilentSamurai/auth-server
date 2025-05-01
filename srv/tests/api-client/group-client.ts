@@ -1,4 +1,4 @@
-import { TestAppFixture } from "../test-app.fixture";
+import {TestAppFixture} from "../test-app.fixture";
 import {expect2xx, HttpClient} from "./client";
 
 export class GroupClient extends HttpClient {
@@ -12,7 +12,7 @@ export class GroupClient extends HttpClient {
             .post('/api/group/create')
             .set('Authorization', `Bearer ${this.accessToken}`)
             .set('Accept', 'application/json')
-            .send({ name, tenantId });
+            .send({name, tenantId});
 
         console.log("Response (createGroup): ", response.body);
         expect2xx(response);
@@ -68,7 +68,7 @@ export class GroupClient extends HttpClient {
             .post(`/api/group/${groupId}/add-roles`)
             .set('Authorization', `Bearer ${this.accessToken}`)
             .set('Accept', 'application/json')
-            .send({ roles });
+            .send({roles});
 
         console.log("Response (addRole): ", response.body);
         expect2xx(response);
@@ -88,7 +88,7 @@ export class GroupClient extends HttpClient {
             .post(`/api/group/${groupId}/remove-roles`)
             .set('Authorization', `Bearer ${this.accessToken}`)
             .set('Accept', 'application/json')
-            .send({ roles });
+            .send({roles});
 
         console.log("Response (removeRoles): ", response.body);
         expect2xx(response);
@@ -107,7 +107,7 @@ export class GroupClient extends HttpClient {
             .post(`/api/group/${groupId}/add-users`)
             .set('Authorization', `Bearer ${this.accessToken}`)
             .set('Accept', 'application/json')
-            .send({ users });
+            .send({users});
 
         console.log("Response (addUser): ", response.body);
         expect2xx(response);
@@ -127,7 +127,7 @@ export class GroupClient extends HttpClient {
             .post(`/api/group/${groupId}/remove-users`)
             .set('Authorization', `Bearer ${this.accessToken}`)
             .set('Accept', 'application/json')
-            .send({ users });
+            .send({users});
 
         console.log("Response (removeUser): ", response.body);
         expect2xx(response);

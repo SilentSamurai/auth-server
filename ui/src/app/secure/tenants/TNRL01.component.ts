@@ -6,11 +6,8 @@ import {TenantService} from '../../_services/tenant.service';
 import {lastValueFrom} from 'rxjs';
 import {MessageService} from 'primeng/api';
 import {AuthDefaultService} from '../../_services/auth.default.service';
-import {StaticModel} from '../../component/model/StaticModel';
-import {
-    CloseType,
-    ValueHelpResult,
-} from '../../component/value-help/value-help.component';
+import {CloseType, ValueHelpResult,} from '../../component/value-help/value-help.component';
+import {StaticSource} from "../../component/model/StaticSource";
 
 @Component({
     selector: 'app-TNRL01',
@@ -27,20 +24,20 @@ import {
             <app-op-header>
                 <div class="row mb-2">
                     <div class="col">
-                        <app-attribute label="Email">{{
-                            user.email
-                        }}</app-attribute>
-                        <app-attribute label="Name">{{
-                            user.name
-                        }}</app-attribute>
+                        <app-attribute label="Email">
+                            {{ user.email }}
+                        </app-attribute>
+                        <app-attribute label="Name">
+                            {{ user.name }}
+                        </app-attribute>
                     </div>
                     <div class="col">
-                        <app-attribute label="Tenant Name">{{
-                            tenant.name
-                        }}</app-attribute>
-                        <app-attribute label="Tenant Id">{{
-                            tenant.id
-                        }}</app-attribute>
+                        <app-attribute label="Tenant Name">
+                            {{ tenant.name }}
+                        </app-attribute>
+                        <app-attribute label="Tenant Id">
+                            {{ tenant.id }}
+                        </app-attribute>
                     </div>
                 </div>
             </app-op-header>
@@ -98,7 +95,7 @@ import {
                                             role.id,
                                         ]"
                                         href="javascript:void(0)"
-                                        >{{ role.name }}</a
+                                    >{{ role.name }}</a
                                     >
                                 </td>
                                 <td>{{ role.description }}</td>
@@ -133,8 +130,8 @@ export class TNRL01Component implements AfterContentInit {
     tenant: any;
     loading = true;
     tenantRoles: any[] = [];
-    rolesDataModel = new StaticModel(['id']);
-    tenantRolesDM = new StaticModel(['id']);
+    rolesDataModel = new StaticSource<any>(['id']);
+    tenantRolesDM = new StaticSource<any>(['id']);
 
     constructor(
         private userService: UserService,
@@ -144,7 +141,8 @@ export class TNRL01Component implements AfterContentInit {
         private messageService: MessageService,
         private authDefaultService: AuthDefaultService,
         private modalService: NgbModal,
-    ) {}
+    ) {
+    }
 
     async ngOnInit(): Promise<void> {
         this.authDefaultService.setTitle('TNRL01: Role Assignment of User');
@@ -179,7 +177,8 @@ export class TNRL01Component implements AfterContentInit {
         }
     }
 
-    ngAfterContentInit(): void {}
+    ngAfterContentInit(): void {
+    }
 
     async loadTable() {
         if (this.tenantId && this.userId) {
@@ -189,7 +188,7 @@ export class TNRL01Component implements AfterContentInit {
             );
             // $event.update(this.member, false);
             this.roles = this.member.roles;
-            (this.rolesDataModel as any as StaticModel<any>).setData(
+            (this.rolesDataModel as any as StaticSource<any>).setData(
                 this.roles,
             );
         }

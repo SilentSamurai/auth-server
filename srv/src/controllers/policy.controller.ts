@@ -35,7 +35,8 @@ export class PolicyController {
         private readonly roleService: RoleService,
         private readonly tenantService: TenantService,
         private readonly usersService: UsersService,
-    ) {}
+    ) {
+    }
 
     @Get("/my/permissions")
     @UseGuards(JwtAuthGuard)
@@ -96,12 +97,12 @@ export class PolicyController {
     async createPermission(
         @Request() request: Request,
         @Body(new ValidationPipe(PolicyController.CreateSchema))
-        body: {
+            body: {
             role: string;
             effect: Effect;
             action: Action;
             subject: string;
-            conditions: {[string: string]: string} | null;
+            conditions: { [string: string]: string } | null;
         },
     ): Promise<Policy> {
         const authContext = request as any as AuthContext;
@@ -156,11 +157,11 @@ export class PolicyController {
         @Request() request: Request,
         @Param("id") id: string,
         @Body(new ValidationPipe(PolicyController.UpdateSchema))
-        body: {
+            body: {
             effect?: Effect;
             action?: Action;
             subject?: string;
-            conditions?: {[string: string]: string} | null;
+            conditions?: { [string: string]: string } | null;
         },
     ) {
         const authContext = request as any as AuthContext;

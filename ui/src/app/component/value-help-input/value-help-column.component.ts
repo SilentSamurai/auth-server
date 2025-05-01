@@ -15,7 +15,8 @@ export class ValueHelpColumnComponent implements OnInit {
     @Input() name: string = '';
     @Input() isId: string | boolean = false;
 
-    constructor() {}
+    constructor() {
+    }
 
     async ngOnInit(): Promise<void> {
         if (typeof this.isId === 'string') {

@@ -16,7 +16,8 @@ import {ActivatedRoute} from '@angular/router';
 export class HttpErrorComponent implements OnInit {
     msg: string = '';
 
-    constructor(private actRoute: ActivatedRoute) {}
+    constructor(private actRoute: ActivatedRoute) {
+    }
 
     ngOnInit(): void {
         this.msg = this.actRoute.snapshot.params['msg'];

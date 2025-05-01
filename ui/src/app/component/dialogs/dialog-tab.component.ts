@@ -14,7 +14,9 @@ export class DialogTabComponent implements OnInit {
 
     @ViewChild('SDTB', {static: true}) template!: TemplateRef<any>;
 
-    constructor() {}
+    constructor() {
+    }
 
-    async ngOnInit(): Promise<void> {}
+    async ngOnInit(): Promise<void> {
+    }
 }

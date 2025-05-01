@@ -37,7 +37,6 @@ RUN npm ci && npm run build
 FROM node:20.19.0-alpine
 
 RUN apk add --no-cache nginx
-RUN apk add envsubst
 
 # Copy build artifacts from previous stage
 COPY --from=build /home/app/srv /home/app/srv

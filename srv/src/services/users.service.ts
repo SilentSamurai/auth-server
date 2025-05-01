@@ -23,9 +23,11 @@ export class UsersService implements OnModuleInit {
         @InjectRepository(User) private usersRepository: Repository<User>,
         private readonly configService: Environment,
         private readonly securityService: SecurityService,
-    ) {}
+    ) {
+    }
 
-    async onModuleInit() {}
+    async onModuleInit() {
+    }
 
     /**
      * Create a user.

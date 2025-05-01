@@ -3,10 +3,9 @@ import {UserService} from '../../_services/user.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {ActivatedRoute, Router} from '@angular/router';
 import {TenantService} from '../../_services/tenant.service';
-import {TableAsyncLoadEvent} from '../../component/table/app-table.component';
 import {MessageService} from 'primeng/api';
 import {AuthDefaultService} from '../../_services/auth.default.service';
-import {IDataModel, DataSource} from '../../component/model/IDataModel';
+import {DataSource} from "../../component/model/DataSource";
 
 @Component({
     selector: 'app-TNRL01-SEL',
@@ -114,14 +113,15 @@ export class TNRL01SelectionComponent implements OnInit {
         private authDefaultService: AuthDefaultService,
         private messageService: MessageService,
         private modalService: NgbModal,
-    ) {}
+    ) {
+    }
 
     async ngOnInit(): Promise<void> {
         this.authDefaultService.setTitle(
             'TNRL01: Manage Role Assignments of Tenant',
         );
-        this.tenantsDM = this.tenantService.createDataModel([]);
-        this.usersDM = this.userService.createDataModel([]);
+        this.tenantsDM = this.tenantService.createDataModel();
+        this.usersDM = this.userService.createDataModel();
     }
 
     async continue() {

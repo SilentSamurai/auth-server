@@ -42,7 +42,8 @@ export class RegisterController {
         private readonly mailService: MailService,
         private readonly securityService: SecurityService,
         @InjectRepository(User) private usersRepository: Repository<User>,
-    ) {}
+    ) {
+    }
 
     static RegisterDomainSchema = yup.object().shape({
         name: yup
@@ -65,14 +66,14 @@ export class RegisterController {
         @Headers() headers,
         @Request() request,
         @Body(new ValidationPipe(RegisterController.RegisterDomainSchema))
-        body: {
+            body: {
             name: string;
             password: string;
             email: string;
             orgName: string;
             domain: string;
         },
-    ): Promise<{success: boolean}> {
+    ): Promise<{ success: boolean }> {
         const existingUser = await this.usersRepository.findOne({
             where: {email: body.email},
         });
@@ -137,13 +138,13 @@ export class RegisterController {
         @Headers() headers,
         @Request() request,
         @Body(new ValidationPipe(RegisterController.SignUpSchema))
-        body: {
+            body: {
             name: string;
             password: string;
             email: string;
             client_id: string;
         },
-    ): Promise<{success: boolean}> {
+    ): Promise<{ success: boolean }> {
         let adminContext =
             await this.securityService.getAdminContextForInternalUse();
         const tenant = await this.tenantService.findByClientIdOrDomain(
@@ -199,8 +200,8 @@ export class RegisterController {
     async signdown(
         @Request() request,
         @Body(new ValidationPipe(ValidationSchema.SignDownSchema))
-        body: {password: string},
-    ): Promise<{status: boolean}> {
+            body: { password: string },
+    ): Promise<{ status: boolean }> {
         const securityContext = this.securityService.getUserToken(request);
         const user = await this.usersService.findByEmail(
             request,

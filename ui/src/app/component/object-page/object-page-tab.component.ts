@@ -1,11 +1,4 @@
-import {
-    Component,
-    Input,
-    OnInit,
-    QueryList,
-    TemplateRef,
-    ViewChild,
-} from '@angular/core';
+import {Component, Input, OnInit, TemplateRef, ViewChild,} from '@angular/core';
 
 @Component({
     selector: 'app-op-tab',
@@ -24,7 +17,8 @@ export class ObjectPageTabComponent implements OnInit {
 
     @ViewChild('OPTC', {static: true}) template!: TemplateRef<any>;
 
-    constructor() {}
+    constructor() {
+    }
 
     async ngOnInit() {
         this.loading = true;

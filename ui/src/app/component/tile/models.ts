@@ -78,13 +78,21 @@ export class Tile {
         this.canActivate = options.canActivate;
     }
 
+    get width() {
+        return this.findSize(this.size).width;
+    }
+
+    get height() {
+        return this.findSize(this.size).height;
+    }
+
     invokeCallback() {
         if (this.isCallbackThere && this.command) {
             this.command();
         }
     }
 
-    findSize(size: string): {width: string; height: string} {
+    findSize(size: string): { width: string; height: string } {
         if (size === 'sm') {
             return sizeMap.sm;
         }
@@ -92,14 +100,6 @@ export class Tile {
             return sizeMap.lg;
         }
         return sizeMap.md;
-    }
-
-    get width() {
-        return this.findSize(this.size).width;
-    }
-
-    get height() {
-        return this.findSize(this.size).height;
     }
 
     checkPermission(permissionService: PermissionService) {
@@ -159,11 +159,11 @@ export function makeLaunchPad(data: any, ps: PermissionService): TileGroup[] {
         // Defensive for missing or malformed tiles
         const groupTiles = Array.isArray(group.tiles)
             ? group.tiles
-                  .map((tile: any) => new Tile(tile))
-                  .map((tile: Tile) => {
-                      tile.checkPermission(ps);
-                      return tile;
-                  })
+                .map((tile: any) => new Tile(tile))
+                .map((tile: Tile) => {
+                    tile.checkPermission(ps);
+                    return tile;
+                })
             : [];
 
         return new TileGroup({

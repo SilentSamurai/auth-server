@@ -29,7 +29,8 @@ export class RoleController {
         private readonly userService: UsersService,
         private readonly roleService: RoleService,
         private readonly securityService: SecurityService,
-    ) {}
+    ) {
+    }
 
     @Post("/:tenantId/role/:name")
     @UseGuards(JwtAuthGuard)

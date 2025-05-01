@@ -10,13 +10,13 @@ export class ModalResult<T> {
     data: T | undefined;
     status: ModalReturnStatus = ModalReturnStatus.OK;
 
-    is_ok() {
-        return this.status == ModalReturnStatus.OK;
-    }
-
     constructor(data: T | undefined, status: ModalReturnStatus) {
         this.data = data;
         this.status = status;
+    }
+
+    is_ok() {
+        return this.status == ModalReturnStatus.OK;
     }
 }
 
@@ -32,7 +32,8 @@ export interface AfterModalInit {
     providedIn: 'root',
 })
 export class ModalService {
-    constructor(private modalService: NgbModal) {}
+    constructor(private modalService: NgbModal) {
+    }
 
     initialize(initData: any, componentRef: any) {
         for (let key in initData) {

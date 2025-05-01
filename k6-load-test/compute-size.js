@@ -1,10 +1,10 @@
 const {readdir, stat} = require('fs/promises');
 const {join} = require('path');
-const { appendFileSync } = require('fs');
+const {appendFileSync} = require('fs');
 
 const append = (path, size) => {
-    if( size < 1024 * 1024) return;
-    const csv = `"${path}",${size / (1024) }\n`; // Construct a CSV row
+    if (size < 1024 * 1024) return;
+    const csv = `"${path}",${size / (1024)}\n`; // Construct a CSV row
     try {
         appendFileSync("./size.csv", csv); // Append the CSV row to the file
     } catch (error) {
@@ -39,13 +39,17 @@ const dirSize = async dir => {
 }
 
 
-const { Console } = require('console');
-const { Transform } = require('stream');
+const {Console} = require('console');
+const {Transform} = require('stream');
 
 function table(input) {
     // @see https://stackoverflow.com/a/67859384
-    const ts = new Transform({ transform(chunk, enc, cb) { cb(null, chunk) } })
-    const logger = new Console({ stdout: ts })
+    const ts = new Transform({
+        transform(chunk, enc, cb) {
+            cb(null, chunk)
+        }
+    })
+    const logger = new Console({stdout: ts})
     logger.table(input)
     const table = (ts.read() || '').toString()
     let result = '';

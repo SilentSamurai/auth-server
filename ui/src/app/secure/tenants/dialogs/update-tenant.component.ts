@@ -2,10 +2,7 @@ import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {lastValueFrom} from 'rxjs';
 import {MessageService} from 'primeng/api';
-import {
-    TenantService,
-    NoChangesException,
-} from '../../../_services/tenant.service';
+import {NoChangesException, TenantService,} from '../../../_services/tenant.service';
 
 @Component({
     selector: 'app-update-tenant',
@@ -111,7 +108,8 @@ export class UpdateTenantComponent implements OnInit {
         private tenantService: TenantService,
         private messageService: MessageService,
         public activeModal: NgbActiveModal,
-    ) {}
+    ) {
+    }
 
     ngOnInit(): void {
         this.form = {
