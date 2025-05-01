@@ -47,9 +47,6 @@ COPY ./ui/nginx/templates /etc/nginx/templates
 
 # Nginx static files root (adjust as needed)
 COPY --from=build /home/app/ui/dist /home/static/
-
-RUN cat /etc/nginx/templates/default.conf.template | envsubst > /etc/nginx/http.d/default.conf
-
 COPY start-standalone.sh /home/app/start-standalone.sh
 
 # Start script to run both backend and nginx
