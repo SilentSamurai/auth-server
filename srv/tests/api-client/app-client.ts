@@ -1,5 +1,5 @@
-import {TestAppFixture} from "../test-app.fixture";
-import {expect2xx, HttpClient} from "./client";
+import { TestAppFixture } from "../test-app.fixture";
+import { expect2xx, HttpClient } from "./client";
 
 export class AppClient extends HttpClient {
     constructor(app: TestAppFixture, accessToken: string) {
