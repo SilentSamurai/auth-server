@@ -1,5 +1,5 @@
 import {AbilityBuilder, createMongoAbility} from "@casl/ability";
-import {Action, Effect} from "./actions.enum";
+import {Action} from "./actions.enum";
 import {Injectable} from "@nestjs/common";
 import {RoleEnum} from "../entity/roleEnum";
 import {AnyAbility} from "@casl/ability/dist/types/PureAbility";

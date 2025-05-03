@@ -1,10 +1,4 @@
-import {
-    MigrationInterface,
-    QueryRunner,
-    Table,
-    TableForeignKey,
-    TableIndex,
-} from "typeorm";
+import {MigrationInterface, QueryRunner, Table, TableForeignKey, TableIndex,} from "typeorm";
 
 export class CreateAuthorizationTable1698765432100
     implements MigrationInterface {

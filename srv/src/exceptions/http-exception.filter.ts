@@ -1,12 +1,4 @@
-import {
-    ArgumentsHost,
-    Catch,
-    ExceptionFilter,
-    HttpException,
-    HttpStatus,
-    Logger,
-    Type,
-} from "@nestjs/common";
+import {ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, Logger, Type,} from "@nestjs/common";
 import {Request, Response} from "express";
 import {BackendError} from "./backend-error.class";
 import {UnknownErrorException} from "./unknown-error.exception";

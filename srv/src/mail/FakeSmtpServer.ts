@@ -1,15 +1,5 @@
-import {
-    SMTPServer,
-    SMTPServerDataStream,
-    SMTPServerOptions,
-    SMTPServerSession,
-} from "smtp-server";
-import {
-    AddressObject,
-    EmailAddress,
-    ParsedMail,
-    simpleParser,
-} from "mailparser";
+import {SMTPServer, SMTPServerDataStream, SMTPServerOptions, SMTPServerSession,} from "smtp-server";
+import {AddressObject, EmailAddress, ParsedMail, simpleParser,} from "mailparser";
 
 /**
  * Interface for environment configuration

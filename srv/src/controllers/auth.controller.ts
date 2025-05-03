@@ -27,7 +27,6 @@ import {InvalidTokenException} from "../exceptions/invalid-token.exception";
 import {AuthCodeService} from "../auth/auth-code.service";
 import {GRANT_TYPES, TenantToken} from "../casl/contexts";
 import {AuthUserService} from "../casl/authUser.service";
-import {request} from "express";
 import {SecurityService} from "../casl/security.service";
 
 @Controller("api/oauth")

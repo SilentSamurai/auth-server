@@ -8,14 +8,8 @@ import {AnyAbility} from "@casl/ability/dist/types/PureAbility";
 import {Action} from "./actions.enum";
 import {subject} from "@casl/ability";
 import {AuthUserService} from "./authUser.service";
-import {
-    AuthContext,
-    GRANT_TYPES,
-    OAuthToken,
-    TechnicalToken,
-    TenantToken,
-    UserToken,
-} from "./contexts";
+import {AuthContext, GRANT_TYPES, OAuthToken, TechnicalToken, TenantToken, UserToken,} from "./contexts";
+import {UnauthorizedException} from "../exceptions/unauthorized.exception";
 
 @Injectable()
 export class SecurityService implements OnModuleInit {
@@ -31,7 +25,10 @@ export class SecurityService implements OnModuleInit {
     }
 
     getAbility(authContext: AuthContext): AnyAbility {
-        return authContext.SCOPE_ABILITIES;
+        if (authContext.SCOPE_ABILITIES) {
+            return authContext.SCOPE_ABILITIES;
+        }
+        throw new UnauthorizedException();
     }
 
     isAuthorized(
