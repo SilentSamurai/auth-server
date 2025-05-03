@@ -27,7 +27,7 @@ import {AppService} from "./app.service";
         ],
         controllers: [],
         providers: [UsersService, GroupService, TenantService, RoleService, SubscriptionService, AppService],
-        exports: [ UsersService, GroupService, TenantService, RoleService, SubscriptionService, AppService]
+        exports: [UsersService, GroupService, TenantService, RoleService, SubscriptionService, AppService]
     })
 export class ServiceModule {
 }

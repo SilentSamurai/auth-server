@@ -23,6 +23,7 @@ import {UR02SelectionComponent} from './secure/users/UR02-selection.component';
 import {UserAuthGuard} from './shared/user-auth-guard.service';
 import {HttpErrorComponent} from './error-pages/HttpError.component';
 import {TenantAccessAuthGuard} from './shared/tenant-auth-guard.service';
+import {AP01Component} from './secure/apps/AP01.component';
 
 const routes: Routes = [
     {path: 'session-confirm', component: SessionConfirmationComponent},
@@ -100,6 +101,9 @@ const routes: Routes = [
                 canActivate: [],
             },
             {path: 'UR02/:userId', component: UR02Component, canActivate: []},
+
+            // apps
+            {path: 'AP01', component: AP01Component, canActivate: []},
         ],
     },
     {path: '**', redirectTo: '/error/404'},

@@ -8,7 +8,7 @@ import {AnyAbility} from "@casl/ability/dist/types/PureAbility";
 import {Action} from "./actions.enum";
 import {subject} from "@casl/ability";
 import {AuthUserService} from "./authUser.service";
-import {AuthContext, GRANT_TYPES, OAuthToken, TechnicalToken, TenantToken, UserToken,} from "./contexts";
+import {AuthContext, GRANT_TYPES, TechnicalToken, TenantToken, UserToken,} from "./contexts";
 import {UnauthorizedException} from "../exceptions/unauthorized.exception";
 
 @Injectable()
@@ -54,14 +54,6 @@ export class SecurityService implements OnModuleInit {
     getUserToken(authContext: AuthContext): UserToken {
         let payload = authContext.SECURITY_CONTEXT;
         if (payload.grant_type !== GRANT_TYPES.PASSWORD) {
-            throw new ForbiddenException("");
-        }
-        return payload;
-    }
-
-    getTechnicalSecurityContext(authContext: any): OAuthToken {
-        let payload = authContext.SECURITY_CONTEXT;
-        if (payload.grant_type !== GRANT_TYPES.CLIENT_CREDENTIAL) {
             throw new ForbiddenException("");
         }
         return payload;

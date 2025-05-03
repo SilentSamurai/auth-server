@@ -46,7 +46,7 @@ export class TenantAppServer {
     private server: http.Server;
     private config: Required<ServerConfig>;
     private logger: Console;
-    
+
     // Track onboard and offboard requests
     private onboardRequests: OnboardRequest[] = [];
     private offboardRequests: OffboardRequest[] = [];
@@ -57,125 +57,18 @@ export class TenantAppServer {
 
         // Create Express app
         this.app = express();
-        
+
         // Setup middleware
         this.setupMiddleware();
-        
+
         // Setup routes
         this.setupRoutes();
-        
+
         // Create HTTP server
         this.server = http.createServer(this.app);
 
         // Setup graceful shutdown
         this.setupShutdownHandlers();
-    }
-
-    /**
-     * Setup middleware
-     */
-    private setupMiddleware(): void {
-        // Parse JSON bodies
-        this.app.use(express.json());
-        
-        // Enable CORS
-        this.app.use(cors());
-    }
-
-    /**
-     * Setup routes
-     */
-    private setupRoutes(): void {
-        // Onboard endpoint
-        this.app.post('/onboard/tenant/', (req, res) => {
-            try {
-                const tenantId = req.body.tenantId;
-                this.log('info', `Received onboard request for tenant: ${tenantId}`);
-                
-                // Track the request
-                this.onboardRequests.push({
-                    tenantId,
-                    timestamp: new Date()
-                });
-                
-                // Return a successful response with no additional apps
-                res.json({ appNames: [] } as OnboardResponse);
-            } catch (error) {
-                this.log('error', 'Error processing onboard request:', error);
-                res.status(400).json({ error: 'Invalid request body' });
-            }
-        });
-
-        // Offboard endpoint
-        this.app.post('/offboard/tenant/:tenantId', (req, res) => {
-            const tenantId = req.params.tenantId;
-            this.log('info', `Received offboard request for tenant: ${tenantId}`);
-            
-            // Track the offboard request
-            this.offboardRequests.push({
-                tenantId,
-                timestamp: new Date()
-            });
-            
-            // Return a successful response with no additional apps
-            res.json({ appNames: [] } as OffboardResponse);
-        });
-        
-        // API to check if onboard was called
-        this.app.get('/api/onboard/requests', (req, res) => {
-            res.json({
-                count: this.onboardRequests.length,
-                requests: this.onboardRequests
-            });
-        });
-        
-        // API to check if a specific tenant was onboarded
-        this.app.get('/api/onboard/requests/:tenantId', (req, res) => {
-            const tenantId = req.params.tenantId;
-            const requests = this.onboardRequests.filter(req => req.tenantId === tenantId);
-            
-            res.json({
-                count: requests.length,
-                requests
-            });
-        });
-        
-        // API to clear onboard requests history
-        this.app.delete('/api/onboard/requests', (req, res) => {
-            this.onboardRequests = [];
-            res.json({ message: 'Onboard requests cleared' });
-        });
-
-        // API to check if offboard was called
-        this.app.get('/api/offboard/requests', (req, res) => {
-            res.json({
-                count: this.offboardRequests.length,
-                requests: this.offboardRequests
-            });
-        });
-        
-        // API to check if a specific tenant was offboarded
-        this.app.get('/api/offboard/requests/:tenantId', (req, res) => {
-            const tenantId = req.params.tenantId;
-            const requests = this.offboardRequests.filter(req => req.tenantId === tenantId);
-            
-            res.json({
-                count: requests.length,
-                requests
-            });
-        });
-        
-        // API to clear offboard requests history
-        this.app.delete('/api/offboard/requests', (req, res) => {
-            this.offboardRequests = [];
-            res.json({ message: 'Offboard requests cleared' });
-        });
-
-        // Catch-all route for unknown endpoints
-        this.app.use((req, res) => {
-            this.log('warn', `Unknown endpoint: ${req.method} ${req.url}`);
-            res.status(404).json({ error: 'Not found' });
-        });
     }
 
     /**
@@ -206,21 +99,21 @@ export class TenantAppServer {
             });
         });
     }
-    
+
     /**
      * Get all onboard requests
      */
     public getOnboardRequests(): OnboardRequest[] {
         return [...this.onboardRequests];
     }
-    
+
     /**
      * Check if a specific tenant was onboarded
      */
     public wasTenantOnboarded(tenantId: string): boolean {
         return this.onboardRequests.some(req => req.tenantId === tenantId);
     }
-    
+
     /**
      * Clear onboard requests history
      */
@@ -234,19 +127,126 @@ export class TenantAppServer {
     public getOffboardRequests(): OffboardRequest[] {
         return [...this.offboardRequests];
     }
-    
+
     /**
      * Check if a specific tenant was offboarded
      */
     public wasTenantOffboarded(tenantId: string): boolean {
         return this.offboardRequests.some(req => req.tenantId === tenantId);
     }
-    
+
     /**
      * Clear offboard requests history
      */
     public clearOffboardRequests(): void {
         this.offboardRequests = [];
+    }
+
+    /**
+     * Setup middleware
+     */
+    private setupMiddleware(): void {
+        // Parse JSON bodies
+        this.app.use(express.json());
+
+        // Enable CORS
+        this.app.use(cors());
+    }
+
+    /**
+     * Setup routes
+     */
+    private setupRoutes(): void {
+        // Onboard endpoint
+        this.app.post('/onboard/tenant/', (req, res) => {
+            try {
+                const tenantId = req.body.tenantId;
+                this.log('info', `Received onboard request for tenant: ${tenantId}`);
+
+                // Track the request
+                this.onboardRequests.push({
+                    tenantId,
+                    timestamp: new Date()
+                });
+
+                // Return a successful response with no additional apps
+                res.json({appNames: []} as OnboardResponse);
+            } catch (error) {
+                this.log('error', 'Error processing onboard request:', error);
+                res.status(400).json({error: 'Invalid request body'});
+            }
+        });
+
+        // Offboard endpoint
+        this.app.post('/offboard/tenant/:tenantId', (req, res) => {
+            const tenantId = req.params.tenantId;
+            this.log('info', `Received offboard request for tenant: ${tenantId}`);
+
+            // Track the offboard request
+            this.offboardRequests.push({
+                tenantId,
+                timestamp: new Date()
+            });
+
+            // Return a successful response with no additional apps
+            res.json({appNames: []} as OffboardResponse);
+        });
+
+        // API to check if onboard was called
+        this.app.get('/api/onboard/requests', (req, res) => {
+            res.json({
+                count: this.onboardRequests.length,
+                requests: this.onboardRequests
+            });
+        });
+
+        // API to check if a specific tenant was onboarded
+        this.app.get('/api/onboard/requests/:tenantId', (req, res) => {
+            const tenantId = req.params.tenantId;
+            const requests = this.onboardRequests.filter(req => req.tenantId === tenantId);
+
+            res.json({
+                count: requests.length,
+                requests
+            });
+        });
+
+        // API to clear onboard requests history
+        this.app.delete('/api/onboard/requests', (req, res) => {
+            this.onboardRequests = [];
+            res.json({message: 'Onboard requests cleared'});
+        });
+
+        // API to check if offboard was called
+        this.app.get('/api/offboard/requests', (req, res) => {
+            res.json({
+                count: this.offboardRequests.length,
+                requests: this.offboardRequests
+            });
+        });
+
+        // API to check if a specific tenant was offboarded
+        this.app.get('/api/offboard/requests/:tenantId', (req, res) => {
+            const tenantId = req.params.tenantId;
+            const requests = this.offboardRequests.filter(req => req.tenantId === tenantId);
+
+            res.json({
+                count: requests.length,
+                requests
+            });
+        });
+
+        // API to clear offboard requests history
+        this.app.delete('/api/offboard/requests', (req, res) => {
+            this.offboardRequests = [];
+            res.json({message: 'Offboard requests cleared'});
+        });
+
+        // Catch-all route for unknown endpoints
+        this.app.use((req, res) => {
+            this.log('warn', `Unknown endpoint: ${req.method} ${req.url}`);
+            res.status(404).json({error: 'Not found'});
+        });
     }
 
     /**

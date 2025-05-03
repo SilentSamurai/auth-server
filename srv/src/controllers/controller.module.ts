@@ -23,6 +23,7 @@ import {GroupController} from "./group.controller";
 import {RoleControllerV2} from "./roleV2.controller";
 import {RegisterController} from "./registration.controller";
 import {AppController} from "./app.controller";
+import {App} from "../entity/app.entity";
 
 @Module(
     {
@@ -33,7 +34,7 @@ import {AppController} from "./app.controller";
                 MailModule,
                 CaslModule,
                 ServiceModule,
-                TypeOrmModule.forFeature([User, Tenant, Role, TenantMember, Group])
+                TypeOrmModule.forFeature([User, Tenant, Role, TenantMember, Group, App])
             ],
         controllers: [
             UsersController,

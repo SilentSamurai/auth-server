@@ -25,6 +25,7 @@ export enum Subjects {
     TENANT = 'Tenant',
     ROLE = 'Role',
     GROUP = 'Group',
+    APPS = 'Apps',
 }
 
 @Injectable({

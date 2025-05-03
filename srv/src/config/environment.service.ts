@@ -65,6 +65,13 @@ export class Environment {
     }
 
     /**
+     * Is a production environment?
+     */
+    static isProduction(): boolean {
+        return process.env.NODE_ENV === "production";
+    }
+
+    /**
      * Get a configuration value.
      */
     get(key: string, defaultValue: any = null): any {
@@ -81,13 +88,6 @@ export class Environment {
         } else {
             return "Auth Server";
         }
-    }
-
-    /**
-     * Is a production environment?
-     */
-    static isProduction(): boolean {
-        return process.env.NODE_ENV === "production";
     }
 
     isProduction() {

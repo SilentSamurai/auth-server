@@ -7,13 +7,12 @@ import * as process from "node:process";
 
 export class HelperFixture {
 
-    private readonly app: TestAppFixture;
-    private accessToken: string;
-
     public tenant: TenantClient;
     public role: RoleClient;
     public group: GroupClient;
     public user: UsersClient;
+    private readonly app: TestAppFixture;
+    private accessToken: string;
 
     constructor(app: TestAppFixture, accessToken: string) {
         this.app = app;

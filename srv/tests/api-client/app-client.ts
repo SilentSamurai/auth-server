@@ -1,5 +1,5 @@
-import { TestAppFixture } from "../test-app.fixture";
-import { expect2xx, HttpClient } from "./client";
+import {TestAppFixture} from "../test-app.fixture";
+import {expect2xx, HttpClient} from "./client";
 
 export class AppClient extends HttpClient {
     constructor(app: TestAppFixture, accessToken: string) {
@@ -40,7 +40,7 @@ export class AppClient extends HttpClient {
     public async subscribeToApp(appId: string, tenantId: string) {
         const response = await this.app.getHttpServer()
             .post(`/api/apps/${appId}/subscribe`)
-            .send({ tenantId })
+            .send({tenantId})
             .set('Authorization', `Bearer ${this.accessToken}`)
             .set('Accept', 'application/json');
 

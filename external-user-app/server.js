@@ -19,19 +19,19 @@ const server = http.createServer((req, res) => {
         req.on('data', chunk => {
             body += chunk.toString();
         });
-        
+
         req.on('end', () => {
             try {
                 const data = JSON.parse(body);
                 const tenantId = data.tenantId;
                 const timestamp = new Date().toISOString();
-                
+
                 // Log detailed information about the onboard request
                 console.log(`[${timestamp}] Received onboard request:`);
                 console.log(`  - Tenant ID: ${tenantId}`);
                 console.log(`  - Method: ${req.method}`);
                 console.log(`  - Headers:`, req.headers);
-                
+
                 // Store the request for verification
                 onboardRequests.push({
                     tenantId,
@@ -39,14 +39,14 @@ const server = http.createServer((req, res) => {
                     method: req.method,
                     headers: req.headers
                 });
-                
+
                 // Return success response
                 res.writeHead(200, {'Content-Type': 'application/json'});
-                res.end(JSON.stringify({ appNames: [] }));
+                res.end(JSON.stringify({appNames: []}));
             } catch (error) {
                 console.error('Error processing onboard request:', error);
                 res.writeHead(400, {'Content-Type': 'application/json'});
-                res.end(JSON.stringify({ error: 'Invalid request body' }));
+                res.end(JSON.stringify({error: 'Invalid request body'}));
             }
         });
         return;
@@ -56,13 +56,13 @@ const server = http.createServer((req, res) => {
     if (pathname.startsWith('/offboard/tenant/')) {
         const tenantId = pathname.split('/').pop();
         const timestamp = new Date().toISOString();
-        
+
         // Log detailed information about the offboard request
         console.log(`[${timestamp}] Received offboard request:`);
         console.log(`  - Tenant ID: ${tenantId}`);
         console.log(`  - Method: ${req.method}`);
         console.log(`  - Headers:`, req.headers);
-        
+
         // Store the request for verification
         offboardRequests.push({
             tenantId,
@@ -70,10 +70,10 @@ const server = http.createServer((req, res) => {
             method: req.method,
             headers: req.headers
         });
-        
+
         // Return success response
         res.writeHead(200, {'Content-Type': 'application/json'});
-        res.end(JSON.stringify({ appNames: [] }));
+        res.end(JSON.stringify({appNames: []}));
         return;
     }
 
@@ -95,7 +95,7 @@ const server = http.createServer((req, res) => {
     if (pathname.startsWith('/onboard/check/')) {
         const tenantId = pathname.split('/').pop();
         const requests = onboardRequests.filter(req => req.tenantId === tenantId);
-        
+
         res.writeHead(200, {'Content-Type': 'application/json'});
         res.end(JSON.stringify({
             wasOnboarded: requests.length > 0,
@@ -109,7 +109,7 @@ const server = http.createServer((req, res) => {
     if (pathname.startsWith('/offboard/check/')) {
         const tenantId = pathname.split('/').pop();
         const requests = offboardRequests.filter(req => req.tenantId === tenantId);
-        
+
         res.writeHead(200, {'Content-Type': 'application/json'});
         res.end(JSON.stringify({
             wasOffboarded: requests.length > 0,
@@ -124,7 +124,7 @@ const server = http.createServer((req, res) => {
         const tenantId = pathname.split('/').pop();
         const onboardRequests = onboardRequests.filter(req => req.tenantId === tenantId);
         const offboardRequests = offboardRequests.filter(req => req.tenantId === tenantId);
-        
+
         res.writeHead(200, {'Content-Type': 'application/json'});
         res.end(JSON.stringify({
             tenantId,

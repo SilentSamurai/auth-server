@@ -25,6 +25,11 @@ import {SubjectEnum} from "../entity/subjectEnum";
 @Controller("api/role")
 @UseInterceptors(ClassSerializerInterceptor)
 export class RoleControllerV2 {
+    static UpdateRoleSchema = yup.object().shape({
+        name: yup.string().required("name is required"),
+        description: yup.string().required("description is required"),
+    });
+
     constructor(
         private readonly configService: Environment,
         private readonly tenantService: TenantService,
@@ -33,11 +38,6 @@ export class RoleControllerV2 {
         private readonly securityService: SecurityService,
     ) {
     }
-
-    static UpdateRoleSchema = yup.object().shape({
-        name: yup.string().required("name is required"),
-        description: yup.string().required("description is required"),
-    });
 
     @Patch("/:roleId")
     @UseGuards(JwtAuthGuard)

@@ -2,8 +2,8 @@ import {Injectable} from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
 export enum ModalReturnStatus {
-    OK,
-    USER_CLOSED,
+    OK = "Ok",
+    USER_CLOSED = "UserClosed",
 }
 
 export class ModalResult<T> {

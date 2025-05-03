@@ -1,10 +1,10 @@
-import { TestAppFixture } from '../test-app.fixture';
-import { INestApplication } from '@nestjs/common';
-import { v4 as uuid } from 'uuid';
-import { AppClient } from '../api-client/app-client';
-import { SearchClient } from '../api-client/search-client';
-import { TokenFixture } from '../token.fixture';
-import { createTenantAppServer, TenantAppServer } from './tenant-app-server';
+import {TestAppFixture} from '../test-app.fixture';
+import {INestApplication} from '@nestjs/common';
+import {v4 as uuid} from 'uuid';
+import {AppClient} from '../api-client/app-client';
+import {SearchClient} from '../api-client/search-client';
+import {TokenFixture} from '../token.fixture';
+import {createTenantAppServer, TenantAppServer} from './tenant-app-server';
 
 describe('AppController', () => {
     let app: INestApplication;
@@ -19,17 +19,17 @@ describe('AppController', () => {
 
     beforeAll(async () => {
         // Start the mock server
-        mockServer = createTenantAppServer({ port: MOCK_SERVER_PORT });
+        mockServer = createTenantAppServer({port: MOCK_SERVER_PORT});
         await mockServer.listen();
-        
+
         // Initialize the test app
         fixture = new TestAppFixture();
         await fixture.init();
         app = fixture.nestApp;
-        
+
         // Initialize token fixture
         tokenFixture = new TokenFixture(fixture);
-        
+
         // Get access token for the tenant using TokenFixture
         const tokenResponse = await tokenFixture.fetchAccessToken(
             'admin@auth.server.com',
@@ -37,14 +37,14 @@ describe('AppController', () => {
             'auth.server.com'
         );
         accessToken = tokenResponse.accessToken;
-        
+
         // Initialize search client with the access token
         searchClient = new SearchClient(fixture, accessToken);
-        
+
         // Find the shire.local tenant
-        const shireTenant = await searchClient.findTenantBy({ domain: 'shire.local' });
+        const shireTenant = await searchClient.findTenantBy({domain: 'shire.local'});
         tenantId = shireTenant.id;
-        
+
         // Initialize app client with the access token
         appClient = new AppClient(fixture, accessToken);
     });
@@ -110,7 +110,7 @@ describe('AppController', () => {
 
         it('should successfully subscribe to an app', async () => {
             const subscription = await appClient.subscribeToApp(testAppId, tenantId);
-            
+
             expect(subscription).toBeDefined();
             expect(subscription.id).toBeDefined();
             expect(subscription.status).toBeDefined();
@@ -144,11 +144,11 @@ describe('AppController', () => {
 
         it('should fail when subscribing with invalid app ID', async () => {
             const invalidAppId = 'invalid-uuid';
-            
+
             // This test needs to be done with direct HTTP request since the client validates inputs
             const response = await fixture.getHttpServer()
                 .post(`/api/apps/${invalidAppId}/subscribe`)
-                .send({ tenantId })
+                .send({tenantId})
                 .set('Authorization', `Bearer ${accessToken}`)
                 .set('Accept', 'application/json');
 
@@ -157,11 +157,11 @@ describe('AppController', () => {
 
         it('should fail when subscribing with invalid tenant ID', async () => {
             const invalidTenantId = 'invalid-uuid';
-            
+
             // This test needs to be done with direct HTTP request since the client validates inputs
             const response = await fixture.getHttpServer()
                 .post(`/api/apps/${testAppId}/subscribe`)
-                .send({ tenantId: invalidTenantId })
+                .send({tenantId: invalidTenantId})
                 .set('Authorization', `Bearer ${accessToken}`)
                 .set('Accept', 'application/json');
 

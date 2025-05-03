@@ -258,7 +258,7 @@ const SecurityContextSchema = yup.object().shape({
     email: yup.string().required("token is invalid").max(128),
     name: yup.string().required("token is invalid").max(128),
     tenant: yup.object().shape({
-        id: yup.string().required("token is invalid"),
+        id: yup.string().required("token is invalid").uuid("tenant id must be a valid UUID"),
         name: yup.string().required("token is invalid"),
         domain: yup.string().required("token is invalid"),
     }),

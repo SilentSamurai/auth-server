@@ -101,6 +101,12 @@ export class SubscriptionAndApps1744497534374 implements MigrationInterface {
                         default: 'CURRENT_TIMESTAMP',
                     },
                 ],
+                uniques: [
+                    {
+                        columnNames: ['subscriber_tenant_id', 'app_id'],
+                        name: 'UQ_subscription_tenant_app'
+                    }
+                ]
             }),
             true,
         );

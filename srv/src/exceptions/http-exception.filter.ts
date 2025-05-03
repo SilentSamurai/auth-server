@@ -7,8 +7,8 @@ import {ForbiddenException} from "./forbidden.exception";
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
-    private static readonly LOGGER = new Logger(HttpExceptionFilter.name);
     static exceptionResolver: Map<Type, Function> = new Map<Type, Function>();
+    private static readonly LOGGER = new Logger(HttpExceptionFilter.name);
 
     static {
     }

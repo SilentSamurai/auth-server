@@ -6,9 +6,10 @@ import {App} from './app.entity';
  * Enum representing possible status values for Subscription.
  */
 export enum SubscriptionStatus {
-  SUCCESS = 'success',
-  PENDING = 'pending',
-  CANCELED = 'canceled',
+    SUCCESS = 'success',
+    PENDING = 'pending',
+    CANCELED = 'canceled',
+    FAILED = 'failed'
 }
 
 @Entity({name: 'subscriptions'})
@@ -36,6 +37,6 @@ export class Subscription {
     /**
      * New field to store any error or status messages encountered during subscription calls.
      */
-    @Column({ type: 'text', nullable: true })
+    @Column({type: 'text', nullable: true})
     message?: string;
 }
