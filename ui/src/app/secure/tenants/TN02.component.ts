@@ -21,7 +21,7 @@ import {SubscriptionService} from "../../_services/subscription.service";
     selector: 'view-tenant',
     template: `
         <nav-bar></nav-bar>
-        <app-object-page>
+        <app-object-page [loading]="loading">
             <app-op-title>
                 {{ tenant.name }}
             </app-op-title>
@@ -359,6 +359,8 @@ import {SubscriptionService} from "../../_services/subscription.service";
     styles: [''],
 })
 export class TN02Component implements OnInit {
+    loading: boolean = false;
+
     tenant_id: string = '';
     tenant: any = {};
     credentials: any = {
@@ -394,27 +396,32 @@ export class TN02Component implements OnInit {
     }
 
     async ngOnInit() {
-        this.tenant_id = this.actRoute.snapshot.params['tenantId'];
-        if (this.tokenStorageService.isTenantAdmin()) {
-            this.isTenantAdmin = true;
-            this.credentials = await this.tenantService.getTenantCredentials(
-                this.tenant_id,
-            );
+        this.loading = true;
+        try {
+            this.tenant_id = this.actRoute.snapshot.params['tenantId'];
+            if (this.tokenStorageService.isTenantAdmin()) {
+                this.isTenantAdmin = true;
+                this.credentials = await this.tenantService.getTenantCredentials(
+                    this.tenant_id,
+                );
+            }
+            console.log(this.tenant_id);
+            this.tenant = await this.tenantService.getTenantDetails(this.tenant_id);
+            this.members = await this.tenantService.getMembers(this.tenant_id);
+            this.roles = await this.tenantService.getTenantRoles(this.tenant_id);
+
+            const createdApps = await this.appService.getAppCreatedByTenantId(this.tenant_id);
+            const subscribedApps = await this.subscriptionService.getTenantSubscription(this.tenant_id);
+
+            this.memberDataModel.setData(Array.isArray(this.members) ? this.members : []);
+            this.rolesDataModel.setData(Array.isArray(this.roles) ? this.roles : []);
+            this.createdAppsDataModel.setData(Array.isArray(createdApps) ? createdApps : []);
+            this.subscribedAppsDataModel.setData(Array.isArray(subscribedApps) ? subscribedApps : []);
+
+            this.authDefaultService.setTitle('TN02: ' + this.tenant.name);
+        } finally {
+            this.loading = false;
         }
-        console.log(this.tenant_id);
-        this.tenant = await this.tenantService.getTenantDetails(this.tenant_id);
-        this.members = await this.tenantService.getMembers(this.tenant_id);
-        this.roles = await this.tenantService.getTenantRoles(this.tenant_id);
-
-        const createdApps = await this.appService.getAppCreatedByTenantId(this.tenant_id);
-        const subscribedApps = await this.subscriptionService.getTenantSubscription(this.tenant_id);
-
-        this.memberDataModel.setData(Array.isArray(this.members) ? this.members : []);
-        this.rolesDataModel.setData(Array.isArray(this.roles) ? this.roles : []);
-        this.createdAppsDataModel.setData(Array.isArray(createdApps) ? createdApps : []);
-        this.subscribedAppsDataModel.setData(Array.isArray(subscribedApps) ? subscribedApps : []);
-
-        this.authDefaultService.setTitle('TN02: ' + this.tenant.name);
     }
 
     async onUpdateTenant() {

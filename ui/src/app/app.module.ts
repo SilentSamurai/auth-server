@@ -16,7 +16,7 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {ToastModule} from 'primeng/toast';
 import {ConfirmationService, MessageService} from 'primeng/api';
 import {RouterModule} from '@angular/router';
-import {SessionConfirmationComponent} from './session/session-confirmation.component';
+import {SessionConfirmationComponent} from './open-pages/session/session-confirmation.component';
 import {SecureModule} from './secure/secure.module';
 import {CardModule} from 'primeng/card';
 import {ComponentModule} from './component/component.module';
@@ -24,6 +24,7 @@ import {ConfirmDialogModule} from 'primeng/confirmdialog';
 import {HttpErrorComponent} from './error-pages/HttpError.component';
 import {AbilityModule} from '@casl/angular';
 import {Ability, createMongoAbility, PureAbility,} from '@casl/ability';
+import {AuthorizeLoginComponent} from "./open-pages/authorize/authorize-login.component";
 
 @NgModule({
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -34,6 +35,7 @@ import {Ability, createMongoAbility, PureAbility,} from '@casl/ability';
         ProfileComponent,
         SessionConfirmationComponent,
         HttpErrorComponent,
+        AuthorizeLoginComponent
     ],
     imports: [
         BrowserModule,

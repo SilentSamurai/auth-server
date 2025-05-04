@@ -1,11 +1,16 @@
-import {HTTP_INTERCEPTORS, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest,} from '@angular/common/http';
+import {
+    HTTP_INTERCEPTORS,
+    HttpErrorResponse,
+    HttpEvent,
+    HttpHandler,
+    HttpInterceptor,
+    HttpRequest
+} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-
+import {catchError, Observable, throwError} from 'rxjs';
 import {SessionService} from '../_services/session.service';
-import {Observable} from 'rxjs';
 import {AuthDefaultService} from '../_services/auth.default.service';
 
-// const TOKEN_HEADER_KEY = 'Authorization';       // for Spring Boot back-end
 const TOKEN_HEADER_KEY = 'Authorization'; // for Node.js Express back-end
 
 @Injectable()
@@ -16,24 +21,35 @@ export class AuthInterceptor implements HttpInterceptor {
     ) {
     }
 
-    intercept(
-        req: HttpRequest<any>,
-        next: HttpHandler,
-    ): Observable<HttpEvent<any>> {
+    intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
         let authReq = req;
 
-        if (this.tokenService.isTokenExpired()) {
-            console.log('signing out as token is null');
+        // 1. Check if token is expired before sending the request
+        if (this.tokenService.getToken() != null && this.tokenService.isTokenExpired()) {
+            console.warn('Signing out: Token is expired.');
             this.authDefaultService.signOut('/home');
+            // We still return the request so the app doesn't freeze
+            return throwError(() => new Error('Token expired'));
         }
+
+        // 2. Add Authorization header if token is present
         const token = this.tokenService.getToken();
-        if (token != null) {
+        if (token) {
             authReq = req.clone({
                 headers: req.headers.set(TOKEN_HEADER_KEY, 'Bearer ' + token),
             });
         }
 
-        return next.handle(authReq);
+        // 3. Handle 403 response errors
+        return next.handle(authReq).pipe(
+            catchError((error: HttpErrorResponse) => {
+                if (error.status === 403) {
+                    console.warn('Signing out: Received 403 Forbidden.');
+                    this.authDefaultService.signOut('/home');
+                }
+                return throwError(() => error);
+            })
+        );
     }
 }
 

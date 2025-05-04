@@ -68,7 +68,7 @@
         const code_challenge = code_verifier
         const domain = "dummy.com";
         const code_challenge_method = "plain";
-        window.location.href = `http://localhost:9001/login?redirect_uri=${redirect_uri}&code_challenge=${code_challenge}&client_id=${domain}&code_challenge_method=${code_challenge_method}`;
+        window.location.href = `http://localhost:4200/authorize?redirect_uri=${redirect_uri}&code_challenge=${code_challenge}&client_id=${domain}&code_challenge_method=${code_challenge_method}`;
     }
 
     async function getAuthToken(code) {

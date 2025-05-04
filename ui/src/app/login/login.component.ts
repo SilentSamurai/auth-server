@@ -16,9 +16,6 @@ export class LoginComponent implements OnInit {
     isLoggedIn = false;
     isLoginFailed = false;
     errorMessage = '';
-    freezeClientId = false;
-    redirectUri = '';
-    code_challenge = '';
     isPasswordVisible = false;
     code_challenge_method: string = 'plain';
 
@@ -32,56 +29,18 @@ export class LoginComponent implements OnInit {
         this.loginForm = this.fb.group({
             username: ['', Validators.required],
             password: ['', Validators.required],
-            client_id: ['', Validators.required],
         });
     }
 
     async ngOnInit(): Promise<void> {
-        let params = this.route.snapshot.queryParamMap;
 
-        // code_challenge_method
-        if (!params.has('code_challenge')) {
-            alert('Invalid challenge || challenge not found!');
-            return;
-        }
-        this.code_challenge = params.get('code_challenge')!;
-
-        if (!params.has('redirect_uri')) {
-            alert('Invalid redirect_uri || redirect_uri not found');
-            return;
-        }
-        this.redirectUri = params.get('redirect_uri')!;
-
-        if (params.has('client_id')) {
-            const cid = params.get('client_id');
-            this.loginForm.patchValue({client_id: cid});
-            if (cid && cid.length > 0) {
-                this.freezeClientId = true;
-            }
-        }
-
-        if (params.has('code_challenge_method')) {
-            this.code_challenge_method = params.get('code_challenge_method')!;
-        }
+        const code_challenge = await this.tokenStorage.getCodeChallenge(this.code_challenge_method);
 
         // if auth code is present, then redirect
         // verify auth-code
         const authCode = this.tokenStorage.getAuthCode();
         if (authCode) {
-            try {
-                const data = await this.authService.validateAuthCode(authCode);
-                if (data.status) {
-                    await this.router.navigate(['session-confirm'], {
-                        queryParams: {
-                            redirect_uri: this.redirectUri,
-                            client_id: this.loginForm.get('client_id'),
-                            code_challenge: this.code_challenge,
-                        },
-                    });
-                }
-            } catch (e: any) {
-                console.error(e);
-            }
+            await this.redirect(authCode);
         }
         // else if (this.tokenStorage.isLoggedIn() && !externalLogin) {
         //     await this.router.navigateByUrl("/home");
@@ -89,21 +48,18 @@ export class LoginComponent implements OnInit {
         this.loading = false;
     }
 
-    onContinue() {
-        // this.loginForm.get('client_id')?.disable();
-        this.freezeClientId = true;
-    }
-
     // redirection to home page might not work sometime,
     // check if internally anything is nav-ing to login page again
     async onSubmit(): Promise<void> {
-        const {username, password, client_id} = this.loginForm.value;
+        this.loading = true;
+        const {username, password} = this.loginForm.value;
+        const code_challenge = await this.tokenStorage.getCodeChallenge(this.code_challenge_method);
         try {
             const data = await this.authService.login(
                 username,
                 password,
-                client_id,
-                this.code_challenge,
+                'auth.server.com',
+                code_challenge,
                 this.code_challenge_method,
             );
             let authenticationCode = data.authentication_code;
@@ -115,39 +71,22 @@ export class LoginComponent implements OnInit {
             console.error(err);
             this.errorMessage = err.error.message;
             this.isLoginFailed = true;
+        } finally {
+            this.loading = false;
         }
     }
 
     async redirect(code: string) {
-        if (this.redirectUri.length <= 0) {
-            return;
-        }
-
-        if (this.isAbsoluteUrl(this.redirectUri)) {
-            // redirecting else where
-            window.location.href = `${this.redirectUri}?code=${code}`;
-        } else {
-            // redirecting internally
-            await this.setAccessToken(code);
-            await this.router.navigateByUrl(this.redirectUri);
-        }
+        await this.setAccessToken(code);
+        await this.router.navigateByUrl("/home");
     }
 
     async onSigUpClick() {
         await this.router.navigate(['/register'], {
             queryParams: {
-                client_id: this.loginForm.get('client_id')?.value!,
+                client_id: 'auth.server.com',
             },
         });
-    }
-
-    protected isAbsoluteUrl(url: string): boolean {
-        try {
-            new URL(url);
-            return true;
-        } catch (error) {
-            return false;
-        }
     }
 
     private async setAccessToken(code: string) {

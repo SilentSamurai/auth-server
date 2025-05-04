@@ -6,7 +6,7 @@ import {LoginComponent} from './login/login.component';
 import {UR01Component} from './secure/users/UR01.component';
 import {TN01Component} from './secure/tenants/TN01.component';
 import {UR02Component} from './secure/users/UR02.component';
-import {SessionConfirmationComponent} from './session/session-confirmation.component';
+import {SessionConfirmationComponent} from './open-pages/session/session-confirmation.component';
 import {TN02Component} from './secure/tenants/TN02.component';
 import {HomeComponent} from './secure/home.component';
 import {SuperAdminAuthGuard} from './shared/super-admin-auth-guard.service';
@@ -24,9 +24,11 @@ import {UserAuthGuard} from './shared/user-auth-guard.service';
 import {HttpErrorComponent} from './error-pages/HttpError.component';
 import {TenantAccessAuthGuard} from './shared/tenant-auth-guard.service';
 import {AP01Component} from './secure/apps/AP01.component';
+import {AuthorizeLoginComponent} from "./open-pages/authorize/authorize-login.component";
 
 const routes: Routes = [
     {path: 'session-confirm', component: SessionConfirmationComponent},
+    {path: 'authorize', component: AuthorizeLoginComponent},
     {path: 'login', component: LoginComponent},
     {path: 'register', component: RegisterComponent},
     {path: 'error/:msg', component: HttpErrorComponent},

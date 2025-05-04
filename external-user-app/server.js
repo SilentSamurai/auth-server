@@ -201,7 +201,7 @@ const PORT = process.env.PORT || 3000;
 
 server.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
-    console.log(`Onboard request history available at http://localhost:${PORT}/onboard/history`);
-    console.log(`Offboard request history available at http://localhost:${PORT}/offboard/history`);
+    console.log(`Onboard request history available at http://localhost:${PORT}/onboard/tenant`);
+    console.log(`Offboard request history available at http://localhost:${PORT}/offboard/tenant`);
     console.log(`Check tenant lifecycle at http://localhost:${PORT}/tenant/lifecycle/{tenantId}`);
 });

@@ -7,91 +7,87 @@ import {ObjectPageTabComponent} from './object-page-tab.component';
 @Component({
     selector: 'app-object-page',
     template: `
-        <div class="container-fluid mb-5 px-0 main-container" *ngIf="!loading">
-            <div class="card shadow-sm" style="border-radius: 0">
-                <div class="container mt-4">
-                    <div class="row">
-                        <div class="col mb-4">
-                            <div
-                                class="d-flex align-items-center justify-content-between"
-                            >
-                                <div>
-                                    <div class="h3 text-primary">
-                                        <ng-content
-                                            select="app-op-title"
-                                        ></ng-content>
+        <app-loader [loading]="loading">
+            <div class="container-fluid mb-5 px-0 main-container">
+                <div class="card shadow-sm" style="border-radius: 0">
+                    <div class="container mt-4">
+                        <div class="row">
+                            <div class="col mb-4">
+                                <div
+                                    class="d-flex align-items-center justify-content-between"
+                                >
+                                    <div>
+                                        <div class="h3 text-primary">
+                                            <ng-content
+                                                select="app-op-title"
+                                            ></ng-content>
+                                        </div>
+                                        <div class="h6 text-secondary">
+                                            <ng-content
+                                                select="app-op-subtitle"
+                                            ></ng-content>
+                                        </div>
                                     </div>
-                                    <div class="h6 text-secondary">
-                                        <ng-content
-                                            select="app-op-subtitle"
-                                        ></ng-content>
-                                    </div>
-                                </div>
 
-                                <div class="d-flex justify-content-end">
-                                    <ng-content
-                                        select="app-op-actions"
-                                    ></ng-content>
+                                    <div class="d-flex justify-content-end">
+                                        <ng-content
+                                            select="app-op-actions"
+                                        ></ng-content>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col">
-                            <ng-content select="app-op-header"></ng-content>
+                        <div class="row">
+                            <div class="col">
+                                <ng-content select="app-op-header"></ng-content>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="row">
-                        <div class="col">
-                            <ul
-                                class="nav flex-nowrap overflow-x-auto overflow-y-hidden"
-                            >
-                                <li class="nav-item" *ngFor="let tab of tabs">
-                                    <button
-                                        class="nav-link text-uppercase"
-                                        [class.nav-tab-btn]="currentTab === tab"
-                                        [attr.aria-current]="
+                        <div class="row">
+                            <div class="col">
+                                <ul
+                                    class="nav flex-nowrap overflow-x-auto overflow-y-hidden"
+                                >
+                                    <li class="nav-item" *ngFor="let tab of tabs">
+                                        <button
+                                            class="nav-link text-uppercase"
+                                            [class.nav-tab-btn]="currentTab === tab"
+                                            [attr.aria-current]="
                                             currentTab === tab ? 'page' : null
                                         "
-                                        id="{{
+                                            id="{{
                                             tab.name.toUpperCase()
                                         }}_SECTION_NAV"
-                                        (click)="onNavButtonClick(tab)"
-                                    >
-                                        <strong>{{ tab.name }}</strong>
-                                    </button>
-                                </li>
-                            </ul>
+                                            (click)="onNavButtonClick(tab)"
+                                        >
+                                            <strong>{{ tab.name }}</strong>
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="container flex-fill content-area">
-                <ng-container *ngIf="singlePage">
-                    <div
-                        *ngFor="let tab of tabs"
-                        id="{{ tab.name.toUpperCase() }}"
-                    >
+                <div class="container flex-fill content-area">
+                    <ng-container *ngIf="singlePage">
+                        <div
+                            *ngFor="let tab of tabs"
+                            id="{{ tab.name.toUpperCase() }}"
+                        >
+                            <ng-container
+                                [ngTemplateOutlet]="tab.template"
+                            ></ng-container>
+                        </div>
+                    </ng-container>
+                    <ng-container *ngIf="!singlePage && currentTab">
                         <ng-container
-                            [ngTemplateOutlet]="tab.template"
+                            [ngTemplateOutlet]="currentTab.template"
                         ></ng-container>
-                    </div>
-                </ng-container>
-                <ng-container *ngIf="!singlePage && currentTab">
-                    <ng-container
-                        [ngTemplateOutlet]="currentTab.template"
-                    ></ng-container>
-                </ng-container>
+                    </ng-container>
+                </div>
             </div>
-        </div>
-
-        <div class="text-center" *ngIf="loading">
-            <div class="spinner-border" role="status">
-                <span class="sr-only">Loading...</span>
-            </div>
-        </div>
+        </app-loader>
     `,
     styles: [
         `
@@ -160,7 +156,8 @@ import {ObjectPageTabComponent} from './object-page-tab.component';
     providers: [],
 })
 export class ObjectPageComponent implements OnInit, AfterViewInit {
-    loading = true;
+
+    @Input({transform: booleanAttribute}) loading = true;
     @Input({transform: booleanAttribute}) singlePage = false;
 
     @ContentChildren(ObjectPageTabComponent, {descendants: true})
@@ -177,8 +174,6 @@ export class ObjectPageComponent implements OnInit, AfterViewInit {
     }
 
     async ngOnInit() {
-        this.loading = true;
-        this.loading = false;
     }
 
     async ngAfterViewInit(): Promise<void> {
