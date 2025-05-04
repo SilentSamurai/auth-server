@@ -1,7 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {lastValueFrom} from 'rxjs';
-import {SessionService} from './session.service';
 
 const API_URL = '/api';
 
@@ -25,8 +24,8 @@ export class SubscriptionService {
     async subscribeToApp(appId: string, tenantId: string) {
         return lastValueFrom(
             this.http.post(
-                `${API_URL}/apps/${appId}/subscribe`,
-                {tenantId},
+                `${API_URL}/apps/${appId}/subscribe/${tenantId}`,
+                {},
                 this.getHttpOptions(),
             ),
         );
@@ -53,7 +52,7 @@ export class SubscriptionService {
 
     async getTenantSubscription(tenantId: string) {
         return lastValueFrom(
-            this.http.get(`${API_URL}/apps/${tenantId}/subscriptions`)
+            this.http.get(`${API_URL}/apps/subscribed-by/${tenantId}/`)
         );
     }
 

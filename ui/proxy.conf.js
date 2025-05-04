@@ -12,9 +12,9 @@ const PROXY_CONFIG = [
         secure: false,
         changeOrigin: true,
         logLevel: "debug",
-        bypass: function(req, res, proxyOptions) {
+        bypass: function (req, res, proxyOptions) {
             if (req.method === 'POST') {
-                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.writeHead(200, {'Content-Type': 'application/json'});
                 res.end(JSON.stringify({
                     appNames: []
                 }));
@@ -28,9 +28,9 @@ const PROXY_CONFIG = [
         secure: false,
         changeOrigin: true,
         logLevel: "debug",
-        bypass: function(req, res, proxyOptions) {
+        bypass: function (req, res, proxyOptions) {
             if (req.method === 'POST') {
-                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.writeHead(200, {'Content-Type': 'application/json'});
                 res.end(JSON.stringify({
                     appNames: []
                 }));

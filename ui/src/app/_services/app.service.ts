@@ -60,7 +60,7 @@ export class AppService {
     async getAvailableApps(tenantId: string): Promise<any[]> {
         return lastValueFrom(
             this.http.get(
-                `${API_URL}/apps/available/${tenantId}`,
+                `${API_URL}/apps/available-for/${tenantId}`,
                 this.getHttpOptions()
             )
         ) as Promise<any[]>;

@@ -17,6 +17,11 @@ set windows-shell := ["powershell.exe", "-c"]
 # Show help by default
 default: help
 
+test:
+    just test-srv
+    just test-ui
+
+
 # Build both UI and server components
 build:
     just build-ui

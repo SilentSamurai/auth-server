@@ -197,6 +197,8 @@ describe('StaticModel + DataModelImpl (in-memory data source)', () => {
             keyFields: () => ['id'],
             updates: () => new Subject<DataSourceEvents>(),
             filter: () => {
+            },
+            refresh: () => {
             }
         };
 
