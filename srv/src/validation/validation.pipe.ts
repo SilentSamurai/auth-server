@@ -1,9 +1,4 @@
-import {
-    ArgumentMetadata,
-    Injectable,
-    Logger,
-    PipeTransform,
-} from "@nestjs/common";
+import {ArgumentMetadata, Injectable, Logger, PipeTransform,} from "@nestjs/common";
 import {ValidationErrorException} from "../exceptions/validation-error.exception";
 
 @Injectable()
@@ -27,3 +22,9 @@ export class ValidationPipe implements PipeTransform {
         }
     }
 }
+
+
+export function schemaPipe(schema: any) {
+    return new ValidationPipe(schema);
+}
+

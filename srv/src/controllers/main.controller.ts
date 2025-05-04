@@ -1,13 +1,5 @@
-import {
-    ClassSerializerInterceptor,
-    Controller,
-    Get,
-    Request,
-    UseGuards,
-    UseInterceptors,
-} from "@nestjs/common";
+import {ClassSerializerInterceptor, Controller, Get, Request, UseInterceptors,} from "@nestjs/common";
 import {Environment} from "../config/environment.service";
-import {JwtAuthGuard} from "../auth/jwt-auth.guard";
 
 @Controller("api/v1")
 @UseInterceptors(ClassSerializerInterceptor)

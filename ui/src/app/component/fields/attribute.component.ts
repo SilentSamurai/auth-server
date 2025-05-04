@@ -5,7 +5,7 @@ import {Component, Input, OnInit} from '@angular/core';
     template: `
         <div class="row mb-2">
             <span class="col-md-auto p-disabled pe-0 fw-semibold"
-                >{{ label }}:</span
+            >{{ label }}:</span
             >
             <span class=" col-md-auto fw-semibold {{ valueClass }}">
                 <ng-content></ng-content>

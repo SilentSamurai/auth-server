@@ -1,9 +1,4 @@
-import {
-    CanActivate,
-    ExecutionContext,
-    Injectable,
-    Logger,
-} from "@nestjs/common";
+import {CanActivate, ExecutionContext, Injectable, Logger,} from "@nestjs/common";
 import {UnauthorizedException} from "../exceptions/unauthorized.exception";
 import {ExtractJwt} from "passport-jwt";
 import {AuthService} from "./auth.service";

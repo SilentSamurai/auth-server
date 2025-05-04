@@ -22,32 +22,37 @@ import {PolicyController} from "./policy.controller";
 import {GroupController} from "./group.controller";
 import {RoleControllerV2} from "./roleV2.controller";
 import {RegisterController} from "./registration.controller";
+import {AppController} from "./app.controller";
+import {App} from "../entity/app.entity";
 
-@Module({
-    imports: [
-        ConfigModule,
-        AuthModule,
-        MailModule,
-        CaslModule,
-        ServiceModule,
-        TypeOrmModule.forFeature([User, Tenant, Role, TenantMember, Group]),
-    ],
-    controllers: [
-        UsersController,
-        UsersAdminController,
-        TenantController,
-        MemberController,
-        RoleController,
-        MainController,
-        GenericSearchController,
-        AuthController,
-        PolicyController,
-        GroupController,
-        RoleControllerV2,
-        RegisterController,
-    ],
-    providers: [],
-    exports: [],
-})
+@Module(
+    {
+        imports:
+            [
+                ConfigModule,
+                AuthModule,
+                MailModule,
+                CaslModule,
+                ServiceModule,
+                TypeOrmModule.forFeature([User, Tenant, Role, TenantMember, Group, App])
+            ],
+        controllers: [
+            UsersController,
+            UsersAdminController,
+            TenantController,
+            MemberController,
+            RoleController,
+            MainController,
+            GenericSearchController,
+            AuthController,
+            PolicyController,
+            GroupController,
+            RoleControllerV2,
+            RegisterController,
+            AppController
+        ],
+        providers: [],
+        exports: []
+    })
 export class ControllersModule {
 }

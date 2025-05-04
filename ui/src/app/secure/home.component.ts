@@ -55,6 +55,28 @@ export class HomeComponent implements OnInit {
                         });
                     },
                 },
+                {
+                    title: 'Apps',
+                    subtitle: 'Manage Apps',
+                    icon: 'fa-app',
+                    command: async () => {
+                        const tenant_id = this.user.tenant.id;
+                        await this.router.navigate(['/TN02', tenant_id], {
+                            fragment: 'APPS',
+                        });
+                    },
+                },
+                {
+                    title: 'Subscriptions',
+                    subtitle: 'Manage Subscriptions',
+                    icon: 'fa-credit-card',
+                    command: async () => {
+                        const tenant_id = this.user.tenant.id;
+                        await this.router.navigate(['/TN02', tenant_id], {
+                            fragment: 'SUBSCRIPTIONS',
+                        });
+                    },
+                },
             ],
         },
         {
@@ -113,29 +135,6 @@ export class HomeComponent implements OnInit {
             ],
         },
         {
-            name: 'Groups',
-            tiles: [
-                {
-                    title: 'GP01',
-                    subtitle: 'Manage Groups',
-                    icon: 'fa-group',
-                    link: ['/GP01'],
-                    canActivate: (ps: PermissionService) => {
-                        return ps.isAuthorized(Actions.Manage, Subjects.GROUP);
-                    },
-                },
-                {
-                    title: 'GP02',
-                    subtitle: 'Display Group',
-                    icon: 'fa-group',
-                    link: ['/GP02'],
-                    canActivate: (ps: PermissionService) => {
-                        return ps.isAuthorized(Actions.Read, Subjects.GROUP);
-                    },
-                },
-            ],
-        },
-        {
             name: 'Roles',
             tiles: [
                 {
@@ -158,6 +157,44 @@ export class HomeComponent implements OnInit {
                 },
             ],
         },
+        {
+            name: 'Apps',
+            tiles: [
+                {
+                    title: 'AP01',
+                    subtitle: 'Manage Apps',
+                    icon: 'fa-app',
+                    link: ['/AP01'],
+                    canActivate: (ps: PermissionService) => {
+                        return ps.isAuthorized(Actions.Manage, Subjects.APPS);
+                    },
+                },
+            ],
+        },
+        {
+            name: 'Groups',
+            tiles: [
+                {
+                    title: 'GP01',
+                    subtitle: 'Manage Groups',
+                    icon: 'fa-group',
+                    link: ['/GP01'],
+                    canActivate: (ps: PermissionService) => {
+                        return ps.isAuthorized(Actions.Manage, Subjects.GROUP);
+                    },
+                },
+                {
+                    title: 'GP02',
+                    subtitle: 'Display Group',
+                    icon: 'fa-group',
+                    link: ['/GP02'],
+                    canActivate: (ps: PermissionService) => {
+                        return ps.isAuthorized(Actions.Read, Subjects.GROUP);
+                    },
+                },
+            ],
+        },
+
     ];
 
     constructor(

@@ -27,6 +27,11 @@ import * as yup from "yup";
 @Controller("api/tenant")
 @UseInterceptors(ClassSerializerInterceptor)
 export class TenantController {
+    static UpdateTenantSchema = yup.object().shape({
+        name: yup.string().max(128),
+        allowSignUp: yup.boolean(),
+    });
+
     constructor(
         private readonly configService: Environment,
         private readonly tenantService: TenantService,
@@ -54,11 +59,6 @@ export class TenantController {
         );
         return tenant;
     }
-
-    static UpdateTenantSchema = yup.object().shape({
-        name: yup.string().max(128),
-        allowSignUp: yup.boolean(),
-    });
 
     @Patch("/:tenantId")
     @UseGuards(JwtAuthGuard)

@@ -35,16 +35,6 @@ import * as yup from "yup";
 @Controller("api")
 @UseInterceptors(ClassSerializerInterceptor)
 export class RegisterController {
-    constructor(
-        private readonly usersService: UsersService,
-        private readonly authService: AuthService,
-        private readonly tenantService: TenantService,
-        private readonly mailService: MailService,
-        private readonly securityService: SecurityService,
-        @InjectRepository(User) private usersRepository: Repository<User>,
-    ) {
-    }
-
     static RegisterDomainSchema = yup.object().shape({
         name: yup
             .string()
@@ -60,6 +50,30 @@ export class RegisterController {
         orgName: yup.string().required("Org name is required").max(128),
         domain: yup.string().required("Domain is required").max(128),
     });
+    static SignUpSchema = yup.object().shape({
+        name: yup
+            .string()
+            .required("name is required")
+            .max(128)
+            .matches(USERNAME_REGEXP, USERNAME_MESSAGE),
+        password: yup
+            .string()
+            .required("Password is required")
+            .max(128)
+            .matches(PASSWORD_REGEXP, PASSWORD_MESSAGE),
+        email: yup.string().email().required("Email is required").max(128),
+        client_id: yup.string().required("Client Id is required").max(128),
+    });
+
+    constructor(
+        private readonly usersService: UsersService,
+        private readonly authService: AuthService,
+        private readonly tenantService: TenantService,
+        private readonly mailService: MailService,
+        private readonly securityService: SecurityService,
+        @InjectRepository(User) private usersRepository: Repository<User>,
+    ) {
+    }
 
     @Post("/register-domain")
     async registerDomain(
@@ -117,21 +131,6 @@ export class RegisterController {
 
         return {success: true};
     }
-
-    static SignUpSchema = yup.object().shape({
-        name: yup
-            .string()
-            .required("name is required")
-            .max(128)
-            .matches(USERNAME_REGEXP, USERNAME_MESSAGE),
-        password: yup
-            .string()
-            .required("Password is required")
-            .max(128)
-            .matches(PASSWORD_REGEXP, PASSWORD_MESSAGE),
-        email: yup.string().email().required("Email is required").max(128),
-        client_id: yup.string().required("Client Id is required").max(128),
-    });
 
     @Post("/signup")
     async signup(

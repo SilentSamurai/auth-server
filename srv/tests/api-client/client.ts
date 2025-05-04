@@ -1,6 +1,4 @@
 import {TestAppFixture} from "../test-app.fixture";
-import TestAgent from "supertest/lib/agent";
-import * as superTest from "supertest";
 import supertest from "supertest";
 
 export function is2xx(response: { status: number }) {

@@ -1,12 +1,4 @@
-import {
-    ArgumentsHost,
-    Catch,
-    ExceptionFilter,
-    HttpException,
-    HttpStatus,
-    Logger,
-    Type,
-} from "@nestjs/common";
+import {ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, Logger, Type,} from "@nestjs/common";
 import {Request, Response} from "express";
 import {BackendError} from "./backend-error.class";
 import {UnknownErrorException} from "./unknown-error.exception";
@@ -15,8 +7,8 @@ import {ForbiddenException} from "./forbidden.exception";
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
-    private static readonly LOGGER = new Logger(HttpExceptionFilter.name);
     static exceptionResolver: Map<Type, Function> = new Map<Type, Function>();
+    private static readonly LOGGER = new Logger(HttpExceptionFilter.name);
 
     static {
     }
