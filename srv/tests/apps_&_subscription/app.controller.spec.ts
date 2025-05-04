@@ -12,8 +12,10 @@ describe('AppController', () => {
     let appClient: AppClient;
     let searchClient: SearchClient;
     let tokenFixture: TokenFixture;
-    let accessToken: string;
-    let tenantId: string;
+    let creatorAccessToken: string;
+    let subscriberAccessToken: string;
+    let creatorTenantId: string;
+    let subscriberTenantId: string;
     let mockServer: TenantAppServer;
     const MOCK_SERVER_PORT = 3000;
 
@@ -30,23 +32,41 @@ describe('AppController', () => {
         // Initialize token fixture
         tokenFixture = new TokenFixture(fixture);
 
-        // Get access token for the tenant using TokenFixture
-        const tokenResponse = await tokenFixture.fetchAccessToken(
+        // Get super admin access token
+        const superAdminTokenResponse = await tokenFixture.fetchAccessToken(
             'admin@auth.server.com',
             'admin9000',
             'auth.server.com'
         );
-        accessToken = tokenResponse.accessToken;
+        const superAdminToken = superAdminTokenResponse.accessToken;
 
-        // Initialize search client with the access token
-        searchClient = new SearchClient(fixture, accessToken);
+        // Initialize search client with super admin token
+        searchClient = new SearchClient(fixture, superAdminToken);
 
-        // Find the shire.local tenant
+        // Find the existing test tenants
         const shireTenant = await searchClient.findTenantBy({domain: 'shire.local'});
-        tenantId = shireTenant.id;
+        const breeTenant = await searchClient.findTenantBy({domain: 'bree.local'});
+        
+        creatorTenantId = shireTenant.id;
+        subscriberTenantId = breeTenant.id;
 
-        // Initialize app client with the access token
-        appClient = new AppClient(fixture, accessToken);
+        // Get access tokens for both tenants
+        const creatorTokenResponse = await tokenFixture.fetchAccessToken(
+            'admin@shire.local',
+            'admin9000',
+            'shire.local'
+        );
+        creatorAccessToken = creatorTokenResponse.accessToken;
+
+        const subscriberTokenResponse = await tokenFixture.fetchAccessToken(
+            'admin@bree.local',
+            'admin9000',
+            'bree.local'
+        );
+        subscriberAccessToken = subscriberTokenResponse.accessToken;
+
+        // Initialize app client with creator's access token
+        appClient = new AppClient(fixture, creatorAccessToken);
     });
 
     afterAll(async () => {
@@ -64,7 +84,7 @@ describe('AppController', () => {
             };
 
             const createAppResponse = await appClient.createApp(
-                tenantId,
+                creatorTenantId,
                 appData.name,
                 appData.appUrl,
                 appData.description
@@ -87,7 +107,7 @@ describe('AppController', () => {
             const response = await fixture.getHttpServer()
                 .post('/api/apps/create')
                 .send(invalidData)
-                .set('Authorization', `Bearer ${accessToken}`)
+                .set('Authorization', `Bearer ${creatorAccessToken}`)
                 .set('Accept', 'application/json');
 
             expect(response.status).toBe(400);
@@ -100,7 +120,7 @@ describe('AppController', () => {
         beforeEach(async () => {
             // Create a test app to subscribe to with the mock server URL
             const app = await appClient.createApp(
-                tenantId,
+                creatorTenantId,
                 `test-app-${uuid()}`,
                 `http://localhost:${MOCK_SERVER_PORT}`, // Use the mock server URL
                 'Test app for subscription'
@@ -109,7 +129,10 @@ describe('AppController', () => {
         });
 
         it('should successfully subscribe to an app', async () => {
-            const subscription = await appClient.subscribeToApp(testAppId, tenantId);
+            // Create a new app client with subscriber's access token
+            const subscriberAppClient = new AppClient(fixture, subscriberAccessToken);
+            
+            const subscription = await subscriberAppClient.subscribeApp(testAppId, subscriberTenantId);
 
             expect(subscription).toBeDefined();
             expect(subscription.id).toBeDefined();
@@ -119,14 +142,17 @@ describe('AppController', () => {
             // Verify that the onboard request was made
             const onboardRequests = mockServer.getOnboardRequests();
             expect(onboardRequests.length).toBeGreaterThan(0);
-            expect(onboardRequests[0].tenantId).toBe(tenantId);
+            expect(onboardRequests[0].tenantId).toBe(subscriberTenantId);
         });
 
         it('should successfully unsubscribe from an app', async () => {
-            const subscription = await appClient.subscribeToApp(testAppId, tenantId);
+            // Create a new app client with subscriber's access token
+            const subscriberAppClient = new AppClient(fixture, subscriberAccessToken);
+            
+            const subscription = await subscriberAppClient.subscribeApp(testAppId, subscriberTenantId);
 
             // Then unsubscribe using the AppClient
-            const unsubscribeResponse = await appClient.unsubscribeApp(testAppId, tenantId);
+            const unsubscribeResponse = await subscriberAppClient.unsubscribeApp(testAppId, subscriberTenantId);
             expect(unsubscribeResponse).toBeDefined();
             expect(unsubscribeResponse.status).toBeDefined();
             expect(unsubscribeResponse.status).toEqual(true);
@@ -134,10 +160,10 @@ describe('AppController', () => {
             // Verify that the offboard request was made
             const offboardRequests = mockServer.getOffboardRequests();
             expect(offboardRequests.length).toBeGreaterThan(0);
-            expect(offboardRequests[0].tenantId).toBe(tenantId);
+            expect(offboardRequests[0].tenantId).toBe(subscriberTenantId);
 
             // Verify the subscription is no longer active
-            const tenantSubscriptions = await appClient.getTenantSubscriptions(tenantId);
+            const tenantSubscriptions = await subscriberAppClient.getTenantSubscriptions(subscriberTenantId);
             const unsubscribedApp = tenantSubscriptions.find(sub => sub.appId === testAppId);
             expect(unsubscribedApp).toBeUndefined();
         });
@@ -147,10 +173,12 @@ describe('AppController', () => {
 
             // This test needs to be done with direct HTTP request since the client validates inputs
             const response = await fixture.getHttpServer()
-                .post(`/api/apps/${invalidAppId}/subscribe`)
-                .send({tenantId})
-                .set('Authorization', `Bearer ${accessToken}`)
+                .post(`/api/apps/${invalidAppId}/subscribe/${subscriberTenantId}`)
+                .send({})
+                .set('Authorization', `Bearer ${subscriberAccessToken}`)
                 .set('Accept', 'application/json');
+
+            console.log(response.body)
 
             expect(response.status).toBe(400);
         });
@@ -160,9 +188,9 @@ describe('AppController', () => {
 
             // This test needs to be done with direct HTTP request since the client validates inputs
             const response = await fixture.getHttpServer()
-                .post(`/api/apps/${testAppId}/subscribe`)
-                .send({tenantId: invalidTenantId})
-                .set('Authorization', `Bearer ${accessToken}`)
+                .post(`/api/apps/${testAppId}/subscribe/${invalidTenantId}`)
+                .send({})
+                .set('Authorization', `Bearer ${subscriberAccessToken}`)
                 .set('Accept', 'application/json');
 
             expect(response.status).toBe(400);

@@ -22,3 +22,8 @@ start-ui:
 build-ui:
     npm i
     npm run build
+
+[group('ui')]
+[working-directory('ui')]
+test-ui:
+    npm test

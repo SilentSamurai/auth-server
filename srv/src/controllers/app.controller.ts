@@ -6,11 +6,11 @@ import {
     Get,
     Param,
     ParseUUIDPipe,
+    Patch,
     Post,
     Request,
     UseGuards,
-    UseInterceptors,
-    Patch
+    UseInterceptors
 } from '@nestjs/common';
 
 import {SubscriptionService} from '../services/subscription.service';
@@ -48,6 +48,22 @@ export class AppController {
     }
 
     /**
+     * Update an app by its ID
+     */
+    @Patch('/:appId')
+    @UseGuards(JwtAuthGuard)
+    async updateApp(
+        @Request() request: AuthContext,
+        @Param('appId', ParseUUIDPipe) appId: string,
+        @Body('name', schemaPipe(yup.string().required('name is required').max(128))) name: string,
+        @Body('appUrl', schemaPipe(yup.string().required('app url is required').max(2048))) appUrl: string,
+        @Body('description', schemaPipe(yup.string().max(128))) description: string
+    ) {
+        const app = await this.appService.updateApp(request, appId, name, appUrl, description);
+        return app;
+    }
+
+    /**
      * Delete an app by its ID
      */
     @Delete('/:appId')
@@ -60,12 +76,12 @@ export class AppController {
         return {status: 'success'};
     }
 
-    @Post('/:appId/subscribe')
+    @Post('/:appId/subscribe/:tenantId')
     @UseGuards(JwtAuthGuard)
     async subscribeToApp(
         @Request() request: AuthContext,
         @Param('appId', ParseUUIDPipe) appId: string,
-        @Body('tenantId', ParseUUIDPipe) tenantId: string
+        @Param('tenantId', ParseUUIDPipe) tenantId: string
     ) {
         // Retrieve the subscriber tenant & the app, then subscribe
         return this.subscriptionService.subscribeApp(
@@ -97,9 +113,9 @@ export class AppController {
     }
 
     /**
-     * New endpoint to get all apps to which a single tenant is subscribed.
+     * get all app the tenant has subscription to
      */
-    @Get('/:tenantId/subscriptions')
+    @Get('/subscribed-by/:tenantId')
     @UseGuards(JwtAuthGuard)
     async getTenantSubscriptions(
         @Request() request: AuthContext,
@@ -123,7 +139,7 @@ export class AppController {
     /**
      * Get all apps available for subscription
      */
-    @Get('/available/:tenantId')
+    @Get('/available-for/:tenantId')
     @UseGuards(JwtAuthGuard)
     async getAllSubscribableApps(
         @Request() request: AuthContext,
@@ -133,20 +149,5 @@ export class AppController {
         return allApps;
     }
 
-    /**
-     * Update an app by its ID
-     */
-    @Patch('/:appId')
-    @UseGuards(JwtAuthGuard)
-    async updateApp(
-        @Request() request: AuthContext,
-        @Param('appId', ParseUUIDPipe) appId: string,
-        @Body('name', schemaPipe(yup.string().required('name is required').max(128))) name: string,
-        @Body('appUrl', schemaPipe(yup.string().required('app url is required').max(2048))) appUrl: string,
-        @Body('description', schemaPipe(yup.string().max(128))) description: string
-    ) {
-        const app = await this.appService.updateApp(request, appId, name, appUrl, description);
-        return app;
-    }
 
 }

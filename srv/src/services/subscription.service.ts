@@ -17,7 +17,7 @@ interface OnboardResponse {
 }
 
 /**
- * Interface for the response from app's offboard endpoint
+ * Interface for the response from app's off board endpoint
  */
 interface OffboardResponse {
     appNames?: string[];
