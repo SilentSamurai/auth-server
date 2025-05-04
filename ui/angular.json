@@ -1,7 +1,11 @@
 {
     "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
     "cli": {
-        "analytics": false
+        "analytics": false,
+        "schematicCollections": [
+            "@cypress/schematic",
+            "@schematics/angular"
+        ]
     },
     "version": 1,
     "newProjectRoot": "projects",
@@ -106,6 +110,37 @@
                         "scripts": [
                             "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
                         ]
+                    }
+                },
+                "cypress-run": {
+                    "builder": "@cypress/schematic:cypress",
+                    "options": {
+                        "devServerTarget": "AuthServerUI:serve"
+                    },
+                    "configurations": {
+                        "production": {
+                            "devServerTarget": "AuthServerUI:serve:production"
+                        }
+                    }
+                },
+                "cypress-open": {
+                    "builder": "@cypress/schematic:cypress",
+                    "options": {
+                        "watch": true,
+                        "headless": false
+                    }
+                },
+                "e2e": {
+                    "builder": "@cypress/schematic:cypress",
+                    "options": {
+                        "devServerTarget": "AuthServerUI:serve",
+                        "watch": true,
+                        "headless": false
+                    },
+                    "configurations": {
+                        "production": {
+                            "devServerTarget": "AuthServerUI:serve:production"
+                        }
                     }
                 }
             }

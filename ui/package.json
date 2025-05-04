@@ -10,7 +10,12 @@
         "test": "ng test --browsers=ChromeHeadless --watch=false --reporters=progress",
         "test:watch": "ng test AuthServerUI --karma-config karma.conf.js --code-coverage=true",
         "update": "ng update @angular/core@17 @angular/cli@17",
-        "release": "npm run build && npm run test"
+        "release": "npm run build && npm run test",
+        "start:backend": "cd ../srv && npm run start:debug",
+        "e2e:test": "concurrently --kill-others \"npm run start:backend\" \"npm run ui:serve\" \"sleep 15 && cypress run\"",
+        "e2e": "ng e2e",
+        "cypress:open": "cypress open",
+        "cypress:run": "cypress run"
     },
     "private": true,
     "dependencies": {
@@ -43,8 +48,11 @@
         "@angular-devkit/build-angular": "^17.3.8",
         "@angular/cli": "^17.3.8",
         "@angular/compiler-cli": "^17.3.11",
+        "@cypress/schematic": "^3.0.0",
         "@types/jasmine": "~3.10.0",
         "@types/node": "^16.18.102",
+        "concurrently": "^9.1.2",
+        "cypress": "latest",
         "globals": "^16.0.0",
         "jasmine-core": "~3.10.0",
         "karma": "~6.3.0",

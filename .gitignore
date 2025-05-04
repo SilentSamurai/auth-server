@@ -118,3 +118,4 @@ nginx/temp
 .qodo
 
 .qodo
+/ui/cypress/screenshots

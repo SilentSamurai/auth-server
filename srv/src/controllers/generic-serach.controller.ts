@@ -61,7 +61,7 @@ const RELATIONS = {
 
 class Filter {
     label: string;
-    name: string;
+    field: string;
     operator: string;
     value: any;
 }
@@ -176,7 +176,7 @@ enum FilterRule {
     NOT_IN = "nin",
     IS_NULL = "isnull",
     IS_NOT_NULL = "isnotnull",
-    REGEX = "regex",
+    MATCHES = "matches",
 }
 
 export const getCondition = (
@@ -234,7 +234,7 @@ export const getCondition = (
         }
         throw new BadRequestException(value);
     }
-    if (operator == FilterRule.REGEX) {
+    if (operator == FilterRule.MATCHES) {
         let newValue = value.replace(new RegExp(escapeRegExp("*"), "g"), "%");
         return ILike(newValue);
     }
@@ -246,8 +246,8 @@ export const getWhere = (entity: string, filters: Filter[]) => {
     let where: any = {};
 
     for (let filter of filters) {
-        if (filter.name.includes("/")) {
-            let names = filter.name.split("/");
+        if (filter.field.includes("/")) {
+            let names = filter.field.split("/");
             names = names.filter((n: string | any[]) => n.length > 0);
             if (names.length != 2) {
                 logger.log("Invalid filter: ", filter);
@@ -265,7 +265,7 @@ export const getWhere = (entity: string, filters: Filter[]) => {
                 filter.value,
             );
         } else {
-            where[filter.name] = getCondition(filter.operator, filter.value);
+            where[filter.field] = getCondition(filter.operator, filter.value);
         }
     }
     logger.log("Query formed Where: ", where);
