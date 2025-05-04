@@ -20,7 +20,7 @@ export class SearchClient extends HttpClient {
         const searchCriteria = [];
         for (let key in query) {
             searchCriteria.push({
-                name: key,
+                field: key,
                 label: key,
                 value: query[key],
                 operator: "equals"

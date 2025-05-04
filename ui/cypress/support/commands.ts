@@ -42,7 +42,8 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 
-Cypress.Commands.add('adminLogin', (email, password) => {
+// @ts-ignore
+Cypress.Commands.add('adminLogin', (email: string, password: string) => {
     cy.visit("/home");
     // cy.get('#domain-pre').type("auth.server.com")
 
@@ -50,15 +51,15 @@ Cypress.Commands.add('adminLogin', (email, password) => {
     // incomplete item in the list.
     // cy.get('#continue-btn').click()
 
-    cy.get('#username').type(email)
-    cy.get('#password').type(password)
+    cy.get('#username').type(email);
+    cy.get('#password').type(password);
 
     cy.intercept('POST', '**/api/oauth/token*').as('authCode')
 
     cy.get('#login-btn').click();
 
     cy.wait('@authCode').should(({request, response}) => {
-        expect(response.statusCode).to.be.oneOf([201, 200]);
+        expect(response?.statusCode).to.be.oneOf([201, 200]);
         // expect(response && response.body).to.include('authentication_code')
     })
 
@@ -68,7 +69,8 @@ Cypress.Commands.add('adminLogin', (email, password) => {
     cy.contains('Home');
 });
 
-Cypress.Commands.add('login', (email, password, tenant) => {
+// @ts-ignore
+Cypress.Commands.add('login', (email: string, password: string, tenant: string) => {
     cy.visit("/home");
     // cy.get('#domain-pre').type(tenant)
 
@@ -84,7 +86,7 @@ Cypress.Commands.add('login', (email, password, tenant) => {
     cy.get('#login-btn').click();
 
     cy.wait('@authCode').should(({request, response}) => {
-        expect(response.statusCode).to.be.oneOf([201, 200]);
+        expect(response?.statusCode).to.be.oneOf([201, 200]);
         // expect(response && response.body).to.include('authentication_code')
     })
 

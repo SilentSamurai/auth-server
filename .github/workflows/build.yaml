@@ -1,4 +1,4 @@
-name: Build, Test and Create Docker Image
+name: Build and Create Docker Image
 
 on:
     push:
@@ -18,13 +18,6 @@ jobs:
             # ---------- Docker buildx ----------
             -   name: Set up Docker Buildx
                 uses: docker/setup-buildx-action@v3
-
-            -   name: Install dependencies and run Karma tests (ui)
-                working-directory: ui
-                run: |
-                    npm ci            # Install exact dependencies based on package-lock.json
-                    npm run test -- --watch=false --browsers=ChromeHeadless
-                    npm run e2e:test
 
             # ---------- Build docker images ----------
             -   name: Build srv Docker image

@@ -12,7 +12,7 @@
         "update": "ng update @angular/core@17 @angular/cli@17",
         "release": "npm run build && npm run test",
         "start:backend": "cd ../srv && npm run start:debug",
-        "e2e:test": "concurrently --kill-others \"npm run start:backend\" \"npm run ui:serve\" \"sleep 15 && cypress run\"",
+        "e2e:test": "concurrently --kill-others --success=first \"npm run start:backend\" \"npm run ui:serve\" \"sleep 15 && cypress run\"",
         "e2e": "ng e2e",
         "cypress:open": "cypress open",
         "cypress:run": "cypress run"

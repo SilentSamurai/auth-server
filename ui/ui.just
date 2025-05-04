@@ -27,3 +27,4 @@ build-ui:
 [working-directory('ui')]
 test-ui:
     npm test
+    npm run e2e:test
