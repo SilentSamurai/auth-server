@@ -16,62 +16,16 @@ describe('Tenant Flow', () => {
     })
 
     it('Create Tenant', function () {
-        cy.visit('/');
-
-        cy.url().should('include', '/home');
-        cy.get('#Tenants_HOME_NAV').click()
-        cy.get('a[href="/TN01"]').click()
-        cy.get('#CREATE_TENANT_DIALOG_BTN').click()
-
-        cy.get('#create\\.tenant\\.name').type(TENANT_NAME);
-        cy.get('#create\\.tenant\\.domain').type(TENANT_DOMAIN);
-
-        cy.intercept('POST', '**/tenant/create*').as('createTenant')
-
-        cy.get('#CREATE_TENANT_SUBMIT_BTN').click();
-
-        cy.wait('@createTenant').should(({request, response}) => {
-            expect(response.statusCode).to.be.oneOf([201]);
-            // expect(response && response.body).to.include('authentication_code')
-        })
-
-
+        cy.createTenant(TENANT_NAME, TENANT_DOMAIN);
     })
 
-    function GoToTenantObjectPage() {
-        cy.visit('/');
-
-        cy.url().should('include', '/home');
-
-        cy.get('#Tenants_HOME_NAV').click();
-        cy.get('a[href="/TN02"]').click()
-        cy.get('#Tenant-vh-btn').click();
-
-        cy.get('#FILTER_FIELD_domain').type(TENANT_DOMAIN);
-        cy.get('#default_FILTER_BAR_GO_BTN').click();
-
-        cy.contains('td', TENANT_DOMAIN).click();
-
-        cy.get('#Tenant_VH_SELECT_BTN').click();
-
-        cy.intercept('GET', '**/api/tenant/*/members').as('getTenantDetails')
-
-        cy.get('#TN02_SEL_CONT_BTN').click();
-        cy.url().should('match', /TN02\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/);
-
-        cy.wait('@getTenantDetails').should(({request, response}) => {
-            expect(response.statusCode).to.be.oneOf([200, 304]);
-        })
-    }
-
-
     it('GET Tenant', function () {
-        GoToTenantObjectPage();
+        cy.goToTenantObjectPage(TENANT_DOMAIN);
     })
 
 
     it('Update Tenant', function () {
-        GoToTenantObjectPage()
+        cy.goToTenantObjectPage(TENANT_DOMAIN);
 
         cy.get('#UPDATE_TENANT_BTN').click();
 
@@ -83,7 +37,7 @@ describe('Tenant Flow', () => {
     })
 
     it('Add Member', function () {
-        GoToTenantObjectPage()
+        cy.goToTenantObjectPage(TENANT_DOMAIN);
 
         // cy.get('#ADD_MEMBER_BTN').click();
         cy.get('#MEMBERS_SECTION_NAV').click();
@@ -95,7 +49,7 @@ describe('Tenant Flow', () => {
     })
 
     it('Remove Member', function () {
-        GoToTenantObjectPage()
+        cy.goToTenantObjectPage(TENANT_DOMAIN);
 
         // cy.get('#ADD_MEMBER_BTN').click();
         cy.get('#MEMBERS_SECTION_NAV').click();
@@ -113,7 +67,7 @@ describe('Tenant Flow', () => {
     })
 
     it('Add Role', function () {
-        GoToTenantObjectPage()
+        cy.goToTenantObjectPage(TENANT_DOMAIN);
 
         // cy.get('#ADD_MEMBER_BTN').click();
         cy.get('#ROLES_SECTION_NAV').click();
@@ -125,7 +79,7 @@ describe('Tenant Flow', () => {
     })
 
     it('Remove Role', function () {
-        GoToTenantObjectPage()
+        cy.goToTenantObjectPage(TENANT_DOMAIN);
 
         // cy.get('#ADD_MEMBER_BTN').click();
         cy.get('#ROLES_SECTION_NAV').click();
@@ -143,7 +97,7 @@ describe('Tenant Flow', () => {
     })
 
     it('Add App to Tenant', function () {
-        GoToTenantObjectPage();
+        cy.goToTenantObjectPage(TENANT_DOMAIN);
 
         const appName = "Tenant Test App";
 
@@ -168,7 +122,7 @@ describe('Tenant Flow', () => {
     });
 
     it('Delete App', () => {
-        GoToTenantObjectPage();
+        cy.goToTenantObjectPage(TENANT_DOMAIN);
 
         const appName = "Tenant Test App";
 
@@ -190,18 +144,6 @@ describe('Tenant Flow', () => {
     })
 
     it('Delete Tenant', function () {
-
-        GoToTenantObjectPage()
-
-        cy.get('#DELETE_TENANT_BTN').click();
-
-        cy.intercept('DELETE', '**/api/tenant/*').as('DeleteTenant')
-
-        cy.get('#CONFIRMATION_YES_BTN').click();
-
-        cy.wait('@DeleteTenant').should(({request, response}) => {
-            expect(response.statusCode).to.be.oneOf([200]);
-        })
-
+        cy.deleteTenant(TENANT_DOMAIN);
     })
 })

@@ -65,7 +65,7 @@ describe('login', () => {
 
     })
 
-    it('Should fail Login not available to tenant', () => {
+    it('Should fail Login user not available to tenant', () => {
         // We'll click on the "active" button in order to
         // display only incomplete items
         // cy.get('#domain-pre').type('dummy.com')
@@ -82,12 +82,10 @@ describe('login', () => {
         cy.get('#login-btn').click();
 
         cy.wait('@authCode').should(({request, response}) => {
-            expect(response.statusCode).to.be.oneOf([201]);
+            expect(response.statusCode).to.be.oneOf([403]);
             // expect(response && response.body).to.include('authentication_code')
         });
 
-        // Then assert the page title
-        cy.contains('Authentication Error');
 
 
     })

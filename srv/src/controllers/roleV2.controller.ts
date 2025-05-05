@@ -26,6 +26,12 @@ import {SubjectEnum} from "../entity/subjectEnum";
 @UseInterceptors(ClassSerializerInterceptor)
 export class RoleControllerV2 {
 
+    static UpdateRoleSchema = yup.object().shape({
+        name: yup.string().optional(),
+        description: yup.string().optional(),
+        appId: yup.string().optional(),
+    });
+
     constructor(
         private readonly configService: Environment,
         private readonly tenantService: TenantService,
@@ -34,12 +40,6 @@ export class RoleControllerV2 {
         private readonly securityService: SecurityService,
     ) {
     }
-
-    static UpdateRoleSchema = yup.object().shape({
-        name: yup.string().optional(),
-        description: yup.string().optional(),
-        appId: yup.string().optional(),
-    });
 
     @Patch("/:roleId")
     @UseGuards(JwtAuthGuard)

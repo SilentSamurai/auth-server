@@ -16,7 +16,7 @@ export class AuthDefaultService {
     ) {
     }
 
-    async signOut(redirect: string, showSessionExpiredMessage: boolean = false): Promise<void> {
+    async signOut(redirect: string, showSessionExpiredMessage: boolean = false, client_id: string | null = null): Promise<void> {
         if (showSessionExpiredMessage) {
             this.messageService.add({
                 severity: 'warn',
@@ -27,11 +27,7 @@ export class AuthDefaultService {
         }
         const userInfo = this.sessionService.getUser();
         this.sessionService.clearSession();
-        if (userInfo) {
-            await this.navToLogin(redirect, userInfo.tenant.client_id);
-        } else {
-            await this.navToLogin(redirect, null);
-        }
+        await this.navToLogin(redirect, client_id || userInfo?.tenant.client_id || null);
     }
 
     public async navToLogin(

@@ -5,7 +5,7 @@ import {JsonConsoleLogger} from "./log/JsonConsoleLogger";
 import {NestExpressApplication} from "@nestjs/platform-express";
 import {NestFactory} from "@nestjs/core";
 import {AppModule} from "./app.module";
-import {HttpExceptionFilter} from "./exceptions/http-exception.filter";
+import {HttpExceptionFilter} from "./exceptions/filter/http-exception.filter";
 import * as express from "express";
 import * as process from "node:process";
 

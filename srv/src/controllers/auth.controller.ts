@@ -82,6 +82,13 @@ export class AuthController {
             throw new BadRequestException("domain || client_id is required");
         }
 
+        let adminContext = await this.securityService.getAdminContextForInternalUse();
+        let isMember = await this.tenantService.isMember(adminContext, tenant.id, user);
+        let isSubscribed = await this.subscriptionService.isUserSubscribedToTenant(adminContext, user, tenant);
+        if (!isMember && !isSubscribed) {
+            throw new ForbiddenException("User is not a member of the tenant and does not have a valid app subscription");
+        }
+
         const auth_code = await this.authCodeService.createAuthToken(
             user,
             tenant,

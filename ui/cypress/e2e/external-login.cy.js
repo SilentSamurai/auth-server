@@ -8,7 +8,6 @@ describe('login', () => {
     })
 
 
-
     it('External Login', () => {
 
         cy.visit('http://localhost:3000/')

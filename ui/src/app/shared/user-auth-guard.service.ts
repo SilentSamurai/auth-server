@@ -26,7 +26,8 @@ export class UserAuthGuard {
         if (this.tokenStorageService.isLoggedIn()) {
             return true;
         }
-        this.authDefaultService.signOut(state.url);
+
+        this.authDefaultService.signOut(state.url, false, state.root.queryParamMap.get("client_id"));
         return false;
     }
 }

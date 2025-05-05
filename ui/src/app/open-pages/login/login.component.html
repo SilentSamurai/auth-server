@@ -15,6 +15,8 @@
                     src="/assets/logo-img.jpg"
                 />
 
+                <div class="text-center strong"> {{ client_id }}</div>
+
                 <!-- Use one FormGroup with conditional fields -->
                 <form
                     (ngSubmit)="loginForm.valid && onSubmit()"
