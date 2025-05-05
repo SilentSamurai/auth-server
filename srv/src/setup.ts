@@ -52,6 +52,14 @@ export async function prepareApp() {
         await NestFactory.create<NestExpressApplication>(AppModule, options);
     app.useGlobalFilters(new HttpExceptionFilter());
 
+    // Add HEAD / handler
+    app.use('/', (req, res, next) => {
+        if (req.method === 'HEAD' && req.path === '/') {
+            return res.status(200).end();
+        }
+        next();
+    });
+
     if (Environment.get("ENABLE_CORS")) {
         app.enableCors();
     }

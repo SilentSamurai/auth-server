@@ -4,7 +4,7 @@ import {UserService} from '../_services/user.service';
 import {AuthDefaultService} from '../_services/auth.default.service';
 import {SessionService} from '../_services/session.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {ProfileComponent} from '../profile/profile.component';
+import {ProfileComponent} from '../open-pages/profile/profile.component';
 
 @Component({
     selector: 'nav-bar',

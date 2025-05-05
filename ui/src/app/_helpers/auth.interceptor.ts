@@ -27,7 +27,7 @@ export class AuthInterceptor implements HttpInterceptor {
         // 1. Check if token is expired before sending the request
         if (this.tokenService.getToken() != null && this.tokenService.isTokenExpired()) {
             console.warn('Signing out: Token is expired.');
-            this.authDefaultService.signOut('/home');
+            this.authDefaultService.signOut('/home', true);
             // We still return the request so the app doesn't freeze
             return throwError(() => new Error('Token expired'));
         }
@@ -43,9 +43,9 @@ export class AuthInterceptor implements HttpInterceptor {
         // 3. Handle 403 response errors
         return next.handle(authReq).pipe(
             catchError((error: HttpErrorResponse) => {
-                if (error.status === 403) {
+                if (error.status === 401) {
                     console.warn('Signing out: Received 403 Forbidden.');
-                    this.authDefaultService.signOut('/home');
+                    this.authDefaultService.signOut('/home', true);
                 }
                 return throwError(() => error);
             })

@@ -441,7 +441,7 @@ export class TenantService implements OnModuleInit {
                 members: {id: user.id},
             },
             relations: {
-                roles: true,
+                roles: true
             },
         });
         return tenants;

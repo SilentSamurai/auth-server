@@ -142,6 +142,53 @@ describe('Tenant Flow', () => {
 
     })
 
+    it('Add App to Tenant', function () {
+        GoToTenantObjectPage();
+
+        const appName = "Tenant Test App";
+
+        // Add App flow
+        cy.contains('button', 'Apps').click();
+        cy.contains('button', 'Create').click();
+
+        cy.get('input[name="name"]').type(appName); // App name input
+        cy.get('input[name="appUrl"]').type('http://localhost:3000'); // App name input
+        cy.get('textarea[name="description"]').type('A test app for tenant E2E');
+
+        cy.intercept('POST', '**/api/apps/create').as('CreateApp');
+
+        cy.get('.modal-footer').contains('button', 'Create').click();
+
+        cy.wait('@CreateApp').should(({request, response}) => {
+            expect(response.statusCode).to.be.oneOf([201, 200]);
+        });
+
+        cy.contains("td", appName).should("exist");
+
+    });
+
+    it('Delete App', () => {
+        GoToTenantObjectPage();
+
+        const appName = "Tenant Test App";
+
+        cy.contains('button', 'Apps').click();
+
+        cy.intercept('DELETE', '**/api/apps/*').as('DeleteApp');
+
+        cy.contains("td", appName)
+            .parent()
+            .find('button[data-test-id="delete"]')
+            .click();
+
+        cy.get('#CONFIRMATION_YES_BTN').click();
+
+        cy.wait('@DeleteApp').should(({request, response}) => {
+            expect(response.statusCode).to.be.oneOf([201, 200]);
+        });
+
+    })
+
     it('Delete Tenant', function () {
 
         GoToTenantObjectPage()

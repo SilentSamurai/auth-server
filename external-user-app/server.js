@@ -122,18 +122,18 @@ const server = http.createServer((req, res) => {
     // Add endpoint to check if a tenant was onboarded and then offboarded
     if (pathname.startsWith('/tenant/lifecycle/')) {
         const tenantId = pathname.split('/').pop();
-        const onboardRequests = onboardRequests.filter(req => req.tenantId === tenantId);
-        const offboardRequests = offboardRequests.filter(req => req.tenantId === tenantId);
+        const tenantOnboardRequests = onboardRequests.filter(req => req.tenantId === tenantId);
+        const tenantOffboardRequests = offboardRequests.filter(req => req.tenantId === tenantId);
 
         res.writeHead(200, {'Content-Type': 'application/json'});
         res.end(JSON.stringify({
             tenantId,
-            wasOnboarded: onboardRequests.length > 0,
-            onboardCount: onboardRequests.length,
-            wasOffboarded: offboardRequests.length > 0,
-            offboardCount: offboardRequests.length,
-            onboardRequests: onboardRequests,
-            offboardRequests: offboardRequests
+            wasOnboarded: tenantOnboardRequests.length > 0,
+            onboardCount: tenantOnboardRequests.length,
+            wasOffboarded: tenantOffboardRequests.length > 0,
+            offboardCount: tenantOffboardRequests.length,
+            onboardRequests: tenantOnboardRequests,
+            offboardRequests: tenantOffboardRequests
         }));
         return;
     }

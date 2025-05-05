@@ -1,9 +1,10 @@
 import {Component, OnInit} from '@angular/core';
-import {AuthService} from '../_services/auth.service';
-import {SessionService} from '../_services/session.service';
+import {AuthService} from '../../_services/auth.service';
+import {SessionService} from '../../_services/session.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {lastValueFrom} from 'rxjs';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {MessageService} from 'primeng/api';
 
 @Component({
     selector: 'app-login',
@@ -18,6 +19,7 @@ export class LoginComponent implements OnInit {
     errorMessage = '';
     isPasswordVisible = false;
     code_challenge_method: string = 'plain';
+    client_id: string = "auth.server.com";
 
     constructor(
         private authService: AuthService,
@@ -25,6 +27,7 @@ export class LoginComponent implements OnInit {
         private route: ActivatedRoute,
         private fb: FormBuilder,
         private tokenStorage: SessionService,
+        private messageService: MessageService,
     ) {
         this.loginForm = this.fb.group({
             username: ['', Validators.required],
@@ -33,6 +36,10 @@ export class LoginComponent implements OnInit {
     }
 
     async ngOnInit(): Promise<void> {
+        let params = this.route.snapshot.queryParamMap;
+        if (params.has('client_id')) {
+            this.client_id = params.get('client_id')!;
+        }
 
         const code_challenge = await this.tokenStorage.getCodeChallenge(this.code_challenge_method);
 
@@ -58,7 +65,7 @@ export class LoginComponent implements OnInit {
             const data = await this.authService.login(
                 username,
                 password,
-                'auth.server.com',
+                this.client_id,
                 code_challenge,
                 this.code_challenge_method,
             );
@@ -100,6 +107,12 @@ export class LoginComponent implements OnInit {
             this.tokenStorage.savePermissions(rules);
         } catch (e: any) {
             console.error(e);
+            this.messageService.add({
+                severity: 'error',
+                summary: 'Authentication Error',
+                detail: 'Failed to fetch access token. Please try logging in again.',
+                life: 5000
+            });
         }
     }
 }

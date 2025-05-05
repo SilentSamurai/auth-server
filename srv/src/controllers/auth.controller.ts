@@ -5,12 +5,15 @@ import {
     Controller,
     Get,
     Headers,
+    Logger,
     Param,
     Post,
+    Req,
     Request,
     Response,
     UseInterceptors,
 } from "@nestjs/common";
+import {Request as ExpressRequest} from "express";
 
 import {User} from "../entity/user.entity";
 import {Environment} from "../config/environment.service";
@@ -28,6 +31,9 @@ import {AuthCodeService} from "../auth/auth-code.service";
 import {GRANT_TYPES, TenantToken} from "../casl/contexts";
 import {AuthUserService} from "../casl/authUser.service";
 import {SecurityService} from "../casl/security.service";
+import {SubscriptionService} from "../services/subscription.service";
+
+const logger = new Logger("AuthController");
 
 @Controller("api/oauth")
 @UseInterceptors(ClassSerializerInterceptor)
@@ -41,6 +47,7 @@ export class AuthController {
         private readonly authCodeService: AuthCodeService,
         private readonly authUserService: AuthUserService,
         private readonly securityService: SecurityService,
+        private readonly subscriptionService: SubscriptionService,
     ) {
     }
 
@@ -88,19 +95,30 @@ export class AuthController {
 
     @Post("/token")
     async oauthToken(
-        @Body()
-            body: {
-            client_id: string;
-            client_secret: string;
-            password: string;
-            username: string;
-            refresh_token: string;
-            code: string;
-            code_verifier: string;
-            grant_type: GRANT_TYPES;
-            scopes: string[];
-        },
+        @Req() req: ExpressRequest,
+        @Body() body: any,
     ): Promise<any> {
+        // RFC: Accept application/x-www-form-urlencoded and JSON
+        // (body-parser is already set up in setup.ts)
+
+        // RFC: Support HTTP Basic Auth for client authentication
+        let clientId = body.client_id;
+        let clientSecret = body.client_secret;
+        if (req.headers.authorization && req.headers.authorization.startsWith("Basic ")) {
+            try {
+                const base64Credentials = req.headers.authorization.split(" ")[1];
+                const credentials = Buffer.from(base64Credentials, "base64").toString("utf-8");
+                const [id, secret] = credentials.split(":");
+                if (id) clientId = id;
+                if (secret) clientSecret = secret;
+            } catch (e) {
+                logger.error("Error decoding basic auth credentials", e);
+            }
+        }
+        body.client_id = clientId;
+        body.client_secret = clientSecret;
+
+        // RFC: Grant type logic
         switch (body.grant_type) {
             case GRANT_TYPES.CODE: {
                 let validationPipe = new ValidationPipe(
@@ -112,7 +130,15 @@ export class AuthController {
                         body.code,
                         body.code_verifier,
                     );
-                const {accessToken, refreshToken} =
+
+                let adminContext = await this.securityService.getAdminContextForInternalUse();
+                let isMember = await this.tenantService.isMember(adminContext, tenant.id, user);
+                let isSubscribed = await this.subscriptionService.isUserSubscribedToTenant(adminContext, user, tenant);
+                if (!isMember && !isSubscribed) {
+                    throw new BadRequestException("User is not a member of the tenant and does not have a valid app subscription");
+                }
+
+                const {accessToken, refreshToken, scopes} =
                     await this.authService.createUserAccessToken(user, tenant);
                 return {
                     access_token: accessToken,
@@ -121,6 +147,7 @@ export class AuthController {
                     ),
                     token_type: "Bearer",
                     refresh_token: refreshToken,
+                    ...(scopes && scopes.length ? {scope: scopes.join(" ")} : {}),
                 };
             }
             case GRANT_TYPES.PASSWORD: {
@@ -133,38 +160,22 @@ export class AuthController {
                     body.password,
                 );
                 let tenant: Tenant;
-                if (
-                    await this.authUserService.tenantExistsByDomain(
-                        body.client_id,
-                    )
-                ) {
-                    tenant = await this.authUserService.findTenantByDomain(
-                        body.client_id,
-                    );
-                } else if (
-                    await this.authUserService.tenantExistsByClientId(
-                        body.client_id,
-                    )
-                ) {
-                    tenant = await this.authUserService.findTenantByClientId(
-                        body.client_id,
-                    );
+                if (await this.authUserService.tenantExistsByDomain(body.client_id)) {
+                    tenant = await this.authUserService.findTenantByDomain(body.client_id);
+                } else if (await this.authUserService.tenantExistsByClientId(body.client_id)) {
+                    tenant = await this.authUserService.findTenantByClientId(body.client_id);
                 } else {
                     throw new BadRequestException("client_id is required");
                 }
-                let adminContext =
-                    await this.securityService.getAdminContextForInternalUse();
-                if (
-                    !(await this.tenantService.isMember(
-                        adminContext,
-                        tenant.id,
-                        user,
-                    ))
-                ) {
-                    throw new BadRequestException("invalid request");
+
+                let adminContext = await this.securityService.getAdminContextForInternalUse();
+                let isMember = await this.tenantService.isMember(adminContext, tenant.id, user);
+                let isSubscribed = await this.subscriptionService.isUserSubscribedToTenant(adminContext, user, tenant);
+                if (!isMember && !isSubscribed) {
+                    throw new BadRequestException("User is not a member of the tenant and does not have a valid app subscription");
                 }
-                const {accessToken, refreshToken} =
-                    await this.authService.createUserAccessToken(user, tenant);
+
+                const {accessToken, refreshToken, scopes} = await this.authService.createUserAccessToken(user, tenant);
                 return {
                     access_token: accessToken,
                     expires_in: this.configService.get(
@@ -172,6 +183,7 @@ export class AuthController {
                     ),
                     token_type: "Bearer",
                     refresh_token: refreshToken,
+                    ...(scopes && scopes.length ? {scope: scopes.join(" ")} : {}),
                 };
             }
             case GRANT_TYPES.CLIENT_CREDENTIALS:
@@ -190,12 +202,14 @@ export class AuthController {
                         tenant,
                         body.scopes,
                     );
+                const decoded: any = this.authService.decodeToken(token);
                 return {
                     access_token: token,
                     expires_in: this.configService.get(
                         "TOKEN_EXPIRATION_TIME_IN_SECONDS",
                     ),
                     token_type: "Bearer",
+                    ...(decoded && decoded.scopes ? {scope: decoded.scopes.join(" ")} : {}),
                 };
             }
             case GRANT_TYPES.REFRESH_TOKEN: {
@@ -207,7 +221,15 @@ export class AuthController {
                     await this.authService.validateRefreshToken(
                         body.refresh_token,
                     );
-                const {accessToken, refreshToken} =
+
+                let adminContext = await this.securityService.getAdminContextForInternalUse();
+                let isMember = await this.tenantService.isMember(adminContext, tenant.id, user);
+                let isSubscribed = await this.subscriptionService.isUserSubscribedToTenant(adminContext, user, tenant);
+                if (!isMember && !isSubscribed) {
+                    throw new BadRequestException("User is not a member of the tenant and does not have a valid app subscription");
+                }
+
+                const {accessToken, refreshToken, scopes} =
                     await this.authService.createUserAccessToken(user, tenant);
                 return {
                     access_token: accessToken,
@@ -216,10 +238,15 @@ export class AuthController {
                     ),
                     token_type: "Bearer",
                     refresh_token: refreshToken,
+                    ...(scopes && scopes.length ? {scope: scopes.join(" ")} : {}),
                 };
             }
             default:
-                throw new BadRequestException("grant type not recognised.");
+                // RFC: Return error in RFC format
+                throw new BadRequestException({
+                    error: "unsupported_grant_type",
+                    error_description: "grant type not recognised.",
+                });
         }
     }
 
@@ -284,13 +311,14 @@ export class AuthController {
         const tenant = await this.authUserService.findTenantByClientId(
             body.client_id,
         );
-        const {accessToken, refreshToken} =
+        const {accessToken, refreshToken, scopes} =
             await this.authService.createUserAccessToken(user, tenant);
         return {
             access_token: accessToken,
             expires_in: this.configService.get("TOKEN_EXPIRATION_TIME"),
             token_type: "Bearer",
             refresh_token: refreshToken,
+            ...(scopes && scopes.length ? {scope: scopes.join(" ")} : {}),
         };
     }
 

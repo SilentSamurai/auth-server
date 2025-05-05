@@ -254,7 +254,7 @@ import {SubscriptionService} from "../../_services/subscription.service";
                                         (click)="onUpdateApp(app)"
                                         [disabled]="!isTenantAdmin"
                                         class="btn btn-sm"
-                                        [attr.data-cy-id]="app.name"
+                                        data-test-id="edit"
                                         type="button"
                                     >
                                         <i class="fa fa-solid fa-pencil"></i>
@@ -263,7 +263,7 @@ import {SubscriptionService} from "../../_services/subscription.service";
                                         (click)="onDeleteApp(app)"
                                         [disabled]="!isTenantAdmin"
                                         class="btn btn-sm"
-                                        [attr.data-cy-id]="app.name"
+                                        data-test-id="delete"
                                         type="button"
                                     >
                                         <i class="fa fa-solid fa-trash"></i>

@@ -16,8 +16,8 @@ describe('login', () => {
         // incomplete item in the list.
         // cy.get('#continue-btn').click()
 
-        cy.get('#username').type("boromir@mail.com")
-        cy.get('#password').type("boromir9000")
+        cy.get('#username').type("admin@mail.com")
+        cy.get('#password').type("admin9000")
 
         cy.intercept('POST', '**/api/oauth/login*').as('authCode')
 
@@ -26,8 +26,6 @@ describe('login', () => {
         cy.wait('@authCode').should(({request, response}) => {
             expect(response.statusCode).to.be.oneOf([201]);
             // expect(response && response.body).to.include('authentication_code')
-
-
         });
 
         cy.url().should('include', '/home');
@@ -64,6 +62,33 @@ describe('login', () => {
 
         // Then assert the page title
         cy.contains('Home');
+
+    })
+
+    it('Should fail Login not available to tenant', () => {
+        // We'll click on the "active" button in order to
+        // display only incomplete items
+        // cy.get('#domain-pre').type('dummy.com')
+
+        // After filtering, we can assert that there is only the one
+        // incomplete item in the list.
+        // cy.get('#continue-btn').click()
+
+        cy.get('#username').type("legolas@mail.com")
+        cy.get('#password').type("legolas9000")
+
+        cy.intercept('POST', '**/api/oauth/login*').as('authCode')
+
+        cy.get('#login-btn').click();
+
+        cy.wait('@authCode').should(({request, response}) => {
+            expect(response.statusCode).to.be.oneOf([201]);
+            // expect(response && response.body).to.include('authentication_code')
+        });
+
+        // Then assert the page title
+        cy.contains('Authentication Error');
+
 
     })
 })

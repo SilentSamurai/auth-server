@@ -1,8 +1,8 @@
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 
-import {RegisterComponent} from './register/register.component';
-import {LoginComponent} from './login/login.component';
+import {RegisterComponent} from './open-pages/register/register.component';
+import {LoginComponent} from './open-pages/login/login.component';
 import {UR01Component} from './secure/users/UR01.component';
 import {TN01Component} from './secure/tenants/TN01.component';
 import {UR02Component} from './secure/users/UR02.component';

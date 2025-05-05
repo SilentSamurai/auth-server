@@ -165,7 +165,7 @@ export class AuthService {
     async createUserAccessToken(
         user: User,
         tenant: Tenant,
-    ): Promise<{ accessToken: string; refreshToken: string }> {
+    ): Promise<{ accessToken: string; refreshToken: string; scopes: string[] }> {
         if (!user.verified) {
             throw new EmailNotVerifiedException();
         }
@@ -210,7 +210,7 @@ export class AuthService {
             },
         );
 
-        return {accessToken, refreshToken};
+        return {accessToken, refreshToken, scopes: accessTokenPayload.scopes};
     }
 
     /**
@@ -375,5 +375,10 @@ export class AuthService {
         );
 
         return true;
+    }
+
+
+    public decodeToken(token: string): any {
+        return this.jwtService.decode(token, {json: true});
     }
 }

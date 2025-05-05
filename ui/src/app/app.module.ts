@@ -5,9 +5,9 @@ import {HttpClientModule} from '@angular/common/http';
 
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
-import {LoginComponent} from './login/login.component';
-import {RegisterComponent} from './register/register.component';
-import {ProfileComponent} from './profile/profile.component';
+import {LoginComponent} from './open-pages/login/login.component';
+import {RegisterComponent} from './open-pages/register/register.component';
+import {ProfileComponent} from './open-pages/profile/profile.component';
 
 import {authInterceptorProviders} from './_helpers/auth.interceptor';
 import {NgbCollapseModule, NgbDropdown, NgbModule,} from '@ng-bootstrap/ng-bootstrap';

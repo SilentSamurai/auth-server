@@ -54,7 +54,7 @@ export class AppService {
     async getAppCreatedByTenantId(tenantId: string) {
         return lastValueFrom(
             this.http.get(`${API_URL}/apps/created-by/${tenantId}`)
-        );
+        ) as Promise<any[]>;
     }
 
     async getAvailableApps(tenantId: string): Promise<any[]> {

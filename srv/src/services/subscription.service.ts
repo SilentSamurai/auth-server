@@ -6,6 +6,9 @@ import {Tenant} from '../entity/tenant.entity';
 import {Role} from '../entity/role.entity';
 import {App} from '../entity/app.entity';
 import {NotFoundException} from "../exceptions/not-found.exception";
+import {User} from "../entity/user.entity";
+import {AuthContext} from "../casl/contexts";
+import {TenantService} from "./tenant.service";
 
 const logger = new Logger("SubscriptionService");
 
@@ -32,6 +35,7 @@ export class SubscriptionService {
         private readonly roleRepo: Repository<Role>,
         @InjectRepository(App)
         private readonly appRepo: Repository<App>,
+        private readonly tenantService: TenantService,
     ) {
     }
 
@@ -142,7 +146,7 @@ export class SubscriptionService {
             return {status: true};
         }
 
-        if(existingSub.status === SubscriptionStatus.FAILED) {
+        if (existingSub.status === SubscriptionStatus.FAILED) {
             await this.subscriptionRepo.delete({
                 id: existingSub.id,
             });
@@ -218,6 +222,27 @@ export class SubscriptionService {
         return subscriptions;
     }
 
+    async isUserSubscribedToTenant(authContext: AuthContext, user: User, loggingTenant: Tenant): Promise<boolean> {
+        // Get all tenants the user belongs to
+        const userTenants = await this.tenantService.findByMembership(authContext, user);
+        // Get all apps owned by the logging-in tenant
+        const ownedApps = await this.appRepo.findBy({
+            owner: {
+                id: loggingTenant.id
+            }
+        });
+        // For each user tenant, check if it is subscribed to any app owned by the logging-in tenant
+        for (const userTenant of userTenants) {
+            const subscriptions = await this.findByTenantId(userTenant.id);
+            for (const sub of subscriptions) {
+                if (ownedApps.some(app => app.id === sub.app.id) && sub.status === 'success') {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     /**
      * Create a new subscription with status = PENDING.
      */
@@ -268,10 +293,10 @@ export class SubscriptionService {
             // No onboard endpoint available
             return true;
         }
-        
+
         const endpoint = `${app.appUrl.replace(/\/+$/, '')}/onboard/tenant/`;
         logger.log(`Making request to endpoint: ${endpoint}`);
-        logger.log(`Request payload:`, { tenantId: tenant.id });
+        logger.log(`Request payload:`, {tenantId: tenant.id});
 
         const response = await fetch(endpoint, {
             method: 'POST',

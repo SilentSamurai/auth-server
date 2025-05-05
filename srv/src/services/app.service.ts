@@ -92,13 +92,13 @@ export class AppService {
      */
     async updateApp(authContext: AuthContext, appId: string, name: string, appUrl: string, description?: string): Promise<App> {
         const app = await this.getAppById(appId);
-        
+
         // Check if the user has permission to update this app
         this.securityService.isAuthorized(
             authContext,
             Action.Update,
             SubjectEnum.APPS,
-            { id: app.id }
+            {id: app.id}
         );
 
         app.name = name;

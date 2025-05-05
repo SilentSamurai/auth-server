@@ -46,7 +46,7 @@ describe('AppController', () => {
         // Find the existing test tenants
         const shireTenant = await searchClient.findTenantBy({domain: 'shire.local'});
         const breeTenant = await searchClient.findTenantBy({domain: 'bree.local'});
-        
+
         creatorTenantId = shireTenant.id;
         subscriberTenantId = breeTenant.id;
 
@@ -131,7 +131,7 @@ describe('AppController', () => {
         it('should successfully subscribe to an app', async () => {
             // Create a new app client with subscriber's access token
             const subscriberAppClient = new AppClient(fixture, subscriberAccessToken);
-            
+
             const subscription = await subscriberAppClient.subscribeApp(testAppId, subscriberTenantId);
 
             expect(subscription).toBeDefined();
@@ -148,7 +148,7 @@ describe('AppController', () => {
         it('should successfully unsubscribe from an app', async () => {
             // Create a new app client with subscriber's access token
             const subscriberAppClient = new AppClient(fixture, subscriberAccessToken);
-            
+
             const subscription = await subscriberAppClient.subscribeApp(testAppId, subscriberTenantId);
 
             // Then unsubscribe using the AppClient

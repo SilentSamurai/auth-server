@@ -157,7 +157,7 @@ import {ObjectPageTabComponent} from './object-page-tab.component';
 })
 export class ObjectPageComponent implements OnInit, AfterViewInit {
 
-    @Input({transform: booleanAttribute}) loading = true;
+    @Input({transform: booleanAttribute}) loading = false;
     @Input({transform: booleanAttribute}) singlePage = false;
 
     @ContentChildren(ObjectPageTabComponent, {descendants: true})

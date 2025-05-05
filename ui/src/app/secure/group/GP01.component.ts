@@ -57,14 +57,14 @@ import {Filter} from '../../component/model/Filters';
                             <a
                                 [routerLink]="['/GP02/', group.id]"
                                 href="javascript:void(0)"
-                                >{{ group.name }}</a
+                            >{{ group.name }}</a
                             >
                         </td>
                         <td>
                             <a
                                 [routerLink]="['/TN02/', group.tenantId]"
                                 href="javascript:void(0)"
-                                >{{ group.tenantId }}</a
+                            >{{ group.tenantId }}</a
                             >
                         </td>
                         <td>

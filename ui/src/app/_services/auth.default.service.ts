@@ -1,6 +1,7 @@
 import {Injectable} from '@angular/core';
 import {Router} from '@angular/router';
 import {SessionService} from './session.service';
+import {MessageService} from 'primeng/api';
 
 @Injectable({
     providedIn: 'root',
@@ -11,10 +12,19 @@ export class AuthDefaultService {
     constructor(
         private router: Router,
         private sessionService: SessionService,
+        private messageService: MessageService,
     ) {
     }
 
-    async signOut(redirect: string): Promise<void> {
+    async signOut(redirect: string, showSessionExpiredMessage: boolean = false): Promise<void> {
+        if (showSessionExpiredMessage) {
+            this.messageService.add({
+                severity: 'warn',
+                summary: 'Session Expired',
+                detail: 'Your session has expired. Please log in again.',
+                life: 5000
+            });
+        }
         const userInfo = this.sessionService.getUser();
         this.sessionService.clearSession();
         if (userInfo) {
