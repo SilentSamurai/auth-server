@@ -68,7 +68,7 @@ export class AuthorizeLoginComponent implements OnInit {
         const authCode = this.tokenStorage.getAuthCode();
         if (authCode) {
             try {
-                const data = await this.authService.validateAuthCode(authCode);
+                const data = await this.authService.validateAuthCode(authCode, this.loginForm.get('client_id')?.value);
                 if (data.status) {
                     await this.router.navigate(['session-confirm'], {
                         queryParams: {

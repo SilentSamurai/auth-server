@@ -288,6 +288,11 @@ const UpdateGroupUser = yup.object().shape({
     users: yup.array().of(yup.string().max(128)),
 });
 
+const VerifyAuthCodeSchema = yup.object().shape({
+    auth_code: yup.string().required("auth_code is required"),
+    client_id: yup.string().required("client_id is required"),
+});
+
 export const ValidationSchema = {
     SignUpSchema,
     SignDownSchema,
@@ -331,4 +336,5 @@ export const ValidationSchema = {
         email: yup.string().required("Name is required").max(20),
         verify: yup.boolean().required("boolean value is required"),
     }),
+    VerifyAuthCodeSchema,
 };

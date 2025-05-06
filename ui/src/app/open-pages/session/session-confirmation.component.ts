@@ -41,7 +41,7 @@ export class SessionConfirmationComponent implements OnInit {
             // if auth code is present, then redirect
             // verify auth-code
             try {
-                const data = await this.authService.validateAuthCode(authCode);
+                const data = await this.authService.validateAuthCode(authCode, this.client_id);
                 this.authCode = authCode;
                 this.username = data.email;
             } catch (e: any) {

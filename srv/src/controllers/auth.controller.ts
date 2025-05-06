@@ -258,13 +258,28 @@ export class AuthController {
     }
 
     @Post("/verify-auth-code")
-    async authCode(@Body() body: { auth_code: string }) {
-        const authCodeObj = await this.authCodeService.findByCode(
-            body.auth_code,
-        );
-        const user = await this.authUserService.findUserById(
-            authCodeObj.userId,
-        );
+    async authCode(
+        @Body(new ValidationPipe(ValidationSchema.VerifyAuthCodeSchema))
+        body: { auth_code: string, client_id: string }
+    ) {
+        if (!body.client_id) {
+            throw new BadRequestException("client_id is required");
+        }
+        const authCodeObj = await this.authCodeService.findByCode(body.auth_code);
+        // Find tenant by client_id
+        let tenant = null;
+        if (await this.authUserService.tenantExistsByDomain(body.client_id)) {
+            tenant = await this.authUserService.findTenantByDomain(body.client_id);
+        } else if (await this.authUserService.tenantExistsByClientId(body.client_id)) {
+            tenant = await this.authUserService.findTenantByClientId(body.client_id);
+        } else {
+            throw new BadRequestException("Invalid client_id");
+        }
+        // Check if auth code belongs to this tenant
+        if (authCodeObj.tenantId !== tenant.id) {
+            throw new ForbiddenException("auth_code does not belong to the provided client_id");
+        }
+        const user = await this.authUserService.findUserById(authCodeObj.userId);
         return {
             authentication_code: body.auth_code,
             status: true,
