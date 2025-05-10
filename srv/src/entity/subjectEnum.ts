@@ -5,6 +5,7 @@ import {Tenant} from "./tenant.entity";
 import {User} from "./user.entity";
 import {Group} from "./group.entity";
 import {Policy} from "./authorization.entity";
+import {App} from "./app.entity";
 
 export class SubjectEnum {
     public static USER = User.name;
@@ -14,6 +15,7 @@ export class SubjectEnum {
     public static GROUP = Group.name;
     public static GROUP_ROLE = GroupRole.name;
     public static POLICY = Policy.name;
+    public static APPS = App.name;
 
     public static entityMap = {
         Users: SubjectEnum.USER,
@@ -21,6 +23,7 @@ export class SubjectEnum {
         TenantMembers: SubjectEnum.MEMBER,
         Roles: SubjectEnum.ROLE,
         Groups: SubjectEnum.GROUP,
+        Apps: SubjectEnum.APPS
     };
 
     public static getSubject(entity: string): string {

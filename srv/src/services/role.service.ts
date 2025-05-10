@@ -1,9 +1,8 @@
-import {Injectable} from "@nestjs/common";
+import {BadRequestException, Injectable, NotFoundException} from "@nestjs/common";
 import {Environment} from "../config/environment.service";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 import {Tenant} from "../entity/tenant.entity";
-import {ValidationErrorException} from "../exceptions/validation-error.exception";
 import {Role} from "../entity/role.entity";
 import {User} from "../entity/user.entity";
 import {UserRole} from "../entity/user.roles.entity";
@@ -11,6 +10,7 @@ import {AuthContext} from "../casl/contexts";
 import {SecurityService} from "../casl/security.service";
 import {Action} from "../casl/actions.enum";
 import {SubjectEnum} from "../entity/subjectEnum";
+import {App} from "../entity/app.entity";
 
 @Injectable()
 export class RoleService {
@@ -21,6 +21,8 @@ export class RoleService {
         @InjectRepository(Role) private roleRepository: Repository<Role>,
         @InjectRepository(UserRole)
         private userRoleRepository: Repository<UserRole>,
+        @InjectRepository(App)
+        private appRepository: Repository<App>,
     ) {
     }
 
@@ -50,6 +52,7 @@ export class RoleService {
         roleId: string,
         name: string,
         newDescription: string,
+        appId?: string,
     ): Promise<Role> {
         const role = await this.findById(authContext, roleId);
 
@@ -60,8 +63,22 @@ export class RoleService {
             {id: role.tenant.id},
         );
 
-        role.description = newDescription;
-        role.name = name;
+        if (newDescription) {
+            role.description = newDescription;
+        }
+        if (name) {
+            role.name = name;
+        }
+        if (typeof appId !== 'undefined') {
+            if (appId) {
+                role.app = await this.appRepository.findOne({where: {id: appId}});
+                if (!role.app) {
+                    throw new BadRequestException("app not found");
+                }
+            } else {
+                role.app = null;
+            }
+        }
         return this.roleRepository.save(role);
     }
 
@@ -70,10 +87,11 @@ export class RoleService {
             where: {id: id},
             relations: {
                 tenant: true,
+                app: true,
             },
         });
         if (role === null) {
-            throw new ValidationErrorException("role not found");
+            throw new NotFoundException("role not found");
         }
         this.securityService.isAuthorized(
             authContext,
@@ -142,7 +160,7 @@ export class RoleService {
         );
 
         if (count > 0 || !role.removable) {
-            throw new ValidationErrorException(
+            throw new BadRequestException(
                 "role is assigned to members | role is protected",
             );
         }
@@ -172,7 +190,7 @@ export class RoleService {
         });
 
         if (role === null) {
-            throw new ValidationErrorException("role not found");
+            throw new NotFoundException("role not found");
         }
         return role;
     }

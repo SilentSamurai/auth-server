@@ -1,10 +1,4 @@
-import {
-    createHash,
-    generateKeyPairSync,
-    randomBytes,
-    scryptSync,
-    timingSafeEqual,
-} from "crypto";
+import {createHash, generateKeyPairSync, randomBytes, scryptSync, timingSafeEqual,} from "crypto";
 import {generate} from "otp-generator";
 
 function base64UrlEncode(input: Buffer | string): string {

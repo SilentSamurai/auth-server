@@ -58,6 +58,27 @@ export class StartUpService implements OnModuleInit {
                     user.id,
                     true,
                 );
+
+                const isPresent = await this.usersService.existByEmail(
+                    adminContext,
+                    "admin@mail.com",
+                );
+
+                if (!isPresent) {
+
+                    let normalUser: User = await this.usersService.create(
+                        adminContext,
+                        "admin9000",
+                        "admin@mail.com",
+                        "admin",
+                    );
+
+                    await this.usersService.updateVerified(
+                        adminContext,
+                        user.id,
+                        true,
+                    );
+                }
             }
         } catch (exception: any) {
             // Catch user already created.
@@ -210,6 +231,23 @@ export class StartUpService implements OnModuleInit {
                     tenant,
                     user,
                 );
+
+                const normalUser = await this.usersService.findByEmail(
+                    adminContext,
+                    "admin@mail.com",
+                );
+
+                const isMember = await this.tenantService.isMember(adminContext, tenant.id, normalUser)
+                if (!isMember) {
+                    await this.tenantService.addMember(adminContext, tenant.id, normalUser);
+
+                    await this.roleService.updateUserRoles(
+                        adminContext,
+                        [viewerRole.name],
+                        tenant,
+                        normalUser,
+                    );
+                }
             }
         } catch (e) {
             console.error(e);

@@ -2,7 +2,7 @@ import {
     Body,
     ClassSerializerInterceptor,
     Controller,
-    Delete,
+    Delete, ForbiddenException,
     Get,
     Param,
     Post,
@@ -23,7 +23,6 @@ import {Role} from "../entity/role.entity";
 import {SecurityService} from "../casl/security.service";
 import {RoleService} from "../services/role.service";
 import {Action} from "../casl/actions.enum";
-import {ForbiddenException} from "../exceptions/forbidden.exception";
 import {subject} from "@casl/ability";
 import {SubjectEnum} from "../entity/subjectEnum";
 import {InjectRepository} from "@nestjs/typeorm";

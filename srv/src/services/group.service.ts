@@ -4,8 +4,6 @@ import {UsersService} from "./users.service";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 import {Tenant} from "../entity/tenant.entity";
-import {ValidationErrorException} from "../exceptions/validation-error.exception";
-
 import {Group} from "../entity/group.entity";
 import {GroupUser} from "../entity/group.users.entity";
 import {GroupRole} from "../entity/group.roles.entity";
@@ -63,7 +61,7 @@ export class GroupService {
             relations: ["tenant"],
         });
         if (group === null) {
-            throw new ValidationErrorException("group not found");
+            throw new BadRequestException("group not found");
         }
         return group;
     }
@@ -96,7 +94,7 @@ export class GroupService {
             relations: ["tenant"],
         });
         if (group === null) {
-            throw new ValidationErrorException("group not found");
+            throw new BadRequestException("group not found");
         }
         this.securityService.isAuthorized(
             authContext,

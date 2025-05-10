@@ -12,6 +12,8 @@ export interface DataSource<T> {
     updates(): Observable<DataSourceEvents>;
 
     filter(filters: Filter[]): void;
+
+    refresh(): void;
 }
 
 export interface DataSourceEvents {
@@ -62,4 +64,8 @@ export abstract class BaseDataSource<T> implements DataSource<T> {
     abstract queryData(query: Query): Promise<ReturnedData<T>>;
 
     abstract queryCount(query: Query): Promise<number>;
+
+    refresh(): void {
+        this.eventSubject.next({type: 'data-updated', source: 'refresh'});
+    }
 }

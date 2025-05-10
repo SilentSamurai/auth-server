@@ -23,11 +23,30 @@ import {Action, Effect} from "../casl/actions.enum";
 import {Policy} from "../entity/authorization.entity";
 import {TenantService} from "../services/tenant.service";
 import {UsersService} from "../services/users.service";
-import {ro} from "date-fns/locale";
 
 @Controller("api/v1")
 @UseInterceptors(ClassSerializerInterceptor)
 export class PolicyController {
+    static CreateSchema = yup.object().shape({
+        role: yup.string().uuid().required("role is required"),
+        effect: yup
+            .mixed<Effect>()
+            .required("effect is required")
+            .oneOf(Object.values(Effect)),
+        action: yup
+            .mixed<Action>()
+            .required("action is required")
+            .oneOf(Object.values(Action)),
+        subject: yup.string().required("subject is required"),
+        conditions: yup.object(),
+    });
+    static UpdateSchema = yup.object().shape({
+        effect: yup.mixed<Effect>().oneOf(Object.values(Effect)),
+        action: yup.mixed<Action>().oneOf(Object.values(Action)),
+        subject: yup.string(),
+        conditions: yup.object(),
+    });
+
     constructor(
         private readonly configService: Environment,
         private readonly securityService: SecurityService,
@@ -77,20 +96,6 @@ export class PolicyController {
         }
         return policies;
     }
-
-    static CreateSchema = yup.object().shape({
-        role: yup.string().uuid().required("role is required"),
-        effect: yup
-            .mixed<Effect>()
-            .required("effect is required")
-            .oneOf(Object.values(Effect)),
-        action: yup
-            .mixed<Action>()
-            .required("action is required")
-            .oneOf(Object.values(Action)),
-        subject: yup.string().required("subject is required"),
-        conditions: yup.object(),
-    });
 
     @Post("/policy/create")
     @UseGuards(JwtAuthGuard)
@@ -143,13 +148,6 @@ export class PolicyController {
         );
         return auth;
     }
-
-    static UpdateSchema = yup.object().shape({
-        effect: yup.mixed<Effect>().oneOf(Object.values(Effect)),
-        action: yup.mixed<Action>().oneOf(Object.values(Action)),
-        subject: yup.string(),
-        conditions: yup.object(),
-    });
 
     @Patch("/policy/:id")
     @UseGuards(JwtAuthGuard)

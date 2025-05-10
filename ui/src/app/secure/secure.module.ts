@@ -41,6 +41,10 @@ import {AbilityModule} from '@casl/angular';
 import {SkeletonModule} from 'primeng/skeleton';
 import {CreatePolicyModalComponent} from './roles/create-policy-modal.component';
 import {UpdateRoleModalComponent} from './roles/update-role-modal.component';
+import {AP01Component} from './apps/AP01.component';
+import {CreateAppComponent} from "./apps/dialogs/create-app.component";
+import {UpdateAppComponent} from "./apps/dialogs/update-app.component";
+import {CreateSubscriptionComponent} from "./tenants/dialogs/create-subscription.component";
 
 @NgModule({
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -71,6 +75,10 @@ import {UpdateRoleModalComponent} from './roles/update-role-modal.component';
         RL02Component,
         CreatePolicyModalComponent,
         UpdateRoleModalComponent,
+        AP01Component,
+        CreateAppComponent,
+        UpdateAppComponent,
+        CreateSubscriptionComponent
     ],
     imports: [
         TableModule,

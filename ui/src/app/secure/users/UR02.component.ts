@@ -106,7 +106,7 @@ import {StaticSource} from "../../component/model/StaticSource";
                                     <a
                                         [routerLink]="['/TN02/', tenant.id]"
                                         href="javascript:void(0)"
-                                        >{{ tenant.domain }}</a
+                                    >{{ tenant.domain }}</a
                                     >
                                 </td>
                                 <td>
@@ -117,7 +117,7 @@ import {StaticSource} from "../../component/model/StaticSource";
                                             user.id,
                                         ]"
                                         href="javascript:void(0)"
-                                        >View Role Assignments
+                                    >View Role Assignments
                                     </a>
                                 </td>
                             </ng-template>

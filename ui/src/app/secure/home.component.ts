@@ -55,6 +55,28 @@ export class HomeComponent implements OnInit {
                         });
                     },
                 },
+                {
+                    title: 'Apps',
+                    subtitle: 'Manage Apps',
+                    icon: 'fa-app',
+                    command: async () => {
+                        const tenant_id = this.user.tenant.id;
+                        await this.router.navigate(['/TN02', tenant_id], {
+                            fragment: 'APPS',
+                        });
+                    },
+                },
+                {
+                    title: 'Subscriptions',
+                    subtitle: 'Manage Subscriptions',
+                    icon: 'fa-credit-card',
+                    command: async () => {
+                        const tenant_id = this.user.tenant.id;
+                        await this.router.navigate(['/TN02', tenant_id], {
+                            fragment: 'SUBSCRIPTIONS',
+                        });
+                    },
+                },
             ],
         },
         {
@@ -75,7 +97,7 @@ export class HomeComponent implements OnInit {
                     icon: 'fa-bars',
                     link: ['/TN02'],
                     canActivate: (ps: PermissionService) => {
-                        return ps.isAuthorized(Actions.Read, Subjects.TENANT);
+                        return ps.isAuthorized(Actions.Manage, Subjects.TENANT);
                     },
                 },
                 {
@@ -107,30 +129,7 @@ export class HomeComponent implements OnInit {
                     icon: 'fa-users',
                     link: ['/UR02'],
                     canActivate: (ps: PermissionService) => {
-                        return ps.isAuthorized(Actions.Read, Subjects.USER);
-                    },
-                },
-            ],
-        },
-        {
-            name: 'Groups',
-            tiles: [
-                {
-                    title: 'GP01',
-                    subtitle: 'Manage Groups',
-                    icon: 'fa-group',
-                    link: ['/GP01'],
-                    canActivate: (ps: PermissionService) => {
-                        return ps.isAuthorized(Actions.Manage, Subjects.GROUP);
-                    },
-                },
-                {
-                    title: 'GP02',
-                    subtitle: 'Display Group',
-                    icon: 'fa-group',
-                    link: ['/GP02'],
-                    canActivate: (ps: PermissionService) => {
-                        return ps.isAuthorized(Actions.Read, Subjects.GROUP);
+                        return ps.isAuthorized(Actions.Manage, Subjects.USER);
                     },
                 },
             ],
@@ -153,11 +152,49 @@ export class HomeComponent implements OnInit {
                     icon: 'fa-role',
                     link: ['/RL02'],
                     canActivate: (ps: PermissionService) => {
-                        return ps.isAuthorized(Actions.Read, Subjects.ROLE);
+                        return ps.isAuthorized(Actions.Manage, Subjects.ROLE);
                     },
                 },
             ],
         },
+        {
+            name: 'Apps',
+            tiles: [
+                {
+                    title: 'AP01',
+                    subtitle: 'Manage Apps',
+                    icon: 'fa-app',
+                    link: ['/AP01'],
+                    canActivate: (ps: PermissionService) => {
+                        return ps.isAuthorized(Actions.Manage, Subjects.APPS);
+                    },
+                },
+            ],
+        },
+        {
+            name: 'Groups',
+            tiles: [
+                {
+                    title: 'GP01',
+                    subtitle: 'Manage Groups',
+                    icon: 'fa-group',
+                    link: ['/GP01'],
+                    canActivate: (ps: PermissionService) => {
+                        return ps.isAuthorized(Actions.Manage, Subjects.GROUP);
+                    },
+                },
+                {
+                    title: 'GP02',
+                    subtitle: 'Display Group',
+                    icon: 'fa-group',
+                    link: ['/GP02'],
+                    canActivate: (ps: PermissionService) => {
+                        return ps.isAuthorized(Actions.Manage, Subjects.GROUP);
+                    },
+                },
+            ],
+        },
+
     ];
 
     constructor(

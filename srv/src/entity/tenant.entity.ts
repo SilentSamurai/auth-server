@@ -1,16 +1,10 @@
-import {
-    Column,
-    CreateDateColumn,
-    Entity,
-    JoinTable,
-    ManyToMany,
-    OneToMany,
-    PrimaryGeneratedColumn,
-} from "typeorm";
+import {Column, CreateDateColumn, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn,} from "typeorm";
 import {Role} from "./role.entity";
 import {Exclude} from "class-transformer";
 import {User} from "./user.entity";
-import {Group} from "./group.entity"; // Used with ClassSerializerInterceptor to exclude from responses.
+import {Group} from "./group.entity";
+import {App} from "./app.entity";
+import {Subscription} from "./subscription.entity";
 
 @Entity({name: "tenants"})
 export class Tenant {
@@ -73,4 +67,11 @@ export class Tenant {
         onDelete: "CASCADE",
     })
     groups: Group[];
+
+    @OneToMany(() => App, app => app.owner)
+    createdApps: App[];
+
+    @OneToMany(() => Subscription, subscription => subscription.subscriber)
+    appSubscriptions: Subscription[];
+
 }

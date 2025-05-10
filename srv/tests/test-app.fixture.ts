@@ -19,16 +19,16 @@ export class TestAppFixture {
         setupConsole();
     }
 
-    public jwtService(): JwtService {
-        return this._jwtService;
-    }
-
     public get smtp(): FakeSmtpServer {
         return this.smtpServer;
     }
 
     public get nestApp(): INestApplication {
         return this.app;
+    }
+
+    public jwtService(): JwtService {
+        return this._jwtService;
     }
 
     public async init(): Promise<TestAppFixture> {

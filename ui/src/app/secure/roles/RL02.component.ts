@@ -12,6 +12,7 @@ import {CloseType, ValueHelpResult,} from '../../component/value-help/value-help
 import {UpdateRoleModalComponent} from './update-role-modal.component';
 import {ModalResult, ModalService} from '../../component/dialogs/modal.service';
 import {StaticSource} from "../../component/model/StaticSource";
+import {AppService} from '../../_services/app.service';
 
 @Component({
     selector: 'app-RL02',
@@ -52,6 +53,33 @@ import {StaticSource} from "../../component/model/StaticSource";
                         </app-attribute>
                         <app-attribute label="Tenant Name">
                             {{ role.tenant.name }}
+                        </app-attribute>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col">
+                        <app-attribute label="Assigned App">
+                            <span *ngIf="role.app">{{ role.app.name }}</span>
+                            <span *ngIf="!role.app">No app assigned</span>
+                            <app-value-help-button
+                                classStyle="btn-sm btn-primary ms-2"
+                                [dataSource]="appsDM"
+                                [multi]="false"
+                                [selection]="role.app ? [role.app] : []"
+                                name="Select App"
+                                (onOpen)="onAppVhOpen()"
+                                (onClose)="onAppVhClose($event)"
+                            >
+                                <app-btn-content>
+                                    Assign App
+                                </app-btn-content>
+                                <app-vh-col label="Name" name="name"></app-vh-col>
+                                <app-vh-col label="Description" name="description"></app-vh-col>
+                                <ng-template #vh_body let-row>
+                                    <td>{{ row.name }}</td>
+                                    <td>{{ row.description }}</td>
+                                </ng-template>
+                            </app-value-help-button>
                         </app-attribute>
                     </div>
                 </div>
@@ -219,6 +247,7 @@ export class RL02Component implements OnInit {
     };
     usersDM = new StaticSource(['id']);
     policiesDM = new StaticSource(['id']);
+    appsDM = new StaticSource(['id']);
     private roleId: string = '';
     private tenantId: string = '';
 
@@ -233,6 +262,7 @@ export class RL02Component implements OnInit {
         private confirmationService: ConfirmationService,
         private modalService: ModalService,
         private policyService: PolicyService,
+        private appService: AppService,
     ) {
     }
 
@@ -459,6 +489,48 @@ export class RL02Component implements OnInit {
                 },
             },
         );
+    }
+
+    async onAppVhOpen() {
+        try {
+            const apps = await this.appService.getAppCreatedByTenantId(this.tenantId);
+            this.appsDM.setData(apps);
+        } catch (e) {
+            this.messageService.add({
+                severity: 'error',
+                summary: 'App Load Failed',
+                detail: 'Could not load apps',
+            });
+        }
+    }
+
+    async onAppVhClose(valueHelpResult: ValueHelpResult): Promise<void> {
+        if (valueHelpResult.closeType === CloseType.Confirm) {
+            try {
+                const selectedApp = valueHelpResult.selection;
+                for (let app of selectedApp) {
+                    await this.roleService.updateRole(
+                        this.role.id,
+                        this.role.name,
+                        this.role.description || "",
+                        app.id
+                    );
+                }
+                const response = await this.roleService.getRoleDetails(this.tenantId, this.roleId);
+                this.role = response.role;
+                this.messageService.add({
+                    severity: 'info',
+                    summary: 'App Assigned',
+                    detail: selectedApp.length > 0 ? `App [${selectedApp[0].name}] assigned to role.` : 'App assignment cleared.',
+                });
+            } catch (e) {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Refresh Failed',
+                    detail: 'Could not update role details',
+                });
+            }
+        }
     }
 
     isEmpty(obj: any) {

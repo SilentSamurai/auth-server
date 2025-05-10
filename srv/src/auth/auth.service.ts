@@ -1,17 +1,12 @@
-import {Injectable, Logger} from "@nestjs/common";
+import {Injectable, Logger, NotFoundException, UnauthorizedException} from "@nestjs/common";
 import {Environment} from "../config/environment.service";
 import {UsersService} from "../services/users.service";
 import {JwtService} from "@nestjs/jwt";
 import {User} from "../entity/user.entity";
-import {UserNotFoundException} from "../exceptions/user-not-found.exception";
-import {InvalidCredentialsException} from "../exceptions/invalid-credentials.exception";
-import {EmailNotVerifiedException} from "../exceptions/email-not-verified.exception";
-import {InvalidTokenException} from "../exceptions/invalid-token.exception";
 import * as argon2 from "argon2";
 import {Tenant} from "../entity/tenant.entity";
 import {TenantService} from "../services/tenant.service";
 import {CryptUtil} from "../util/crypt.util";
-import {UnauthorizedException} from "../exceptions/unauthorized.exception";
 import {RoleEnum} from "../entity/roleEnum";
 import {ValidationPipe} from "../validation/validation.pipe";
 import {ValidationSchema} from "../validation/validation.schema";
@@ -48,7 +43,7 @@ export class AuthService {
         const user: User = await this.authUserService.findUserByEmail(email);
         const valid: boolean = await argon2.verify(user.password, password);
         if (!valid) {
-            throw new InvalidCredentialsException();
+            throw new UnauthorizedException('Invalid credentials');
         }
         return user;
     }
@@ -119,11 +114,11 @@ export class AuthService {
             tenant.secretSalt,
         );
         if (!valid) {
-            throw new InvalidCredentialsException();
+            throw new UnauthorizedException('Invalid credentials');
         }
         valid = CryptUtil.verifyClientSecret(tenant.clientSecret, clientSecret);
         if (!valid) {
-            throw new InvalidCredentialsException();
+            throw new UnauthorizedException('Invalid credentials');
         }
         return tenant;
     }
@@ -165,9 +160,9 @@ export class AuthService {
     async createUserAccessToken(
         user: User,
         tenant: Tenant,
-    ): Promise<{ accessToken: string; refreshToken: string }> {
+    ): Promise<{ accessToken: string; refreshToken: string; scopes: string[] }> {
         if (!user.verified) {
-            throw new EmailNotVerifiedException();
+            throw new UnauthorizedException('Email not verified');
         }
 
         let roles = await this.authUserService.getMemberRoles(tenant, user);
@@ -210,7 +205,7 @@ export class AuthService {
             },
         );
 
-        return {accessToken, refreshToken};
+        return {accessToken, refreshToken, scopes: accessTokenPayload.scopes};
     }
 
     /**
@@ -240,7 +235,7 @@ export class AuthService {
                 publicKey: globalTenant.publicKey,
             }) as EmailVerificationToken;
         } catch (exception: any) {
-            throw new InvalidTokenException();
+            throw new UnauthorizedException('Invalid token');
         }
 
         const authContext = await this.securityService.getUserAuthContext(
@@ -291,7 +286,7 @@ export class AuthService {
             payload.sub,
         );
         if (!user) {
-            throw new UserNotFoundException();
+            throw new NotFoundException("User not found");
         }
 
         // The token is signed with the user's current password's hash.
@@ -300,7 +295,7 @@ export class AuthService {
         try {
             payload = this.jwtService.verify(token, {secret: user.password});
         } catch (exception: any) {
-            throw new InvalidTokenException();
+            throw new UnauthorizedException('Invalid token');
         }
 
         const authContext = await this.securityService.getUserAuthContext(
@@ -308,7 +303,7 @@ export class AuthService {
         );
 
         if (!user.verified) {
-            throw new EmailNotVerifiedException();
+            throw new UnauthorizedException('Email not verified');
         }
 
         await this.userService.updatePassword(authContext, user.id, password);
@@ -349,7 +344,7 @@ export class AuthService {
             payload.sub,
         );
         if (!user) {
-            throw new UserNotFoundException();
+            throw new NotFoundException("User not found");
         }
 
         // The token is signed with the user's current email.
@@ -361,7 +356,7 @@ export class AuthService {
                 secret: globalTenant.publicKey,
             }) as ChangeEmailToken;
         } catch (exception: any) {
-            throw new InvalidTokenException();
+            throw new UnauthorizedException('Invalid token');
         }
 
         const authContext = await this.securityService.getUserAuthContext(
@@ -375,5 +370,10 @@ export class AuthService {
         );
 
         return true;
+    }
+
+
+    public decodeToken(token: string): any {
+        return this.jwtService.decode(token, {json: true});
     }
 }

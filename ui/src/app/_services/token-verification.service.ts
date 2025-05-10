@@ -60,6 +60,6 @@ export class TokenVerificationService {
     }
 
     private verifyScopes(scopes: string[]): boolean {
-        return Array.isArray(scopes) && scopes.length > 0;
+        return Array.isArray(scopes);
     }
 }

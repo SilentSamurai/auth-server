@@ -258,7 +258,7 @@ const SecurityContextSchema = yup.object().shape({
     email: yup.string().required("token is invalid").max(128),
     name: yup.string().required("token is invalid").max(128),
     tenant: yup.object().shape({
-        id: yup.string().required("token is invalid"),
+        id: yup.string().required("token is invalid").uuid("tenant id must be a valid UUID"),
         name: yup.string().required("token is invalid"),
         domain: yup.string().required("token is invalid"),
     }),
@@ -286,6 +286,11 @@ const UpdateGroupRole = yup.object().shape({
 
 const UpdateGroupUser = yup.object().shape({
     users: yup.array().of(yup.string().max(128)),
+});
+
+const VerifyAuthCodeSchema = yup.object().shape({
+    auth_code: yup.string().required("auth_code is required"),
+    client_id: yup.string().required("client_id is required"),
 });
 
 export const ValidationSchema = {
@@ -331,4 +336,5 @@ export const ValidationSchema = {
         email: yup.string().required("Name is required").max(20),
         verify: yup.boolean().required("boolean value is required"),
     }),
+    VerifyAuthCodeSchema,
 };

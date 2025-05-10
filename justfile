@@ -1,14 +1,8 @@
 # Import Kubernetes build recipes
 
-import './k8s-build.just'
-
-# Import UI commands
-
-import './ui/ui.just'
-
-# Import server commands
-
-import './srv/srv.just'
+import './.just/k8s-build.just'
+import './.just/ui.just'
+import './.just/srv.just'
 
 # Use PowerShell on Windows
 
@@ -16,6 +10,10 @@ set windows-shell := ["powershell.exe", "-c"]
 
 # Show help by default
 default: help
+
+test:
+    just test-srv
+    just test-ui
 
 # Build both UI and server components
 build:
@@ -31,6 +29,14 @@ dev-external-start:
 run-e2e-tests:
     cd ./e2e
     npm run test
+
+install:
+    echo "install"
+
+release:
+    just build
+    just test
+    just install
 
 # Show this help listing available commands
 help:

@@ -5,4 +5,5 @@ export * from './IDataModel';
 export * from './Filters';
 export * from './Operator';
 export * from './RestApiModel';
+export * from './SpeedyApiSource';
 export * from './StaticSource';

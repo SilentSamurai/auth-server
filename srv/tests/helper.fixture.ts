@@ -3,17 +3,15 @@ import {TenantClient} from "./api-client/tenant-client";
 import {RoleClient} from "./api-client/role-client";
 import {GroupClient} from "./api-client/group-client";
 import {UsersClient} from "./api-client/user-client";
-import * as process from "node:process";
 
 export class HelperFixture {
-
-    private readonly app: TestAppFixture;
-    private accessToken: string;
 
     public tenant: TenantClient;
     public role: RoleClient;
     public group: GroupClient;
     public user: UsersClient;
+    private readonly app: TestAppFixture;
+    private accessToken: string;
 
     constructor(app: TestAppFixture, accessToken: string) {
         this.app = app;
@@ -30,6 +28,7 @@ export class HelperFixture {
 export function setupConsole() {
     if (
         process.env.CUSTOM_LOG && process.env.CUSTOM_LOG.includes("1")
+        // true
     ) {
         global.console = require('console');
     }

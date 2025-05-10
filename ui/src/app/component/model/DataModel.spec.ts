@@ -196,7 +196,10 @@ describe('StaticModel + DataModelImpl (in-memory data source)', () => {
             totalCount: () => Promise.resolve(0),
             keyFields: () => ['id'],
             updates: () => new Subject<DataSourceEvents>(),
-            filter: () => {}
+            filter: () => {
+            },
+            refresh: () => {
+            }
         };
 
         dataModel = new DataModel(errorSource);

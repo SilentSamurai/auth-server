@@ -4,7 +4,7 @@ describe('e2e positive auth code flow', () => {
     let app: TestAppFixture;
     let authentication_code = "";
     let accessToken = "";
-    let clientId = "";
+    let clientId = "auth.server.com";
     let clientSecret = "";
     const verifier = "challenge-ABCD";
     const challenge = "challenge-ABCD";
@@ -24,7 +24,7 @@ describe('e2e positive auth code flow', () => {
                 "code_challenge": challenge,
                 "email": "admin@auth.server.com",
                 "password": "admin9000",
-                "client_id": "auth.server.com",
+                "client_id": clientId,
                 "code_challenge_method": "plain"
             })
             .set('Accept', 'application/json');
@@ -59,6 +59,7 @@ describe('e2e positive auth code flow', () => {
             .post('/api/oauth/verify-auth-code')
             .send({
                 "auth_code": authentication_code,
+                "client_id": clientId,
             })
             .set('Accept', 'application/json');
 

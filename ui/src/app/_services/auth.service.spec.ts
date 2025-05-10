@@ -94,12 +94,13 @@ describe('AuthService', () => {
     it('should validate auth code', async () => {
         const mockValidation = {valid: true};
 
-        const validationPromise = service.validateAuthCode('test_auth_code');
+        const validationPromise = service.validateAuthCode('test_auth_code', 'client123');
 
         const req = httpMock.expectOne('/api/oauth/verify-auth-code');
         expect(req.request.method).toBe('POST');
         expect(req.request.body).toEqual({
             auth_code: 'test_auth_code',
+            client_id: 'client123',
         });
 
         req.flush(mockValidation);

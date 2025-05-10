@@ -1,15 +1,11 @@
-import {Injectable, Logger, OnModuleInit} from "@nestjs/common";
+import {Injectable, Logger, OnModuleInit, NotFoundException, ConflictException, UnauthorizedException} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 import {User} from "../entity/user.entity";
 import {Environment} from "../config/environment.service";
-import {EmailTakenException} from "../exceptions/email-taken.exception";
-import {UserNotFoundException} from "../exceptions/user-not-found.exception";
-import {InvalidCredentialsException} from "../exceptions/invalid-credentials.exception";
 import * as argon2 from "argon2";
 import {Role} from "../entity/role.entity";
 import {Tenant} from "src/entity/tenant.entity";
-import {ForbiddenException} from "../exceptions/forbidden.exception";
 import {Action} from "../casl/actions.enum";
 import {SubjectEnum} from "../entity/subjectEnum";
 import {SecurityService} from "../casl/security.service";
@@ -46,7 +42,7 @@ export class UsersService implements OnModuleInit {
             {email},
         );
         if (await this.usersRepository.findOne({where: {email}})) {
-            throw new EmailTakenException();
+            throw new ConflictException('Email is already being used');
         }
 
         // Check create policy
@@ -82,7 +78,7 @@ export class UsersService implements OnModuleInit {
             where: {email},
         });
         if (emailTaken) {
-            throw new EmailTakenException();
+            throw new ConflictException('Email is already being used');
         }
 
         this.securityService.isAuthorized(
@@ -143,7 +139,7 @@ export class UsersService implements OnModuleInit {
             where: {id: id},
         });
         if (user === null) {
-            throw new UserNotFoundException();
+            throw new NotFoundException('User not found');
         }
 
         return user;
@@ -163,7 +159,7 @@ export class UsersService implements OnModuleInit {
             where: {email},
         });
         if (user === null) {
-            throw new UserNotFoundException();
+            throw new NotFoundException('User not found');
         }
         return user;
     }
@@ -253,7 +249,7 @@ export class UsersService implements OnModuleInit {
                 where: {email},
             });
             if (emailTaken) {
-                throw new EmailTakenException();
+                throw new ConflictException('Email is already being used');
             }
             user.email = email;
         }
@@ -278,7 +274,7 @@ export class UsersService implements OnModuleInit {
 
         const valid: boolean = await argon2.verify(user.password, password);
         if (!valid) {
-            throw new InvalidCredentialsException();
+            throw new UnauthorizedException('Invalid credentials');
         }
 
         this.securityService.isAuthorized(
@@ -292,7 +288,7 @@ export class UsersService implements OnModuleInit {
             where: {email},
         });
         if (emailTaken) {
-            throw new EmailTakenException();
+            throw new ConflictException('Email is already being used');
         }
 
         user.email = email;
@@ -357,7 +353,7 @@ export class UsersService implements OnModuleInit {
             currentPassword,
         );
         if (!valid) {
-            throw new InvalidCredentialsException();
+            throw new UnauthorizedException('Invalid credentials');
         }
         this.securityService.isAuthorized(
             authContext,
@@ -422,7 +418,7 @@ export class UsersService implements OnModuleInit {
         );
         const user: User = await this.findById(authContext, id);
         if (user.email === this.configService.get("SUPER_ADMIN_EMAIL")) {
-            throw new ForbiddenException("cannot delete super secure");
+            throw new UnauthorizedException("cannot delete super secure");
         }
         return await this.usersRepository.remove(user);
     }
@@ -444,7 +440,7 @@ export class UsersService implements OnModuleInit {
         );
         const valid: boolean = await argon2.verify(user.password, password);
         if (!valid) {
-            throw new InvalidCredentialsException();
+            throw new UnauthorizedException('Invalid credentials');
         }
         return await this.usersRepository.remove(user);
     }
@@ -507,11 +503,11 @@ export class UsersService implements OnModuleInit {
             where: {email},
         });
         if (!user) {
-            throw new InvalidCredentialsException();
+            throw new UnauthorizedException('Invalid credentials');
         }
         const valid: boolean = await argon2.verify(user.password, password);
         if (!valid) {
-            throw new InvalidCredentialsException();
+            throw new UnauthorizedException('Invalid credentials');
         }
         return user;
     }

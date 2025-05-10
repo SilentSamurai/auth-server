@@ -10,14 +10,14 @@
         "generate-migration": "typeorm migration:create ./src/migrations/new-migration ",
         "nest-cmd": "nest g class casl/casl-ability.factory",
         "build": "rimraf dist && nest build",
+        "start": "nest start",
         "start:debug": "nest start --debug --watch",
         "start:prod": "NODE_ENV=production node dist/src/main",
         "test": "jest --coverage  --silent=true --runInBand",
         "test:watch": "set CUSTOM_LOG=1 && jest --watch --verbose --silent=false --runInBand",
         "package": "node create-zip.js",
         "start:mail-server": "ts-node src/mail/FakeSmtpServer.ts",
-        "release": "npm run build && npm run test ",
-        "smtp-server": "ts-node src/mail/FakeSmtpServer.ts"
+        "release": "npm run build && npm run test "
     },
     "dependencies": {
         "@casl/ability": "^6.4.0",

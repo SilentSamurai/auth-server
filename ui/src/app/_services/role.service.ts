@@ -26,14 +26,18 @@ export class RoleService {
         };
     }
 
-    async updateRole(roleId: string, name: string, description: string) {
+    async updateRole(roleId: string, name: string, description: string, appId?: string) {
+        const body: any = {
+            name,
+            description,
+        };
+        if (appId !== undefined) {
+            body.appId = appId;
+        }
         return lastValueFrom(
             this.http.patch(
                 `${API_URL}/role/${roleId}`,
-                {
-                    name,
-                    description,
-                },
+                body,
                 this.getHttpOptions(),
             ),
         );

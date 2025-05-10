@@ -34,7 +34,7 @@ export class UsersClient extends HttpClient {
                 "pageSize": 50,
                 "where": [
                     {
-                        "name": "email",
+                        "field": "email",
                         "label": "Email",
                         "value": email,
                         "operator": "equals"

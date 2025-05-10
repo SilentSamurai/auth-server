@@ -3,11 +3,140 @@ const fs = require('fs');
 const path = require('path');
 const {parse} = require("node:url");
 
+// Store onboard and offboard requests for verification
+const onboardRequests = [];
+const offboardRequests = [];
+
 const server = http.createServer((req, res) => {
     // Get the file path from the request URL
-    // let filePath = '.' + req.url;
     let parsedUrl = parse(req.url, true);
     let pathname = parsedUrl.pathname;
+
+    // Handle onboard endpoint
+    if (pathname === '/onboard/tenant/') {
+        // Parse request body
+        let body = '';
+        req.on('data', chunk => {
+            body += chunk.toString();
+        });
+
+        req.on('end', () => {
+            try {
+                const data = JSON.parse(body);
+                const tenantId = data.tenantId;
+                const timestamp = new Date().toISOString();
+
+                // Log detailed information about the onboard request
+                console.log(`[${timestamp}] Received onboard request:`);
+                console.log(`  - Tenant ID: ${tenantId}`);
+                console.log(`  - Method: ${req.method}`);
+                console.log(`  - Headers:`, req.headers);
+
+                // Store the request for verification
+                onboardRequests.push({
+                    tenantId,
+                    timestamp,
+                    method: req.method,
+                    headers: req.headers
+                });
+
+                // Return success response
+                res.writeHead(200, {'Content-Type': 'application/json'});
+                res.end(JSON.stringify({appNames: []}));
+            } catch (error) {
+                console.error('Error processing onboard request:', error);
+                res.writeHead(400, {'Content-Type': 'application/json'});
+                res.end(JSON.stringify({error: 'Invalid request body'}));
+            }
+        });
+        return;
+    }
+
+    // Handle offboard endpoint
+    if (pathname.startsWith('/offboard/tenant/')) {
+        const tenantId = pathname.split('/').pop();
+        const timestamp = new Date().toISOString();
+
+        // Log detailed information about the offboard request
+        console.log(`[${timestamp}] Received offboard request:`);
+        console.log(`  - Tenant ID: ${tenantId}`);
+        console.log(`  - Method: ${req.method}`);
+        console.log(`  - Headers:`, req.headers);
+
+        // Store the request for verification
+        offboardRequests.push({
+            tenantId,
+            timestamp,
+            method: req.method,
+            headers: req.headers
+        });
+
+        // Return success response
+        res.writeHead(200, {'Content-Type': 'application/json'});
+        res.end(JSON.stringify({appNames: []}));
+        return;
+    }
+
+    // Add endpoint to get onboard request history
+    if (pathname === '/onboard/history') {
+        res.writeHead(200, {'Content-Type': 'application/json'});
+        res.end(JSON.stringify(onboardRequests));
+        return;
+    }
+
+    // Add endpoint to get offboard request history
+    if (pathname === '/offboard/history') {
+        res.writeHead(200, {'Content-Type': 'application/json'});
+        res.end(JSON.stringify(offboardRequests));
+        return;
+    }
+
+    // Add endpoint to check if a specific tenant was onboarded
+    if (pathname.startsWith('/onboard/check/')) {
+        const tenantId = pathname.split('/').pop();
+        const requests = onboardRequests.filter(req => req.tenantId === tenantId);
+
+        res.writeHead(200, {'Content-Type': 'application/json'});
+        res.end(JSON.stringify({
+            wasOnboarded: requests.length > 0,
+            requestCount: requests.length,
+            requests: requests
+        }));
+        return;
+    }
+
+    // Add endpoint to check if a specific tenant was offboarded
+    if (pathname.startsWith('/offboard/check/')) {
+        const tenantId = pathname.split('/').pop();
+        const requests = offboardRequests.filter(req => req.tenantId === tenantId);
+
+        res.writeHead(200, {'Content-Type': 'application/json'});
+        res.end(JSON.stringify({
+            wasOffboarded: requests.length > 0,
+            requestCount: requests.length,
+            requests: requests
+        }));
+        return;
+    }
+
+    // Add endpoint to check if a tenant was onboarded and then offboarded
+    if (pathname.startsWith('/tenant/lifecycle/')) {
+        const tenantId = pathname.split('/').pop();
+        const tenantOnboardRequests = onboardRequests.filter(req => req.tenantId === tenantId);
+        const tenantOffboardRequests = offboardRequests.filter(req => req.tenantId === tenantId);
+
+        res.writeHead(200, {'Content-Type': 'application/json'});
+        res.end(JSON.stringify({
+            tenantId,
+            wasOnboarded: tenantOnboardRequests.length > 0,
+            onboardCount: tenantOnboardRequests.length,
+            wasOffboarded: tenantOffboardRequests.length > 0,
+            offboardCount: tenantOffboardRequests.length,
+            onboardRequests: tenantOnboardRequests,
+            offboardRequests: tenantOffboardRequests
+        }));
+        return;
+    }
 
     // Remove URL parameters
     let filePath = '.' + pathname.split('?')[0];
@@ -72,4 +201,7 @@ const PORT = process.env.PORT || 3000;
 
 server.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
+    console.log(`Onboard request history available at http://localhost:${PORT}/onboard/tenant`);
+    console.log(`Offboard request history available at http://localhost:${PORT}/offboard/tenant`);
+    console.log(`Check tenant lifecycle at http://localhost:${PORT}/tenant/lifecycle/{tenantId}`);
 });

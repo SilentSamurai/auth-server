@@ -2,7 +2,7 @@ import {v4 as uuidv4} from 'uuid';
 import {TestAppFixture} from "../test-app.fixture";
 import {UsersClient} from "../api-client/user-client";
 import {TokenFixture} from "../token.fixture";
-import {createFakeSmtpServer, EmailSearchCriteria, FakeSmtpServer} from "../../src/mail/FakeSmtpServer";
+import {EmailSearchCriteria} from "../../src/mail/FakeSmtpServer";
 import {TenantClient} from "../api-client/tenant-client";
 import {SearchClient} from "../api-client/search-client";
 

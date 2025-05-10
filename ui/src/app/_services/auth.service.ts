@@ -53,12 +53,13 @@ export class AuthService {
         return await lastValueFrom(this.http.get('/api/v1/my/permissions'));
     }
 
-    validateAuthCode(authCode: string): Promise<any> {
+    validateAuthCode(authCode: string, clientId: string): Promise<any> {
         return lastValueFrom(
             this.http.post(
                 `${AUTH_API}/verify-auth-code`,
                 {
                     auth_code: authCode,
+                    client_id: clientId,
                 },
                 httpOptions,
             ),

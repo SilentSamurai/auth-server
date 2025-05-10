@@ -1,10 +1,4 @@
-import {
-    Column,
-    CreateDateColumn,
-    Entity,
-    ManyToMany,
-    PrimaryGeneratedColumn,
-} from "typeorm";
+import {Column, CreateDateColumn, Entity, ManyToMany, PrimaryGeneratedColumn,} from "typeorm";
 import {Exclude} from "class-transformer"; // Used with ClassSerializerInterceptor to exclude from responses.
 import {Tenant} from "./tenant.entity";
 import {Role} from "./role.entity";

@@ -83,7 +83,7 @@ describe('GenericSearchController (e2e)', () => {
                     pageSize: 50,
                     where: [
                         {
-                            name: 'email',
+                            field: 'email',
                             label: 'Email',
                             value: testUserEmail,
                             operator: 'equals'
@@ -108,7 +108,7 @@ describe('GenericSearchController (e2e)', () => {
                     pageSize: 50,
                     where: [
                         {
-                            name: 'name',
+                            field: 'name',
                             label: 'Name',
                             value: 'Search Test',
                             operator: 'contains'
@@ -148,13 +148,13 @@ describe('GenericSearchController (e2e)', () => {
                     pageSize: 50,
                     where: [
                         {
-                            name: 'email',
+                            field: 'email',
                             label: 'Email',
                             value: '@example.com',
                             operator: 'contains'
                         },
                         {
-                            name: 'name',
+                            field: 'name',
                             label: 'Name',
                             value: 'Test',
                             operator: 'contains'
@@ -275,7 +275,7 @@ describe('GenericSearchController (e2e)', () => {
                     pageSize: 50,
                     where: [
                         {
-                            name: 'Tenants/domain',
+                            field: 'Tenants/domain',
                             label: 'Tenant Domain',
                             value: 'auth.server.com',
                             operator: 'equals'
@@ -302,13 +302,13 @@ describe('GenericSearchController (e2e)', () => {
                     pageSize: 50,
                     where: [
                         {
-                            name: 'createdAt',
+                            field: 'createdAt',
                             label: 'Created At',
                             value: now,
                             operator: 'lessThan'
                         },
                         {
-                            name: 'email',
+                            field: 'email',
                             label: 'Email',
                             value: '@',
                             operator: 'contains'
@@ -332,7 +332,7 @@ describe('GenericSearchController (e2e)', () => {
                     pageSize: 50,
                     where: [
                         {
-                            name: 'email',
+                            field: 'email',
                             label: 'Email',
                             value: null,
                             operator: 'isnotnull'
@@ -504,7 +504,7 @@ describe('GenericSearchController (e2e)', () => {
                 check: (user) => user.email !== null
             },
             {
-                rule: 'regex',
+                rule: 'matches',
                 resource: "Users",
                 field: "email",
                 value: 'test-*@example.com',
@@ -522,7 +522,7 @@ describe('GenericSearchController (e2e)', () => {
                         pageNo: 0,
                         pageSize: 50,
                         where: [{
-                            name: field,
+                            field: field,
                             label: field,
                             operator: rule,
                             value: value

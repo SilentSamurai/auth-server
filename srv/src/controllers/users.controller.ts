@@ -3,9 +3,8 @@ import {
     ClassSerializerInterceptor,
     Controller,
     Get,
-    Headers,
+    Headers, InternalServerErrorException,
     Patch,
-    Post,
     Request,
     UseGuards,
     UseInterceptors,
@@ -18,12 +17,9 @@ import {MailService} from "../mail/mail.service";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
 import {ValidationPipe} from "../validation/validation.pipe";
 import {ValidationSchema} from "../validation/validation.schema";
-import {MailServiceErrorException} from "../exceptions/mail-service-error.exception";
 import {TenantService} from "../services/tenant.service";
 import {Tenant} from "../entity/tenant.entity";
 import {SecurityService} from "../casl/security.service";
-import {EmailTakenException} from "../exceptions/email-taken.exception";
-import * as argon2 from "argon2";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 
@@ -75,7 +71,7 @@ export class UsersController {
             link,
         );
         if (!sent) {
-            throw new MailServiceErrorException();
+            throw new InternalServerErrorException();
         }
 
         return {status: sent};

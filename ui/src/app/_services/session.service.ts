@@ -122,6 +122,11 @@ export class SessionService {
         return this.pkceService.getCodeVerifier();
     }
 
+    public userTenantId() {
+        const user = this.getUser()!;
+        return user.tenant.id;
+    }
+
     public isLoggedIn(): boolean {
         return !!this.getToken();
     }

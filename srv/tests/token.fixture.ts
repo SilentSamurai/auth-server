@@ -10,9 +10,9 @@ export class TokenFixture {
     }
 
     public async fetchAccessToken(username: string, password: string, client_id: string): Promise<{
-        accessToken,
-        refreshToken,
-        jwt
+        accessToken: string,
+        refreshToken: string,
+        jwt: any
     }> {
         const response = await this.app.getHttpServer()
             .post('/api/oauth/token')
