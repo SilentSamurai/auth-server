@@ -53,7 +53,7 @@ import {Filter} from "../../component/model/Filters";
                             <a
                                 [routerLink]="['/UR02/', user.id]"
                                 href="javascript:void(0)"
-                                >{{ user.email }}</a
+                            >{{ user.email }}</a
                             >
                         </td>
                         <td>{{ user.createdAt | date }}</td>

@@ -2,7 +2,8 @@ import {
     BadRequestException,
     Body,
     ClassSerializerInterceptor,
-    Controller, ForbiddenException,
+    Controller,
+    ForbiddenException,
     Get,
     Headers,
     Logger,
@@ -11,9 +12,9 @@ import {
     Req,
     Request,
     Response,
-    UseInterceptors,
-    UnauthorizedException,
     ServiceUnavailableException,
+    UnauthorizedException,
+    UseInterceptors,
 } from "@nestjs/common";
 import {Request as ExpressRequest} from "express";
 
@@ -259,7 +260,7 @@ export class AuthController {
     @Post("/verify-auth-code")
     async authCode(
         @Body(new ValidationPipe(ValidationSchema.VerifyAuthCodeSchema))
-        body: { auth_code: string, client_id: string }
+            body: { auth_code: string, client_id: string }
     ) {
         if (!body.client_id) {
             throw new BadRequestException("client_id is required");

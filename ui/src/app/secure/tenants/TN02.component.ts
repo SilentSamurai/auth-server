@@ -111,7 +111,7 @@ import {SubscriptionService} from "../../_services/subscription.service";
                                 name="actions"
                             ></app-table-col>
 
-                            <app-table-btn>
+                            <app-table-actions>
                                 <button
                                     (click)="onAddMember()"
                                     [disabled]="!isTenantAdmin"
@@ -120,7 +120,7 @@ import {SubscriptionService} from "../../_services/subscription.service";
                                 >
                                     Add
                                 </button>
-                            </app-table-btn>
+                            </app-table-actions>
 
                             <ng-template let-user #table_body>
                                 <td>{{ user.name }}</td>
@@ -173,7 +173,7 @@ import {SubscriptionService} from "../../_services/subscription.service";
                                 name="actions"
                             ></app-table-col>
 
-                            <app-table-btn>
+                            <app-table-actions>
                                 <button
                                     (click)="onAddRole()"
                                     [disabled]="!isTenantAdmin"
@@ -182,7 +182,7 @@ import {SubscriptionService} from "../../_services/subscription.service";
                                 >
                                     Create
                                 </button>
-                            </app-table-btn>
+                            </app-table-actions>
 
                             <ng-template let-role #table_body>
                                 <td>
@@ -235,7 +235,7 @@ import {SubscriptionService} from "../../_services/subscription.service";
                                 name="actions"
                             ></app-table-col>
 
-                            <app-table-btn>
+                            <app-table-actions>
                                 <button
                                     (click)="onAddApp()"
                                     [disabled]="!isTenantAdmin"
@@ -244,7 +244,7 @@ import {SubscriptionService} from "../../_services/subscription.service";
                                 >
                                     Create
                                 </button>
-                            </app-table-btn>
+                            </app-table-actions>
 
                             <ng-template let-app #table_body>
                                 <td>{{ app.name }}</td>
@@ -282,7 +282,7 @@ import {SubscriptionService} from "../../_services/subscription.service";
                             title="Subscribed Apps"
                             [dataSource]="subscribedAppsDataModel"
                         >
-                            <app-table-btn>
+                            <app-table-actions>
                                 <button
                                     (click)="onCreateSubscription()"
                                     [disabled]="!isTenantAdmin"
@@ -291,7 +291,7 @@ import {SubscriptionService} from "../../_services/subscription.service";
                                 >
                                     Subscribe App
                                 </button>
-                            </app-table-btn>
+                            </app-table-actions>
                             <app-table-col
                                 label="Name"
                                 name="name"

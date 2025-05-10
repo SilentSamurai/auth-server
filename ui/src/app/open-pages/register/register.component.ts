@@ -74,6 +74,8 @@ export class RegisterComponent implements OnInit {
             this.registerForm.get('orgName')!.invalid ||
             this.registerForm.get('domain')!.invalid
         ) {
+            this.registerForm.get('orgName')!.markAsTouched();
+            this.registerForm.get('domain')!.markAsTouched();
             return; // remain on step 1 if invalid
         }
         this.currentStep = 2;

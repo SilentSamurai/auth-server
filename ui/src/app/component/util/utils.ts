@@ -80,3 +80,9 @@ export class Util {
         return true;
     }
 }
+
+
+export function randomId(prefix: string = ''): string {
+    const randomPart = Math.random().toString(36).substring(2, 10);
+    return `${prefix}-${randomPart}`;
+}

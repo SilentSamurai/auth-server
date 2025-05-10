@@ -1,10 +1,5 @@
-import { RoleGuard } from '../../src/auth/role.guard';
-import { Reflector } from '@nestjs/core';
-import { SecurityService } from '../../src/casl/security.service';
-import { RoleService } from '../../src/services/role.service';
-import { TenantService } from '../../src/services/tenant.service';
-import { UsersService } from '../../src/services/users.service';
-import { ExecutionContext } from '@nestjs/common';
+import {RoleGuard} from '../../src/auth/role.guard';
+import {ExecutionContext} from '@nestjs/common';
 
 const mockReflector = () => ({
     getAllAndOverride: jest.fn(),
@@ -21,7 +16,7 @@ const mockContext = (handler = {}, req: any = {}) => {
     return {
         getHandler: () => handler,
         getClass: () => ({}),
-        switchToHttp: () => ({ getRequest: () => req }),
+        switchToHttp: () => ({getRequest: () => req}),
     } as unknown as ExecutionContext;
 };
 
@@ -57,7 +52,7 @@ describe('RoleGuard', () => {
 
     it('should allow if ability can all required roles', async () => {
         reflector.getAllAndOverride.mockReturnValue([
-            { action: 'read', subject: 'USER' },
+            {action: 'read', subject: 'USER'},
         ]);
         securityService.isAuthenticated.mockReturnValue(true);
         securityService.getAbility.mockReturnValue({
@@ -69,7 +64,7 @@ describe('RoleGuard', () => {
 
     it('should deny if ability cannot one of the required roles', async () => {
         reflector.getAllAndOverride.mockReturnValue([
-            { action: 'read', subject: 'USER' },
+            {action: 'read', subject: 'USER'},
         ]);
         securityService.isAuthenticated.mockReturnValue(true);
         securityService.getAbility.mockReturnValue({

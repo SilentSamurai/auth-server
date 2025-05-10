@@ -1,12 +1,10 @@
-import {Component, OnInit, QueryList, TemplateRef, ViewChild,} from '@angular/core';
+import {Component, OnInit, QueryList, TemplateRef,} from '@angular/core';
 
 import {NgbActiveModal, NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {ActivatedRoute} from '@angular/router';
 import {ValueHelpColumnComponent} from '../value-help-input/value-help-column.component';
-import {AppTableComponent} from '../table/app-table.component';
 import {FilterBarColumnComponent} from '../filter-bar/filter-bar.component';
 import {DataSource} from '../model/DataSource';
-import {Filter} from '../model/Filters';
 
 export enum CloseType {
     Cancel,
@@ -49,7 +47,7 @@ export class ValueHelpResult {
             </div>
             <div class="row ">
                 <div class="col">
-                    <app-fb (onFilter)="onFilter($event)" editable="false">
+                    <app-fb (onFilter)="vhtable.filter($event)" editable="false">
                         <app-fb-col
                             *ngFor="let filter of filters"
                             name="{{ filter.name }}"
@@ -61,10 +59,10 @@ export class ValueHelpResult {
             </div>
         </div>
         <div class="modal-body p-0 ">
-            <app-table
-                [dataSource]="dataSource"
-                [multi]="multi"
-                [(selection)]="selectedItem"
+            <app-table #vhtable
+                       [dataSource]="dataSource"
+                       [multi]="multi"
+                       [(selection)]="selectedItem"
             >
                 <app-table-col
                     *ngFor="let col of columns"
@@ -111,9 +109,6 @@ export class ValueHelpComponent implements OnInit {
     columns!: QueryList<ValueHelpColumnComponent>;
     filters!: QueryList<FilterBarColumnComponent>;
 
-    @ViewChild(AppTableComponent)
-    table!: AppTableComponent;
-
     constructor(
         private route: ActivatedRoute,
         private activeModal: NgbActiveModal,
@@ -153,7 +148,4 @@ export class ValueHelpComponent implements OnInit {
         this.activeModal.close(ValueHelpResult.result([], CloseType.Clear));
     }
 
-    onFilter(filters: Filter[]) {
-        this.table.filter(filters);
-    }
 }

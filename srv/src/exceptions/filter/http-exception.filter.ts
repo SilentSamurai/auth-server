@@ -2,13 +2,14 @@ import {
     ArgumentsHost,
     BadRequestException,
     Catch,
-    ExceptionFilter, ForbiddenException,
+    ExceptionFilter,
+    ForbiddenException,
     HttpException,
     HttpStatus,
-    Logger,
-    Type,
-    NotFoundException,
     InternalServerErrorException,
+    Logger,
+    NotFoundException,
+    Type,
 } from "@nestjs/common";
 import {Request, Response} from "express";
 import {BackendError} from "../backend-error.class";

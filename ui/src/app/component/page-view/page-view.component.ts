@@ -1,10 +1,8 @@
-import {AfterViewInit, Component, ContentChild, Input, OnInit,} from '@angular/core';
+import {AfterViewInit, Component, Input, OnInit} from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmationService, MessageService} from 'primeng/api';
 import {ActivatedRoute} from '@angular/router';
 import {firstValueFrom} from 'rxjs';
-import {PageViewHeaderComponent} from './page-view-header.component';
-import {PageViewBodyComponent} from './page-view-body.component';
 
 @Component({
     selector: 'app-page-view',
@@ -14,24 +12,18 @@ import {PageViewBodyComponent} from './page-view-body.component';
                 <div class="{{ containerClass }} mt-4 mb-4 px-4">
                     <div class="row">
                         <div class="col">
-                            <ng-container
-                                [ngTemplateOutlet]="header.template"
-                            ></ng-container>
+                            <ng-content
+                                select="app-page-view-header"
+                            ></ng-content>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="{{ containerClass }}">
+            <div class="{{ containerClass }} ">
                 <div class="row my-2">
                     <div class="col-md-12 ">
-                        <div class="card">
-                            <div class="">
-                                <ng-container
-                                    [ngTemplateOutlet]="body.template"
-                                ></ng-container>
-                            </div>
-                        </div>
+                        <ng-content select="app-page-view-body"></ng-content>
                     </div>
                 </div>
             </div>
@@ -57,12 +49,6 @@ export class PageViewComponent implements OnInit, AfterViewInit {
     @Input() fluid: boolean = true;
 
     @Input() name!: string;
-
-    @ContentChild(PageViewHeaderComponent)
-    header!: PageViewHeaderComponent;
-
-    @ContentChild(PageViewBodyComponent)
-    body!: PageViewBodyComponent;
 
     containerClass: string = 'container-fluid';
 

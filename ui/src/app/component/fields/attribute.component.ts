@@ -3,11 +3,11 @@ import {Component, Input, OnInit} from '@angular/core';
 @Component({
     selector: 'app-attribute',
     template: `
-        <div class="row mb-2">
-            <span class="col-md-auto p-disabled pe-0 fw-semibold"
+        <div class="row mb-2 py-1">
+            <span class="col-auto col-md-4 p-disabled fw-semibold text-end "
             >{{ label }}:</span
             >
-            <span class=" col-md-auto fw-semibold {{ valueClass }}">
+            <span class="col-auto col-md-8 fw-semibold {{ valueClass }}">
                 <ng-content></ng-content>
             </span>
         </div>

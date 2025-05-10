@@ -12,7 +12,6 @@ import {
     TemplateRef,
 } from '@angular/core';
 import {TableColumnComponent} from './app-table-column.component';
-import {AppTableButtonComponent} from './app-table-button.component';
 import {DataSource, IDataModel, Query} from '../model/DataModels';
 import {Filter} from '../model/Filters';
 import {BehaviorSubject, Subscription} from 'rxjs';
@@ -30,11 +29,7 @@ export class TableAsyncLoadEvent extends Query {
                     {{ title }} <span>({{ dataModel.totalRowCount() }})</span>
                 </div>
                 <div class="d-flex gap-2">
-                    <ng-container *ngFor="let btnTmpl of buttons">
-                        <ng-container
-                            [ngTemplateOutlet]="btnTmpl.template"
-                        ></ng-container>
-                    </ng-container>
+                    <ng-content select="app-table-actions"></ng-content>
                     <button
                         type="button"
                         class="btn btn-sm"
@@ -60,7 +55,7 @@ export class TableAsyncLoadEvent extends Query {
             (scroll)="lazyLoad($event)"
         >
             <table class="table a-table table-striped table-hover table-sm">
-                <thead class="sticky-top top-0">
+                <thead class="sticky-top top-0 bg-body">
                 <tr style="min-height:35px">
                     <th style="width:40px">
                         <input *ngIf="multi"
@@ -265,9 +260,6 @@ export class AppTableComponent implements OnInit, OnDestroy {
 
     @ContentChildren(TableColumnComponent)
     columns!: QueryList<TableColumnComponent>;
-
-    @ContentChildren(AppTableButtonComponent)
-    buttons!: QueryList<AppTableButtonComponent>;
 
     isAllSelected$ = new BehaviorSubject<true | null>(null);
     idFields: string[] = [];

@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner, Table, TableForeignKey, TableUnique } from "typeorm";
+import {MigrationInterface, QueryRunner, Table, TableForeignKey, TableUnique} from "typeorm";
 
 export class TenantLevelStorage1746655278354 implements MigrationInterface {
 

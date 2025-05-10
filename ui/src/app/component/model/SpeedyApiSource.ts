@@ -92,7 +92,6 @@ export class PaginatedResponse<T> {
      * Constructs a PaginatedResponse object using data from the backend
      * and a type constructor for mapping each payload item.
      * @param data - Incoming data including payload, pageCount, and pageIndex.
-     * @param type - Constructor that maps each item in the payload to a typed object.
      */
     constructor(data: any) {
         // Map raw payload items to properly typed objects.

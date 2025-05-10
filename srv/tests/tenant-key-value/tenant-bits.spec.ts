@@ -1,7 +1,6 @@
-import { TestAppFixture } from '../test-app.fixture';
-import { TenantClient } from '../api-client/tenant-client';
-import { TokenFixture } from '../token.fixture';
-import { UsersClient } from '../api-client/user-client';
+import {TestAppFixture} from '../test-app.fixture';
+import {TenantClient} from '../api-client/tenant-client';
+import {TokenFixture} from '../token.fixture';
 import {TenantBitsClient} from "../api-client/tenant-bits-client";
 
 describe('TenantBits API', () => {

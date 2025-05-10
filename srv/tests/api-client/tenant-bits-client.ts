@@ -1,5 +1,5 @@
-import { HttpClient, expect2xx } from './client';
-import { TestAppFixture } from '../test-app.fixture';
+import {expect2xx, HttpClient} from './client';
+import {TestAppFixture} from '../test-app.fixture';
 
 export class TenantBitsClient extends HttpClient {
     constructor(app: TestAppFixture, accessToken: string) {
@@ -10,7 +10,7 @@ export class TenantBitsClient extends HttpClient {
         const response = await this.app.getHttpServer()
             .post('/api/tenant-bits')
             .set('Authorization', `Bearer ${this.accessToken}`)
-            .send({ tenantId, key, value });
+            .send({tenantId, key, value});
         expect2xx(response);
         return response.body;
     }
@@ -19,7 +19,7 @@ export class TenantBitsClient extends HttpClient {
         const response = await this.app.getHttpServer()
             .delete('/api/tenant-bits')
             .set('Authorization', `Bearer ${this.accessToken}`)
-            .send({ tenantId, key });
+            .send({tenantId, key});
         expect2xx(response);
         return response.body;
     }
@@ -28,7 +28,7 @@ export class TenantBitsClient extends HttpClient {
         const response = await this.app.getHttpServer()
             .get('/api/tenant-bits/exists')
             .set('Authorization', `Bearer ${this.accessToken}`)
-            .query({ tenantId, key });
+            .query({tenantId, key});
         expect2xx(response);
         return response.body.exists;
     }
@@ -37,7 +37,7 @@ export class TenantBitsClient extends HttpClient {
         const response = await this.app.getHttpServer()
             .get('/api/tenant-bits')
             .set('Authorization', `Bearer ${this.accessToken}`)
-            .query({ tenantId, key });
+            .query({tenantId, key});
         expect2xx(response);
         return response.body.value;
     }

@@ -10,7 +10,6 @@ import {
     TemplateRef,
 } from '@angular/core';
 import {ValueHelpComponent, ValueHelpResult,} from '../value-help/value-help.component';
-
 import {ValueHelpColumnComponent} from '../value-help-input/value-help-column.component';
 import {FilterBarColumnComponent} from '../filter-bar/filter-bar.component';
 import {ModalResult, ModalService} from '../dialogs/modal.service';
@@ -21,7 +20,7 @@ import {DataSource} from "../model/DataSource";
     template: `
         <button
             type="button"
-            class="btn {{ classStyle }}"
+            class="btn btn-primary {{ classStyle }}"
             (click)="openValueHelp()"
         >
             <ng-content select="app-btn-content"></ng-content>

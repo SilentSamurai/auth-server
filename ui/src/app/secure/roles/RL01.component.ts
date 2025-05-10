@@ -62,14 +62,14 @@ import {Filter} from '../../component/model/Filters';
                                     role.id,
                                 ]"
                                 href="javascript:void(0)"
-                                >{{ role.name }}</a
+                            >{{ role.name }}</a
                             >
                         </td>
                         <td>
                             <a
                                 [routerLink]="['/TN02/', role.tenant.id]"
                                 href="javascript:void(0)"
-                                >{{ role.tenant.domain }}</a
+                            >{{ role.tenant.domain }}</a
                             >
                         </td>
                         <td>{{ role.tenant.name }}</td>

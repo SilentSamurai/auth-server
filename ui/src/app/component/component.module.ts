@@ -1,4 +1,4 @@
-import {CUSTOM_ELEMENTS_SCHEMA, NgModule} from '@angular/core';
+import {NgModule} from '@angular/core';
 import {TableModule} from 'primeng/table';
 import {RouterModule} from '@angular/router';
 import {CommonModule} from '@angular/common';
@@ -15,15 +15,12 @@ import {ValueHelpInputComponent} from './value-help-input/value-help-input.compo
 import {SkeletonModule} from 'primeng/skeleton';
 import {ValueHelpColumnComponent} from './value-help-input/value-help-column.component';
 import {FilterBarColumnComponent, FilterBarComponent,} from './filter-bar/filter-bar.component';
-import {AppTableComponent} from './table/app-table.component';
 import {TileGroupsComponent} from './tile/tile-groups.component';
 import {ObjectPageComponent} from './object-page/object-page.component';
 import {ObjectPageSectionComponent} from './object-page/object-page-section.component';
 import {LaunchPadComponent} from './tile/launchpad.component';
 import {PageViewComponent} from './page-view/page-view.component';
-import {PageViewHeaderComponent} from './page-view/page-view-header.component';
 import {TableColumnComponent} from './table/app-table-column.component';
-import {PageViewBodyComponent} from './page-view/page-view-body.component';
 import {FilterFieldComponent} from './filter-bar/filter-field.component';
 import {FilterValueHelpComponent} from './filter-bar/filter-value-help.component';
 import {ButtonModule} from 'primeng/button';
@@ -34,18 +31,21 @@ import {DialogActionsComponent} from './dialogs/dialog-actions.component';
 import {DialogTabComponent} from './dialogs/dialog-tab.component';
 import {DialogFooterComponent} from './dialogs/dialog-footer.component';
 import {ConfirmationDialogComponent, ConfirmationService,} from './dialogs/confirmation.service';
-import {InputErrorComponent, TextInputComponent,} from './inputs/text-input.component';
+import {TextInputComponent} from './inputs/text-input.component';
 import {ButtonLinkComponent} from './button/button-link.component';
-import {AppTableButtonComponent} from './table/app-table-button.component';
 import {CheckboxModule} from 'primeng/checkbox';
 import {RadioButtonModule} from 'primeng/radiobutton';
+import {InputErrorComponent} from './inputs/input-error.component';
+import {FormValueHelpInputComponent} from './inputs/form-value-help-input.component';
+import {ModalService} from './dialogs/modal.service';
+import {SelectInputComponent, SelectOptionComponent,} from './inputs/select-input.component';
 import {ObjectPageTabComponent} from './object-page/object-page-tab.component';
 import {ValueHelpButtonComponent} from './button/value-help-button.component';
-import {ThemeToggleComponent} from './theme-toggle/theme-toggle.component';
+import {AppTableComponent} from './table/app-table.component';
+import {ThemeToggleComponent} from './theme/theme-toggle.component';
 import {LoaderComponent} from "./loader/loader.component";
 
 @NgModule({
-    schemas: [CUSTOM_ELEMENTS_SCHEMA],
     declarations: [
         TileComponent,
         ValueHelpComponent,
@@ -55,8 +55,6 @@ import {LoaderComponent} from "./loader/loader.component";
         FilterBarColumnComponent,
         FilterFieldComponent,
         FilterValueHelpComponent,
-        AppTableComponent,
-        AppTableButtonComponent,
         TableColumnComponent,
         TileGroupsComponent,
         LaunchPadComponent,
@@ -64,8 +62,6 @@ import {LoaderComponent} from "./loader/loader.component";
         ObjectPageSectionComponent,
         ObjectPageTabComponent,
         PageViewComponent,
-        PageViewBodyComponent,
-        PageViewHeaderComponent,
         AttributeComponent,
         StandardDialogComponent,
         DialogActionsComponent,
@@ -75,7 +71,11 @@ import {LoaderComponent} from "./loader/loader.component";
         TextInputComponent,
         InputErrorComponent,
         ButtonLinkComponent,
+        FormValueHelpInputComponent,
+        SelectInputComponent,
+        SelectOptionComponent,
         ValueHelpButtonComponent,
+        AppTableComponent,
         ThemeToggleComponent,
         LoaderComponent
     ],
@@ -99,23 +99,19 @@ import {LoaderComponent} from "./loader/loader.component";
         CheckboxModule,
         RadioButtonModule,
     ],
-    providers: [ConfirmationService],
+    providers: [ConfirmationService, ModalService],
     exports: [
         TileComponent,
         ValueHelpInputComponent,
         ValueHelpColumnComponent,
         FilterBarColumnComponent,
-        AppTableComponent,
         TableColumnComponent,
         FilterBarComponent,
         TileGroupsComponent,
         ObjectPageComponent,
         ObjectPageSectionComponent,
-        ObjectPageTabComponent,
         LaunchPadComponent,
         PageViewComponent,
-        PageViewHeaderComponent,
-        PageViewBodyComponent,
         AttributeComponent,
         StandardDialogComponent,
         DialogTabComponent,
@@ -123,10 +119,14 @@ import {LoaderComponent} from "./loader/loader.component";
         TextInputComponent,
         InputErrorComponent,
         ButtonLinkComponent,
-        AppTableButtonComponent,
+        FormValueHelpInputComponent,
+        SelectInputComponent,
+        SelectOptionComponent,
+        ObjectPageTabComponent,
         ValueHelpButtonComponent,
+        AppTableComponent,
         ThemeToggleComponent,
-        LoaderComponent,
+        LoaderComponent
     ],
 })
 export class ComponentModule {

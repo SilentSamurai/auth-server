@@ -1,4 +1,4 @@
-import {BadRequestException, Injectable, NotFoundException, OnModuleInit, ForbiddenException} from "@nestjs/common";
+import {BadRequestException, ForbiddenException, Injectable, NotFoundException, OnModuleInit} from "@nestjs/common";
 import {Environment} from "../config/environment.service";
 import {UsersService} from "./users.service";
 import {InjectRepository} from "@nestjs/typeorm";

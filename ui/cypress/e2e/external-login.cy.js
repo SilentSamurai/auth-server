@@ -10,7 +10,7 @@ describe('login', () => {
 
     it('External Login', () => {
 
-        cy.visit('http://localhost:3000/')
+        cy.visit('http://localhost:3000/');
 
         cy.get('#login-btn').click();
 

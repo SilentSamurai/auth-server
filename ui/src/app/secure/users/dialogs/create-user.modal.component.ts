@@ -14,32 +14,28 @@ import {UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
             <app-dialog-tab>
                 <form [formGroup]="form" name="CREATE_USER" novalidate>
                     <app-text-input
-                        [form]="form"
-                        formName="CREATE_USER"
-                        formField="name"
+                        test_id="CREATE_USER"
+                        formControlName="name"
                         label="Name"
                     ></app-text-input>
 
                     <app-text-input
-                        [form]="form"
-                        formName="CREATE_USER"
-                        formField="email"
+                        test_id="CREATE_USER"
+                        formControlName="email"
                         label="Email"
                     ></app-text-input>
 
                     <app-text-input
-                        [form]="form"
-                        formName="CREATE_USER"
+                        test_id="CREATE_USER"
+                        formControlName="password"
                         type="password"
-                        formField="password"
                         label="Password"
                     ></app-text-input>
 
                     <app-text-input
-                        [form]="form"
-                        formName="CREATE_USER"
+                        test_id="CREATE_USER"
+                        formControlName="confirmPassword"
                         type="password"
-                        formField="confirmPassword"
                         label="Confirm Password"
                     >
                         <app-input-error field="confirmedValidator">

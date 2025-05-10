@@ -57,10 +57,9 @@ export class InternalFilter {
                 background-color: var(--bs-body-bg);
                 color: var(--bs-body-color);
                 border-color: var(--bs-border-color);
-                transition:
-                    background-color 0.3s ease,
-                    color 0.3s ease,
-                    border-color 0.3s ease;
+                transition: background-color 0.3s ease,
+                color 0.3s ease,
+                border-color 0.3s ease;
             }
 
             .form-control:focus {
@@ -74,10 +73,9 @@ export class InternalFilter {
                 color: var(--bs-secondary-color);
                 border-color: var(--bs-border-color);
                 background-color: var(--bs-body-bg);
-                transition:
-                    color 0.3s ease,
-                    border-color 0.3s ease,
-                    background-color 0.3s ease;
+                transition: color 0.3s ease,
+                border-color 0.3s ease,
+                background-color 0.3s ease;
             }
 
             .btn-outline-secondary:hover {

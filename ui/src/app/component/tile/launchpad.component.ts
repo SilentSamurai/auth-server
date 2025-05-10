@@ -3,7 +3,7 @@ import {SessionService} from '../../_services/session.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {AuthService} from '../../_services/auth.service';
 import {AuthDefaultService} from '../../_services/auth.default.service';
-import {PermissionService,} from '../../_services/permission.service';
+import {PermissionService} from '../../_services/permission.service';
 import {TileGroup} from './models';
 
 @Component({
@@ -39,7 +39,7 @@ import {TileGroup} from './models';
                     >
                         {{ group.groupName }}
                     </div>
-                    <app-tile-group [tiles]="group.tiles"> </app-tile-group>
+                    <app-tile-group [tiles]="group.tiles"></app-tile-group>
                 </ng-container>
             </div>
         </div>

@@ -17,7 +17,7 @@ import {PermissionService} from '../../_services/permission.service';
                             (click)="tile.invokeCallback()"
                             class="text-decoration-none"
                         >
-                            <app-tile [tile]="tile"> </app-tile>
+                            <app-tile [tile]="tile"></app-tile>
                         </a>
                     </ng-container>
                     <ng-container *ngIf="!tile.isCallbackThere">
@@ -25,7 +25,7 @@ import {PermissionService} from '../../_services/permission.service';
                             [routerLink]="tile.link"
                             class="text-decoration-none"
                         >
-                            <app-tile [tile]="tile"> </app-tile>
+                            <app-tile [tile]="tile"></app-tile>
                         </a>
                     </ng-container>
                 </div>

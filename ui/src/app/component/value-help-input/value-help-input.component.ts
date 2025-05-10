@@ -14,8 +14,8 @@ import {ActivatedRoute} from '@angular/router';
 import {ValueHelpComponent, ValueHelpResult,} from '../value-help/value-help.component';
 import {ValueHelpColumnComponent} from './value-help-column.component';
 import {FilterBarColumnComponent} from '../filter-bar/filter-bar.component';
-import {DataSource} from '../model/DataModels';
-import {ModalResult, ModalService} from "../dialogs/modal.service";
+import {ModalResult, ModalService} from '../dialogs/modal.service';
+import {DataSource} from '../model/DataSource';
 
 function parseBoolean(value: string): boolean {
     const lowerCaseStr = value.toLowerCase();

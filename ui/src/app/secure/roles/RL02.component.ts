@@ -93,7 +93,7 @@ import {AppService} from '../../_services/app.service';
                             title="Users"
                             scrollHeight="75vh"
                         >
-                            <app-table-btn>
+                            <app-table-actions>
                                 <app-value-help-button
                                     classStyle="btn-sm btn-primary"
                                     [dataSource]="usersDM"
@@ -115,7 +115,7 @@ import {AppService} from '../../_services/app.service';
                                         <td>{{ row.email }}</td>
                                     </ng-template>
                                 </app-value-help-button>
-                            </app-table-btn>
+                            </app-table-actions>
 
                             <app-table-col
                                 label="Name"
@@ -156,14 +156,14 @@ import {AppService} from '../../_services/app.service';
                             title="Policies"
                             scrollHeight="75vh"
                         >
-                            <app-table-btn>
+                            <app-table-actions>
                                 <button
                                     class="btn btn-sm btn-primary"
                                     (click)="openCreatePolicyModal()"
                                 >
                                     New Policy
                                 </button>
-                            </app-table-btn>
+                            </app-table-actions>
 
                             <app-table-col
                                 label="Effect"

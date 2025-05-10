@@ -71,19 +71,14 @@ import {ObjectPageTabComponent} from './object-page-tab.component';
 
                 <div class="container flex-fill content-area">
                     <ng-container *ngIf="singlePage">
-                        <div
-                            *ngFor="let tab of tabs"
-                            id="{{ tab.name.toUpperCase() }}"
-                        >
-                            <ng-container
-                                [ngTemplateOutlet]="tab.template"
-                            ></ng-container>
+                        <div *ngFor="let tab of tabs" id="{{ tab.name.toUpperCase() }}">
+                            <ng-container [ngTemplateOutlet]="tab.template">
+                            </ng-container>
                         </div>
                     </ng-container>
                     <ng-container *ngIf="!singlePage && currentTab">
-                        <ng-container
-                            [ngTemplateOutlet]="currentTab.template"
-                        ></ng-container>
+                        <ng-container [ngTemplateOutlet]="currentTab.template">
+                        </ng-container>
                     </ng-container>
                 </div>
             </div>

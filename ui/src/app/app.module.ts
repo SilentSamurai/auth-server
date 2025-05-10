@@ -25,6 +25,7 @@ import {HttpErrorComponent} from './error-pages/HttpError.component';
 import {AbilityModule} from '@casl/angular';
 import {Ability, createMongoAbility, PureAbility,} from '@casl/ability';
 import {AuthorizeLoginComponent} from "./open-pages/authorize/authorize-login.component";
+import {NgOptimizedImage} from "@angular/common";
 
 @NgModule({
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -54,6 +55,7 @@ import {AuthorizeLoginComponent} from "./open-pages/authorize/authorize-login.co
         ComponentModule,
         ConfirmDialogModule,
         AbilityModule,
+        NgOptimizedImage,
     ],
     providers: [
         authInterceptorProviders,
