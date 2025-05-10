@@ -18,7 +18,7 @@ import {DataSource} from '../../../component/model/DataSource';
                 >
                     <div class="mb-3 form-group">
                         <label class="form-label" for="create.group.name"
-                            >Name</label
+                        >Name</label
                         >
                         <input
                             #name="ngModel"
@@ -39,7 +39,7 @@ import {DataSource} from '../../../component/model/DataSource';
                     </div>
                     <div class="mb-3 form-group">
                         <label class="form-label" for="create.group.domain"
-                            >Tenant</label
+                        >Tenant</label
                         >
                         <app-value-help-input
                             [dataSource]="tenantsDM"

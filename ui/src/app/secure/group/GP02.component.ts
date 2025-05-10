@@ -165,7 +165,7 @@ import {CloseType, ValueHelpResult,} from '../../component/value-help/value-help
                                         <a
                                             [routerLink]="['/UR02', user.email]"
                                             href="javascript:void(0)"
-                                            >{{ user.email }}</a
+                                        >{{ user.email }}</a
                                         >
                                     </td>
                                     <td>
@@ -176,7 +176,7 @@ import {CloseType, ValueHelpResult,} from '../../component/value-help/value-help
                                                 user.email,
                                             ]"
                                             href="javascript:void(0)"
-                                            >View Assignments</a
+                                        >View Assignments</a
                                         >
                                     </td>
                                     <td>

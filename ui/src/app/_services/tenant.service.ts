@@ -137,9 +137,9 @@ export class TenantService {
 
     async removeMember(email: string, tenantId: string) {
         return lastValueFrom(
-            this.http.delete(`${API_URL}/tenant/${tenantId}/member/delete`, {
+            this.http.delete(`${API_URL}/tenant/${tenantId}/members/delete`, {
                 body: {
-                    email: email,
+                    emails: [email],
                 },
             }),
         );

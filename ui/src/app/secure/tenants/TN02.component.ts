@@ -1,6 +1,5 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {MessageService} from 'primeng/api';
 import {TenantService} from '../../_services/tenant.service';
 import {SessionService} from '../../_services/session.service';
@@ -11,12 +10,18 @@ import {AuthDefaultService} from '../../_services/auth.default.service';
 import {ConfirmationService} from '../../component/dialogs/confirmation.service';
 import {Location} from '@angular/common';
 import {StaticSource} from "../../component/model/StaticSource";
+import {AppService} from '../../_services/app.service';
+import {CreateAppComponent} from '../apps/dialogs/create-app.component';
+import {UpdateAppComponent} from '../apps/dialogs/update-app.component';
+import {CreateSubscriptionComponent} from "./dialogs/create-subscription.component";
+import {ModalService} from "../../component/dialogs/modal.service";
+import {SubscriptionService} from "../../_services/subscription.service";
 
 @Component({
     selector: 'view-tenant',
     template: `
         <nav-bar></nav-bar>
-        <app-object-page>
+        <app-object-page [loading]="loading">
             <app-op-title>
                 {{ tenant.name }}
             </app-op-title>
@@ -106,7 +111,7 @@ import {StaticSource} from "../../component/model/StaticSource";
                                 name="actions"
                             ></app-table-col>
 
-                            <app-table-btn>
+                            <app-table-actions>
                                 <button
                                     (click)="onAddMember()"
                                     [disabled]="!isTenantAdmin"
@@ -115,7 +120,7 @@ import {StaticSource} from "../../component/model/StaticSource";
                                 >
                                     Add
                                 </button>
-                            </app-table-btn>
+                            </app-table-actions>
 
                             <ng-template let-user #table_body>
                                 <td>{{ user.name }}</td>
@@ -168,7 +173,7 @@ import {StaticSource} from "../../component/model/StaticSource";
                                 name="actions"
                             ></app-table-col>
 
-                            <app-table-btn>
+                            <app-table-actions>
                                 <button
                                     (click)="onAddRole()"
                                     [disabled]="!isTenantAdmin"
@@ -177,7 +182,7 @@ import {StaticSource} from "../../component/model/StaticSource";
                                 >
                                     Create
                                 </button>
-                            </app-table-btn>
+                            </app-table-actions>
 
                             <ng-template let-role #table_body>
                                 <td>
@@ -209,11 +214,153 @@ import {StaticSource} from "../../component/model/StaticSource";
                     </app-section-content>
                 </app-op-section>
             </app-op-tab>
+
+            <app-op-tab name="Apps">
+                <app-op-section name="Apps">
+                    <app-section-content>
+                        <app-table
+                            title="Created Apps"
+                            [dataSource]="createdAppsDataModel"
+                        >
+                            <app-table-col
+                                label="Name"
+                                name="name"
+                            ></app-table-col>
+                            <app-table-col
+                                label="Description"
+                                name="description"
+                            ></app-table-col>
+                            <app-table-col
+                                label="Actions"
+                                name="actions"
+                            ></app-table-col>
+
+                            <app-table-actions>
+                                <button
+                                    (click)="onAddApp()"
+                                    [disabled]="!isTenantAdmin"
+                                    id="ADD_APP_DIALOG_BTN"
+                                    class="btn btn-primary btn-sm"
+                                >
+                                    Create
+                                </button>
+                            </app-table-actions>
+
+                            <ng-template let-app #table_body>
+                                <td>{{ app.name }}</td>
+                                <td>{{ app.description }}</td>
+                                <td>
+                                    <button
+                                        (click)="onUpdateApp(app)"
+                                        [disabled]="!isTenantAdmin"
+                                        class="btn btn-sm"
+                                        data-test-id="edit"
+                                        type="button"
+                                    >
+                                        <i class="fa fa-solid fa-pencil"></i>
+                                    </button>
+                                    <button
+                                        (click)="onDeleteApp(app)"
+                                        [disabled]="!isTenantAdmin"
+                                        class="btn btn-sm"
+                                        data-test-id="delete"
+                                        type="button"
+                                    >
+                                        <i class="fa fa-solid fa-trash"></i>
+                                    </button>
+                                </td>
+                            </ng-template>
+                        </app-table>
+                    </app-section-content>
+                </app-op-section>
+            </app-op-tab>
+
+            <app-op-tab name="Subscriptions">
+                <app-op-section name="Subscriptions">
+                    <app-section-content>
+                        <app-table
+                            title="Subscribed Apps"
+                            [dataSource]="subscribedAppsDataModel"
+                        >
+                            <app-table-actions>
+                                <button
+                                    (click)="onCreateSubscription()"
+                                    [disabled]="!isTenantAdmin"
+                                    id="CREATE_SUBSCRIPTION_BTN"
+                                    class="btn btn-success btn-sm ms-2"
+                                >
+                                    Subscribe App
+                                </button>
+                            </app-table-actions>
+                            <app-table-col
+                                label="Name"
+                                name="name"
+                            ></app-table-col>
+                            <app-table-col
+                                label="Description"
+                                name="description"
+                            ></app-table-col>
+                            <app-table-col
+                                label="Status"
+                                name="status"
+                            ></app-table-col>
+                            <app-table-col
+                                label="Message"
+                                name="message"
+                            ></app-table-col>
+                            <app-table-col
+                                label="Subscribed At"
+                                name="subscribedAt"
+                            ></app-table-col>
+                            <app-table-col
+                                label="Application"
+                                name="application"
+                            ></app-table-col>
+                            <app-table-col
+                                label="Actions"
+                                name="actions"
+                            ></app-table-col>
+
+                            <ng-template let-subscription #table_body>
+                                <td>{{ subscription.app.name }}</td>
+                                <td>{{ subscription.app.description }}</td>
+                                <td>{{ subscription.status }}</td>
+                                <td>{{ subscription.message }}</td>
+                                <td>{{ subscription.subscribedAt | date }}</td>
+
+                                <td>
+                                    <button
+                                        (click)="onViewApp(subscription)"
+                                        class="btn btn-sm btn-primary me-2"
+                                        type="button"
+                                    >
+                                        View App
+                                    </button>
+                                </td>
+
+                                <td class="">
+                                    <button
+                                        (click)="onUnsubscribe(subscription)"
+                                        [disabled]="!isTenantAdmin"
+                                        class="btn btn-sm btn-danger me-2"
+                                        type="button"
+                                    >
+                                        <i class="fa fa-solid fa-trash"></i>
+                                    </button>
+                                </td>
+
+                            </ng-template>
+                        </app-table>
+                    </app-section-content>
+                </app-op-section>
+            </app-op-tab>
         </app-object-page>
     `,
     styles: [''],
 })
 export class TN02Component implements OnInit {
+    loading: boolean = false;
+
     tenant_id: string = '';
     tenant: any = {};
     credentials: any = {
@@ -226,6 +373,8 @@ export class TN02Component implements OnInit {
     roles: any = [];
     memberDataModel: StaticSource<any>;
     rolesDataModel: StaticSource<any>;
+    createdAppsDataModel: StaticSource<any>;
+    subscribedAppsDataModel: StaticSource<any>;
 
     constructor(
         private tenantService: TenantService,
@@ -236,53 +385,74 @@ export class TN02Component implements OnInit {
         private _location: Location,
         private confirmationService: ConfirmationService,
         private authDefaultService: AuthDefaultService,
-        private modalService: NgbModal,
+        private modalService: ModalService,
+        private appService: AppService,
+        private subscriptionService: SubscriptionService,
     ) {
         this.memberDataModel = new StaticSource(['id']);
         this.rolesDataModel = new StaticSource(['id']);
+        this.createdAppsDataModel = new StaticSource(['id']);
+        this.subscribedAppsDataModel = new StaticSource(['id']);
     }
 
     async ngOnInit() {
-        this.tenant_id = this.actRoute.snapshot.params['tenantId'];
-        if (this.tokenStorageService.isTenantAdmin()) {
-            this.isTenantAdmin = true;
-            this.credentials = await this.tenantService.getTenantCredentials(
-                this.tenant_id,
-            );
+        this.loading = true;
+        try {
+            this.tenant_id = this.actRoute.snapshot.params['tenantId'];
+            if (this.tokenStorageService.isTenantAdmin()) {
+                this.isTenantAdmin = true;
+                this.credentials = await this.tenantService.getTenantCredentials(
+                    this.tenant_id,
+                );
+            }
+            console.log(this.tenant_id);
+            this.tenant = await this.tenantService.getTenantDetails(this.tenant_id);
+            this.members = await this.tenantService.getMembers(this.tenant_id);
+            this.roles = await this.tenantService.getTenantRoles(this.tenant_id);
+
+            const createdApps = await this.appService.getAppCreatedByTenantId(this.tenant_id);
+            const subscribedApps = await this.subscriptionService.getTenantSubscription(this.tenant_id);
+
+            this.memberDataModel.setData(Array.isArray(this.members) ? this.members : []);
+            this.rolesDataModel.setData(Array.isArray(this.roles) ? this.roles : []);
+            this.createdAppsDataModel.setData(Array.isArray(createdApps) ? createdApps : []);
+            this.subscribedAppsDataModel.setData(Array.isArray(subscribedApps) ? subscribedApps : []);
+
+            this.authDefaultService.setTitle('TN02: ' + this.tenant.name);
+        } finally {
+            this.loading = false;
         }
-        console.log(this.tenant_id);
-        this.tenant = await this.tenantService.getTenantDetails(this.tenant_id);
-        this.members = await this.tenantService.getMembers(this.tenant_id);
-        this.roles = await this.tenantService.getTenantRoles(this.tenant_id);
-
-        this.memberDataModel.setData(this.members);
-        this.rolesDataModel.setData(this.roles);
-
-        this.authDefaultService.setTitle('TN02: ' + this.tenant.name);
     }
 
     async onUpdateTenant() {
-        const modalRef = this.modalService.open(UpdateTenantComponent);
-        modalRef.componentInstance.tenant = this.tenant;
-        const editedTenant = await modalRef.result;
-        console.log(editedTenant);
-        await this.ngOnInit();
+        const modalRef = await this.modalService.open(UpdateTenantComponent, {
+            initData: {
+                tenant: this.tenant
+            }
+        });
+        if (modalRef.is_ok()) {
+            await this.ngOnInit();
+        }
     }
 
     async onAddMember() {
-        const modalRef = this.modalService.open(AddMemberComponent);
-        modalRef.componentInstance.tenant = this.tenant;
-        const addedMember = await modalRef.result;
-        console.log(addedMember);
-        await this.ngOnInit();
+        const modalRef = await this.modalService.open(AddMemberComponent, {
+            initData: {tenant: this.tenant}
+        });
+        if (modalRef.is_ok()) {
+            await this.ngOnInit();
+        }
     }
 
     async onAddRole() {
-        const modalRef = this.modalService.open(AddRoleComponent);
-        modalRef.componentInstance.tenant = this.tenant;
-        const addedRole = await modalRef.result;
-        console.log(addedRole);
-        await this.ngOnInit();
+        const modalRef = await this.modalService.open(AddRoleComponent, {
+            initData: {
+                tenant: this.tenant
+            }
+        });
+        if (modalRef.is_ok()) {
+            await this.ngOnInit();
+        }
     }
 
     async onRemoveRole(role: any) {
@@ -312,8 +482,9 @@ export class TN02Component implements OnInit {
                 return null;
             },
         });
-        console.log(deletedRole);
-        await this.ngOnInit();
+        if (deletedRole) {
+            await this.ngOnInit();
+        }
     }
 
     async removeMember(user: any) {
@@ -343,8 +514,9 @@ export class TN02Component implements OnInit {
                 return null;
             },
         });
-        console.log(removedMember);
-        await this.ngOnInit();
+        if (removedMember) {
+            await this.ngOnInit();
+        }
     }
 
     async onDeleteTenant() {
@@ -373,7 +545,98 @@ export class TN02Component implements OnInit {
                 return null;
             },
         });
-        console.log(deletedTenant);
-        this._location.back();
+        if (deletedTenant) {
+            this._location.back();
+        }
+    }
+
+    async onAddApp() {
+        const modalRef = await this.modalService.open(CreateAppComponent, {
+            initData: {tenantId: this.tenant.id}
+        });
+        if (modalRef.is_ok()) {
+            await this.ngOnInit();
+        }
+    }
+
+    async onUpdateApp(app: any) {
+        const modalRef = await this.modalService.open(UpdateAppComponent, {
+            initData: {app}
+        });
+        if (modalRef.is_ok()) {
+            await this.ngOnInit();
+        }
+    }
+
+    async onDeleteApp(app: any) {
+        const deletedApp = await this.confirmationService.confirm({
+            message: `Are you sure you want to delete <b>${app.name}</b>?`,
+            header: 'Confirmation',
+            icon: 'pi pi-info-circle',
+            accept: async () => {
+                try {
+                    await this.appService.deleteApp(app.id);
+                    this.messageService.add({
+                        severity: 'success',
+                        summary: 'Success',
+                        detail: 'App Deleted'
+                    });
+                    return app;
+                } catch (e) {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'App Deletion Failed'
+                    });
+                }
+                return null;
+            },
+        });
+        if (deletedApp) {
+            await this.ngOnInit();
+        }
+    }
+
+    async onCreateSubscription() {
+        const result = await this.modalService.open(CreateSubscriptionComponent, {
+            initData: {tenant: this.tenant}
+        });
+        console.log(result, "test");
+        if (result.is_ok()) {
+            await this.ngOnInit();
+        }
+    }
+
+    async onUnsubscribe(subscription: any) {
+        const unsubscribed = await this.confirmationService.confirm({
+            message: `Are you sure you want to unsubscribe from <b>${subscription.app.name}</b>?`,
+            header: 'Confirmation',
+            icon: 'pi pi-info-circle',
+            accept: async () => {
+                try {
+                    await this.subscriptionService.unsubscribeFromApp(subscription.app.id, this.tenant.id);
+                    this.messageService.add({
+                        severity: 'success',
+                        summary: 'Success',
+                        detail: 'Successfully unsubscribed from app'
+                    });
+                    return true;
+                } catch (e) {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'Failed to unsubscribe from app'
+                    });
+                }
+                return false;
+            },
+        });
+        if (unsubscribed) {
+            await this.ngOnInit();
+        }
+    }
+
+    onViewApp(subscription: any) {
+        window.open(subscription.app.appUrl, '_blank');
     }
 }

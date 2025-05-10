@@ -2,10 +2,12 @@ import {
     BadRequestException,
     Body,
     ClassSerializerInterceptor,
+    ConflictException,
     Controller,
     Headers,
     Post,
     Request,
+    ServiceUnavailableException,
     UseGuards,
     UseInterceptors,
 } from "@nestjs/common";
@@ -23,10 +25,8 @@ import {
     USERNAME_REGEXP,
     ValidationSchema,
 } from "../validation/validation.schema";
-import {MailServiceErrorException} from "../exceptions/mail-service-error.exception";
 import {TenantService} from "../services/tenant.service";
 import {SecurityService} from "../casl/security.service";
-import {EmailTakenException} from "../exceptions/email-taken.exception";
 import * as argon2 from "argon2";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
@@ -35,16 +35,6 @@ import * as yup from "yup";
 @Controller("api")
 @UseInterceptors(ClassSerializerInterceptor)
 export class RegisterController {
-    constructor(
-        private readonly usersService: UsersService,
-        private readonly authService: AuthService,
-        private readonly tenantService: TenantService,
-        private readonly mailService: MailService,
-        private readonly securityService: SecurityService,
-        @InjectRepository(User) private usersRepository: Repository<User>,
-    ) {
-    }
-
     static RegisterDomainSchema = yup.object().shape({
         name: yup
             .string()
@@ -60,6 +50,30 @@ export class RegisterController {
         orgName: yup.string().required("Org name is required").max(128),
         domain: yup.string().required("Domain is required").max(128),
     });
+    static SignUpSchema = yup.object().shape({
+        name: yup
+            .string()
+            .required("name is required")
+            .max(128)
+            .matches(USERNAME_REGEXP, USERNAME_MESSAGE),
+        password: yup
+            .string()
+            .required("Password is required")
+            .max(128)
+            .matches(PASSWORD_REGEXP, PASSWORD_MESSAGE),
+        email: yup.string().email().required("Email is required").max(128),
+        client_id: yup.string().required("Client Id is required").max(128),
+    });
+
+    constructor(
+        private readonly usersService: UsersService,
+        private readonly authService: AuthService,
+        private readonly tenantService: TenantService,
+        private readonly mailService: MailService,
+        private readonly securityService: SecurityService,
+        @InjectRepository(User) private usersRepository: Repository<User>,
+    ) {
+    }
 
     @Post("/register-domain")
     async registerDomain(
@@ -78,7 +92,7 @@ export class RegisterController {
             where: {email: body.email},
         });
         if (existingUser) {
-            throw new EmailTakenException();
+            throw new ConflictException('Email is already being used');
         }
 
         let adminContext =
@@ -105,7 +119,7 @@ export class RegisterController {
         const sent = await this.mailService.sendVerificationMail(user, link);
         if (!sent) {
             await this.usersRepository.remove(user);
-            throw new MailServiceErrorException();
+            throw new ServiceUnavailableException('Mail service error');
         }
 
         const tenant = await this.tenantService.create(
@@ -117,21 +131,6 @@ export class RegisterController {
 
         return {success: true};
     }
-
-    static SignUpSchema = yup.object().shape({
-        name: yup
-            .string()
-            .required("name is required")
-            .max(128)
-            .matches(USERNAME_REGEXP, USERNAME_MESSAGE),
-        password: yup
-            .string()
-            .required("Password is required")
-            .max(128)
-            .matches(PASSWORD_REGEXP, PASSWORD_MESSAGE),
-        email: yup.string().email().required("Email is required").max(128),
-        client_id: yup.string().required("Client Id is required").max(128),
-    });
 
     @Post("/signup")
     async signup(
@@ -176,7 +175,7 @@ export class RegisterController {
             );
             if (!sent) {
                 await this.usersRepository.remove(user);
-                throw new MailServiceErrorException();
+                throw new ServiceUnavailableException('Mail service error');
             }
         } else {
             user = await this.usersService.findByEmailSecure(

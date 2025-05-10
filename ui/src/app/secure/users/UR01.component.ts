@@ -53,22 +53,24 @@ import {Filter} from "../../component/model/Filters";
                             <a
                                 [routerLink]="['/UR02/', user.id]"
                                 href="javascript:void(0)"
-                                >{{ user.email }}</a
+                            >{{ user.email }}</a
                             >
                         </td>
                         <td>{{ user.createdAt | date }}</td>
-                        <td class="d-flex ">
+                        <td class="">
                             <button
                                 (click)="openUpdateModal(user)"
-                                class="btn "
+                                class="btn btn-sm btn-primary me-2"
                                 type="button"
+                                data-test-id="edit"
                             >
                                 <i class="fa fa-edit"></i>
                             </button>
                             <button
                                 (click)="openDeleteModal(user)"
-                                class="btn "
+                                class="btn btn-sm btn-danger"
                                 type="button"
+                                data-test-id="delete"
                             >
                                 <i class="fa fa-solid fa-trash"></i>
                             </button>

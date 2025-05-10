@@ -10,15 +10,11 @@ import {
     Output,
     QueryList,
     TemplateRef,
-    ViewChild,
 } from '@angular/core';
-import {FilterBarComponent} from '../filter-bar/filter-bar.component';
 import {TableColumnComponent} from './app-table-column.component';
-import {AppTableButtonComponent} from './app-table-button.component';
 import {DataSource, IDataModel, Query} from '../model/DataModels';
 import {Filter} from '../model/Filters';
-import {CheckboxChangeEvent} from 'primeng/checkbox';
-import {Subscription} from 'rxjs';
+import {BehaviorSubject, Subscription} from 'rxjs';
 import {DataModel} from "../model/DataModel";
 
 export class TableAsyncLoadEvent extends Query {
@@ -33,11 +29,7 @@ export class TableAsyncLoadEvent extends Query {
                     {{ title }} <span>({{ dataModel.totalRowCount() }})</span>
                 </div>
                 <div class="d-flex gap-2">
-                    <ng-container *ngFor="let btnTmpl of buttons">
-                        <ng-container
-                            [ngTemplateOutlet]="btnTmpl.template"
-                        ></ng-container>
-                    </ng-container>
+                    <ng-content select="app-table-actions"></ng-content>
                     <button
                         type="button"
                         class="btn btn-sm"
@@ -63,15 +55,15 @@ export class TableAsyncLoadEvent extends Query {
             (scroll)="lazyLoad($event)"
         >
             <table class="table a-table table-striped table-hover table-sm">
-                <thead class="sticky-top top-0">
+                <thead class="sticky-top top-0 bg-body">
                 <tr style="min-height:35px">
                     <th style="width:40px">
-                        <p-checkbox
-                            *ngIf="multi"
-                            [binary]="true"
-                            [(ngModel)]="_selectAll"
-                            (onChange)="onSelectAll($event)"
-                        ></p-checkbox>
+                        <input *ngIf="multi"
+                               class="form-check-input"
+                               type="checkbox"
+                               value=""
+                               [checked]="isAllSelected$ | async"
+                               (click)="onSelectAll()"/>
                     </th>
                     <ng-container
                         *ngFor="let col of columns; let i = index"
@@ -102,19 +94,18 @@ export class TableAsyncLoadEvent extends Query {
                 </thead>
                 <tbody>
                 <ng-container *ngFor="let row of actualRows">
-                    <tr class="a-table-row" style="height:35px">
+                    <tr class="a-table-row" style="height:35px" (click)="onRowSelect(row)">
                         <td style="width:40px">
-                            <p-checkbox
-                                *ngIf="multi"
-                                [value]="getKeyValue(row)"
-                                [(ngModel)]="selectedItem"
-                            ></p-checkbox>
-                            <p-radioButton
-                                *ngIf="!multi"
-                                name="table_input"
-                                [value]="getKeyValue(row)"
-                                [(ngModel)]="selectedItem"
-                            ></p-radioButton>
+                            <input *ngIf="multi"
+                                   class="form-check-input"
+                                   type="checkbox" value="" readonly
+                                   [checked]="isSelected(row)"/>
+
+                            <input *ngIf="!multi"
+                                   class="form-check-input"
+                                   name="table-selection"
+                                   type="radio" value="" readonly
+                                   [checked]="isSelected(row)"/>
                         </td>
                         <ng-container *ngIf="body">
                             <ng-container
@@ -259,21 +250,21 @@ export class AppTableComponent implements OnInit, OnDestroy {
     @Input() title: string = '';
     @Input() scrollHeight: string = '65vh';
     @Input({transform: booleanAttribute}) multi: boolean = true;
+
     @Input() selection: any[] = [];
     @Output() selectionChange: EventEmitter<any[]> = new EventEmitter();
+
     @ContentChild('table_body')
     body: TemplateRef<any> | null = null;
     actualRows: any[] = [];
+
     @ContentChildren(TableColumnComponent)
     columns!: QueryList<TableColumnComponent>;
-    @ContentChildren(AppTableButtonComponent)
-    buttons!: QueryList<AppTableButtonComponent>;
-    @ViewChild(FilterBarComponent)
-    filterBar!: FilterBarComponent;
-    _selectAll: boolean = false;
+
+    isAllSelected$ = new BehaviorSubject<true | null>(null);
     idFields: string[] = [];
     protected pagesInProgress = new Set();
-    protected _selectedKeys: string[] | null = null;
+    protected selectedKeys: Set<string> = new Set();
     private query: Query = new Query({});
     private sortDirection: { [key: string]: 'asc' | 'desc' } = {};
     private currentSortColumn: string | null = null;
@@ -294,36 +285,6 @@ export class AppTableComponent implements OnInit, OnDestroy {
         this.idFields = dataSource.keyFields();
     }
 
-    get selectedItem() {
-        if (!this._selectedKeys) {
-            this._selectedKeys = this.selection.map((row) =>
-                this.getKeyValue(row),
-            );
-        }
-        return this._selectedKeys;
-    }
-
-    set selectedItem(selectedKeys: any[] | any) {
-        this._selectedKeys = selectedKeys;
-        if (Array.isArray(selectedKeys)) {
-            const keysSet = new Set(selectedKeys);
-            this.selection = this.actualRows.filter((item) =>
-                keysSet.has(this.getKeyValue(item)),
-            );
-            this._selectAll =
-                this.actualRows.length > 0 &&
-                this.actualRows.every((item) =>
-                    keysSet.has(this.getKeyValue(item)),
-                );
-        } else {
-            this.selection = this.actualRows.filter(
-                (item) => this.getKeyValue(item) === selectedKeys,
-            );
-            this._selectAll = false;
-        }
-        this.selectionChange.emit(this.selection);
-    }
-
     async ngOnInit(): Promise<void> {
         this._subscriptions.add(
             this._dataModel.dataSourceEvents().subscribe((x) => {
@@ -332,6 +293,8 @@ export class AppTableComponent implements OnInit, OnDestroy {
                 }
             }),
         );
+
+        this.selection.forEach(item => this.selectRow(item));
 
         this.refresh();
     }
@@ -345,35 +308,6 @@ export class AppTableComponent implements OnInit, OnDestroy {
             .map((kf) => row[kf]?.toString() ?? 'null')
             .join('|');
     }
-
-    onSelectAll($event: CheckboxChangeEvent) {
-        if ($event.checked) {
-            this._selectAll = true;
-            this.selectedItem = this.actualRows.map((row) =>
-                this.getKeyValue(row),
-            );
-        } else {
-            this._selectAll = false;
-            this.selectedItem = [];
-        }
-    }
-
-    // dataPushEventHandler(event: DataPushEvent<any>, append: boolean) {
-    //     switch (event.type) {
-    //         case LoadEvent.UPDATED_DATA:
-    //             if (append) {
-    //                 this.appendData(event.data!, event.page!);
-    //             } else {
-    //                 this.setData(event.data!);
-    //             }
-    //             break;
-    //         case LoadEvent.START_FETCH:
-    //             this.loading = true;
-    //             break;
-    //         default:
-    //             this.loading = false;
-    //     }
-    // }
 
     async requestForData(query: Query, append: boolean) {
         if (
@@ -481,6 +415,49 @@ export class AppTableComponent implements OnInit, OnDestroy {
         link.click();
     }
 
+    selectRow(row: any) {
+        if (!this.multi) {
+            this.selectedKeys.clear();
+        }
+        const key = this.getKeyValue(row);
+        if (this.selectedKeys.has(key)) {
+            this.selectedKeys.delete(key);
+        } else {
+            this.selectedKeys.add(key);
+        }
+
+        if (this.multi) {
+            const isAllSelected = this.actualRows.length > 0 &&
+                this.actualRows.every(item => this.selectedKeys.has(this.getKeyValue(item)));
+
+            this.isAllSelected$.next(isAllSelected ? true : null);
+        }
+    }
+
+    onRowSelect(row: any) {
+        this.selectRow(row);
+
+        this.selection = this.actualRows.filter(
+            (row) => this.isSelected(row),
+        );
+        this.selectionChange.next(this.selection);
+    }
+
+    isSelected(row: any) {
+        return this.selectedKeys.has(this.getKeyValue(row)) ? true : null;
+    }
+
+    onSelectAll() {
+        if (!this.isAllSelected$.getValue()) {
+            this.selectedKeys = new Set(this.actualRows.map(row => this.getKeyValue(row)));
+            this.isAllSelected$.next(true);
+        } else {
+            this.selectedKeys.clear();
+            this.isAllSelected$.next(null);
+        }
+    }
+
+
     protected setData(data: any[]) {
         this.actualRows = data;
     }
@@ -490,6 +467,8 @@ export class AppTableComponent implements OnInit, OnDestroy {
             // this.actualRows.push(...data);
             this.actualRows = [...this.actualRows, ...data];
         }
-        // this.isLastPageReached = !isNextPageAvailable;
+        // this.isLastPageReached = !i3*sNextPageAvailable;
     }
+
+
 }

@@ -49,7 +49,7 @@ import {StaticSource} from "../../component/model/StaticSource";
                             title="Role List"
                             [dataSource]="rolesDataModel"
                         >
-                            <app-table-btn>
+                            <app-table-actions>
                                 <app-value-help-button
                                     classStyle="btn-sm btn-primary "
                                     [dataSource]="tenantRolesDM"
@@ -71,7 +71,7 @@ import {StaticSource} from "../../component/model/StaticSource";
                                         <td>{{ row.name }}</td>
                                     </ng-template>
                                 </app-value-help-button>
-                            </app-table-btn>
+                            </app-table-actions>
 
                             <app-table-col
                                 label="Name"

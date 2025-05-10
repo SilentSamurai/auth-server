@@ -8,11 +8,19 @@ export class SearchClient extends HttpClient {
         super(app, accessToken);
     }
 
+    public async findTenantBy(query: any) {
+        return this.searchApi("Tenants", query);
+    }
+
+    async findByUser(query: any) {
+        return this.searchApi("Users", query);
+    }
+
     private convertToCriteria(query: any) {
         const searchCriteria = [];
         for (let key in query) {
             searchCriteria.push({
-                name: key,
+                field: key,
                 label: key,
                 value: query[key],
                 operator: "equals"
@@ -34,13 +42,5 @@ export class SearchClient extends HttpClient {
         expect2xx(response);
         expect(response.body.data.length).toBeGreaterThanOrEqual(1);
         return response.body.data[0];
-    }
-
-    public async findTenantBy(query: any) {
-        return this.searchApi("Tenants", query);
-    }
-
-    async findByUser(query: any) {
-        return this.searchApi("Users", query);
     }
 }

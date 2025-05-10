@@ -1,53 +1,59 @@
-import {Component, ContentChildren, Input, OnInit, QueryList, TemplateRef, ViewChild,} from '@angular/core';
-import {UntypedFormControl, UntypedFormGroup} from '@angular/forms';
-
-@Component({
-    selector: 'app-input-error',
-    template: `
-        <ng-template #INPERR>
-            <ng-content></ng-content>
-        </ng-template>
-    `,
-    styles: [],
-})
-export class InputErrorComponent implements OnInit {
-    @Input() field: string = '';
-    @ViewChild('INPERR', {static: true}) template!: TemplateRef<any>;
-
-    constructor() {
-    }
-
-    async ngOnInit(): Promise<void> {
-    }
-}
+import {Component, ContentChildren, Inject, Injector, Input, OnInit, QueryList,} from '@angular/core';
+import {
+    ControlValueAccessor,
+    FormControl,
+    FormControlDirective,
+    FormControlName,
+    FormGroupDirective,
+    NG_VALUE_ACCESSOR,
+    NgControl,
+    UntypedFormControl,
+    Validators,
+} from '@angular/forms';
+import {Subject} from 'rxjs';
+import {InputErrorComponent} from "./input-error.component";
+import {randomId} from "../util/utils";
 
 @Component({
     selector: 'app-text-input',
     template: `
-        <div class="form-group mb-3">
+        <div class="form-group row mb-2">
             <label
-                class="form-label"
-                for="{{ formName }}_{{ formField }}_INPUT"
-            >{{ label }}</label
+                *ngIf="showLabel"
+                class="col-auto col-md-4 col-form-label form-label fw-semibold text-end  {{
+                    disabled ? 'p-disabled' : ''
+                }}"
+                for="{{ test_id }}_{{ formControlName }}_INPUT"
             >
-            <input
-                [formControl]="formControl"
-                class="form-control"
-                id="{{ formName }}_{{ formField }}_INPUT"
-                name="{{ formField }}"
-                type="{{ type }}"
-                [readonly]="readonly"
-            />
+                {{ label }}:<span *ngIf="required" class="text-danger">*</span>
+            </label>
+            <div class="col-auto {{ showLabel ? 'col-md-8' : 'col-md-12' }}">
+                <input
+                    [value]="value"
+                    (input)="onInput($event)"
+                    (blur)="onTouched()"
+                    [disabled]="disabled"
+                    class="form-control"
+                    id="{{ test_id }}_{{ formControlName }}_INPUT"
+                    name="{{ formControlName }}"
+                    type="{{ type }}"
+                    [attr.readonly]="readonly ? true : null "
+                />
+            </div>
             <div
-                *ngIf="field.invalid && (field.dirty || field.touched)"
-                class="text-danger"
+                *ngIf="control.invalid && (control.dirty || control.touched)"
+                class="text-danger text-end"
                 role="alert"
             >
-                <div *ngIf="field.hasError('required')">
+                <div *ngIf="control.hasError('required')">
                     {{ label }} is required.
                 </div>
+                <div *ngIf="control.hasError('email')">
+                    Invalid email address.
+                </div>
+                <div *ngIf="control.hasError('min')">Invalid Value</div>
                 <ng-container *ngFor="let eh of inputErrors">
-                    <div *ngIf="field.hasError(eh.field)">
+                    <div *ngIf="control.hasError(eh.field)">
                         <ng-container
                             [ngTemplateOutlet]="eh.template"
                         ></ng-container>
@@ -57,31 +63,104 @@ export class InputErrorComponent implements OnInit {
         </div>
     `,
     styles: [],
+    providers: [
+        {
+            provide: NG_VALUE_ACCESSOR,
+            useExisting: TextInputComponent,
+            multi: true,
+        },
+    ],
 })
-export class TextInputComponent implements OnInit {
-    @Input() formName: string = '';
-    @Input() form!: UntypedFormGroup;
-    @Input() formField: string = '';
+export class TextInputComponent implements OnInit, ControlValueAccessor {
+    @Input() test_id: string = randomId();
+    @Input({required: true}) formControlName: string = '';
     @Input() label: string = '';
-    @Input() value: string = '';
     @Input() type: string = 'text';
-    @Input() readonly: boolean = false;
-    formControl!: UntypedFormControl;
 
+    value = '';
+    disabled = false;
+    formControl!: UntypedFormControl;
     @ContentChildren(InputErrorComponent)
     inputErrors!: QueryList<InputErrorComponent>;
+    private _destroy$ = new Subject<void>();
 
-    constructor() {
+    constructor(@Inject(Injector) private injector: Injector) {
     }
 
-    get field() {
-        return this.form.get(this.formField)!;
+    get showLabel() {
+        return this.label != '';
     }
+
+    get required() {
+        return this.control.hasValidator(Validators.required);
+    }
+
+    get control() {
+        return this.formControl!;
+    }
+
+    onTouched = () => {
+    };
+
+    onChange = (value: any) => {
+    };
+
+    @Input() readonly: boolean = false;
 
     async ngOnInit(): Promise<void> {
-        this.formControl = this.form.get(this.formField) as UntypedFormControl;
-        if (this.value && this.value.length > 0) {
-            this.field.setValue(this.value);
+        // console.log("pool: ", this.disabled)
+        this.setFormControl();
+    }
+
+    setFormControl() {
+        try {
+            const formControl = this.injector.get(NgControl);
+            switch (formControl.constructor) {
+                case FormControlName:
+                    this.formControl = this.injector
+                        .get(FormGroupDirective)
+                        .getControl(formControl as FormControlName);
+                    break;
+                default:
+                    this.formControl = (formControl as FormControlDirective)
+                        .form as FormControl;
+                    break;
+            }
+        } catch (err) {
+            console.error(err);
+            this.formControl = new FormControl();
         }
+    }
+
+    onInput($event: Event) {
+        const input = $event.target as HTMLInputElement;
+        this.value = input.value;
+        this.onChange(this.value); // trigger validation
+    }
+
+    writeToDisplay(value: any) {
+        if (value != null) {
+            this.value = value;
+            this.control?.markAsTouched();
+        } else {
+            this.control?.markAsUntouched();
+        }
+    }
+
+    writeValue(value: any): void {
+        // this.value = value;
+        this.writeToDisplay(value);
+    }
+
+    registerOnChange(fn: any): void {
+        this.onChange = fn;
+    }
+
+    registerOnTouched(fn: any): void {
+        this.onTouched = fn;
+    }
+
+    setDisabledState?(isDisabled: boolean): void {
+        this.disabled = isDisabled;
     }
 }

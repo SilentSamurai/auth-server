@@ -5,7 +5,7 @@ import {JsonConsoleLogger} from "./log/JsonConsoleLogger";
 import {NestExpressApplication} from "@nestjs/platform-express";
 import {NestFactory} from "@nestjs/core";
 import {AppModule} from "./app.module";
-import {HttpExceptionFilter} from "./exceptions/http-exception.filter";
+import {HttpExceptionFilter} from "./exceptions/filter/http-exception.filter";
 import * as express from "express";
 import * as process from "node:process";
 
@@ -51,6 +51,14 @@ export async function prepareApp() {
     const app: NestExpressApplication =
         await NestFactory.create<NestExpressApplication>(AppModule, options);
     app.useGlobalFilters(new HttpExceptionFilter());
+
+    // Add HEAD / handler
+    app.use('/', (req, res, next) => {
+        if (req.method === 'HEAD' && req.path === '/') {
+            return res.status(200).end();
+        }
+        next();
+    });
 
     if (Environment.get("ENABLE_CORS")) {
         app.enableCors();

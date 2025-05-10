@@ -16,9 +16,7 @@ import {NoChangesException, TenantService,} from '../../../_services/tenant.serv
                     novalidate
                 >
                     <div class="mb-3 form-group">
-                        <label class="form-label" for="update.tenant.name"
-                            >Name</label
-                        >
+                        <label class="form-label" for="update.tenant.name">Name</label>
                         <input
                             #name="ngModel"
                             [(ngModel)]="form.name"
@@ -38,7 +36,7 @@ import {NoChangesException, TenantService,} from '../../../_services/tenant.serv
                     </div>
                     <div class="mb-3">
                         <label class="form-label" for="update.tenant.domain"
-                            >Domain</label
+                        >Domain</label
                         >
                         <input
                             #domain="ngModel"

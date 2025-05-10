@@ -16,7 +16,7 @@ import {TenantService} from '../../../_services/tenant.service';
                 >
                     <div class="mb-3 form-group">
                         <label class="form-label" for="add.member.name"
-                            >Email</label
+                        >Email</label
                         >
                         <input
                             #email="ngModel"

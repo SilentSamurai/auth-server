@@ -1,12 +1,9 @@
-import {Injectable} from "@nestjs/common";
+import {ForbiddenException, Injectable, NotFoundException} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {User} from "../entity/user.entity";
 import {Repository} from "typeorm";
-import {UserNotFoundException} from "../exceptions/user-not-found.exception";
 import {Tenant} from "../entity/tenant.entity";
-import {NotFoundException} from "../exceptions/not-found.exception";
 import {Role} from "../entity/role.entity";
-import {ForbiddenException} from "../exceptions/forbidden.exception";
 import {TenantMember} from "../entity/tenant.members.entity";
 import {Environment} from "../config/environment.service";
 
@@ -27,7 +24,7 @@ export class AuthUserService {
             where: {id: id},
         });
         if (user === null) {
-            throw new UserNotFoundException();
+            throw new NotFoundException('User not found');
         }
 
         return user;
@@ -38,7 +35,7 @@ export class AuthUserService {
             where: {email: email},
         });
         if (user === null) {
-            throw new UserNotFoundException();
+            throw new NotFoundException('User not found');
         }
 
         return user;

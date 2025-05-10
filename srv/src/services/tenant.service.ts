@@ -1,18 +1,15 @@
-import {Injectable, OnModuleInit} from "@nestjs/common";
+import {BadRequestException, ForbiddenException, Injectable, NotFoundException, OnModuleInit} from "@nestjs/common";
 import {Environment} from "../config/environment.service";
 import {UsersService} from "./users.service";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 import {Tenant} from "../entity/tenant.entity";
-import {ValidationErrorException} from "../exceptions/validation-error.exception";
 import {User} from "../entity/user.entity";
 import {Role} from "../entity/role.entity";
-import {ForbiddenException} from "../exceptions/forbidden.exception";
 import {RoleService} from "./role.service";
 import {RoleEnum} from "../entity/roleEnum";
 import {CryptUtil} from "../util/crypt.util";
 import {TenantMember} from "../entity/tenant.members.entity";
-import {NotFoundException} from "../exceptions/not-found.exception";
 import {AuthContext} from "../casl/contexts";
 import {SecurityService} from "../casl/security.service";
 import {Action} from "../casl/actions.enum";
@@ -51,7 +48,7 @@ export class TenantService implements OnModuleInit {
             where: {domain},
         });
         if (domainTaken) {
-            throw new ValidationErrorException("Domain already Taken");
+            throw new BadRequestException("Domain already Taken");
         }
 
         const {privateKey, publicKey} = CryptUtil.generateKeyPair();
@@ -441,7 +438,7 @@ export class TenantService implements OnModuleInit {
                 members: {id: user.id},
             },
             relations: {
-                roles: true,
+                roles: true
             },
         });
         return tenants;
@@ -494,7 +491,7 @@ export class TenantService implements OnModuleInit {
         let tenant: Tenant = await this.findById(authContext, tenantId);
         let count = await this.usersService.countByTenant(authContext, tenant);
         if (count > 0) {
-            throw new ValidationErrorException("tenant contains members");
+            throw new BadRequestException("tenant contains members");
         }
         return this.tenantRepository.remove(tenant);
     }

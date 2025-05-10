@@ -10,7 +10,14 @@
         "test": "ng test --browsers=ChromeHeadless --watch=false --reporters=progress",
         "test:watch": "ng test AuthServerUI --karma-config karma.conf.js --code-coverage=true",
         "update": "ng update @angular/core@17 @angular/cli@17",
-        "release": "npm run build && npm run test"
+        "release": "npm run build && npm run test",
+        "start:external-service": "cd ../external-user-app && node server.js",
+        "start:backend": "cd ../srv && cross-env ENV_FILE=./envs/.env.testing npm run start",
+        "e2e:test": "start-server-and-test start:all \"http://localhost:4200|http://localhost:9001\" cypress:run",
+        "e2e": "ng e2e",
+        "cypress:open": "cypress open",
+        "cypress:run": "cypress run",
+        "start:all": "concurrently \"npm run start:backend\" \"npm run ui:serve\" \"npm run start:external-service\""
     },
     "private": true,
     "dependencies": {
@@ -43,8 +50,12 @@
         "@angular-devkit/build-angular": "^17.3.8",
         "@angular/cli": "^17.3.8",
         "@angular/compiler-cli": "^17.3.11",
+        "@cypress/schematic": "^3.0.0",
         "@types/jasmine": "~3.10.0",
         "@types/node": "^16.18.102",
+        "concurrently": "^9.1.2",
+        "cross-env": "^7.0.3",
+        "cypress": "latest",
         "globals": "^16.0.0",
         "jasmine-core": "~3.10.0",
         "karma": "~6.3.0",
@@ -52,6 +63,7 @@
         "karma-coverage": "~2.0.3",
         "karma-jasmine": "~4.0.0",
         "karma-jasmine-html-reporter": "~1.7.0",
+        "start-server-and-test": "^2.0.11",
         "typescript": "^5.4.5"
     }
 }

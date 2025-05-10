@@ -38,10 +38,7 @@ import {PolicyService} from '../../_services/policy.service';
                         <label class="form-label">Action</label>
                         <select class="form-select" formControlName="action">
                             <!-- Show default actions plus an 'OTHER' option -->
-                            <option
-                                *ngFor="let act of possibleActions"
-                                [value]="act"
-                            >
+                            <option *ngFor="let act of possibleActions" [value]="act">
                                 {{ act.toUpperCase() }}
                             </option>
                             <option value="OTHER">OTHER (Type Your Own)</option>

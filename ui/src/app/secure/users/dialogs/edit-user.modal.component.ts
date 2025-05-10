@@ -17,7 +17,7 @@ import {MessageService} from 'primeng/api';
                 >
                     <div class="mb-3 form-group">
                         <label class="form-label" for="edit.user.name"
-                            >Name</label
+                        >Name</label
                         >
                         <input
                             #name="ngModel"
@@ -38,7 +38,7 @@ import {MessageService} from 'primeng/api';
                     </div>
                     <div class="mb-3 form-group">
                         <label class="form-label" for="edit.user.email"
-                            >Email address</label
+                        >Email address</label
                         >
                         <input
                             #email="ngModel"
@@ -60,7 +60,7 @@ import {MessageService} from 'primeng/api';
 
                     <div class="mb-3 form-group">
                         <label class="form-label" for="edit.user.password"
-                            >Password</label
+                        >Password</label
                         >
                         <input
                             #password="ngModel"

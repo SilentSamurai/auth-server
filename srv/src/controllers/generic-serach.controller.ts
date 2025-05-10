@@ -4,6 +4,7 @@ import {
     ClassSerializerInterceptor,
     Controller,
     Logger,
+    NotFoundException,
     Param,
     Post,
     Request,
@@ -34,7 +35,7 @@ import {escapeRegExp} from "typeorm/util/escapeRegExp";
 import {Group} from "../entity/group.entity";
 import {FindOperator} from "typeorm/find-options/FindOperator";
 import {SubjectEnum} from "../entity/subjectEnum";
-import {NotFoundException} from "../exceptions/not-found.exception";
+import {App} from "../entity/app.entity";
 
 const logger = new Logger("GenericSearchController");
 const RELATIONS = {
@@ -52,11 +53,15 @@ const RELATIONS = {
     Groups: {
         Tenants: "tenant",
     },
+    Apps: {
+        owner: "owner",
+        roles: "roles"
+    }
 };
 
 class Filter {
     label: string;
-    name: string;
+    field: string;
     operator: string;
     value: any;
 }
@@ -81,14 +86,16 @@ export class GenericSearchController {
         private memberRepo: Repository<TenantMember>,
         @InjectRepository(Role) private roleRepository: Repository<Role>,
         @InjectRepository(Group) private groupRepository: Repository<Group>,
+        @InjectRepository(App) private appRepository: Repository<App>,
         private readonly securityService: SecurityService,
     ) {
         this.repos = {
             Users: usersRepo,
             Tenants: tenantRepo,
-            TenantMembers: tenantRepo,
+            TenantMembers: memberRepo,
             Roles: roleRepository,
             Groups: groupRepository,
+            Apps: appRepository
         };
     }
 
@@ -169,7 +176,7 @@ enum FilterRule {
     NOT_IN = "nin",
     IS_NULL = "isnull",
     IS_NOT_NULL = "isnotnull",
-    REGEX = "regex",
+    MATCHES = "matches",
 }
 
 export const getCondition = (
@@ -227,7 +234,7 @@ export const getCondition = (
         }
         throw new BadRequestException(value);
     }
-    if (operator == FilterRule.REGEX) {
+    if (operator == FilterRule.MATCHES) {
         let newValue = value.replace(new RegExp(escapeRegExp("*"), "g"), "%");
         return ILike(newValue);
     }
@@ -239,8 +246,8 @@ export const getWhere = (entity: string, filters: Filter[]) => {
     let where: any = {};
 
     for (let filter of filters) {
-        if (filter.name.includes("/")) {
-            let names = filter.name.split("/");
+        if (filter.field.includes("/")) {
+            let names = filter.field.split("/");
             names = names.filter((n: string | any[]) => n.length > 0);
             if (names.length != 2) {
                 logger.log("Invalid filter: ", filter);
@@ -258,7 +265,7 @@ export const getWhere = (entity: string, filters: Filter[]) => {
                 filter.value,
             );
         } else {
-            where[filter.name] = getCondition(filter.operator, filter.value);
+            where[filter.field] = getCondition(filter.operator, filter.value);
         }
     }
     logger.log("Query formed Where: ", where);

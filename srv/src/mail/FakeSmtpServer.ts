@@ -1,15 +1,5 @@
-import {
-    SMTPServer,
-    SMTPServerDataStream,
-    SMTPServerOptions,
-    SMTPServerSession,
-} from "smtp-server";
-import {
-    AddressObject,
-    EmailAddress,
-    ParsedMail,
-    simpleParser,
-} from "mailparser";
+import {SMTPServer, SMTPServerDataStream, SMTPServerOptions, SMTPServerSession,} from "smtp-server";
+import {AddressObject, EmailAddress, ParsedMail, simpleParser,} from "mailparser";
 
 /**
  * Interface for environment configuration
@@ -34,11 +24,10 @@ export interface EmailSearchCriteria {
 }
 
 export class FakeSmtpServer {
+    public emails: ParsedMail[] = [];
     private server: SMTPServer;
     private config: Required<ServerConfig>;
     private logger: Console;
-
-    public emails: ParsedMail[] = [];
 
     constructor(config: ServerConfig = {}) {
         this.config = this.getFullConfig(config);
@@ -99,6 +88,70 @@ export class FakeSmtpServer {
                     callback();
                 });
         };
+    }
+
+    public searchEmails(criteria: EmailSearchCriteria): ParsedMail[] {
+        const limit = criteria.limit ?? this.emails.length;
+        const sortNewest = criteria.sort === "newest";
+
+        return this.emails
+            .filter((email) => this.matchEmail(email, criteria))
+            .sort((a, b) => {
+                // Safely obtain epoch times, falling back to 0 if the Date is missing
+                const timeA = a.date?.getTime() ?? 0;
+                const timeB = b.date?.getTime() ?? 0;
+                return sortNewest ? timeB - timeA : timeA - timeB;
+            })
+            .slice(0, limit);
+    }
+
+    public waitForEmail(
+        criteria: EmailSearchCriteria,
+        timeoutMs = 5000,
+        pollInterval = 500,
+    ): Promise<ParsedMail> {
+        return new Promise((resolve, reject) => {
+            const startTime = Date.now();
+            const checkEmails = () => {
+                const matchingEmail = this.searchEmails(criteria);
+                if (matchingEmail.length > 0) {
+                    return resolve(matchingEmail[0]);
+                }
+
+                if (Date.now() - startTime >= timeoutMs) {
+                    return reject(
+                        new Error(
+                            `Timeout waiting for email matching: ${JSON.stringify(criteria)}`,
+                        ),
+                    );
+                }
+                setTimeout(checkEmails, pollInterval);
+            };
+            checkEmails();
+        });
+    }
+
+    public extractPaths(email: ParsedMail): string[] {
+        const body = `${email.text || ""} ${email.html || ""}`;
+        const urlRegex = /(https?:\/\/[^\s<>"']+)/gi;
+
+        return Array.from(
+            new Set(
+                (body.match(urlRegex) || []).map((url) => {
+                    try {
+                        return new URL(url).pathname;
+                    } catch (error) {
+                        return ""; // Ignore invalid URLs
+                    }
+                }),
+            ),
+        ).filter((path) => path); // Remove empty values
+    }
+
+    public extractLinks(email: ParsedMail): string[] {
+        const body = `${email.text || ""} ${email.html || ""}`;
+        const urlRegex = /(https?:\/\/[^\s<>"']+)/gi;
+        return Array.from(new Set(body.match(urlRegex) || [])); // Remove duplicates
     }
 
     /**
@@ -208,21 +261,6 @@ export class FakeSmtpServer {
         return String(address);
     }
 
-    public searchEmails(criteria: EmailSearchCriteria): ParsedMail[] {
-        const limit = criteria.limit ?? this.emails.length;
-        const sortNewest = criteria.sort === "newest";
-
-        return this.emails
-            .filter((email) => this.matchEmail(email, criteria))
-            .sort((a, b) => {
-                // Safely obtain epoch times, falling back to 0 if the Date is missing
-                const timeA = a.date?.getTime() ?? 0;
-                const timeB = b.date?.getTime() ?? 0;
-                return sortNewest ? timeB - timeA : timeA - timeB;
-            })
-            .slice(0, limit);
-    }
-
     private matchEmail(
         email: ParsedMail,
         criteria: EmailSearchCriteria,
@@ -253,55 +291,6 @@ export class FakeSmtpServer {
         if (criteria.before && email.date && email.date > criteria.before)
             return false;
         return true;
-    }
-
-    public waitForEmail(
-        criteria: EmailSearchCriteria,
-        timeoutMs = 5000,
-        pollInterval = 500,
-    ): Promise<ParsedMail> {
-        return new Promise((resolve, reject) => {
-            const startTime = Date.now();
-            const checkEmails = () => {
-                const matchingEmail = this.searchEmails(criteria);
-                if (matchingEmail.length > 0) {
-                    return resolve(matchingEmail[0]);
-                }
-
-                if (Date.now() - startTime >= timeoutMs) {
-                    return reject(
-                        new Error(
-                            `Timeout waiting for email matching: ${JSON.stringify(criteria)}`,
-                        ),
-                    );
-                }
-                setTimeout(checkEmails, pollInterval);
-            };
-            checkEmails();
-        });
-    }
-
-    public extractPaths(email: ParsedMail): string[] {
-        const body = `${email.text || ""} ${email.html || ""}`;
-        const urlRegex = /(https?:\/\/[^\s<>"']+)/gi;
-
-        return Array.from(
-            new Set(
-                (body.match(urlRegex) || []).map((url) => {
-                    try {
-                        return new URL(url).pathname;
-                    } catch (error) {
-                        return ""; // Ignore invalid URLs
-                    }
-                }),
-            ),
-        ).filter((path) => path); // Remove empty values
-    }
-
-    public extractLinks(email: ParsedMail): string[] {
-        const body = `${email.text || ""} ${email.html || ""}`;
-        const urlRegex = /(https?:\/\/[^\s<>"']+)/gi;
-        return Array.from(new Set(body.match(urlRegex) || [])); // Remove duplicates
     }
 }
 

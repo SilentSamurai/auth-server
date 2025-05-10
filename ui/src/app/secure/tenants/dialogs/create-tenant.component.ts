@@ -22,7 +22,7 @@ import {MessageService} from 'primeng/api';
                         <label
                             class="form-label control-label-required"
                             for="create.tenant.name"
-                            >Name:
+                        >Name:
                         </label>
                         <input
                             #name="ngModel"
@@ -45,7 +45,7 @@ import {MessageService} from 'primeng/api';
                         <label
                             class="form-label control-label-required"
                             for="create.tenant.domain"
-                            >Domain:
+                        >Domain:
                         </label>
                         <input
                             #domain="ngModel"

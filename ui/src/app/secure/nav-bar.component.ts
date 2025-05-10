@@ -4,7 +4,7 @@ import {UserService} from '../_services/user.service';
 import {AuthDefaultService} from '../_services/auth.default.service';
 import {SessionService} from '../_services/session.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {ProfileComponent} from '../profile/profile.component';
+import {ProfileComponent} from '../open-pages/profile/profile.component';
 
 @Component({
     selector: 'nav-bar',
@@ -60,20 +60,20 @@ import {ProfileComponent} from '../profile/profile.component';
                                     class="dropdown-item"
                                     href="javascript:void(0)"
                                     (click)="openProfileModal()"
-                                    >Profile</a
+                                >Profile</a
                                 >
                                 <div class="dropdown-divider"></div>
                                 <a
                                     class="dropdown-item"
                                     href="https://silentsamurai.github.io/auth-server"
-                                    >API Docs</a
+                                >API Docs</a
                                 >
                                 <div class="dropdown-divider"></div>
                                 <a
                                     class="dropdown-item"
                                     href="javascript:void(0)"
                                     (click)="logout()"
-                                    >Sign Out</a
+                                >Sign Out</a
                                 >
                             </div>
                         </li>

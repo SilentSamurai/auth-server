@@ -148,6 +148,7 @@ export class TileGroup {
  * Factory function to build an array of TileGroups and Tiles from plain data.
  *
  * @param data - Array of plain objects (e.g., from configs or API) defining groups and their tiles.
+ * @param ps
  * @returns Array of fully instantiated TileGroup objects with Tile instances inside.
  */
 export function makeLaunchPad(data: any, ps: PermissionService): TileGroup[] {

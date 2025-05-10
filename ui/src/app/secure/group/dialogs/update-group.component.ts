@@ -17,7 +17,7 @@ import {TenantService} from '../../../_services/tenant.service';
                 >
                     <div class="mb-3 form-group">
                         <label class="form-label" for="create.group.name"
-                            >Name</label
+                        >Name</label
                         >
                         <input
                             #name="ngModel"
