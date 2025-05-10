@@ -23,7 +23,8 @@ import {GroupController} from "./group.controller";
 import {RoleControllerV2} from "./roleV2.controller";
 import {RegisterController} from "./registration.controller";
 import {AppController} from "./app.controller";
-import {App} from "../entity/app.entity";
+import {App} from "../entity/app.entity"
+import {TenantBitsController} from "./tenant-bits.controller";
 
 @Module(
     {
@@ -49,7 +50,8 @@ import {App} from "../entity/app.entity";
             GroupController,
             RoleControllerV2,
             RegisterController,
-            AppController
+            AppController,
+            TenantBitsController
         ],
         providers: [],
         exports: []

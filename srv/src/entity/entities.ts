@@ -10,6 +10,7 @@ import {GroupUser} from "./group.users.entity";
 import {Policy} from "./authorization.entity";
 import {App} from "./app.entity";
 import {Subscription} from "./subscription.entity";
+import {TenantBits} from "./tenant-bits.entity";
 
 export const entities = [
     Tenant,
@@ -23,5 +24,6 @@ export const entities = [
     GroupUser,
     Policy,
     App,
-    Subscription
+    Subscription,
+    TenantBits
 ];

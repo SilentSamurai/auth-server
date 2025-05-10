@@ -18,16 +18,18 @@ import {App} from "../entity/app.entity";
 import {Subscription} from "../entity/subscription.entity";
 import {SubscriptionService} from "./subscription.service";
 import {AppService} from "./app.service";
+import {TenantBits} from "../entity/tenant-bits.entity";
+import {TenantBitsService} from "./tenant-bits.service";
 
 @Module(
     {
         imports: [
-            TypeOrmModule.forFeature([Tenant, User, TenantMember, Role, UserRole, AuthCode, Group, GroupRole, GroupUser, App, Subscription]),
+            TypeOrmModule.forFeature([Tenant, User, TenantMember, Role, UserRole, AuthCode, Group, GroupRole, GroupUser, App, Subscription, TenantBits]),
             CaslModule,
         ],
         controllers: [],
-        providers: [UsersService, GroupService, TenantService, RoleService, SubscriptionService, AppService],
-        exports: [UsersService, GroupService, TenantService, RoleService, SubscriptionService, AppService]
+        providers: [UsersService, GroupService, TenantService, RoleService, SubscriptionService, AppService, TenantBitsService],
+        exports: [UsersService, GroupService, TenantService, RoleService, SubscriptionService, AppService, TenantBitsService]
     })
 export class ServiceModule {
 }
