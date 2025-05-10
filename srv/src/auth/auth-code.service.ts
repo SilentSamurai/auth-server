@@ -1,15 +1,13 @@
-import {Injectable, Logger} from "@nestjs/common";
+import {Injectable, Logger, NotFoundException, UnauthorizedException} from "@nestjs/common";
 import {Environment} from "../config/environment.service";
 import {JwtService} from "@nestjs/jwt";
 import {TenantService} from "../services/tenant.service";
-import {NotFoundException} from "../exceptions/not-found.exception";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 import {AuthCode} from "../entity/auth_code.entity";
 import {User} from "../entity/user.entity";
 import {Tenant} from "../entity/tenant.entity";
 import {CryptUtil} from "../util/crypt.util";
-import {InvalidCredentialsException} from "../exceptions/invalid-credentials.exception";
 import {Cron} from "@nestjs/schedule";
 import * as ms from "ms";
 import {AuthUserService} from "../casl/authUser.service";
@@ -85,7 +83,7 @@ export class AuthCodeService {
             session.method,
         );
         if (generateCodeChallenge !== session.codeChallenge) {
-            throw new InvalidCredentialsException();
+            throw new UnauthorizedException('Invalid credentials');
         }
         return {tenant, user};
     }

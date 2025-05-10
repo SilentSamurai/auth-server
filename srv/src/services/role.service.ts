@@ -1,9 +1,8 @@
-import {BadRequestException, Injectable} from "@nestjs/common";
+import {BadRequestException, Injectable, NotFoundException} from "@nestjs/common";
 import {Environment} from "../config/environment.service";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 import {Tenant} from "../entity/tenant.entity";
-import {ValidationErrorException} from "../exceptions/validation-error.exception";
 import {Role} from "../entity/role.entity";
 import {User} from "../entity/user.entity";
 import {UserRole} from "../entity/user.roles.entity";
@@ -92,7 +91,7 @@ export class RoleService {
             },
         });
         if (role === null) {
-            throw new ValidationErrorException("role not found");
+            throw new NotFoundException("role not found");
         }
         this.securityService.isAuthorized(
             authContext,
@@ -161,7 +160,7 @@ export class RoleService {
         );
 
         if (count > 0 || !role.removable) {
-            throw new ValidationErrorException(
+            throw new BadRequestException(
                 "role is assigned to members | role is protected",
             );
         }
@@ -191,7 +190,7 @@ export class RoleService {
         });
 
         if (role === null) {
-            throw new ValidationErrorException("role not found");
+            throw new NotFoundException("role not found");
         }
         return role;
     }

@@ -3,7 +3,7 @@ import {
     Body,
     ClassSerializerInterceptor,
     Controller,
-    Logger,
+    Logger, NotFoundException,
     Param,
     Post,
     Request,
@@ -34,7 +34,6 @@ import {escapeRegExp} from "typeorm/util/escapeRegExp";
 import {Group} from "../entity/group.entity";
 import {FindOperator} from "typeorm/find-options/FindOperator";
 import {SubjectEnum} from "../entity/subjectEnum";
-import {NotFoundException} from "../exceptions/not-found.exception";
 import {App} from "../entity/app.entity";
 
 const logger = new Logger("GenericSearchController");

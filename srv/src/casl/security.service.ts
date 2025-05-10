@@ -1,15 +1,13 @@
-import {forwardRef, Inject, Injectable, OnModuleInit} from "@nestjs/common";
+import {forwardRef, Inject, Injectable, OnModuleInit, ForbiddenException, UnauthorizedException} from "@nestjs/common";
 
 import {RoleEnum} from "../entity/roleEnum";
 import {Environment} from "../config/environment.service";
-import {ForbiddenException} from "../exceptions/forbidden.exception";
 import {CaslAbilityFactory} from "./casl-ability.factory";
 import {AnyAbility} from "@casl/ability/dist/types/PureAbility";
 import {Action} from "./actions.enum";
 import {subject} from "@casl/ability";
 import {AuthUserService} from "./authUser.service";
 import {AuthContext, GRANT_TYPES, TechnicalToken, TenantToken, UserToken,} from "./contexts";
-import {UnauthorizedException} from "../exceptions/unauthorized.exception";
 
 @Injectable()
 export class SecurityService implements OnModuleInit {

@@ -2,17 +2,16 @@ import {
     ArgumentsHost,
     BadRequestException,
     Catch,
-    ExceptionFilter,
+    ExceptionFilter, ForbiddenException,
     HttpException,
     HttpStatus,
     Logger,
     Type,
+    NotFoundException,
+    InternalServerErrorException,
 } from "@nestjs/common";
 import {Request, Response} from "express";
 import {BackendError} from "../backend-error.class";
-import {UnknownErrorException} from "../unknown-error.exception";
-import {InvalidRequestException} from "../invalid-request.exception";
-import {ForbiddenException} from "../forbidden.exception";
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -36,7 +35,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
                 const status = exception.getStatus();
                 switch (status) {
                     case HttpStatus.NOT_FOUND: {
-                        exception = new InvalidRequestException();
+                        exception = new NotFoundException();
                         break;
                     }
                     case HttpStatus.FORBIDDEN: {
@@ -49,14 +48,14 @@ export class HttpExceptionFilter implements ExceptionFilter {
                     }
                     default: {
                         const message: string = exception.message;
-                        exception = new UnknownErrorException(message);
+                        exception = new InternalServerErrorException(message);
                         break;
                     }
                 }
             }
         } else {
             const message: string = (exception as Error)?.message;
-            exception = new UnknownErrorException(message);
+            exception = new InternalServerErrorException(message);
             error["message"] = message;
         }
 

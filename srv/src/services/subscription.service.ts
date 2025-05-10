@@ -1,11 +1,10 @@
-import {Injectable, Logger} from '@nestjs/common';
+import {Injectable, Logger, NotFoundException} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {Repository} from 'typeorm';
 import {Subscription, SubscriptionStatus} from '../entity/subscription.entity';
 import {Tenant} from '../entity/tenant.entity';
 import {Role} from '../entity/role.entity';
 import {App} from '../entity/app.entity';
-import {NotFoundException} from "../exceptions/not-found.exception";
 import {User} from "../entity/user.entity";
 import {AuthContext} from "../casl/contexts";
 import {TenantService} from "./tenant.service";

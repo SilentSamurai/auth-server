@@ -2,7 +2,7 @@ import {
     BadRequestException,
     Body,
     ClassSerializerInterceptor,
-    Controller,
+    Controller, ForbiddenException,
     Get,
     Headers,
     Logger,
@@ -12,6 +12,8 @@ import {
     Request,
     Response,
     UseInterceptors,
+    UnauthorizedException,
+    ServiceUnavailableException,
 } from "@nestjs/common";
 import {Request as ExpressRequest} from "express";
 
@@ -22,11 +24,8 @@ import {UsersService} from "../services/users.service";
 import {MailService} from "../mail/mail.service";
 import {ValidationPipe} from "../validation/validation.pipe";
 import {ValidationSchema} from "../validation/validation.schema";
-import {MailServiceErrorException} from "../exceptions/mail-service-error.exception";
 import {TenantService} from "../services/tenant.service";
 import {Tenant} from "../entity/tenant.entity";
-import {ForbiddenException} from "../exceptions/forbidden.exception";
-import {InvalidTokenException} from "../exceptions/invalid-token.exception";
 import {AuthCodeService} from "../auth/auth-code.service";
 import {GRANT_TYPES, TenantToken} from "../casl/contexts";
 import {AuthUserService} from "../casl/authUser.service";
@@ -303,7 +302,7 @@ export class AuthController {
         let securityContext: TenantToken =
             await this.authService.validateAccessToken(body.access_token);
         if (securityContext.tenant.id !== tenant.id) {
-            throw new InvalidTokenException("not a valid token");
+            throw new UnauthorizedException("not a valid token");
         }
         return securityContext;
     }
@@ -385,7 +384,7 @@ export class AuthController {
             link,
         );
         if (!sent) {
-            throw new MailServiceErrorException();
+            throw new ServiceUnavailableException('Mail service error');
         }
 
         return {status: sent};
