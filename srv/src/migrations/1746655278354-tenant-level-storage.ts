@@ -3,13 +3,15 @@ import {MigrationInterface, QueryRunner, Table, TableForeignKey, TableUnique} fr
 export class TenantLevelStorage1746655278354 implements MigrationInterface {
 
     public async up(queryRunner: QueryRunner): Promise<void> {
+        const DB_STRING_TYPE = "VARCHAR";
+        const DB_UUID_GENERATOR = "uuid_generate_v4()";
         await queryRunner.createTable(
             new Table({
                 name: "tenant_bits",
                 columns: [
                     {
                         name: "id",
-                        type: "uuid",
+                        type: DB_STRING_TYPE,
                         isPrimary: true,
                         isNullable: false,
                         generationStrategy: "uuid",
@@ -17,12 +19,12 @@ export class TenantLevelStorage1746655278354 implements MigrationInterface {
                     },
                     {
                         name: "tenant_id",
-                        type: "uuid",
+                        type: DB_STRING_TYPE,
                         isNullable: false,
                     },
                     {
                         name: "owner_tenant_id",
-                        type: "uuid",
+                        type: DB_STRING_TYPE,
                         isNullable: false,
                     },
                     {
