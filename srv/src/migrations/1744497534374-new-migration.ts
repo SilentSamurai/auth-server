@@ -13,7 +13,7 @@ export class SubscriptionAndApps1744497534374 implements MigrationInterface {
                 columns: [
                     {
                         name: 'id',
-                        type: 'uuid',
+                        type: DB_STRING_TYPE,
                         isPrimary: true,
                         generationStrategy: 'uuid',
                         default: DB_UUID_GENERATOR,
@@ -35,7 +35,7 @@ export class SubscriptionAndApps1744497534374 implements MigrationInterface {
                     },
                     {
                         name: 'owner_tenant_id',
-                        type: 'uuid',
+                        type: DB_STRING_TYPE,
                         isNullable: false,
                     },
                     {
@@ -68,19 +68,19 @@ export class SubscriptionAndApps1744497534374 implements MigrationInterface {
                 columns: [
                     {
                         name: 'id',
-                        type: 'uuid',
+                        type: DB_STRING_TYPE,
                         isPrimary: true,
                         generationStrategy: 'uuid',
                         default: DB_UUID_GENERATOR,
                     },
                     {
                         name: 'subscriber_tenant_id',
-                        type: 'uuid',
+                        type: DB_STRING_TYPE,
                         isNullable: false,
                     },
                     {
                         name: 'app_id',
-                        type: 'uuid',
+                        type: DB_STRING_TYPE,
                         isNullable: false,
                     },
                     {
@@ -138,7 +138,7 @@ export class SubscriptionAndApps1744497534374 implements MigrationInterface {
             'roles',
             new TableColumn({
                 name: 'app_id',
-                type: 'uuid',
+                type: DB_STRING_TYPE,
                 isNullable: true,
             }),
         );
