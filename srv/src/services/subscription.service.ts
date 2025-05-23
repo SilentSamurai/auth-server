@@ -8,6 +8,7 @@ import {App} from '../entity/app.entity';
 import {User} from "../entity/user.entity";
 import {AuthContext} from "../casl/contexts";
 import {TenantService} from "./tenant.service";
+import { AuthService } from '../auth/auth.service';
 
 const logger = new Logger("SubscriptionService");
 
@@ -35,6 +36,7 @@ export class SubscriptionService {
         @InjectRepository(App)
         private readonly appRepo: Repository<App>,
         private readonly tenantService: TenantService,
+        private readonly authService: AuthService, // Inject AuthService
     ) {
     }
 
@@ -293,13 +295,19 @@ export class SubscriptionService {
             return true;
         }
 
-        const endpoint = `${app.appUrl.replace(/\/+$/, '')}/onboard/tenant/`;
+        const endpoint = `${app.appUrl.replace(/\/+/g, '')}/api/onboard/tenant/`;
         logger.log(`Making request to endpoint: ${endpoint}`);
         logger.log(`Request payload:`, {tenantId: tenant.id});
 
+        // Get technical token using AuthService
+        const token = await this.authService.createTechnicalAccessToken(tenant, []);
+
         const response = await fetch(endpoint, {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
             body: JSON.stringify({tenantId: tenant.id}),
         });
 
@@ -343,12 +351,19 @@ export class SubscriptionService {
             return;
         }
 
-        const endpoint = `${app.appUrl.replace(/\/+$/, '')}/offboard/tenant/${tenant.id}`;
+        const endpoint = `${app.appUrl.replace(/\/+/g, '')}/api/offboard/tenant/${tenant.id}`;
         logger.log(`Making request to endpoint: ${endpoint}`);
+
+        // Get technical token using AuthService
+        const token = await this.authService.createTechnicalAccessToken(tenant, []);
 
         const response = await fetch(endpoint, {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({tenantId: tenant.id}),
         });
 
         if (!response.ok) {

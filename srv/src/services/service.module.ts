@@ -1,4 +1,4 @@
-import {Module} from "@nestjs/common";
+import {forwardRef, Module} from "@nestjs/common";
 import {TypeOrmModule} from "@nestjs/typeorm";
 import {Role} from "../entity/role.entity";
 import {UserRole} from "../entity/user.roles.entity";
@@ -20,12 +20,14 @@ import {SubscriptionService} from "./subscription.service";
 import {AppService} from "./app.service";
 import {TenantBits} from "../entity/tenant-bits.entity";
 import {TenantBitsService} from "./tenant-bits.service";
+import {AuthModule} from "../auth/auth.module";
 
 @Module(
     {
         imports: [
             TypeOrmModule.forFeature([Tenant, User, TenantMember, Role, UserRole, AuthCode, Group, GroupRole, GroupUser, App, Subscription, TenantBits]),
             CaslModule,
+            forwardRef(() => AuthModule),
         ],
         controllers: [],
         providers: [UsersService, GroupService, TenantService, RoleService, SubscriptionService, AppService, TenantBitsService],
