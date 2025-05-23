@@ -1,7 +1,8 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
-const {parse} = require("node:url");
+const { parse } = require("node:url");
+const { assert } = require('node:console');
 
 // Store onboard and offboard requests for verification
 const onboardRequests = [];
@@ -13,18 +14,37 @@ const server = http.createServer((req, res) => {
     let pathname = parsedUrl.pathname;
 
     // Handle onboard endpoint
-    if (pathname === '/onboard/tenant/') {
-        // Parse request body
+    if (pathname === '/api/onboard/tenant/') {
         let body = '';
-        req.on('data', chunk => {
-            body += chunk.toString();
-        });
-
-        req.on('end', () => {
+        req.on('data', chunk => { body += chunk.toString(); });
+        req.on('end', async () => {
             try {
                 const data = JSON.parse(body);
+
+                // Get token from Authorization header
+                let token = null;
+                if (req.headers && req.headers.authorization) {
+                    const parts = req.headers.authorization.split(' ');
+                    if (parts.length === 2 && parts[0] === 'Bearer') {
+                        token = parts[1];
+                    }
+                }
+                if (!token) {
+                    res.writeHead(401, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Missing or invalid Authorization header' }));
+                    return;
+                }
                 const tenantId = data.tenantId;
                 const timestamp = new Date().toISOString();
+                // Verify token before proceeding
+                try {
+                    await verifyToken(token);
+                } catch (err) {
+                    console.error('Token verification failed:', err);
+                    res.writeHead(401, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Token verification failed', details: err }));
+                    return;
+                }
 
                 // Log detailed information about the onboard request
                 console.log(`[${timestamp}] Received onboard request:`);
@@ -41,52 +61,86 @@ const server = http.createServer((req, res) => {
                 });
 
                 // Return success response
-                res.writeHead(200, {'Content-Type': 'application/json'});
+                res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({appNames: []}));
             } catch (error) {
                 console.error('Error processing onboard request:', error);
-                res.writeHead(400, {'Content-Type': 'application/json'});
-                res.end(JSON.stringify({error: 'Invalid request body'}));
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Invalid request body' }));
             }
         });
         return;
     }
 
     // Handle offboard endpoint
-    if (pathname.startsWith('/offboard/tenant/')) {
-        const tenantId = pathname.split('/').pop();
-        const timestamp = new Date().toISOString();
+    if (pathname.startsWith('/api/offboard/tenant/')) {
+        let body = '';
+        req.on('data', chunk => { body += chunk.toString(); });
+        req.on('end', async () => {
+            try {
+                const data = JSON.parse(body);
 
-        // Log detailed information about the offboard request
-        console.log(`[${timestamp}] Received offboard request:`);
-        console.log(`  - Tenant ID: ${tenantId}`);
-        console.log(`  - Method: ${req.method}`);
-        console.log(`  - Headers:`, req.headers);
+                // Get token from Authorization header
+                let token = null;
+                if (req.headers && req.headers.authorization) {
+                    const parts = req.headers.authorization.split(' ');
+                    if (parts.length === 2 && parts[0] === 'Bearer') {
+                        token = parts[1];
+                    }
+                }
+                if (!token) {
+                    res.writeHead(401, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Missing or invalid Authorization header' }));
+                    return;
+                }
+                const tenantId = pathname.split('/').pop();
+                const timestamp = new Date().toISOString();
+                // Verify token before proceeding
+                try {
+                    await verifyToken(token);
+                } catch (err) {
+                    console.error('Token verification failed:', err);
+                    res.writeHead(401, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Token verification failed', details: err }));
+                    return;
+                }
 
-        // Store the request for verification
-        offboardRequests.push({
-            tenantId,
-            timestamp,
-            method: req.method,
-            headers: req.headers
+                // Log detailed information about the offboard request
+                console.log(`[${timestamp}] Received offboard request:`);
+                console.log(`  - Tenant ID: ${tenantId}`);
+                console.log(`  - Method: ${req.method}`);
+                console.log(`  - Headers:`, req.headers);
+
+                // Store the request for verification
+                offboardRequests.push({
+                    tenantId,
+                    timestamp,
+                    method: req.method,
+                    headers: req.headers
+                });
+
+                // Return success response
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({appNames: []}));
+            } catch (error) {
+                console.error('Error processing offboard request:', error);
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Invalid request body' }));
+            }
         });
-
-        // Return success response
-        res.writeHead(200, {'Content-Type': 'application/json'});
-        res.end(JSON.stringify({appNames: []}));
         return;
     }
 
     // Add endpoint to get onboard request history
     if (pathname === '/onboard/history') {
-        res.writeHead(200, {'Content-Type': 'application/json'});
+        res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify(onboardRequests));
         return;
     }
 
     // Add endpoint to get offboard request history
     if (pathname === '/offboard/history') {
-        res.writeHead(200, {'Content-Type': 'application/json'});
+        res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify(offboardRequests));
         return;
     }
@@ -96,7 +150,7 @@ const server = http.createServer((req, res) => {
         const tenantId = pathname.split('/').pop();
         const requests = onboardRequests.filter(req => req.tenantId === tenantId);
 
-        res.writeHead(200, {'Content-Type': 'application/json'});
+        res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({
             wasOnboarded: requests.length > 0,
             requestCount: requests.length,
@@ -110,7 +164,7 @@ const server = http.createServer((req, res) => {
         const tenantId = pathname.split('/').pop();
         const requests = offboardRequests.filter(req => req.tenantId === tenantId);
 
-        res.writeHead(200, {'Content-Type': 'application/json'});
+        res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({
             wasOffboarded: requests.length > 0,
             requestCount: requests.length,
@@ -125,7 +179,7 @@ const server = http.createServer((req, res) => {
         const tenantOnboardRequests = onboardRequests.filter(req => req.tenantId === tenantId);
         const tenantOffboardRequests = offboardRequests.filter(req => req.tenantId === tenantId);
 
-        res.writeHead(200, {'Content-Type': 'application/json'});
+        res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({
             tenantId,
             wasOnboarded: tenantOnboardRequests.length > 0,
@@ -162,7 +216,7 @@ const server = http.createServer((req, res) => {
                 } else {
                     // Serve the file with appropriate content type
                     const contentType = getContentType(filePath);
-                    res.writeHead(200, {'Content-Type': contentType});
+                    res.writeHead(200, { 'Content-Type': contentType });
                     res.end(data);
                 }
             });
@@ -173,6 +227,40 @@ const server = http.createServer((req, res) => {
         }
     });
 });
+
+// Minimal helper to verify a JWT token
+function parseJwt(token) {
+    try {
+        const base64Url = token.split('.')[1];
+        if (!base64Url) return null;
+
+        // Convert Base64Url to Base64
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+
+        // Decode the Base64 string to JSON
+        const jsonPayload = decodeURIComponent(
+            atob(base64)
+                .split('')
+                .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+                .join('')
+        );
+
+        return JSON.parse(jsonPayload);
+    } catch (e) {
+        console.error('Invalid JWT:', e);
+        return null;
+    }
+}
+
+
+async function verifyToken(token) {
+    // Parse JWT manually
+    const decoded = parseJwt(token);
+    assert(decoded.grant_type.includes("client_credential"), 'Invalid grant type');
+    assert(decoded.tenant != undefined, 'Missing tenant ID');
+    assert(decoded.tenant.domain != undefined, 'Missing tenant domain');
+    assert(decoded.tenant.domain != "shire.local", 'Invalid tenant domain');
+}
 
 // Helper function to determine the content type based on file extension
 function getContentType(filePath) {

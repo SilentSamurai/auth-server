@@ -157,8 +157,8 @@ export class TenantAppServer {
      * Setup routes
      */
     private setupRoutes(): void {
-        // Onboard endpoint
-        this.app.post('/onboard/tenant/', (req, res) => {
+        // Onboard endpoint (update path to match SubscriptionService)
+        this.app.post('/api/onboard/tenant/', (req, res) => {
             try {
                 const tenantId = req.body.tenantId;
                 this.log('info', `Received onboard request for tenant: ${tenantId}`);
@@ -177,8 +177,8 @@ export class TenantAppServer {
             }
         });
 
-        // Offboard endpoint
-        this.app.post('/offboard/tenant/:tenantId', (req, res) => {
+        // Offboard endpoint (update path to match SubscriptionService)
+        this.app.post('/api/offboard/tenant/:tenantId', (req, res) => {
             const tenantId = req.params.tenantId;
             this.log('info', `Received offboard request for tenant: ${tenantId}`);
 
