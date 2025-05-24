@@ -1,6 +1,7 @@
 import * as express from 'express';
 import * as http from 'http';
 import * as cors from 'cors';
+import * as jwt from 'jsonwebtoken';
 
 /**
  * Interface for environment configuration
@@ -50,6 +51,7 @@ export class TenantAppServer {
     // Track onboard and offboard requests
     private onboardRequests: OnboardRequest[] = [];
     private offboardRequests: OffboardRequest[] = [];
+    private lastDecodedToken: any = null; // Store last decoded JWT for test assertions
 
     constructor(config: ServerConfig = {}) {
         this.config = this.getFullConfig(config);
@@ -161,7 +163,19 @@ export class TenantAppServer {
         this.app.post('/api/onboard/tenant/', (req, res) => {
             try {
                 const tenantId = req.body.tenantId;
-                this.log('info', `Received onboard request for tenant: ${tenantId}`);
+                // Decode JWT from Authorization header
+                const authHeader = req.headers['authorization'];
+                let decoded: any = null;
+                if (authHeader && authHeader.startsWith('Bearer ')) {
+                    const token = authHeader.substring(7);
+                    try {
+                        decoded = jwt.decode(token);
+                        this.lastDecodedToken = decoded;
+                    } catch (e) {
+                        this.lastDecodedToken = null;
+                    }
+                }
+                this.log('info', `Received onboard request for tenant: ${tenantId}, token sub: ${decoded?.sub}`);
 
                 // Track the request
                 this.onboardRequests.push({
@@ -180,7 +194,19 @@ export class TenantAppServer {
         // Offboard endpoint (update path to match SubscriptionService)
         this.app.post('/api/offboard/tenant/:tenantId', (req, res) => {
             const tenantId = req.params.tenantId;
-            this.log('info', `Received offboard request for tenant: ${tenantId}`);
+            // Decode JWT from Authorization header
+            const authHeader = req.headers['authorization'];
+            let decoded: any = null;
+            if (authHeader && authHeader.startsWith('Bearer ')) {
+                const token = authHeader.substring(7);
+                try {
+                    decoded = jwt.decode(token);
+                    this.lastDecodedToken = decoded;
+                } catch (e) {
+                    this.lastDecodedToken = null;
+                }
+            }
+            this.log('info', `Received offboard request for tenant: ${tenantId}, token sub: ${decoded?.sub}`);
 
             // Track the offboard request
             this.offboardRequests.push({
@@ -286,6 +312,13 @@ export class TenantAppServer {
         if (levels[level] <= levels[this.config.logLevel]) {
             console[level === 'error' ? 'error' : level === 'warn' ? 'warn' : level === 'info' ? 'info' : 'log'](...args);
         }
+    }
+
+    /**
+     * Get the last decoded JWT token (for test assertions)
+     */
+    public getLastDecodedToken(): any {
+        return this.lastDecodedToken;
     }
 }
 

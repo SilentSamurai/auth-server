@@ -11,6 +11,7 @@ import {
     UseGuards,
     UseInterceptors,
 } from "@nestjs/common";
+import * as yup from 'yup';
 
 import {User} from "../entity/user.entity";
 import {UsersService} from "../services/users.service";
@@ -22,6 +23,12 @@ import {ValidationSchema} from "../validation/validation.schema";
 import {TenantService} from "../services/tenant.service";
 import {Tenant} from "../entity/tenant.entity";
 import {SecurityService} from "../casl/security.service";
+
+// Local VerifyUserSchema for this controller
+const VerifyUserSchema = yup.object().shape({
+    email: yup.string().required("Name is required").max(128),
+    verify: yup.boolean().required("boolean value is required"),
+});
 
 @Controller("api/users")
 @UseInterceptors(ClassSerializerInterceptor)
@@ -126,7 +133,7 @@ export class UsersAdminController {
     @UseGuards(JwtAuthGuard)
     async updateVerification(
         @Request() request,
-        @Body(new ValidationPipe(ValidationSchema.verifyUser))
+        @Body(new ValidationPipe(VerifyUserSchema))
             body: {
             email: string;
             verify: boolean;

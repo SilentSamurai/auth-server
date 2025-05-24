@@ -69,7 +69,7 @@ describe('e2e tenant technical credential', () => {
         const response = await app.getHttpServer()
             .post('/api/oauth/token')
             .send({
-                "grant_type": "client_credential",
+                "grant_type": "client_credentials",
                 "client_id": tenant.clientId,
                 "client_secret": tenant.clientSecret
             })
@@ -86,7 +86,7 @@ describe('e2e tenant technical credential', () => {
         const response = await app.getHttpServer()
             .post('/api/oauth/token')
             .send({
-                "grant_type": "client_credential",
+                "grant_type": "client_credentials",
                 "client_id": tenant.clientId,
                 "client_secret": "dsgsdg"
             })

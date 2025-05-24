@@ -143,6 +143,12 @@ describe('AppController', () => {
             const onboardRequests = mockServer.getOnboardRequests();
             expect(onboardRequests.length).toBeGreaterThan(0);
             expect(onboardRequests[0].tenantId).toBe(subscriberTenantId);
+
+            // Assert the technical token is for the app owner (creatorTenantId)
+            const lastDecodedToken = mockServer.getLastDecodedToken();
+            expect(lastDecodedToken).toBeDefined();
+            expect(lastDecodedToken.grant_type).toBe('client_credentials');
+            expect(lastDecodedToken.tenant?.domain).toBe('shire.local');
         });
 
         it('should successfully unsubscribe from an app', async () => {
@@ -161,6 +167,12 @@ describe('AppController', () => {
             const offboardRequests = mockServer.getOffboardRequests();
             expect(offboardRequests.length).toBeGreaterThan(0);
             expect(offboardRequests[0].tenantId).toBe(subscriberTenantId);
+
+            // Assert the technical token is for the app owner (creatorTenantId)
+            const lastDecodedToken = mockServer.getLastDecodedToken();
+            expect(lastDecodedToken).toBeDefined();
+            expect(lastDecodedToken.grant_type).toBe('client_credentials');
+            expect(lastDecodedToken.tenant?.domain).toBe('shire.local');
 
             // Verify the subscription is no longer active
             const tenantSubscriptions = await subscriberAppClient.getTenantSubscriptions(subscriberTenantId);

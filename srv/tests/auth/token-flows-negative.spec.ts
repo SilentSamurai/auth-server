@@ -150,7 +150,7 @@ describe('e2e negative token flow', () => {
         const response = await app.getHttpServer()
             .post('/api/oauth/token')
             .send({
-                // "grant_type": "client_credential",
+                // "grant_type": "client_credentials",
                 "client_id": clientId,
                 "client_secret": clientSecret
             })
@@ -163,7 +163,7 @@ describe('e2e negative token flow', () => {
         const response = await app.getHttpServer()
             .post('/api/oauth/token')
             .send({
-                "grant_type": "client_credential",
+                "grant_type": "client_credentials",
                 "client_id": "",
                 "client_secret": ""
             })
@@ -176,7 +176,7 @@ describe('e2e negative token flow', () => {
         const response = await app.getHttpServer()
             .post('/api/oauth/token')
             .send({
-                "grant_type": "client_credential",
+                "grant_type": "client_credentials",
                 "client_id": "sadasdasfasf",
                 "client_secret": "asfasfasfasfasf"
             })
@@ -217,7 +217,7 @@ describe('e2e negative token flow', () => {
         const response = await app.getHttpServer()
             .post('/api/oauth/token')
             .send({
-                "grant_type": "client_credential",
+                "grant_type": "client_credentials",
                 "client_id": null,
                 "client_secret": ""
             })
@@ -230,7 +230,7 @@ describe('e2e negative token flow', () => {
         const response = await app.getHttpServer()
             .post('/api/oauth/token')
             .send({
-                "grant_type": "client_credential",
+                "grant_type": "client_credentials",
                 "client_id": "Asfasf",
                 "client_secret": null
             })

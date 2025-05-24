@@ -193,8 +193,7 @@ export class AuthController {
                     ...(scopes && scopes.length ? {scope: scopes.join(" ")} : {}),
                 };
             }
-            case GRANT_TYPES.CLIENT_CREDENTIALS:
-            case GRANT_TYPES.CLIENT_CREDENTIAL: {
+            case GRANT_TYPES.CLIENT_CREDENTIALS: {
                 let validationPipe = new ValidationPipe(
                     ValidationSchema.ClientCredentialGrantSchema,
                 );
