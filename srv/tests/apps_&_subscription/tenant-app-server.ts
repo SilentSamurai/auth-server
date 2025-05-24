@@ -192,8 +192,8 @@ export class TenantAppServer {
         });
 
         // Offboard endpoint (update path to match SubscriptionService)
-        this.app.post('/api/offboard/tenant/:tenantId', (req, res) => {
-            const tenantId = req.params.tenantId;
+        this.app.post('/api/offboard/tenant/', (req, res) => {
+            const tenantId = req.body.tenantId;
             // Decode JWT from Authorization header
             const authHeader = req.headers['authorization'];
             let decoded: any = null;
