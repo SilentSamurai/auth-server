@@ -36,9 +36,9 @@ export async function prepareApp() {
     }
 
     // logger
-    if (Environment.isProduction()) {
-        options.logger = new JsonConsoleLogger();
-    }
+    // if (Environment.isProduction()) {
+    //     options.logger = new JsonConsoleLogger();
+    // }
 
     // smtp
     if (!Environment.isProduction()) {
