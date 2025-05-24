@@ -295,12 +295,15 @@ export class SubscriptionService {
             return true;
         }
 
-        const endpoint = `${app.appUrl.replace(/\/+/g, '')}/api/onboard/tenant/`;
+        const endpoint = `${app.appUrl.replace(/\/+/g, '')}/api/onboard/tenant`;
         logger.log(`Making request to endpoint: ${endpoint}`);
         logger.log(`Request payload:`, {tenantId: tenant.id});
-
         // Get technical token using AuthService (use app owner's tenant)
         const token = await this.authService.createTechnicalAccessToken(app.owner, []);
+        logger.log(`Request headers:`, {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        });
 
         const response = await fetch(endpoint, {
             method: 'POST',
@@ -351,11 +354,15 @@ export class SubscriptionService {
             return;
         }
 
-        const endpoint = `${app.appUrl.replace(/\/+/g, '')}/api/offboard/tenant/${tenant.id}`;
+        const endpoint = `${app.appUrl.replace(/\/+/g, '')}/api/offboard/tenant`;
         logger.log(`Making request to endpoint: ${endpoint}`);
-
+        logger.log(`Request payload:`, {tenantId: tenant.id});
         // Get technical token using AuthService (use app owner's tenant)
         const token = await this.authService.createTechnicalAccessToken(app.owner, []);
+        logger.log(`Request headers:`, {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        });
 
         const response = await fetch(endpoint, {
             method: 'POST',

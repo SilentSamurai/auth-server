@@ -14,7 +14,7 @@ const server = http.createServer((req, res) => {
     let pathname = parsedUrl.pathname;
 
     // Handle onboard endpoint
-    if (pathname === '/api/onboard/tenant/') {
+    if (pathname === '/api/onboard/tenant') {
         let body = '';
         req.on('data', chunk => { body += chunk.toString(); });
         req.on('end', async () => {
@@ -73,7 +73,7 @@ const server = http.createServer((req, res) => {
     }
 
     // Handle offboard endpoint
-    if (pathname.startsWith('/api/offboard/tenant/')) {
+    if (pathname.startsWith('/api/offboard/tenant')) {
         let body = '';
         req.on('data', chunk => { body += chunk.toString(); });
         req.on('end', async () => {
@@ -93,7 +93,7 @@ const server = http.createServer((req, res) => {
                     res.end(JSON.stringify({ error: 'Missing or invalid Authorization header' }));
                     return;
                 }
-                const tenantId = pathname.split('/').pop();
+                const tenantId = data.tenantId;
                 const timestamp = new Date().toISOString();
                 // Verify token before proceeding
                 try {
@@ -259,7 +259,7 @@ async function verifyToken(token) {
     assert(decoded.grant_type === "client_credentials", 'Invalid grant type');
     assert(decoded.tenant != undefined, 'Missing tenant ID');
     assert(decoded.tenant.domain != undefined, 'Missing tenant domain');
-    assert(decoded.tenant.domain != "shire.local", 'Invalid tenant domain');
+    assert(decoded.tenant.domain === "shire.local", 'Invalid tenant domain');
 }
 
 // Helper function to determine the content type based on file extension
