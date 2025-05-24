@@ -75,12 +75,11 @@ export class UsersClient extends HttpClient {
     public async updateUser(
         id: string,
         name: string,
-        email: string,
-        password: string
+        email: string
     ) {
         const response = await this.app.getHttpServer()
             .put('/api/users/update')
-            .send({id, name, email, password})
+            .send({id, name, email})
             .set('Authorization', `Bearer ${this.accessToken}`)
             .set('Accept', 'application/json');
 

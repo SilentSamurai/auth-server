@@ -10,6 +10,7 @@ import {
     Request,
     UseGuards,
     UseInterceptors,
+    BadRequestException,
 } from "@nestjs/common";
 import * as yup from 'yup';
 
@@ -19,10 +20,11 @@ import {AuthService} from "../auth/auth.service";
 import {MailService} from "../mail/mail.service";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
 import {ValidationPipe} from "../validation/validation.pipe";
-import {ValidationSchema} from "../validation/validation.schema";
+import {PASSWORD_MESSAGE, PASSWORD_REGEXP, ValidationSchema} from "../validation/validation.schema";
 import {TenantService} from "../services/tenant.service";
 import {Tenant} from "../entity/tenant.entity";
 import {SecurityService} from "../casl/security.service";
+import {AuthContext} from "../casl/contexts";
 
 // Local VerifyUserSchema for this controller
 const VerifyUserSchema = yup.object().shape({
@@ -30,9 +32,19 @@ const VerifyUserSchema = yup.object().shape({
     verify: yup.boolean().required("boolean value is required"),
 });
 
+const UpdateUserPasswordSchema = yup.object().shape({
+    password: yup
+        .string()
+        .required("Password is required")
+        .matches(PASSWORD_REGEXP, PASSWORD_MESSAGE)
+        .max(128),
+    confirmPassword: yup.string().required("Confirm Password is required"),
+});
+
 @Controller("api/users")
 @UseInterceptors(ClassSerializerInterceptor)
 export class UsersAdminController {
+
     constructor(
         private readonly usersService: UsersService,
         private readonly authService: AuthService,
@@ -72,16 +84,14 @@ export class UsersAdminController {
             body: {
             id: string;
             name: string;
-            email: string;
-            password: string;
+            email: string
         },
     ): Promise<User> {
         let user: User = await this.usersService.update(
             request,
             body.id,
             body.name,
-            body.email,
-            body.password,
+            body.email
         );
 
         return user;
@@ -149,5 +159,19 @@ export class UsersAdminController {
             user.id,
             body.verify,
         );
+    }
+
+    @Put(":userId/password")
+    @UseGuards(JwtAuthGuard)
+    async updateUserPassword(
+        @Request() request: AuthContext,
+        @Param("userId") id: string,
+        @Body(new ValidationPipe(UpdateUserPasswordSchema))
+            body: { password: string; confirmPassword: string },
+    ): Promise<User> {
+        if (body.password !== body.confirmPassword) {
+            throw new BadRequestException("Passwords do not match");
+        }
+        return await this.usersService.updatePassword(request, id, body.password);
     }
 }

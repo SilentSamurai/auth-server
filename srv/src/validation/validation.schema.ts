@@ -169,12 +169,7 @@ const CreateUserSchema = yup.object().shape({
 const UpdateUserSchema = yup.object().shape({
     id: yup.string().required("Id is required"),
     email: yup.string().max(128).email().nullable(),
-    name: yup.string().max(128).nullable(),
-    password: yup
-        .string()
-        .matches(PASSWORD_REGEXP, PASSWORD_MESSAGE)
-        .nullable()
-        .max(128),
+    name: yup.string().max(128).nullable()
 });
 
 const LoginSchema = yup.object().shape({

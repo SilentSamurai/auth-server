@@ -49,8 +49,7 @@ describe('e2e users', () => {
         const updatedUser = await usersClient.updateUser(
             user.id,
             "UpdateTestUser",
-            "UpdatedTestUser@test-wesite.com",
-            "TestUser9000"
+            "UpdatedTestUser@test-wesite.com"
         );
         expect(updatedUser.id).toBeDefined();
         expect(updatedUser.name).toEqual("UpdateTestUser");

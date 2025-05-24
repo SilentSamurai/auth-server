@@ -41,14 +41,13 @@ export class UserService {
         );
     }
 
-    editUser(id: string, name: string, email: string, password: string) {
+    editUser(id: string, name: string, email: string) {
         return this.http.put(
             `${API_URL}/users/update`,
             {
                 id,
                 name,
-                email,
-                password,
+                email
             },
             this.getHttpOptions(),
         );
@@ -103,6 +102,16 @@ export class UserService {
             `${API_URL}/search/Users`,
             ['id'],
             query({expand: ["Tenants"]}),
+        );
+    }
+
+    changeUserPassword(userId: string, password: string, confirmPassword: string) {
+        return lastValueFrom(
+            this.http.put(
+                `${API_URL}/users/${userId}/password`,
+                { password, confirmPassword },
+                this.getHttpOptions(),
+            ),
         );
     }
 }

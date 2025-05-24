@@ -104,8 +104,7 @@ describe('UsersController (e2e)', () => {
             const user = await adminClient.updateUser(
                 testUserId,
                 'Updated Admin User',
-                updatedAdminEmail,
-                'UpdatedAdmin@123'
+                updatedAdminEmail
             );
 
             expect(user).toBeDefined();
