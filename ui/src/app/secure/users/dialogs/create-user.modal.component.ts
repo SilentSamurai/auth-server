@@ -25,23 +25,21 @@ import {UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
                         label="Email"
                     ></app-text-input>
 
-                    <app-text-input
+                    <app-password-input
                         test_id="CREATE_USER"
                         formControlName="password"
-                        type="password"
                         label="Password"
-                    ></app-text-input>
+                    ></app-password-input>
 
-                    <app-text-input
+                    <app-password-input
                         test_id="CREATE_USER"
                         formControlName="confirmPassword"
-                        type="password"
                         label="Confirm Password"
                     >
                         <app-input-error field="confirmedValidator">
                             Both password should match.
                         </app-input-error>
-                    </app-text-input>
+                    </app-password-input>
                 </form>
             </app-dialog-tab>
             <app-dialog-footer>

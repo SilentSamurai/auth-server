@@ -1,14 +1,15 @@
-import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {EditUserModalComponent} from './dialogs/edit-user.modal.component';
-import {UserService} from '../../_services/user.service';
-import {lastValueFrom} from 'rxjs';
-import {ConfirmationService} from '../../component/dialogs/confirmation.service';
-import {MessageService} from 'primeng/api';
-import {Location} from '@angular/common';
-import {AuthDefaultService} from '../../_services/auth.default.service';
-import {StaticSource} from "../../component/model/StaticSource";
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { EditUserModalComponent } from './dialogs/edit-user.modal.component';
+import { UserService } from '../../_services/user.service';
+import { lastValueFrom } from 'rxjs';
+import { ConfirmationService } from '../../component/dialogs/confirmation.service';
+import { MessageService } from 'primeng/api';
+import { Location } from '@angular/common';
+import { AuthDefaultService } from '../../_services/auth.default.service';
+import { StaticSource } from "../../component/model/StaticSource";
+import { ChangePasswordModalComponent } from './dialogs/change-password.modal.component';
 
 @Component({
     selector: 'tenant-details',
@@ -31,20 +32,7 @@ import {StaticSource} from "../../component/model/StaticSource";
                             {{ user.name }}
                         </app-attribute>
                         <app-attribute label="is Verified">
-                            <input
-                                class="form-check-input"
-                                type="checkbox"
-                                value=""
-                                [(ngModel)]="user.verified"
-                                [ngModelOptions]="{standalone: true}"
-                            />
-                            <app-button-link
-                                *ngIf="!user.verified"
-                                (click)="verifyUser()"
-                                class="px-2"
-                            >
-                                Verify
-                            </app-button-link>
+                            {{ user.verified ? 'Yes' : 'No' }}
                         </app-attribute>
                     </div>
                     <div class="col">
@@ -65,7 +53,7 @@ import {StaticSource} from "../../component/model/StaticSource";
                     Update
                 </button>
                 <button
-                    (click)="openUpdateModal()"
+                    (click)="openChangePasswordModal()"
                     class="btn btn-sm  btn-primary mx-2"
                 >
                     Change Password
@@ -81,6 +69,13 @@ import {StaticSource} from "../../component/model/StaticSource";
                     class="btn btn-sm  btn-danger mx-2"
                 >
                     Delete
+                </button>
+                <button
+                    *ngIf="!user.verified"
+                    (click)="onVerifyUser()"
+                    class="btn btn-sm btn-success mx-2"
+                >
+                    Verify User
                 </button>
             </app-op-actions>
             <app-op-tab name="Tenants">
@@ -165,6 +160,11 @@ export class UR02Component implements OnInit {
         modalRef.componentInstance.user = this.user;
     }
 
+    openChangePasswordModal() {
+        const modalRef = this.modalService.open(ChangePasswordModalComponent);
+        modalRef.componentInstance.user = this.user;
+    }
+
     async onDelete() {
         const deletedUser = await this.confirmationService.confirm({
             message: `Are you sure you want to delete ${this.user.email} ?`,
@@ -195,10 +195,29 @@ export class UR02Component implements OnInit {
         this._location.back();
     }
 
-    async verifyUser() {
-        console.log('verify');
-        await this.userService.verifyUser(this.user.email, true);
-        await this.ngOnInit();
+    async onVerifyUser() {
+        const confirmed = await this.confirmationService.confirm({
+            message: `Are you sure you want to verify ${this.user.email}?`,
+            header: 'Verify User',
+            icon: 'pi pi-info-circle',
+            accept: async () => {
+                try {
+                    await this.userService.verifyUser(this.user.email, true);
+                    this.messageService.add({
+                        severity: 'success',
+                        summary: 'Success',
+                        detail: 'User Verified',
+                    });
+                    await this.ngOnInit();
+                } catch (e) {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'User Verification Failed',
+                    });
+                }
+            },
+        });
     }
 
     // async onTenantLoad($event: TableAsyncLoadEvent) {

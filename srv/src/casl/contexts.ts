@@ -3,7 +3,6 @@ import {AnyAbility} from "@casl/ability/dist/types/PureAbility";
 export enum GRANT_TYPES {
     PASSWORD = "password",
     CLIENT_CREDENTIALS = "client_credentials",
-    CLIENT_CREDENTIAL = "client_credential",
     REFRESH_TOKEN = "refresh_token",
     CODE = "authorization_code",
 }

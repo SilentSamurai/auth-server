@@ -60,7 +60,6 @@ export class SecurityService implements OnModuleInit {
     isClientCredentials(request: any) {
         let context = this.getUserOrTechnicalSecurityContext(request);
         return (
-            context.grant_type === GRANT_TYPES.CLIENT_CREDENTIAL ||
             context.grant_type === GRANT_TYPES.CLIENT_CREDENTIALS
         );
     }

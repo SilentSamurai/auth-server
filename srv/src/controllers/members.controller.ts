@@ -28,6 +28,12 @@ import {subject} from "@casl/ability";
 import {SubjectEnum} from "../entity/subjectEnum";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
+import * as yup from 'yup';
+
+// Local MemberOperationSchema for this controller
+const MemberOperationSchema = yup.object().shape({
+    emails: yup.array().of(yup.string().max(128)),
+});
 
 @Controller("api/tenant")
 @UseInterceptors(ClassSerializerInterceptor)
@@ -81,7 +87,7 @@ export class MemberController {
     async addMember(
         @Request() request,
         @Param("tenantId") tenantId: string,
-        @Body(new ValidationPipe(ValidationSchema.MemberOperationSchema))
+        @Body(new ValidationPipe(MemberOperationSchema))
             body: { emails: string[] },
     ): Promise<Tenant> {
         let tenant = await this.tenantService.findById(request, tenantId);
@@ -110,7 +116,7 @@ export class MemberController {
     async removeMember(
         @Request() request,
         @Param("tenantId") tenantId: string,
-        @Body(new ValidationPipe(ValidationSchema.MemberOperationSchema))
+        @Body(new ValidationPipe(MemberOperationSchema))
             body: { emails: string[] },
     ): Promise<Tenant> {
         let tenant = await this.tenantService.findById(request, tenantId);

@@ -45,6 +45,7 @@ import {AP01Component} from './apps/AP01.component';
 import {CreateAppComponent} from "./apps/dialogs/create-app.component";
 import {UpdateAppComponent} from "./apps/dialogs/update-app.component";
 import {CreateSubscriptionComponent} from "./tenants/dialogs/create-subscription.component";
+import {ChangePasswordModalComponent} from "./users/dialogs/change-password.modal.component";
 
 @NgModule({
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -78,7 +79,8 @@ import {CreateSubscriptionComponent} from "./tenants/dialogs/create-subscription
         AP01Component,
         CreateAppComponent,
         UpdateAppComponent,
-        CreateSubscriptionComponent
+        CreateSubscriptionComponent,
+        ChangePasswordModalComponent
     ],
     imports: [
         TableModule,

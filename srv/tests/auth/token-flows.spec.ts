@@ -61,7 +61,7 @@ describe('e2e positive token flow', () => {
         const response = await app.getHttpServer()
             .post('/api/oauth/token')
             .send({
-                "grant_type": "client_credential",
+                "grant_type": "client_credentials",
                 "client_id": clientId,
                 "client_secret": clientSecret
             })

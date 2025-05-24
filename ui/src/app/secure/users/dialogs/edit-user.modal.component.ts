@@ -57,27 +57,6 @@ import {MessageService} from 'primeng/api';
                             Email is required!
                         </div>
                     </div>
-
-                    <div class="mb-3 form-group">
-                        <label class="form-label" for="edit.user.password"
-                        >Password</label
-                        >
-                        <input
-                            #password="ngModel"
-                            [(ngModel)]="form.password"
-                            class="form-control"
-                            id="edit.user.password"
-                            name="password"
-                            type="password"
-                        />
-                        <div
-                            *ngIf="password.errors && editUserForm.submitted"
-                            class="alert alert-danger"
-                            role="alert"
-                        >
-                            Email is required!
-                        </div>
-                    </div>
                 </form>
             </app-dialog-tab>
             <app-dialog-footer>
@@ -110,7 +89,6 @@ export class EditUserModalComponent implements OnInit {
         this.form = {
             name: this.user.name,
             email: this.user.email,
-            password: null,
         };
         console.log(this.user);
     }
@@ -121,7 +99,6 @@ export class EditUserModalComponent implements OnInit {
                 this.user.id,
                 this.user.name === this.form.name ? null : this.form.name,
                 this.user.email === this.form.email ? null : this.form.email,
-                this.form.password,
             );
             editedUser = await lastValueFrom(editedUser);
             this.messageService.add({

@@ -50,7 +50,7 @@ export class CaslAbilityFactory {
 
         let roles = tenantToken.scopes;
 
-        if (tenantToken.grant_type === GRANT_TYPES.CLIENT_CREDENTIAL) {
+        if (tenantToken.grant_type === GRANT_TYPES.CLIENT_CREDENTIALS) {
             can(Action.Read, SubjectEnum.TENANT, {id: tenantToken.tenant.id});
             can(Action.Read, SubjectEnum.MEMBER, {
                 tenantId: tenantToken.tenant.id,

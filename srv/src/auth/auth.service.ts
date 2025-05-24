@@ -86,7 +86,7 @@ export class AuthService {
                 publicKey: tenant.publicKey,
             });
             this.LOGGER.log("token verified with public Key");
-            if (payload.grant_type === GRANT_TYPES.CLIENT_CREDENTIAL) {
+            if (payload.grant_type === GRANT_TYPES.CLIENT_CREDENTIALS) {
                 if (payload.sub !== "oauth") {
                     throw "Invalid Token";
                 }
@@ -136,7 +136,7 @@ export class AuthService {
                 domain: tenant.domain,
             },
             scopes: [RoleEnum.TENANT_VIEWER, ...roles],
-            grant_type: GRANT_TYPES.CLIENT_CREDENTIAL,
+            grant_type: GRANT_TYPES.CLIENT_CREDENTIALS,
             isTechnical: true,
         };
         return payload;

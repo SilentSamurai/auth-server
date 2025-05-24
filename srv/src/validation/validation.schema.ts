@@ -158,7 +158,7 @@ const MemberOperationsSchema = yup.object().shape({
 });
 
 const CreateUserSchema = yup.object().shape({
-    email: yup.string().email().required("Email is required"),
+    email: yup.string().email().required("Email is required").max(128),
     name: yup.string().required("Name is required").max(128),
     password: yup
         .string()
@@ -169,12 +169,7 @@ const CreateUserSchema = yup.object().shape({
 const UpdateUserSchema = yup.object().shape({
     id: yup.string().required("Id is required"),
     email: yup.string().max(128).email().nullable(),
-    name: yup.string().max(128).nullable(),
-    password: yup
-        .string()
-        .matches(PASSWORD_REGEXP, PASSWORD_MESSAGE)
-        .nullable()
-        .max(128),
+    name: yup.string().max(128).nullable()
 });
 
 const LoginSchema = yup.object().shape({
@@ -212,7 +207,7 @@ const ClientCredentialGrantSchema = yup.object().shape({
     grant_type: yup
         .string()
         .required()
-        .matches(/^client_credentials?$/g, {
+        .matches(/^client_credentials$/g, {
             message: "grant type not recognised",
         }),
     client_id: yup.string().required("client_id is required"),
@@ -329,12 +324,5 @@ export const ValidationSchema = {
     UpdateGroupRole,
     UpdateGroupUser,
     UpdateGroupSchema,
-    MemberOperationSchema: yup.object().shape({
-        emails: yup.array().of(yup.string().max(20)),
-    }),
-    verifyUser: yup.object().shape({
-        email: yup.string().required("Name is required").max(20),
-        verify: yup.boolean().required("boolean value is required"),
-    }),
     VerifyAuthCodeSchema,
 };

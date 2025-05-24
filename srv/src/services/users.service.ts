@@ -240,7 +240,6 @@ export class UsersService implements OnModuleInit {
         id: string,
         name: string,
         email: string,
-        password: string,
     ): Promise<User> {
         const user: User = await this.findById(authContext, id);
 
@@ -259,9 +258,6 @@ export class UsersService implements OnModuleInit {
                 throw new ConflictException('Email is already being used');
             }
             user.email = email;
-        }
-        if (password !== null) {
-            user.password = await argon2.hash(password);
         }
         user.name = name || user.name;
 

@@ -44,6 +44,7 @@ import {ValueHelpButtonComponent} from './button/value-help-button.component';
 import {AppTableComponent} from './table/app-table.component';
 import {ThemeToggleComponent} from './theme/theme-toggle.component';
 import {LoaderComponent} from "./loader/loader.component";
+import { PasswordInputComponent } from './inputs/password-input.component';
 
 @NgModule({
     declarations: [
@@ -77,7 +78,8 @@ import {LoaderComponent} from "./loader/loader.component";
         ValueHelpButtonComponent,
         AppTableComponent,
         ThemeToggleComponent,
-        LoaderComponent
+        LoaderComponent,
+        PasswordInputComponent
     ],
     imports: [
         TableModule,
@@ -126,7 +128,8 @@ import {LoaderComponent} from "./loader/loader.component";
         ValueHelpButtonComponent,
         AppTableComponent,
         ThemeToggleComponent,
-        LoaderComponent
+        LoaderComponent,
+        PasswordInputComponent
     ],
 })
 export class ComponentModule {

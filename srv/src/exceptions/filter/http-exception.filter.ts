@@ -1,18 +1,5 @@
-import {
-    ArgumentsHost,
-    BadRequestException,
-    Catch,
-    ExceptionFilter,
-    ForbiddenException,
-    HttpException,
-    HttpStatus,
-    InternalServerErrorException,
-    Logger,
-    NotFoundException,
-    Type,
-} from "@nestjs/common";
+import {ArgumentsHost, Catch, ExceptionFilter, HttpException, Logger, Type,} from "@nestjs/common";
 import {Request, Response} from "express";
-import {BackendError} from "../backend-error.class";
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -23,46 +10,30 @@ export class HttpExceptionFilter implements ExceptionFilter {
     }
 
     // Exception may not be an HttpException.
-    catch(exception: HttpException, host: ArgumentsHost) {
+    catch(exception: Error, host: ArgumentsHost) {
         const context = host.switchToHttp();
         const request = context.getRequest<Request>();
         const response = context.getResponse<Response>();
-        let error = exception.getResponse ? exception.getResponse() : {};
         console.error(exception);
-        // Throwed http exception.
+
         if (exception instanceof HttpException) {
-            // Throwed unknown http exception.
-            if (!(error instanceof BackendError)) {
-                const status = exception.getStatus();
-                switch (status) {
-                    case HttpStatus.NOT_FOUND: {
-                        exception = new NotFoundException();
-                        break;
-                    }
-                    case HttpStatus.FORBIDDEN: {
-                        exception = new ForbiddenException();
-                        break;
-                    }
-                    case HttpStatus.BAD_REQUEST: {
-                        exception = new BadRequestException();
-                        break;
-                    }
-                    default: {
-                        const message: string = exception.message;
-                        exception = new InternalServerErrorException(message);
-                        break;
-                    }
-                }
-            }
+            const httpException = exception as HttpException;
+            let error = httpException.getResponse ? httpException.getResponse() : {};
+
+            error["message"] = httpException.message;
+            error["url"] = request.url;
+            error["timestamp"] = new Date().toISOString();
+            error["status"] = httpException.getStatus();
+
+            response.status(httpException.getStatus()).json(error);
         } else {
             const message: string = (exception as Error)?.message;
-            exception = new InternalServerErrorException(message);
-            error["message"] = message;
+            response.status(500).json({
+                message: message,
+                status: 500,
+                timestamp: new Date().toISOString(),
+                url: request.url,
+            });
         }
-
-        error["url"] = request.url;
-        error["timestamp"] = new Date().toISOString();
-
-        response.status(exception.getStatus()).json(error);
     }
 }

@@ -256,7 +256,7 @@ function parseJwt(token) {
 async function verifyToken(token) {
     // Parse JWT manually
     const decoded = parseJwt(token);
-    assert(decoded.grant_type.includes("client_credential"), 'Invalid grant type');
+    assert(decoded.grant_type === "client_credentials", 'Invalid grant type');
     assert(decoded.tenant != undefined, 'Missing tenant ID');
     assert(decoded.tenant.domain != undefined, 'Missing tenant domain');
     assert(decoded.tenant.domain != "shire.local", 'Invalid tenant domain');

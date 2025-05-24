@@ -299,8 +299,8 @@ export class SubscriptionService {
         logger.log(`Making request to endpoint: ${endpoint}`);
         logger.log(`Request payload:`, {tenantId: tenant.id});
 
-        // Get technical token using AuthService
-        const token = await this.authService.createTechnicalAccessToken(tenant, []);
+        // Get technical token using AuthService (use app owner's tenant)
+        const token = await this.authService.createTechnicalAccessToken(app.owner, []);
 
         const response = await fetch(endpoint, {
             method: 'POST',
@@ -354,8 +354,8 @@ export class SubscriptionService {
         const endpoint = `${app.appUrl.replace(/\/+/g, '')}/api/offboard/tenant/${tenant.id}`;
         logger.log(`Making request to endpoint: ${endpoint}`);
 
-        // Get technical token using AuthService
-        const token = await this.authService.createTechnicalAccessToken(tenant, []);
+        // Get technical token using AuthService (use app owner's tenant)
+        const token = await this.authService.createTechnicalAccessToken(app.owner, []);
 
         const response = await fetch(endpoint, {
             method: 'POST',
