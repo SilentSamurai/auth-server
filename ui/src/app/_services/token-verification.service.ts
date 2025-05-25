@@ -56,7 +56,7 @@ export class TokenVerificationService {
 
     private verifyTokenIssuedTime(iat: number): boolean {
         const currentTime = Math.floor(Date.now() / 1000);
-        return iat <= currentTime;
+        return iat <= currentTime + 300;
     }
 
     private verifyScopes(scopes: string[]): boolean {
