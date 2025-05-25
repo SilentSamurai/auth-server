@@ -160,12 +160,15 @@ export class AuthService {
     async createUserAccessToken(
         user: User,
         tenant: Tenant,
+        scopes: string[] = [],
     ): Promise<{ accessToken: string; refreshToken: string; scopes: string[] }> {
         if (!user.verified) {
             throw new UnauthorizedException('Email not verified');
         }
 
         let roles = await this.authUserService.getMemberRoles(tenant, user);
+        let scopesFromRoles = roles.map((role) => role.name);
+        scopesFromRoles.push(...scopes);
 
         const accessTokenPayload: TenantToken = {
             sub: user.email,
@@ -177,7 +180,7 @@ export class AuthService {
                 name: tenant.name,
                 domain: tenant.domain,
             },
-            scopes: roles.map((role) => role.name),
+            scopes: scopesFromRoles,
             grant_type: GRANT_TYPES.PASSWORD,
         };
 

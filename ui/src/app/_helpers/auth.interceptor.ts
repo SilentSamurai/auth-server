@@ -6,10 +6,10 @@ import {
     HttpInterceptor,
     HttpRequest
 } from '@angular/common/http';
-import {Injectable} from '@angular/core';
-import {catchError, Observable, throwError} from 'rxjs';
-import {SessionService} from '../_services/session.service';
-import {AuthDefaultService} from '../_services/auth.default.service';
+import { Injectable } from '@angular/core';
+import { catchError, Observable, throwError } from 'rxjs';
+import { SessionService } from '../_services/session.service';
+import { AuthDefaultService } from '../_services/auth.default.service';
 
 const TOKEN_HEADER_KEY = 'Authorization'; // for Node.js Express back-end
 
@@ -23,6 +23,13 @@ export class AuthInterceptor implements HttpInterceptor {
 
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
         let authReq = req;
+
+        const nonAuthUrls = ['/login', '/authorize', '/register', '/forgot-password', '/reset-password'];
+        // Bypass the interceptor for non-authentication related URLs
+        if (nonAuthUrls.some(url => req.url.includes(url))) {
+            return next.handle(req);
+        }
+
 
         // 1. Check if token is expired before sending the request
         if (this.tokenService.getToken() != null && this.tokenService.isTokenExpired()) {
@@ -40,11 +47,11 @@ export class AuthInterceptor implements HttpInterceptor {
             });
         }
 
-        // 3. Handle 403 response errors
+        // 3. Handle 401 response errors
         return next.handle(authReq).pipe(
             catchError((error: HttpErrorResponse) => {
                 if (error.status === 401) {
-                    console.warn('Signing out: Received 403 Forbidden.');
+                    console.warn('Signing out: Received 401 Unathorized.');
                     this.authDefaultService.signOut('/home', true);
                 }
                 return throwError(() => error);
@@ -54,5 +61,5 @@ export class AuthInterceptor implements HttpInterceptor {
 }
 
 export const authInterceptorProviders = [
-    {provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
 ];
