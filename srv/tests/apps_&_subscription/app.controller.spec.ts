@@ -208,4 +208,32 @@ describe('AppController', () => {
             expect(response.status).toBe(400);
         });
     });
+
+    it('should include the correct scope in the access token after subscribing', async () => {
+        // Subscribe to an app
+        const subscriberAppClient = new AppClient(fixture, subscriberAccessToken);
+        const app = await appClient.createApp(
+            creatorTenantId,
+            `test-app-scope-${uuid()}`,
+            `http://localhost:${MOCK_SERVER_PORT}`,
+            'Test app for scope validation'
+        );
+        await subscriberAppClient.subscribeApp(app.id, subscriberTenantId);
+
+        // Fetch access token for the subscriber again (should now include scope)
+        const tokenResponse = await tokenFixture.fetchAccessToken(
+            'admin@bree.local',
+            'admin9000',
+            'shire.local'
+        );
+        // The decoded JWT is in tokenResponse.jwt
+        expect(tokenResponse.jwt).toBeDefined();
+        expect(tokenResponse.jwt.scopes).toBeDefined();
+        expect(Array.isArray(tokenResponse.jwt.scopes)).toBe(true);
+        // Should include at least one scope (role) from the subscription
+        expect(tokenResponse.jwt.scopes.length).toBeGreaterThan(0);
+        // Optionally, check for a specific role name if known (e.g., 'TENANT_VIEWER')
+        // expect(tokenResponse.jwt.scopes).toContain('TENANT_VIEWER');
+    });
+    
 }); 

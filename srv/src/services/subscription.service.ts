@@ -8,7 +8,7 @@ import {App} from '../entity/app.entity';
 import {User} from "../entity/user.entity";
 import {AuthContext} from "../casl/contexts";
 import {TenantService} from "./tenant.service";
-import { AuthService } from '../auth/auth.service';
+import {AuthService} from '../auth/auth.service';
 
 const logger = new Logger("SubscriptionService");
 
@@ -242,6 +242,29 @@ export class SubscriptionService {
             }
         }
         return false;
+    }
+
+    /**
+     * Returns all unique scopes (role names) granted to a user via subscriptions to apps owned by the tenant.
+     * Used for additional scopes in OAuth tokens.
+     */
+    async getSubscribedTenantScope(authContext: AuthContext, user: User, tenant: Tenant): Promise<string[]> {
+        // Get all tenants the user is a member of
+        const userTenants = await this.tenantService.findByMembership(authContext, user);
+        // Get all apps owned by the target tenant
+        const ownedApps = await this.appRepo.findBy({owner: {id: tenant.id}});
+        const scopes = new Set<string>();
+        for (const userTenant of userTenants) {
+            // For each user-tenant, get all successful subscriptions
+            const subscriptions = await this.findByTenantId(userTenant.id);
+            for (const sub of subscriptions) {
+                if (ownedApps.some(app => app.id === sub.app.id) && sub.status === 'success') {
+                    const roles = await this.tenantService.getMemberRoles(authContext, userTenant.id, user)
+                    roles.forEach(role => scopes.add(role.name))
+                }
+            }
+        }
+        return Array.from(scopes);
     }
 
     /**

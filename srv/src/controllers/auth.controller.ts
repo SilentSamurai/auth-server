@@ -144,9 +144,13 @@ export class AuthController {
                 if (!isMember && !isSubscribed) {
                     throw new BadRequestException("User is not a member of the tenant and does not have a valid app subscription");
                 }
+                let additionalScopes = [];
+                if (isSubscribed) {
+                    additionalScopes = await this.subscriptionService.getSubscribedTenantScope(adminContext, user, tenant)
+                }
 
                 const {accessToken, refreshToken, scopes} =
-                    await this.authService.createUserAccessToken(user, tenant);
+                    await this.authService.createUserAccessToken(user, tenant, additionalScopes);
                 return {
                     access_token: accessToken,
                     expires_in: this.configService.get(
@@ -181,8 +185,16 @@ export class AuthController {
                 if (!isMember && !isSubscribed) {
                     throw new BadRequestException("User is not a member of the tenant and does not have a valid app subscription");
                 }
+                let additionalScopes = [];
+                if (isSubscribed) {
+                    additionalScopes = await this.subscriptionService.getSubscribedTenantScope(adminContext, user, tenant)
+                }
 
-                const {accessToken, refreshToken, scopes} = await this.authService.createUserAccessToken(user, tenant);
+                const {
+                    accessToken,
+                    refreshToken,
+                    scopes
+                } = await this.authService.createUserAccessToken(user, tenant, additionalScopes);
                 return {
                     access_token: accessToken,
                     expires_in: this.configService.get(
@@ -234,9 +246,13 @@ export class AuthController {
                 if (!isMember && !isSubscribed) {
                     throw new BadRequestException("User is not a member of the tenant and does not have a valid app subscription");
                 }
+                let additionalScopes = [];
+                if (isSubscribed) {
+                    additionalScopes = await this.subscriptionService.getSubscribedTenantScope(adminContext, user, tenant)
+                }
 
                 const {accessToken, refreshToken, scopes} =
-                    await this.authService.createUserAccessToken(user, tenant);
+                    await this.authService.createUserAccessToken(user, tenant, additionalScopes);
                 return {
                     access_token: accessToken,
                     expires_in: this.configService.get(
