@@ -58,6 +58,9 @@ export class SubscriptionService {
         app: App,
         visited: Set<string> = new Set<string>()
     ): Promise<Subscription> {
+        if (!app.isPublic) {
+            throw new Error('Cannot subscribe to a private app. The app must be published first.');
+        }
         // Prevent tenant from subscribing to their own app
         if (subscriberTenant.id === app.owner.id) {
             throw new Error('A tenant cannot subscribe to their own application');

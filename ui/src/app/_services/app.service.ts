@@ -71,4 +71,10 @@ export class AppService {
             expand: ['owner']
         }));
     }
+
+    async publishApp(appId: string) {
+        return lastValueFrom(
+            this.http.patch(`${API_URL}/apps/${appId}/publish`, {}, this.getHttpOptions())
+        );
+    }
 }

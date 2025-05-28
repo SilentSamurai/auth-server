@@ -27,6 +27,7 @@ export class AppClient extends HttpClient {
         expect(response.body.id).toBeDefined();
         expect(response.body.name).toEqual(name);
         expect(response.body.appUrl).toEqual(appUrl);
+        expect(response.body.isPublic).toEqual(false);
         if (description) {
             expect(response.body.description).toEqual(description);
         }
@@ -175,5 +176,23 @@ export class AppClient extends HttpClient {
         return response.body;
     }
 
+    public async publishApp(appId: string) {
+        const response = await this.app.getHttpServer()
+            .patch(`/api/apps/${appId}/publish`)
+            .set('Authorization', `Bearer ${this.accessToken}`)
+            .set('Accept', 'application/json');
+        expect2xx(response);
+        return response.body;
+    }
+
+    public async getAvailableApps(tenantId: string) {
+        const response = await this.app.getHttpServer()
+            .get(`/api/apps/available-for/${tenantId}`)
+            .set('Authorization', `Bearer ${this.accessToken}`)
+            .set('Accept', 'application/json');
+        expect2xx(response);
+        expect(Array.isArray(response.body)).toBe(true);
+        return response.body;
+    }
 
 } 

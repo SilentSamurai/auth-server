@@ -14,6 +14,26 @@ describe('Apps & Subscription Flow', () => {
         cy.addAppFromOverview(APP_NAME, APP_URL, APP_DESC);
     });
 
+    it('Tenant B should NOT see the app before it is published', () => {
+        cy.login(TENANT_B_ADMIN, 'admin9000', TENANT_B_DOMAIN);
+        cy.openTenantOverviewTile();
+        cy.contains('button', 'Subscriptions').click();
+
+        cy.get('button').contains('Subscribe App').click();
+        cy.get('table').should('not.contain', APP_NAME);
+        cy.get('button').contains('Cancel').click();
+    });
+
+    it('Tenant A should publish the app', () => {
+        cy.login(TENANT_A_ADMIN, 'admin9000', TENANT_A_DOMAIN);
+        cy.openTenantOverviewTile();
+        cy.get('button').contains('Apps').click();
+        cy.get('table').contains('tr', APP_NAME).within(() => {
+            cy.get('button').contains('Publish').click();
+        });
+        cy.get('table').contains('tr', APP_NAME).should('contain', 'Public');
+    });
+
     it('Tenant B should be able to subscribe and Open App', () => {
         cy.login(TENANT_B_ADMIN, 'admin9000', TENANT_B_DOMAIN);
         cy.openTenantOverviewTile();

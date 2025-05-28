@@ -122,10 +122,12 @@ describe('AppController', () => {
             const app = await appClient.createApp(
                 creatorTenantId,
                 `test-app-${uuid()}`,
-                `http://localhost:${MOCK_SERVER_PORT}`, // Use the mock server URL
+                `http://localhost:${MOCK_SERVER_PORT}`,
                 'Test app for subscription'
             );
             testAppId = app.id;
+            // Publish the app so it can be subscribed to
+            await appClient.publishApp(testAppId);
         });
 
         it('should successfully subscribe to an app', async () => {
@@ -218,6 +220,8 @@ describe('AppController', () => {
             `http://localhost:${MOCK_SERVER_PORT}`,
             'Test app for scope validation'
         );
+        // Publish the app so it can be subscribed to
+        await appClient.publishApp(app.id);
         await subscriberAppClient.subscribeApp(app.id, subscriberTenantId);
 
         // Fetch access token for the subscriber again (should now include scope)
@@ -235,5 +239,40 @@ describe('AppController', () => {
         // Optionally, check for a specific role name if known (e.g., 'TENANT_VIEWER')
         // expect(tokenResponse.jwt.scopes).toContain('TENANT_VIEWER');
     });
-    
+
+    describe('app visibility and publishing', () => {
+        let testAppId: string;
+        let testAppName: string;
+
+        beforeEach(async () => {
+            testAppName = `test-app-publish-${uuid()}`;
+            // Create a test app (not public by default)
+            const app = await appClient.createApp(
+                creatorTenantId,
+                testAppName,
+                `http://localhost:${MOCK_SERVER_PORT}`,
+                'Test app for publish/visibility'
+            );
+            testAppId = app.id;
+        });
+
+        it('should NOT be visible to other tenants before publishing', async () => {
+            // Use the search client with the subscriber's token
+            const subscriberAppClient = new AppClient(fixture, subscriberAccessToken);
+            const availableApps = await subscriberAppClient.getAvailableApps(subscriberTenantId);
+            const found = availableApps.find((a: any) => a.id === testAppId);
+            expect(found).toBeUndefined();
+        });
+
+        it('should be visible to other tenants after publishing', async () => {
+            // Publish the app
+            await appClient.publishApp(testAppId);
+            // Use the search client with the subscriber's token
+            const subscriberAppClient = new AppClient(fixture, subscriberAccessToken);
+            const availableApps = await subscriberAppClient.getAvailableApps(subscriberTenantId);
+            const found = availableApps.find((a: any) => a.id === testAppId);
+            expect(found).toBeDefined();
+            expect(found.isPublic).toBe(true);
+        });
+    });
 }); 

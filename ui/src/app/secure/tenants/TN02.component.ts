@@ -231,6 +231,10 @@ import {SubscriptionService} from "../../_services/subscription.service";
                                 name="description"
                             ></app-table-col>
                             <app-table-col
+                                label="Visibility"
+                                name="visibility"
+                            ></app-table-col>
+                            <app-table-col
                                 label="Actions"
                                 name="actions"
                             ></app-table-col>
@@ -250,6 +254,18 @@ import {SubscriptionService} from "../../_services/subscription.service";
                                 <td>{{ app.name }}</td>
                                 <td>{{ app.description }}</td>
                                 <td>
+                                    <span *ngIf="app.isPublic" class="badge bg-success me-2">Public</span>
+                                    <span *ngIf="!app.isPublic" class="badge bg-secondary me-2">Private</span>
+                                </td>
+                                <td>
+                                    <button
+                                        *ngIf="!app.isPublic && isTenantAdmin"
+                                        (click)="onPublishApp(app)"
+                                        class="btn btn-sm btn-warning me-2"
+                                        type="button"
+                                    >
+                                        <i class="fa fa-bullhorn"></i> Publish
+                                    </button>
                                     <button
                                         (click)="onUpdateApp(app)"
                                         [disabled]="!isTenantAdmin"
@@ -638,5 +654,23 @@ export class TN02Component implements OnInit {
 
     onViewApp(subscription: any) {
         window.open(subscription.app.appUrl, '_blank');
+    }
+
+    async onPublishApp(app: any) {
+        try {
+            await this.appService.publishApp(app.id);
+            this.messageService.add({
+                severity: 'success',
+                summary: 'Success',
+                detail: 'App published and now visible to other tenants.'
+            });
+            await this.ngOnInit();
+        } catch (e) {
+            this.messageService.add({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'Failed to publish app.'
+            });
+        }
     }
 }

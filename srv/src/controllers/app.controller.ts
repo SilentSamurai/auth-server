@@ -149,5 +149,17 @@ export class AppController {
         return allApps;
     }
 
+    /**
+     * Publish an app (make it visible to other tenants)
+     */
+    @Patch('/:appId/publish')
+    @UseGuards(JwtAuthGuard)
+    async publishApp(
+        @Request() request: AuthContext,
+        @Param('appId', ParseUUIDPipe) appId: string
+    ) {
+        const app = await this.appService.publishApp(appId);
+        return app;
+    }
 
 }
