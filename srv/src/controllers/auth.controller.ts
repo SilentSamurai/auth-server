@@ -125,151 +125,172 @@ export class AuthController {
         body.client_id = clientId;
         body.client_secret = clientSecret;
 
-        // RFC: Grant type logic
         switch (body.grant_type) {
-            case GRANT_TYPES.CODE: {
-                let validationPipe = new ValidationPipe(
-                    ValidationSchema.CodeGrantSchema,
-                );
-                await validationPipe.transform(body, null);
-                const {user, tenant} =
-                    await this.authCodeService.validateAuthCode(
-                        body.code,
-                        body.code_verifier,
-                    );
-
-                let adminContext = await this.securityService.getAdminContextForInternalUse();
-                let isMember = await this.tenantService.isMember(adminContext, tenant.id, user);
-                let isSubscribed = await this.subscriptionService.isUserSubscribedToTenant(adminContext, user, tenant);
-                if (!isMember && !isSubscribed) {
-                    throw new BadRequestException("User is not a member of the tenant and does not have a valid app subscription");
-                }
-                let additionalScopes = [];
-                if (isSubscribed) {
-                    additionalScopes = await this.subscriptionService.getSubscribedTenantScope(adminContext, user, tenant)
-                }
-
-                const {accessToken, refreshToken, scopes} =
-                    await this.authService.createUserAccessToken(user, tenant, additionalScopes);
-                return {
-                    access_token: accessToken,
-                    expires_in: this.configService.get(
-                        "TOKEN_EXPIRATION_TIME_IN_SECONDS",
-                    ),
-                    token_type: "Bearer",
-                    refresh_token: refreshToken,
-                    ...(scopes && scopes.length ? {scope: scopes.join(" ")} : {}),
-                };
-            }
-            case GRANT_TYPES.PASSWORD: {
-                let validationPipe = new ValidationPipe(
-                    ValidationSchema.PasswordGrantSchema,
-                );
-                await validationPipe.transform(body, null);
-                const user: User = await this.authService.validate(
-                    body.username,
-                    body.password,
-                );
-                let tenant: Tenant;
-                if (await this.authUserService.tenantExistsByDomain(body.client_id)) {
-                    tenant = await this.authUserService.findTenantByDomain(body.client_id);
-                } else if (await this.authUserService.tenantExistsByClientId(body.client_id)) {
-                    tenant = await this.authUserService.findTenantByClientId(body.client_id);
-                } else {
-                    throw new BadRequestException("client_id is required");
-                }
-
-                let adminContext = await this.securityService.getAdminContextForInternalUse();
-                let isMember = await this.tenantService.isMember(adminContext, tenant.id, user);
-                let isSubscribed = await this.subscriptionService.isUserSubscribedToTenant(adminContext, user, tenant);
-                if (!isMember && !isSubscribed) {
-                    throw new BadRequestException("User is not a member of the tenant and does not have a valid app subscription");
-                }
-                let additionalScopes = [];
-                if (isSubscribed) {
-                    additionalScopes = await this.subscriptionService.getSubscribedTenantScope(adminContext, user, tenant)
-                }
-
-                const {
-                    accessToken,
-                    refreshToken,
-                    scopes
-                } = await this.authService.createUserAccessToken(user, tenant, additionalScopes);
-                return {
-                    access_token: accessToken,
-                    expires_in: this.configService.get(
-                        "TOKEN_EXPIRATION_TIME_IN_SECONDS",
-                    ),
-                    token_type: "Bearer",
-                    refresh_token: refreshToken,
-                    ...(scopes && scopes.length ? {scope: scopes.join(" ")} : {}),
-                };
-            }
-            case GRANT_TYPES.CLIENT_CREDENTIALS: {
-                let validationPipe = new ValidationPipe(
-                    ValidationSchema.ClientCredentialGrantSchema,
-                );
-                await validationPipe.transform(body, null);
-                const tenant: Tenant =
-                    await this.authService.validateClientCredentials(
-                        body.client_id,
-                        body.client_secret,
-                    );
-                const token: string =
-                    await this.authService.createTechnicalAccessToken(
-                        tenant,
-                        body.scopes,
-                    );
-                const decoded: any = this.authService.decodeToken(token);
-                return {
-                    access_token: token,
-                    expires_in: this.configService.get(
-                        "TOKEN_EXPIRATION_TIME_IN_SECONDS",
-                    ),
-                    token_type: "Bearer",
-                    ...(decoded && decoded.scopes ? {scope: decoded.scopes.join(" ")} : {}),
-                };
-            }
-            case GRANT_TYPES.REFRESH_TOKEN: {
-                let validationPipe = new ValidationPipe(
-                    ValidationSchema.RefreshTokenGrantSchema,
-                );
-                await validationPipe.transform(body, null);
-                const {tenant, user} =
-                    await this.authService.validateRefreshToken(
-                        body.refresh_token,
-                    );
-
-                let adminContext = await this.securityService.getAdminContextForInternalUse();
-                let isMember = await this.tenantService.isMember(adminContext, tenant.id, user);
-                let isSubscribed = await this.subscriptionService.isUserSubscribedToTenant(adminContext, user, tenant);
-                if (!isMember && !isSubscribed) {
-                    throw new BadRequestException("User is not a member of the tenant and does not have a valid app subscription");
-                }
-                let additionalScopes = [];
-                if (isSubscribed) {
-                    additionalScopes = await this.subscriptionService.getSubscribedTenantScope(adminContext, user, tenant)
-                }
-
-                const {accessToken, refreshToken, scopes} =
-                    await this.authService.createUserAccessToken(user, tenant, additionalScopes);
-                return {
-                    access_token: accessToken,
-                    expires_in: this.configService.get(
-                        "TOKEN_EXPIRATION_TIME_IN_SECONDS",
-                    ),
-                    token_type: "Bearer",
-                    refresh_token: refreshToken,
-                    ...(scopes && scopes.length ? {scope: scopes.join(" ")} : {}),
-                };
-            }
+            case GRANT_TYPES.CODE:
+                return this.handleCodeGrant(body);
+            case GRANT_TYPES.PASSWORD:
+                return this.handlePasswordGrant(body);
+            case GRANT_TYPES.CLIENT_CREDENTIALS:
+                return this.handleClientCredentialsGrant(body);
+            case GRANT_TYPES.REFRESH_TOKEN:
+                return this.handleRefreshTokenGrant(body);
             default:
-                // RFC: Return error in RFC format
                 throw new BadRequestException({
                     error: "unsupported_grant_type",
                     error_description: "grant type not recognised.",
                 });
         }
+    }
+
+    private async handleCodeGrant(body: any): Promise<any> {
+        let validationPipe = new ValidationPipe(
+            ValidationSchema.CodeGrantSchema,
+        );
+        await validationPipe.transform(body, null);
+        const {user, tenant} =
+            await this.authCodeService.validateAuthCode(
+                body.code,
+                body.code_verifier,
+            );
+
+        const adminContext = await this.securityService.getAdminContextForInternalUse();
+
+        // Use service to resolve subscription tenant ambiguity
+        const ambiguityResult = await this.subscriptionService.resolveSubscriptionTenantAmbiguity(adminContext, user, tenant);
+        if (ambiguityResult.ambiguousTenants) {
+            return {
+                error: 'SUBSCRIPTION_TENANT_AMBIGUOUS',
+                tenants: ambiguityResult.ambiguousTenants
+            };
+        }
+        const resolvedTenant = ambiguityResult.resolvedTenant;
+
+        let isMember = await this.tenantService.isMember(adminContext, resolvedTenant.id, user);
+        let isSubscribed = await this.subscriptionService.isUserSubscribedToTenant(adminContext, user, resolvedTenant);
+        if (!isMember && !isSubscribed) {
+            throw new BadRequestException("User is not a member of the tenant and does not have a valid app subscription");
+        }
+        let additionalScopes = [];
+        if (isSubscribed) {
+            additionalScopes = await this.subscriptionService.getSubscribedTenantScope(adminContext, user, resolvedTenant)
+        }
+
+        const {accessToken, refreshToken, scopes} =
+            await this.authService.createUserAccessToken(user, resolvedTenant, additionalScopes);
+        return {
+            access_token: accessToken,
+            expires_in: this.configService.get(
+                "TOKEN_EXPIRATION_TIME_IN_SECONDS",
+            ),
+            token_type: "Bearer",
+            refresh_token: refreshToken,
+            ...(scopes && scopes.length ? {scope: scopes.join(" ")} : {}),
+        };
+    }
+
+    private async handlePasswordGrant(body: any): Promise<any> {
+        let validationPipe = new ValidationPipe(
+            ValidationSchema.PasswordGrantSchema,
+        );
+        await validationPipe.transform(body, null);
+        const user: User = await this.authService.validate(
+            body.username,
+            body.password,
+        );
+        let tenant: Tenant;
+        if (await this.authUserService.tenantExistsByDomain(body.client_id)) {
+            tenant = await this.authUserService.findTenantByDomain(body.client_id);
+        } else if (await this.authUserService.tenantExistsByClientId(body.client_id)) {
+            tenant = await this.authUserService.findTenantByClientId(body.client_id);
+        } else {
+            throw new BadRequestException("client_id is required");
+        }
+
+        let adminContext = await this.securityService.getAdminContextForInternalUse();
+        let isMember = await this.tenantService.isMember(adminContext, tenant.id, user);
+        let isSubscribed = await this.subscriptionService.isUserSubscribedToTenant(adminContext, user, tenant);
+        if (!isMember && !isSubscribed) {
+            throw new BadRequestException("User is not a member of the tenant and does not have a valid app subscription");
+        }
+        let additionalScopes = [];
+        if (isSubscribed) {
+            additionalScopes = await this.subscriptionService.getSubscribedTenantScope(adminContext, user, tenant)
+        }
+
+        const {
+            accessToken,
+            refreshToken,
+            scopes
+        } = await this.authService.createUserAccessToken(user, tenant, additionalScopes);
+        return {
+            access_token: accessToken,
+            expires_in: this.configService.get(
+                "TOKEN_EXPIRATION_TIME_IN_SECONDS",
+            ),
+            token_type: "Bearer",
+            refresh_token: refreshToken,
+            ...(scopes && scopes.length ? {scope: scopes.join(" ")} : {}),
+        };
+    }
+
+    private async handleClientCredentialsGrant(body: any): Promise<any> {
+        let validationPipe = new ValidationPipe(
+            ValidationSchema.ClientCredentialGrantSchema,
+        );
+        await validationPipe.transform(body, null);
+        const tenant: Tenant =
+            await this.authService.validateClientCredentials(
+                body.client_id,
+                body.client_secret,
+            );
+        const token: string =
+            await this.authService.createTechnicalAccessToken(
+                tenant,
+                body.scopes,
+            );
+        const decoded: any = this.authService.decodeToken(token);
+        return {
+            access_token: token,
+            expires_in: this.configService.get(
+                "TOKEN_EXPIRATION_TIME_IN_SECONDS",
+            ),
+            token_type: "Bearer",
+            ...(decoded && decoded.scopes ? {scope: decoded.scopes.join(" ")} : {}),
+        };
+    }
+
+    private async handleRefreshTokenGrant(body: any): Promise<any> {
+        let validationPipe = new ValidationPipe(
+            ValidationSchema.RefreshTokenGrantSchema,
+        );
+        await validationPipe.transform(body, null);
+        const {tenant, user} =
+            await this.authService.validateRefreshToken(
+                body.refresh_token,
+            );
+
+        let adminContext = await this.securityService.getAdminContextForInternalUse();
+        let isMember = await this.tenantService.isMember(adminContext, tenant.id, user);
+        let isSubscribed = await this.subscriptionService.isUserSubscribedToTenant(adminContext, user, tenant);
+        if (!isMember && !isSubscribed) {
+            throw new BadRequestException("User is not a member of the tenant and does not have a valid app subscription");
+        }
+        let additionalScopes = [];
+        if (isSubscribed) {
+            additionalScopes = await this.subscriptionService.getSubscribedTenantScope(adminContext, user, tenant)
+        }
+
+        const {accessToken, refreshToken, scopes} =
+            await this.authService.createUserAccessToken(user, tenant, additionalScopes);
+        return {
+            access_token: accessToken,
+            expires_in: this.configService.get(
+                "TOKEN_EXPIRATION_TIME_IN_SECONDS",
+            ),
+            token_type: "Bearer",
+            refresh_token: refreshToken,
+            ...(scopes && scopes.length ? {scope: scopes.join(" ")} : {}),
+        };
     }
 
     @Post("/verify-auth-code")

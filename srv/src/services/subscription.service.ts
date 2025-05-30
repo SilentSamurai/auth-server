@@ -271,6 +271,43 @@ export class SubscriptionService {
     }
 
     /**
+     * Resolves subscription tenant ambiguity for a user and a target tenant (app owner).
+     * Returns { resolvedTenant } if unambiguous, or { ambiguousTenants: [...] } if ambiguous.
+     */
+    async resolveSubscriptionTenantAmbiguity(context: AuthContext, user: User, tenant: Tenant): Promise<{
+        resolvedTenant?: Tenant,
+        ambiguousTenants?: any[]
+    }> {
+        // Get admin context
+
+        // Find all tenants the user is a member of
+        const userTenants = await this.tenantService.findByMembership(context, user);
+        // Find all successful subscriptions for these tenants to the app owned by the current tenant
+        const ownedApps = await this.appRepo.findBy({owner: {id: tenant.id}});
+        // Find all userTenants that are subscribed to any of the ownedApps
+        const validTenants = [];
+        for (const t of userTenants) {
+            const subscriptions = await this.findByTenantId(t.id);
+            for (const sub of subscriptions) {
+                if (ownedApps.some(app => app.id === sub.app.id) && sub.status === 'success') {
+                    validTenants.push({id: t.id, name: t.name, client_id: t.clientId, domain: t.domain});
+                    break;
+                }
+            }
+        }
+        if (validTenants.length > 1) {
+            return {ambiguousTenants: validTenants};
+        }
+        if (validTenants.length === 1) {
+            // Find the resolved tenant entity
+            const resolvedTenant = await this.tenantService.findByClientId(context, validTenants[0].client_id);
+            return {resolvedTenant};
+        }
+        // Default: no ambiguity, return original tenant
+        return {resolvedTenant: tenant};
+    }
+
+    /**
      * Create a new subscription with status = PENDING.
      */
     private async createPendingSubscription(tenant: Tenant, app: App): Promise<Subscription> {
