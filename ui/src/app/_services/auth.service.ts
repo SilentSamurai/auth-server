@@ -37,13 +37,14 @@ export class AuthService {
         );
     }
 
-    fetchAccessToken(code: string, verifier: string): Observable<any> {
+    fetchAccessToken(code: string, verifier: string, client_id: string): Observable<any> {
         return this.http.post(
             `${AUTH_API}/token`,
             {
                 grant_type: 'authorization_code',
                 code,
                 code_verifier: verifier,
+                client_id
             },
             httpOptions,
         );

@@ -60,7 +60,7 @@ describe('AuthService', () => {
         };
 
         service
-            .fetchAccessToken('auth_code_123', 'verifier_123')
+            .fetchAccessToken('auth_code_123', 'verifier_123', 'test_client_id')
             .subscribe((response) => {
                 expect(response).toEqual(mockToken);
                 done();
@@ -72,6 +72,7 @@ describe('AuthService', () => {
             grant_type: 'authorization_code',
             code: 'auth_code_123',
             code_verifier: 'verifier_123',
+            client_id: 'test_client_id'
         });
 
         req.flush(mockToken);

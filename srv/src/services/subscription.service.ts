@@ -1,4 +1,4 @@
-import {Injectable, Logger, NotFoundException} from '@nestjs/common';
+import {Injectable, InternalServerErrorException, Logger, NotFoundException} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {Repository} from 'typeorm';
 import {Subscription, SubscriptionStatus} from '../entity/subscription.entity';
@@ -226,85 +226,82 @@ export class SubscriptionService {
         return subscriptions;
     }
 
-    async isUserSubscribedToTenant(authContext: AuthContext, user: User, loggingTenant: Tenant): Promise<boolean> {
+    async isUserSubscribedToTenant(authContext: AuthContext, user: User, appOwnerTenant: Tenant): Promise<boolean> {
         // Get all tenants the user belongs to
         const userTenants = await this.tenantService.findByMembership(authContext, user);
-        // Get all apps owned by the logging-in tenant
-        const ownedApps = await this.appRepo.findBy({
-            owner: {
-                id: loggingTenant.id
-            }
-        });
         // For each user tenant, check if it is subscribed to any app owned by the logging-in tenant
-        for (const userTenant of userTenants) {
-            const subscriptions = await this.findByTenantId(userTenant.id);
-            for (const sub of subscriptions) {
-                if (ownedApps.some(app => app.id === sub.app.id) && sub.status === 'success') {
-                    return true;
-                }
+        for (const tenant of userTenants) {
+            if (tenant.id == appOwnerTenant.id) continue;
+            if (await this.canLoginToTenant(authContext, tenant, appOwnerTenant)) {
+                return true
             }
         }
         return false;
     }
 
     /**
-     * Returns all unique scopes (role names) granted to a user via subscriptions to apps owned by the tenant.
-     * Used for additional scopes in OAuth tokens.
-     */
-    async getSubscribedTenantScope(authContext: AuthContext, user: User, tenant: Tenant): Promise<string[]> {
-        // Get all tenants the user is a member of
-        const userTenants = await this.tenantService.findByMembership(authContext, user);
-        // Get all apps owned by the target tenant
-        const ownedApps = await this.appRepo.findBy({owner: {id: tenant.id}});
-        const scopes = new Set<string>();
-        for (const userTenant of userTenants) {
-            // For each user-tenant, get all successful subscriptions
-            const subscriptions = await this.findByTenantId(userTenant.id);
-            for (const sub of subscriptions) {
-                if (ownedApps.some(app => app.id === sub.app.id) && sub.status === 'success') {
-                    const roles = await this.tenantService.getMemberRoles(authContext, userTenant.id, user)
-                    roles.forEach(role => scopes.add(role.name))
-                }
-            }
-        }
-        return Array.from(scopes);
-    }
-
-    /**
      * Resolves subscription tenant ambiguity for a user and a target tenant (app owner).
      * Returns { resolvedTenant } if unambiguous, or { ambiguousTenants: [...] } if ambiguous.
      */
-    async resolveSubscriptionTenantAmbiguity(context: AuthContext, user: User, tenant: Tenant): Promise<{
+    async resolveSubscriptionTenantAmbiguity(context: AuthContext, user: User, appOwnerTenant: Tenant, subscriberTenantHint: string | null): Promise<{
         resolvedTenant?: Tenant,
-        ambiguousTenants?: any[]
+        ambiguousTenants?: Tenant[]
     }> {
-        // Get admin context
-
         // Find all tenants the user is a member of
         const userTenants = await this.tenantService.findByMembership(context, user);
-        // Find all successful subscriptions for these tenants to the app owned by the current tenant
-        const ownedApps = await this.appRepo.findBy({owner: {id: tenant.id}});
         // Find all userTenants that are subscribed to any of the ownedApps
-        const validTenants = [];
-        for (const t of userTenants) {
-            const subscriptions = await this.findByTenantId(t.id);
-            for (const sub of subscriptions) {
-                if (ownedApps.some(app => app.id === sub.app.id) && sub.status === 'success') {
-                    validTenants.push({id: t.id, name: t.name, client_id: t.clientId, domain: t.domain});
-                    break;
+        if (subscriberTenantHint) {
+            const resolvedTenant = await this.tenantService.findByClientIdOrDomain(context, subscriberTenantHint);
+            if (await this.canLoginToTenant(context, resolvedTenant, appOwnerTenant)) {
+                return {resolvedTenant}
+            }
+            throw new InternalServerErrorException("subscribedTenant hint did not work");
+        } else {
+            const validTenants = [];
+            for (const t of userTenants) {
+                if (t.id == appOwnerTenant.id) continue;
+                if (await this.canLoginToTenant(context, t, appOwnerTenant)) {
+                    validTenants.push(t)
                 }
             }
+            if (validTenants.length === 1) {
+                return {resolvedTenant: validTenants[0]};
+            } else {
+                return {ambiguousTenants: validTenants};
+            }
         }
-        if (validTenants.length > 1) {
-            return {ambiguousTenants: validTenants};
+    }
+
+    async canLoginToTenant(authContext: AuthContext, loggingTenant: Tenant, appOwnerTenant: Tenant): Promise<boolean> {
+        // Get all apps owned by the app owner tenant
+        const ownedApps = await this.appRepo.findBy({
+            owner: {
+                id: appOwnerTenant.id
+            }
+        });
+        for (const app of ownedApps) {
+            if (await this.hasValidSubscription(loggingTenant, app)) {
+                return true;
+            }
         }
-        if (validTenants.length === 1) {
-            // Find the resolved tenant entity
-            const resolvedTenant = await this.tenantService.findByClientId(context, validTenants[0].client_id);
-            return {resolvedTenant};
-        }
-        // Default: no ambiguity, return original tenant
-        return {resolvedTenant: tenant};
+        return false;
+    }
+
+    /**
+     * Checks if a subscriber tenant has a valid subscription to any app owned by the target tenant.
+     * @param subscriberTenant The tenant to check subscription status for
+     * @param targetTenant The tenant whose apps we want to check subscription against
+     * @param app subscription for this app
+     * @returns true if the subscriber has at least one valid subscription to any app owned by the target tenant
+     */
+    async hasValidSubscription(subscriberTenant: Tenant, app: App): Promise<boolean> {
+        return await this.subscriptionRepo.exists({
+            where: {
+                subscriber: {id: subscriberTenant.id},
+                app: {id: app.id},
+                status: SubscriptionStatus.SUCCESS
+            }
+        });
     }
 
     /**

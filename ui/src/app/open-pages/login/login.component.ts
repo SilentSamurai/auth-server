@@ -84,7 +84,7 @@ export class LoginComponent implements OnInit {
     }
 
     async redirect(code: string) {
-        await this.setAccessToken(code);
+        await this.setAccessToken(code, this.client_id);
         await this.router.navigateByUrl("/home");
     }
 
@@ -96,11 +96,11 @@ export class LoginComponent implements OnInit {
         });
     }
 
-    private async setAccessToken(code: string) {
+    private async setAccessToken(code: string, clientId: string) {
         try {
             let verifier = this.tokenStorage.getCodeVerifier();
             const data = await lastValueFrom(
-                this.authService.fetchAccessToken(code, verifier),
+                this.authService.fetchAccessToken(code, verifier, clientId),
             );
             this.tokenStorage.saveToken(data.access_token);
             const rules = await this.authService.fetchPermissions();

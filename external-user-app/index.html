@@ -81,7 +81,8 @@
             body: JSON.stringify({
                 grant_type: "authorization_code",
                 code,
-                code_verifier: code_verifier
+                code_verifier: code_verifier,
+                client_id: "shire.local"
             }),
         })
         if (response.ok) {

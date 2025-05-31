@@ -200,6 +200,7 @@ const PasswordGrantSchema = yup.object().shape({
         .matches(PASSWORD_REGEXP, PASSWORD_MESSAGE)
         .max(128),
     client_id: yup.string().required("client_id is required"),
+    subscriber_tenant_hint: yup.string().optional(),
     scopes: yup.array().of(yup.string().max(20)),
 });
 
@@ -221,6 +222,7 @@ const RefreshTokenGrantSchema = yup.object().shape({
         .required()
         .matches(/^refresh_token$/g, {message: "grant type not recognised"}),
     refresh_token: yup.string().required("refresh_token is required"),
+    subscriber_tenant_hint: yup.string().optional(),
     scopes: yup.array().of(yup.string().max(20)),
 });
 
@@ -233,6 +235,8 @@ const CodeGrantSchema = yup.object().shape({
         }),
     code: yup.string().required("code is required"),
     code_verifier: yup.string().required("code_verifier is required"),
+    client_id: yup.string().optional(),
+    subscriber_tenant_hint: yup.string().optional(),
     scopes: yup.array().of(yup.string().max(20)),
 });
 
