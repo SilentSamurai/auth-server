@@ -21,6 +21,7 @@ import {AppService} from "./app.service";
 import {TenantBits} from "../entity/tenant-bits.entity";
 import {TenantBitsService} from "./tenant-bits.service";
 import {AuthModule} from "../auth/auth.module";
+import {AppSubscriptionService} from "./app-subscription.service";
 
 @Module(
     {
@@ -30,8 +31,8 @@ import {AuthModule} from "../auth/auth.module";
             forwardRef(() => AuthModule),
         ],
         controllers: [],
-        providers: [UsersService, GroupService, TenantService, RoleService, SubscriptionService, AppService, TenantBitsService],
-        exports: [UsersService, GroupService, TenantService, RoleService, SubscriptionService, AppService, TenantBitsService]
+        providers: [UsersService, GroupService, TenantService, RoleService, SubscriptionService, AppService, TenantBitsService, AppSubscriptionService],
+        exports: [UsersService, GroupService, TenantService, RoleService, SubscriptionService, AppService, TenantBitsService, AppSubscriptionService]
     })
 export class ServiceModule {
 }

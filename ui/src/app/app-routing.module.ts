@@ -25,6 +25,7 @@ import {HttpErrorComponent} from './error-pages/HttpError.component';
 import {TenantAccessAuthGuard} from './shared/tenant-auth-guard.service';
 import {AP01Component} from './secure/apps/AP01.component';
 import {AuthorizeLoginComponent} from "./open-pages/authorize/authorize-login.component";
+import {TenantSelectionComponent} from './open-pages/tenant-selection/tenant-selection.component';
 
 const routes: Routes = [
     {path: 'session-confirm', component: SessionConfirmationComponent},
@@ -108,6 +109,7 @@ const routes: Routes = [
             {path: 'AP01', component: AP01Component, canActivate: []},
         ],
     },
+    {path: 'tenant-selection', component: TenantSelectionComponent},
     {path: '**', redirectTo: '/error/404'},
 ];
 

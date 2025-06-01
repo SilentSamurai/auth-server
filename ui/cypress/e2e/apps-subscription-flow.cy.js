@@ -26,11 +26,7 @@ describe('Apps & Subscription Flow', () => {
 
     it('Tenant A should publish the app', () => {
         cy.login(TENANT_A_ADMIN, 'admin9000', TENANT_A_DOMAIN);
-        cy.openTenantOverviewTile();
-        cy.get('button').contains('Apps').click();
-        cy.get('table').contains('tr', APP_NAME).within(() => {
-            cy.get('button').contains('Publish').click();
-        });
+        cy.publishApp(APP_NAME)
         cy.get('table').contains('tr', APP_NAME).should('contain', 'Public');
     });
 

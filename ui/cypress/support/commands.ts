@@ -250,6 +250,58 @@ Cypress.Commands.add('deleteAppFromOverview', (appName: string) => {
     cy.contains('td', appName).should('not.exist');
 });
 
+// @ts-ignore
+Cypress.Commands.add('loginWithAmbiguousUser', (email: string, password: string, clientId: string) => {
+    cy.visit('/');
+    cy.get('#username').type(email);
+    cy.get('#password').type(password);
+    cy.intercept('POST', '**/api/oauth/login*').as('login');
+    cy.get('#login-btn').click();
+    return cy.wait('@login');
+});
+
+// @ts-ignore
+Cypress.Commands.add('addMemberToTenant', (tenantDomain: string, email: string, password: string) => {
+    cy.openTenantOverviewTile();
+    cy.contains('button', 'Members').click();
+    cy.get('#OPEN_ADD_MEMBER_DIALOG_BTN').click();
+    cy.get('#add\\.member\\.name').type(email);
+    cy.intercept('POST', '**/api/tenant/*/members/add').as('createMember');
+    cy.get('#ADD_TENANT_MEMBER_BTN').click();
+    cy.wait('@createMember').should(({response}) => {
+        expect(response?.statusCode).to.be.oneOf([201]);
+    });
+    cy.contains('td', email).should('exist');
+});
+
+// @ts-ignore
+Cypress.Commands.add('publishApp', (appName: string) => {
+    cy.openTenantOverviewTile();
+    cy.contains('button', 'Apps').click();
+    cy.contains('td', appName)
+        .parent()
+        .find('button')
+        .contains('Publish')
+        .click();
+    cy.intercept('PATCH', '**/api/apps/*/publish').as('publishApp');
+    cy.get('#CONFIRMATION_YES_BTN').click();
+    cy.wait('@publishApp').should(({response}) => {
+        expect(response?.statusCode).to.be.oneOf([200, 201]);
+    });
+    // Verify app is published by checking that the Publish button is gone
+    cy.contains('td', appName)
+        .parent()
+        .find('button')
+        .contains('Publish')
+        .should('not.exist');
+});
+
+Cypress.Commands.add('logout', () => {
+    cy.get('#dropdownUser1').click();
+    cy.contains('a.dropdown-item', 'Sign Out').click();
+    cy.url().should('include', '/login');
+});
+
 declare namespace Cypress {
     interface Chainable<Subject = any> {
         addAppFromOverview(appName: string, appUrl: string, description: string): Chainable<any>;
@@ -275,6 +327,10 @@ declare namespace Cypress {
         adminLogin(email: string, password: string): Chainable<any>;
 
         login(email: string, password: string, domain: string): Chainable<any>;
+        loginWithAmbiguousUser(email: string, password: string, clientId: string): Chainable<any>;
+        addMemberToTenant(tenantDomain: string, email: string, password: string): Chainable<any>;
+        publishApp(appName: string): Chainable<any>;
+        logout(): Chainable<any>;
     }
 }
 

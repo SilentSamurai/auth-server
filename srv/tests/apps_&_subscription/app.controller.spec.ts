@@ -137,9 +137,8 @@ describe('AppController', () => {
             const subscription = await subscriberAppClient.subscribeApp(testAppId, subscriberTenantId);
 
             expect(subscription).toBeDefined();
-            expect(subscription.id).toBeDefined();
             expect(subscription.status).toBeDefined();
-            expect(subscription.subscribedAt).toBeDefined();
+            expect(subscription.status).toEqual("success");
 
             // Verify that the onboard request was made
             const onboardRequests = mockServer.getOnboardRequests();
@@ -163,7 +162,7 @@ describe('AppController', () => {
             const unsubscribeResponse = await subscriberAppClient.unsubscribeApp(testAppId, subscriberTenantId);
             expect(unsubscribeResponse).toBeDefined();
             expect(unsubscribeResponse.status).toBeDefined();
-            expect(unsubscribeResponse.status).toEqual(true);
+            expect(unsubscribeResponse.status).toEqual("success");
 
             // Verify that the offboard request was made
             const offboardRequests = mockServer.getOffboardRequests();

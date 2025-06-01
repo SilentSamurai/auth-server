@@ -28,12 +28,19 @@ import {ValidationSchema} from "../validation/validation.schema";
 import {TenantService} from "../services/tenant.service";
 import {Tenant} from "../entity/tenant.entity";
 import {AuthCodeService} from "../auth/auth-code.service";
-import {GRANT_TYPES, TenantToken} from "../casl/contexts";
+import {GRANT_TYPES, Token} from "../casl/contexts";
 import {AuthUserService} from "../casl/authUser.service";
 import {SecurityService} from "../casl/security.service";
 import {SubscriptionService} from "../services/subscription.service";
+import * as yup from "yup";
 
 const logger = new Logger("AuthController");
+
+const UpdateSubscriberTenantHintSchema = yup.object().shape({
+    auth_code: yup.string().required("auth_code is required"),
+    client_id: yup.string().required("client_id is required"),
+    subscriber_tenant_hint: yup.string().required("subscriber_tenant_hint is required"),
+});
 
 @Controller("api/oauth")
 @UseInterceptors(ClassSerializerInterceptor)
@@ -185,12 +192,11 @@ export class AuthController {
             body.client_id,
             body.client_secret,
         );
-        let securityContext: TenantToken =
-            await this.authService.validateAccessToken(body.access_token);
-        if (securityContext.tenant.id !== tenant.id) {
-            throw new UnauthorizedException("not a valid token");
+        let securityContext: Token = await this.authService.validateAccessToken(body.access_token);
+        if (securityContext.isTenantToken() || securityContext.asTenantToken().tenant.id !== tenant.id) {
+            return securityContext;
         }
-        return securityContext;
+        throw new UnauthorizedException("not a valid token");
     }
 
     @Post("/exchange")
@@ -202,9 +208,7 @@ export class AuthController {
             client_secret: string;
         },
     ): Promise<object> {
-        let tenantToken = await this.authService.validateAccessToken(
-            body.access_token,
-        );
+        let tenantToken = await this.authService.validateAccessToken(body.access_token,);
         if (tenantToken.grant_type !== GRANT_TYPES.PASSWORD) {
             throw new ForbiddenException("grant_type not allowed");
         }
@@ -213,7 +217,7 @@ export class AuthController {
             body.client_secret,
         );
         const user = await this.authUserService.findUserByEmail(
-            tenantToken.email,
+            tenantToken.asTenantToken().email,
         );
         const tenant = await this.authUserService.findTenantByClientId(
             body.client_id,
@@ -305,6 +309,81 @@ export class AuthController {
         }
     }
 
+    @Post("/check-tenant-ambiguity")
+    async checkTenantAmbiguity(
+        @Body(new ValidationPipe(ValidationSchema.VerifyAuthCodeSchema))
+            body: { auth_code: string, client_id: string }
+    ) {
+        //TODO verify authcode
+        const authCodeObj = await this.authCodeService.findByCode(body.auth_code);
+
+        // Find tenant by client_id
+        let tenant = null;
+        if (await this.authUserService.tenantExistsByDomain(body.client_id)) {
+            tenant = await this.authUserService.findTenantByDomain(body.client_id);
+        } else if (await this.authUserService.tenantExistsByClientId(body.client_id)) {
+            tenant = await this.authUserService.findTenantByClientId(body.client_id);
+        } else {
+            throw new BadRequestException("Invalid client_id");
+        }
+
+        // Check if auth code belongs to this tenant
+        if (authCodeObj.tenantId !== tenant.id) {
+            throw new ForbiddenException("auth_code does not belong to the provided client_id");
+        }
+
+        const user = await this.authUserService.findUserById(authCodeObj.userId);
+        const adminContext = await this.securityService.getAdminContextForInternalUse();
+
+        // Check if user is subscribed through multiple tenants
+        const ambiguityResult = await this.subscriptionService
+            .resolveSubscriptionTenantAmbiguity(adminContext, user, tenant, null);
+
+        if (ambiguityResult.ambiguousTenants) {
+            return {
+                hasAmbiguity: true,
+                tenants: ambiguityResult.ambiguousTenants.map(t => {
+                    return {id: t.id, domain: t.domain, name: t.name};
+                }),
+            };
+        }
+
+        return {
+            hasAmbiguity: false
+        };
+    }
+
+
+    @Post("/update-subscriber-tenant-hint")
+    async updateSubscriberTenantHint(
+        @Body(new ValidationPipe(UpdateSubscriberTenantHintSchema))
+            body: { auth_code: string, client_id: string, subscriber_tenant_hint: string }
+    ) {
+        /// TODO Validate auth code
+        const authCodeObj = await this.authCodeService.findByCode(body.auth_code);
+        // Find tenant by client_id
+        let tenant = null;
+        if (await this.authUserService.tenantExistsByDomain(body.client_id)) {
+            tenant = await this.authUserService.findTenantByDomain(body.client_id);
+        } else if (await this.authUserService.tenantExistsByClientId(body.client_id)) {
+            tenant = await this.authUserService.findTenantByClientId(body.client_id);
+        } else {
+            throw new BadRequestException("Invalid client_id");
+        }
+        // Check if auth code belongs to this tenant
+        if (authCodeObj.tenantId !== tenant.id) {
+            throw new ForbiddenException("auth_code does not belong to the provided client_id");
+        }
+
+        // Update the subscriber tenant hint
+        await this.authCodeService.updateAuthCode(authCodeObj, body.subscriber_tenant_hint);
+
+        return {
+            status: true,
+            message: "Subscriber tenant hint updated successfully"
+        };
+    }
+
     private async handleCodeGrant(body: any): Promise<any> {
         let validationPipe = new ValidationPipe(
             ValidationSchema.CodeGrantSchema,
@@ -334,19 +413,37 @@ export class AuthController {
         }
         let additionalScopes = [];
         if (isSubscribed) {
+
+            // if hint is there add it
+            if (!body.subscriber_tenant_hint && await this.authCodeService.hasAuthCodeWithHint(body.code)) {
+                const authCode = await this.authCodeService.findByCode(body.code);
+                if (authCode?.subscriberTenantHint) {
+                    body.subscriber_tenant_hint = authCode.subscriberTenantHint;
+                }
+            }
+
             // Use service to resolve subscription tenant ambiguity
             const ambiguityResult = await this.subscriptionService
                 .resolveSubscriptionTenantAmbiguity(adminContext, user, tenant, body.subscriber_tenant_hint);
             if (ambiguityResult.ambiguousTenants) {
-                return {
-                    error: 'SUBSCRIPTION_TENANT_AMBIGUOUS',
-                    tenants: ambiguityResult.ambiguousTenants
-                };
+                throw new BadRequestException("Multiple subscription tenants found. Please specify a subscriber_tenant_hint.");
             }
             const subscribingTenant = ambiguityResult.resolvedTenant!;
 
             additionalScopes = await this.tenantService.getMemberRoles(adminContext, subscribingTenant.id, user);
             additionalScopes = additionalScopes.map(r => r.name);
+
+            const {accessToken, refreshToken, scopes} =
+                await this.authService.createSubscribedUserAccessToken(user, tenant, subscribingTenant, additionalScopes);
+            return {
+                access_token: accessToken,
+                expires_in: this.configService.get(
+                    "TOKEN_EXPIRATION_TIME_IN_SECONDS",
+                ),
+                token_type: "Bearer",
+                refresh_token: refreshToken,
+                ...(scopes && scopes.length ? {scope: scopes.join(" ")} : {}),
+            };
         }
 
         const {accessToken, refreshToken, scopes} =
@@ -392,21 +489,27 @@ export class AuthController {
             const ambiguityResult = await this.subscriptionService
                 .resolveSubscriptionTenantAmbiguity(adminContext, user, tenant, body.subscriber_tenant_hint);
             if (ambiguityResult.ambiguousTenants) {
-                return {
-                    error: 'SUBSCRIPTION_TENANT_AMBIGUOUS',
-                    tenants: ambiguityResult.ambiguousTenants
-                };
+                throw new BadRequestException("Multiple subscription tenants found. Please specify a subscriber_tenant_hint.");
             }
             const subscribingTenant = ambiguityResult.resolvedTenant!;
             additionalScopes = await this.tenantService.getMemberRoles(adminContext, subscribingTenant.id, user);
             additionalScopes = additionalScopes.map(r => r.name);
+
+            const {accessToken, refreshToken, scopes} =
+                await this.authService.createSubscribedUserAccessToken(user, tenant, subscribingTenant, additionalScopes);
+            return {
+                access_token: accessToken,
+                expires_in: this.configService.get(
+                    "TOKEN_EXPIRATION_TIME_IN_SECONDS",
+                ),
+                token_type: "Bearer",
+                refresh_token: refreshToken,
+                ...(scopes && scopes.length ? {scope: scopes.join(" ")} : {}),
+            };
         }
 
-        const {
-            accessToken,
-            refreshToken,
-            scopes
-        } = await this.authService.createUserAccessToken(user, tenant, additionalScopes);
+        const {accessToken, refreshToken, scopes} =
+            await this.authService.createUserAccessToken(user, tenant, additionalScopes);
         return {
             access_token: accessToken,
             expires_in: this.configService.get(
@@ -466,14 +569,23 @@ export class AuthController {
             const ambiguityResult = await this.subscriptionService
                 .resolveSubscriptionTenantAmbiguity(adminContext, user, tenant, body.subscriber_tenant_hint);
             if (ambiguityResult.ambiguousTenants) {
-                return {
-                    error: 'SUBSCRIPTION_TENANT_AMBIGUOUS',
-                    tenants: ambiguityResult.ambiguousTenants
-                };
+                throw new BadRequestException("Multiple subscription tenants found. Please specify a subscriber_tenant_hint.");
             }
             const subscribingTenant = ambiguityResult.resolvedTenant!;
             additionalScopes = await this.tenantService.getMemberRoles(adminContext, subscribingTenant.id, user);
             additionalScopes = additionalScopes.map(r => r.name);
+
+            const {accessToken, refreshToken, scopes} =
+                await this.authService.createSubscribedUserAccessToken(user, tenant, subscribingTenant, additionalScopes);
+            return {
+                access_token: accessToken,
+                expires_in: this.configService.get(
+                    "TOKEN_EXPIRATION_TIME_IN_SECONDS",
+                ),
+                token_type: "Bearer",
+                refresh_token: refreshToken,
+                ...(scopes && scopes.length ? {scope: scopes.join(" ")} : {}),
+            };
         }
 
         const {accessToken, refreshToken, scopes} =

@@ -19,8 +19,21 @@ import {
     ResetPasswordToken,
     TechnicalToken,
     TenantToken,
+    Token,
 } from "../casl/contexts";
 import {AuthUserService} from "../casl/authUser.service";
+import * as yup from "yup";
+
+const SecurityContextSchema = yup.object().shape({
+    sub: yup.string().required("token is invalid"),
+    tenant: yup.object().shape({
+        id: yup.string().required("token is invalid").uuid("tenant id must be a valid UUID"),
+        name: yup.string().required("token is invalid"),
+        domain: yup.string().required("token is invalid"),
+    }),
+    scopes: yup.array().of(yup.string().max(128)),
+    grant_type: yup.string().required("token is invalid"),
+});
 
 @Injectable()
 export class AuthService {
@@ -69,30 +82,28 @@ export class AuthService {
         return {tenant, user};
     }
 
-    async validateAccessToken(token: string): Promise<TenantToken> {
+    async validateAccessToken(token: string): Promise<Token> {
         try {
-            let validationPipe = new ValidationPipe(
-                ValidationSchema.SecurityContextSchema,
-            );
-            let payload: TenantToken = (await validationPipe.transform(
+            let decoded = await new ValidationPipe(SecurityContextSchema).transform(
                 this.jwtService.decode(token, {json: true}),
                 null,
-            )) as TenantToken;
-
-            let tenant = await this.authUserService.findTenantByDomain(
-                payload.tenant.domain,
             );
-            payload = await this.jwtService.verifyAsync(token, {
+            let tenant = await this.authUserService.findTenantByDomain(
+                decoded.tenant.domain,
+            );
+            const verifiedToken = await this.jwtService.verifyAsync(token, {
                 publicKey: tenant.publicKey,
-            });
+            })
+            const payload: Token = verifiedToken.isTechnical ? TechnicalToken.create(verifiedToken) : TenantToken.create(verifiedToken)
+
             this.LOGGER.log("token verified with public Key");
-            if (payload.grant_type === GRANT_TYPES.CLIENT_CREDENTIALS) {
+            if (payload.isTechnicalToken()) {
                 if (payload.sub !== "oauth") {
                     throw "Invalid Token";
                 }
             } else {
                 let user = await this.authUserService.findUserByEmail(
-                    payload.email,
+                    (payload as TenantToken).email,
                 );
             }
             return payload;
@@ -125,21 +136,15 @@ export class AuthService {
 
     createTechnicalToken(tenant: Tenant, roles: string[]): TechnicalToken {
         roles = roles instanceof Array ? roles : [];
-        const payload: TechnicalToken = {
+        return TechnicalToken.create({
             sub: "oauth",
-            email: "oauth@" + tenant.domain,
-            name: "oauth",
-            userId: "na",
             tenant: {
                 id: tenant.id,
                 name: tenant.name,
                 domain: tenant.domain,
             },
-            scopes: [RoleEnum.TENANT_VIEWER, ...roles],
-            grant_type: GRANT_TYPES.CLIENT_CREDENTIALS,
-            isTechnical: true,
-        };
-        return payload;
+            scopes: [RoleEnum.TENANT_VIEWER, ...roles]
+        });
     }
 
     async createTechnicalAccessToken(
@@ -147,11 +152,11 @@ export class AuthService {
         roles: string[],
     ): Promise<string> {
         roles = roles instanceof Array ? roles : [];
-        const payload: TechnicalToken = this.createTechnicalToken(
+        const payload = this.createTechnicalToken(
             tenant,
             roles,
         );
-        return this.jwtService.sign(payload, {privateKey: tenant.privateKey});
+        return this.jwtService.sign(payload.asPlainObject(), {privateKey: tenant.privateKey});
     }
 
     /**
@@ -170,7 +175,7 @@ export class AuthService {
         let scopesFromRoles = roles.map((role) => role.name);
         scopesFromRoles.push(...scopes);
 
-        const accessTokenPayload: TenantToken = {
+        const accessTokenPayload = TenantToken.create({
             sub: user.email,
             email: user.email,
             name: user.name,
@@ -180,9 +185,14 @@ export class AuthService {
                 name: tenant.name,
                 domain: tenant.domain,
             },
+            userTenant: {
+                id: tenant.id,
+                name: tenant.name,
+                domain: tenant.domain,
+            },
             scopes: scopesFromRoles,
             grant_type: GRANT_TYPES.PASSWORD,
-        };
+        });
 
         const refreshTokenPayload: RefreshToken = {
             email: user.email,
@@ -190,7 +200,7 @@ export class AuthService {
         };
 
         const accessToken = await this.jwtService.signAsync(
-            accessTokenPayload,
+            accessTokenPayload.asPlainObject(),
             {
                 privateKey: tenant.privateKey,
                 issuer: this.configService.get("SUPER_TENANT_DOMAIN"),
@@ -201,6 +211,70 @@ export class AuthService {
             refreshTokenPayload,
             {
                 privateKey: tenant.privateKey,
+                expiresIn: this.configService.get(
+                    "REFRESH_TOKEN_EXPIRATION_TIME",
+                ),
+                issuer: this.configService.get("SUPER_TENANT_DOMAIN"),
+            },
+        );
+
+        return {accessToken, refreshToken, scopes: accessTokenPayload.scopes};
+    }
+
+    /**
+     * Create an access token for a subscribed user.
+     * This method is specifically for users who are accessing a different tenant than their own.
+     */
+    async createSubscribedUserAccessToken(
+        user: User,
+        issuingTenant: Tenant,
+        userTenant: Tenant,
+        scopes: string[] = [],
+    ): Promise<{ accessToken: string; refreshToken: string; scopes: string[] }> {
+        if (!user.verified) {
+            throw new UnauthorizedException('Email not verified');
+        }
+
+        let roles = await this.authUserService.getMemberRoles(issuingTenant, user);
+        let scopesFromRoles = roles.map((role) => role.name);
+        scopesFromRoles.push(...scopes);
+
+        const accessTokenPayload = TenantToken.create({
+            sub: user.email,
+            email: user.email,
+            name: user.name,
+            userId: user.id,
+            tenant: {
+                id: issuingTenant.id,
+                name: issuingTenant.name,
+                domain: issuingTenant.domain,
+            },
+            userTenant: {
+                id: userTenant.id,
+                name: userTenant.name,
+                domain: userTenant.domain,
+            },
+            scopes: scopesFromRoles,
+            grant_type: GRANT_TYPES.PASSWORD,
+        });
+
+        const refreshTokenPayload: RefreshToken = {
+            email: user.email,
+            domain: issuingTenant.domain,
+        };
+
+        const accessToken = await this.jwtService.signAsync(
+            accessTokenPayload.asPlainObject(),
+            {
+                privateKey: issuingTenant.privateKey,
+                issuer: this.configService.get("SUPER_TENANT_DOMAIN"),
+            },
+        );
+
+        const refreshToken = await this.jwtService.signAsync(
+            refreshTokenPayload,
+            {
+                privateKey: issuingTenant.privateKey,
                 expiresIn: this.configService.get(
                     "REFRESH_TOKEN_EXPIRATION_TIME",
                 ),

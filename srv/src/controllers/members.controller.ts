@@ -96,15 +96,16 @@ export class MemberController {
             Action.Update,
             subject(SubjectEnum.TENANT, tenant),
         );
+        const adminContext = await this.securityService.getAdminContextForInternalUse();
         for (const email of body.emails) {
             const isPresent = await this.usersService.existByEmail(
-                request,
+                adminContext,
                 email,
             );
             if (!isPresent) {
-                await this.usersService.createShadowUser(request, email, email);
+                await this.usersService.createShadowUser(adminContext, email, email);
             }
-            const user = await this.usersService.findByEmail(request, email);
+            const user = await this.usersService.findByEmail(adminContext, email);
             await this.tenantService.addMember(request, tenant.id, user);
         }
         tenant = await this.tenantService.findById(request, tenantId);
@@ -127,7 +128,7 @@ export class MemberController {
         );
         for (const email of body.emails) {
             const user = await this.usersService.findByEmail(request, email);
-            let securityContext = this.securityService.getUserToken(request);
+            let securityContext = this.securityService.getToken(request);
             if (securityContext.email === email) {
                 throw new ForbiddenException("cannot remove self");
             }

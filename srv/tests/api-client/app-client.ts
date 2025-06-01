@@ -76,9 +76,8 @@ export class AppClient extends HttpClient {
         console.log("Subscribe to App Response:", response.body);
         expect2xx(response);
         expect(response.status).toEqual(201);
-        expect(response.body.id).toBeDefined();
         expect(response.body.status).toBeDefined();
-        expect(response.body.subscribedAt).toBeDefined();
+        expect(response.body.status).toBe("success");
 
         return response.body;
     }
@@ -95,7 +94,7 @@ export class AppClient extends HttpClient {
         console.log("Unsubscribe from App Response:", response.body);
         expect2xx(response);
         expect(response.body.status).toBeDefined();
-        expect(response.body.status).toEqual(true);
+        expect(response.body.status).toEqual("success");
 
         return response.body;
     }

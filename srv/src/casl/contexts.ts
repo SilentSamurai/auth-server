@@ -25,31 +25,148 @@ export class RefreshToken {
     domain: string;
 }
 
-export class OAuthToken {
+export interface Token {
+    get sub(): string;
+
+    get scopes(): string[];
+
+    get grant_type(): GRANT_TYPES;
+
+    isTenantToken(): boolean;
+
+    isTechnicalToken(): boolean;
+
+    asTenantToken(): TenantToken;
+
+    asTechnicalToken(): TechnicalToken;
+}
+
+export interface TenantInfo {
+    id: string;
+    name: string;
+    domain: string;
+}
+
+export interface TenantTokenParams {
     sub: string;
+    email: string;
+    name: string;
+    userId: string;
+    tenant: TenantInfo;
+    userTenant: TenantInfo;
     scopes: string[];
     grant_type: GRANT_TYPES;
 }
 
-export class UserToken extends OAuthToken {
-    email: string;
-    name: string;
-    userId: string;
-}
-
-export class TenantToken extends UserToken {
-    tenant?: {
+export interface TechnicalTokenParams {
+    sub: string;
+    tenant: {
         id: string;
         name: string;
         domain: string;
     };
+    scopes: string[];
 }
 
-export class TechnicalToken extends TenantToken {
-    isTechnical: boolean = true;
+export class TenantToken implements Token {
+    sub: string;
+    scopes: string[];
+    grant_type: GRANT_TYPES;
+    email: string;
+    name: string;
+    userId: string;
+    tenant: TenantInfo;
+    userTenant: TenantInfo;
+
+    static create(params: TenantTokenParams): TenantToken {
+        const token = new TenantToken();
+        token.sub = params.sub;
+        token.email = params.email;
+        token.name = params.name;
+        token.userId = params.userId;
+        token.tenant = params.tenant;
+        token.userTenant = params.userTenant;
+        token.scopes = params.scopes;
+        token.grant_type = params.grant_type;
+        return token;
+    }
+
+    isTechnicalToken(): boolean {
+        return false;
+    }
+
+    isTenantToken(): boolean {
+        return true;
+    }
+
+    asPlainObject(): Record<string, any> {
+        return {
+            sub: this.sub,
+            email: this.email,
+            name: this.name,
+            userId: this.userId,
+            tenant: this.tenant,
+            userTenant: this.userTenant,
+            scopes: this.scopes,
+            grant_type: this.grant_type
+        };
+    }
+
+    asTechnicalToken(): TechnicalToken {
+        throw new Error("Invalid Token");
+    }
+
+    asTenantToken(): TenantToken {
+        return this;
+    }
+}
+
+export class TechnicalToken implements Token {
+    sub: string;
+    scopes: string[];
+    tenant: {
+        id: string;
+        name: string;
+        domain: string;
+    };
+    grant_type: GRANT_TYPES = GRANT_TYPES.CLIENT_CREDENTIALS;
+
+    static create(params: TechnicalTokenParams): TechnicalToken {
+        const token = new TechnicalToken();
+        token.sub = params.sub;
+        token.tenant = params.tenant;
+        token.scopes = params.scopes;
+        return token;
+    }
+
+    isTechnicalToken(): boolean {
+        return true;
+    }
+
+    isTenantToken(): boolean {
+        return false;
+    }
+
+    asPlainObject(): Record<string, any> {
+        return {
+            sub: this.sub,
+            tenant: this.tenant,
+            scopes: this.scopes,
+            grant_type: this.grant_type,
+            isTechnical: true
+        };
+    }
+
+    asTechnicalToken(): TechnicalToken {
+        return this;
+    }
+
+    asTenantToken(): TenantToken {
+        throw new Error("Invalid Token");
+    }
 }
 
 export class AuthContext {
     SCOPE_ABILITIES: AnyAbility;
-    SECURITY_CONTEXT: TenantToken;
+    SECURITY_CONTEXT: Token;
 }

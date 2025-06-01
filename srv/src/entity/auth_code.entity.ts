@@ -17,6 +17,9 @@ export class AuthCode {
     @Column({name: "tenant_id", nullable: false})
     tenantId: string;
 
+    @Column({name: "subscriber_tenant_hint", nullable: true})
+    subscriberTenantHint: string;
+
     @CreateDateColumn({name: "created_at"})
     createdAt: Date;
 }

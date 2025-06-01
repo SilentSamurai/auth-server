@@ -1,5 +1,6 @@
 import {TestAppFixture} from "../test-app.fixture";
 import {TokenFixture} from "../token.fixture";
+import {expect2xx} from "../api-client/client";
 
 describe('e2e tenant technical credential', () => {
     let app: TestAppFixture;
@@ -49,7 +50,7 @@ describe('e2e tenant technical credential', () => {
         tenant = response.body;
     });
 
-    it(`/GET Tenant Credentials`, async () => {
+    it(`/GET Tenant Credentials with admin token`, async () => {
         const response = await app.getHttpServer()
             .get(`/api/tenant/${tenant.id}/credentials`)
             .set('Authorization', `Bearer ${adminAccessToken}`)
@@ -96,13 +97,15 @@ describe('e2e tenant technical credential', () => {
     });
 
     it(`/GET Tenant Credentials`, async () => {
+
         const response = await app.getHttpServer()
             .get(`/api/tenant/${tenant.id}/credentials`)
             .set('Authorization', `Bearer ${technicalAccessToken}`)
             .set('Accept', 'application/json');
 
-        expect(response.status).toEqual(200);
-        console.log(response.body);
+        console.log(" Tenant Credentials", response.body);
+        expect2xx(response);
+
 
         expect(response.body.id).toBeDefined();
         expect(response.body.clientId).toBeDefined();

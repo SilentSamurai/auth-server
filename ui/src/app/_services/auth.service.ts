@@ -37,15 +37,21 @@ export class AuthService {
         );
     }
 
-    fetchAccessToken(code: string, verifier: string, client_id: string): Observable<any> {
+    fetchAccessToken(code: string, verifier: string, client_id: string, subscriber_tenant_hint?: string): Observable<any> {
+        const body: any = {
+            grant_type: 'authorization_code',
+            code,
+            code_verifier: verifier,
+            client_id
+        };
+        
+        if (subscriber_tenant_hint) {
+            body.subscriber_tenant_hint = subscriber_tenant_hint;
+        }
+
         return this.http.post(
             `${AUTH_API}/token`,
-            {
-                grant_type: 'authorization_code',
-                code,
-                code_verifier: verifier,
-                client_id
-            },
+            body,
             httpOptions,
         );
     }
@@ -61,6 +67,20 @@ export class AuthService {
                 {
                     auth_code: authCode,
                     client_id: clientId,
+                },
+                httpOptions,
+            ),
+        );
+    }
+
+    updateSubscriberTenantHint(authCode: string, clientId: string, subscriberTenantHint: string): Promise<any> {
+        return lastValueFrom(
+            this.http.post(
+                `${AUTH_API}/update-subscriber-tenant-hint`,
+                {
+                    auth_code: authCode,
+                    client_id: clientId,
+                    subscriber_tenant_hint: subscriberTenantHint,
                 },
                 httpOptions,
             ),
@@ -106,6 +126,17 @@ export class AuthService {
                 },
                 httpOptions,
             ),
+        );
+    }
+
+    checkTenantAmbiguity(authCode: string, clientId: string): Observable<any> {
+        return this.http.post(
+            `${AUTH_API}/check-tenant-ambiguity`,
+            {
+                auth_code: authCode,
+                client_id: clientId
+            },
+            httpOptions
         );
     }
 }

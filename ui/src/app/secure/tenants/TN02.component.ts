@@ -657,20 +657,31 @@ export class TN02Component implements OnInit {
     }
 
     async onPublishApp(app: any) {
-        try {
-            await this.appService.publishApp(app.id);
-            this.messageService.add({
-                severity: 'success',
-                summary: 'Success',
-                detail: 'App published and now visible to other tenants.'
-            });
+        const published = await this.confirmationService.confirm({
+            message: `Are you sure you want to publish app ${app.name}?`,
+            header: 'Confirmation',
+            icon: 'pi pi-info-circle',
+            accept: async () => {
+                try {
+                    await this.appService.publishApp(app.id);
+                    this.messageService.add({
+                        severity: 'success',
+                        summary: 'Success',
+                        detail: 'App published and now visible to other tenants.'
+                    });
+                    return true;
+                } catch (e) {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'Failed to publish app.'
+                    });
+                }
+                return false;
+            },
+        });
+        if (published) {
             await this.ngOnInit();
-        } catch (e) {
-            this.messageService.add({
-                severity: 'error',
-                summary: 'Error',
-                detail: 'Failed to publish app.'
-            });
         }
     }
 }
