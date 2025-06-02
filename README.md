@@ -47,6 +47,8 @@ A production‑ready, OAuth Authorization service built with
 
 ## ⚡️ Quick start
 
+### Using npm
+
 ```bash
 # 1. Install dependencies
 cd srv
@@ -57,6 +59,25 @@ cp envs/.env.example envs/.env.development   # or point ENV_FILE yourself
 
 # 3. Run the service in watch mode
 npm run start:debug          # http://localhost:9000 by default
+
+# In another terminal you can tail the fake SMTP output:
+npm run smtp-server
+```
+
+### Using just
+
+```bash
+# 1. Install just (if not already installed)
+# Windows:
+scoop install just
+# macOS:
+brew install just
+# Linux:
+curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash
+
+# 2. Install dependencies and start the service
+just install
+just dev-external-start    # Starts the service in development mode
 
 # In another terminal you can tail the fake SMTP output:
 npm run smtp-server
@@ -99,6 +120,35 @@ Add anything else you need—the service simply reads from `process.env`.
 | `npm run generate-migration "<name>"` | Create a skeleton migration in `src/migrations/`                |
 | `npm run smtp-server`                 | Run the dev‑only fake SMTP server (same as `start:mail-server`) |
 | `npm run release`                     | `build` + `test` – CI release helper                            |
+
+> 💡 **Tip**: This project also uses [just](https://github.com/casey/just) for command automation. See the [Just Commands](#-just-commands) section below.
+
+---
+
+## 🚀 Just Commands
+
+This project uses [just](https://github.com/casey/just) for command automation. Install it with:
+
+```bash
+# Windows (with scoop)
+scoop install just
+
+# macOS (with homebrew)
+brew install just
+
+# Linux
+curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash
+```
+
+Then run `just --list` to see all available commands. Common commands include:
+
+| Command              | Description                                    |
+|----------------------|------------------------------------------------|
+| `just build`         | Build both UI and server components            |
+| `just test`          | Run tests for both UI and server               |
+| `just release`       | Build, test, and install                       |
+| `just dev-external-start` | Start the external user app in dev mode    |
+| `just run-e2e-tests` | Run end-to-end tests                           |
 
 ---
 
