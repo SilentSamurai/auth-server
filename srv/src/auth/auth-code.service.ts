@@ -3,7 +3,7 @@ import {Environment} from "../config/environment.service";
 import {JwtService} from "@nestjs/jwt";
 import {TenantService} from "../services/tenant.service";
 import {InjectRepository} from "@nestjs/typeorm";
-import {Repository} from "typeorm";
+import {IsNull, Not, Repository} from "typeorm";
 import {AuthCode} from "../entity/auth_code.entity";
 import {User} from "../entity/user.entity";
 import {Tenant} from "../entity/tenant.entity";
@@ -41,6 +41,20 @@ export class AuthCodeService {
             throw new NotFoundException("auth code not found");
         }
         return session;
+    }
+
+    async updateAuthCode(authCode: AuthCode, subscriberTenantHint: string): Promise<AuthCode> {
+        authCode.subscriberTenantHint = subscriberTenantHint;
+        return this.authCodeRepository.save(authCode);
+    }
+
+    async hasAuthCodeWithHint(code: string): Promise<boolean> {
+        return this.authCodeRepository.exists({
+            where: {
+                code: code,
+                subscriberTenantHint: Not(IsNull())
+            }
+        });
     }
 
     /**

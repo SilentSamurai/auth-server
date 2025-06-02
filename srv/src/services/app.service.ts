@@ -53,12 +53,13 @@ export class AppService {
      * and apps that the tenant is already subscribed to.
      */
     async findAllApps(excludeTenantId: string): Promise<App[]> {
-        // Get all apps except those owned by the current tenant
+        // Get all public apps except those owned by the current tenant
         const allApps = await this.appRepository.find({
             where: {
                 owner: {
                     id: Not(excludeTenantId)
-                }
+                },
+                isPublic: true
             },
             relations: ['owner']
         });
@@ -107,6 +108,12 @@ export class AppService {
             app.description = description;
         }
 
+        return this.appRepository.save(app);
+    }
+
+    async publishApp(appId: string): Promise<App> {
+        const app = await this.getAppById(appId);
+        app.isPublic = true;
         return this.appRepository.save(app);
     }
 }

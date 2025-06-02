@@ -201,7 +201,7 @@ export class RegisterController {
         @Body(new ValidationPipe(ValidationSchema.SignDownSchema))
             body: { password: string },
     ): Promise<{ status: boolean }> {
-        const securityContext = this.securityService.getUserToken(request);
+        const securityContext = this.securityService.getToken(request);
         const user = await this.usersService.findByEmail(
             request,
             securityContext.email,

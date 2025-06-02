@@ -26,6 +26,7 @@ import {AbilityModule} from '@casl/angular';
 import {Ability, createMongoAbility, PureAbility,} from '@casl/ability';
 import {AuthorizeLoginComponent} from "./open-pages/authorize/authorize-login.component";
 import {NgOptimizedImage} from "@angular/common";
+import {TenantSelectionComponent} from './open-pages/tenant-selection/tenant-selection.component';
 
 @NgModule({
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -36,7 +37,8 @@ import {NgOptimizedImage} from "@angular/common";
         ProfileComponent,
         SessionConfirmationComponent,
         HttpErrorComponent,
-        AuthorizeLoginComponent
+        AuthorizeLoginComponent,
+        TenantSelectionComponent
     ],
     imports: [
         BrowserModule,

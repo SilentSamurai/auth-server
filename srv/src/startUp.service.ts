@@ -96,11 +96,14 @@ export class StartUpService implements OnModuleInit {
             const dummyTenants = [
                 {name: "Shire Tenant", domain: "shire.local", signUp: true},
                 {name: "Bree Tenant", domain: "bree.local", signUp: false},
-                {
-                    name: "Rivendell Tenant",
-                    domain: "rivendell.local",
-                    signUp: false,
-                },
+                {name: "Rivendell Tenant", domain: "rivendell.local", signUp: false},
+                {name: "Mordor Tenant", domain: "mordor.local", signUp: false},
+                {name: "Gondor Tenant", domain: "gondor.local", signUp: true},
+                {name: "Rohan Tenant", domain: "rohan.local", signUp: true},
+                {name: "Lothlorien Tenant", domain: "lothlorien.local", signUp: false},
+                {name: "Mirkwood Tenant", domain: "mirkwood.local", signUp: true},
+                {name: "Erebor Tenant", domain: "erebor.local", signUp: false},
+                {name: "Isengard Tenant", domain: "isengard.local", signUp: false}
             ];
 
             // 4) Create each tenant and assign the existing user as owner

@@ -3,6 +3,8 @@ import {AuthService} from '../../_services/auth.service';
 import {SessionService} from '../../_services/session.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {lastValueFrom} from 'rxjs';
+import {MessageService} from 'primeng/api';
 
 @Component({
     selector: 'app-login',
@@ -20,6 +22,10 @@ export class AuthorizeLoginComponent implements OnInit {
     code_challenge = '';
     isPasswordVisible = false;
     code_challenge_method: string = 'plain';
+    clientId: string = '';
+    state: string = '';
+    scope: string = '';
+    responseType: string = '';
 
     constructor(
         private authService: AuthService,
@@ -27,6 +33,7 @@ export class AuthorizeLoginComponent implements OnInit {
         private route: ActivatedRoute,
         private fb: FormBuilder,
         private tokenStorage: SessionService,
+        private messageService: MessageService
     ) {
         this.loginForm = this.fb.group({
             username: ['', Validators.required],
@@ -86,6 +93,14 @@ export class AuthorizeLoginComponent implements OnInit {
         //     await this.router.navigateByUrl("/home");
         // }
         this.loading = false;
+
+        // Get query parameters
+        this.route.queryParams.subscribe(params => {
+            this.clientId = params['client_id'];
+            this.state = params['state'];
+            this.scope = params['scope'];
+            this.responseType = params['response_type'];
+        });
     }
 
     onContinue() {
@@ -110,7 +125,7 @@ export class AuthorizeLoginComponent implements OnInit {
             this.isLoginFailed = false;
             this.isLoggedIn = true;
             this.tokenStorage.saveAuthCode(authenticationCode);
-            await this.redirect(authenticationCode);
+            await this.onLoginSuccess(authenticationCode);
         } catch (err: any) {
             console.error(err);
             this.errorMessage = err.error.message;
@@ -120,11 +135,46 @@ export class AuthorizeLoginComponent implements OnInit {
         }
     }
 
-    async redirect(code: string) {
-        if (this.redirectUri.length <= 0) {
-            return;
+    async onLoginSuccess(authCode: string) {
+        try {
+            // Check for tenant ambiguity
+            const ambiguityCheck = await lastValueFrom(
+                this.authService.checkTenantAmbiguity(authCode, this.clientId)
+            );
+
+            if (ambiguityCheck.hasAmbiguity) {
+                // Navigate to tenant selection with necessary data
+                this.router.navigate(['/tenant-selection'], {
+                    state: {
+                        authCode: authCode,
+                        clientId: this.clientId,
+                        tenants: ambiguityCheck.tenants,
+                        redirectUri: this.redirectUri,
+                        state: this.state
+                    }
+                });
+            } else {
+                // No ambiguity, proceed with normal flow
+                this.redirectToClient(authCode);
+            }
+        } catch (error) {
+            console.error('Error checking tenant ambiguity:', error);
+            this.messageService.add({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'Failed to process authorization. Please try again.',
+                life: 5000
+            });
         }
-        window.location.href = `${this.redirectUri}?code=${code}`;
+    }
+
+    private redirectToClient(authCode: string) {
+        const redirectUrl = new URL(this.redirectUri);
+        redirectUrl.searchParams.append('code', authCode);
+        if (this.state) {
+            redirectUrl.searchParams.append('state', this.state);
+        }
+        window.location.href = redirectUrl.toString();
     }
 
     async onSigUpClick() {

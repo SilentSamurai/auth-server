@@ -1,4 +1,5 @@
 import {TestAppFixture} from "../test-app.fixture";
+import {expect2xx} from "../api-client/client";
 
 describe('e2e positive auth code flow', () => {
     let app: TestAppFixture;
@@ -40,9 +41,13 @@ describe('e2e positive auth code flow', () => {
             .send({
                 "grant_type": "authorization_code",
                 "code": authentication_code,
+                client_id: clientId,
                 "code_verifier": verifier
             })
             .set('Accept', 'application/json');
+
+        console.log("Fetch Access Token:", response.body);
+        expect2xx(response);
 
         expect(response.status).toEqual(201);
         expect(response.body.access_token).toBeDefined();

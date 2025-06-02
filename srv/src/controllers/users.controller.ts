@@ -40,7 +40,7 @@ export class UsersController {
     @Get("/me")
     @UseGuards(JwtAuthGuard)
     async getMyUser(@Request() request): Promise<User> {
-        const securityContext = this.securityService.getUserToken(request);
+        const securityContext = this.securityService.getToken(request);
         const user = await this.usersService.findByEmail(
             request,
             securityContext.email,
@@ -56,7 +56,7 @@ export class UsersController {
         @Body(new ValidationPipe(ValidationSchema.UpdateMyEmailSchema))
             body: any,
     ): Promise<{ status: boolean }> {
-        const securityContext = this.securityService.getUserToken(request);
+        const securityContext = this.securityService.getToken(request);
         const user = await this.usersService.findByEmail(
             request,
             securityContext.email,
@@ -85,7 +85,7 @@ export class UsersController {
         @Body(new ValidationPipe(ValidationSchema.UpdateMyPasswordSchema))
             body: any,
     ): Promise<{ status: boolean }> {
-        const securityContext = this.securityService.getUserToken(request);
+        const securityContext = this.securityService.getToken(request);
         const user = await this.usersService.findByEmail(
             request,
             securityContext.email,
@@ -106,7 +106,7 @@ export class UsersController {
         @Body(new ValidationPipe(ValidationSchema.UpdateMyNameSchema))
             body: any,
     ): Promise<User> {
-        const securityContext = this.securityService.getUserToken(request);
+        const securityContext = this.securityService.getToken(request);
         const user = await this.usersService.findByEmail(
             request,
             securityContext.email,
@@ -117,7 +117,7 @@ export class UsersController {
     @Get("/me/tenants")
     @UseGuards(JwtAuthGuard)
     async getTenants(@Request() request): Promise<Tenant[]> {
-        const securityContext = this.securityService.getUserToken(request);
+        const securityContext = this.securityService.getToken(request);
         const user = await this.usersService.findByEmail(
             request,
             securityContext.email,

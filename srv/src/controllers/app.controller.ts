@@ -84,10 +84,11 @@ export class AppController {
         @Param('tenantId', ParseUUIDPipe) tenantId: string
     ) {
         // Retrieve the subscriber tenant & the app, then subscribe
-        return this.subscriptionService.subscribeApp(
+        const promise = await this.subscriptionService.subscribeApp(
             await this.tenantService.findById(request, tenantId),
             await this.appService.getAppById(appId)
         );
+        return {status: "success"}
     }
 
     @Post('/:appId/unsubscribe/:tenantId')
@@ -98,10 +99,11 @@ export class AppController {
         @Param('tenantId', ParseUUIDPipe) tenantId: string
     ) {
         // Retrieve the subscriber tenant & the app, then unsubscribe
-        return this.subscriptionService.unsubscribe(
+        const promise = await this.subscriptionService.unsubscribe(
             await this.tenantService.findById(request, tenantId),
             await this.appService.getAppById(appId)
         );
+        return {status: "success"}
     }
 
     @Get('/subscriptions/:appId')
@@ -149,5 +151,17 @@ export class AppController {
         return allApps;
     }
 
+    /**
+     * Publish an app (make it visible to other tenants)
+     */
+    @Patch('/:appId/publish')
+    @UseGuards(JwtAuthGuard)
+    async publishApp(
+        @Request() request: AuthContext,
+        @Param('appId', ParseUUIDPipe) appId: string
+    ) {
+        const app = await this.appService.publishApp(appId);
+        return app;
+    }
 
 }

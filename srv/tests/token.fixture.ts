@@ -107,4 +107,148 @@ export class TokenFixture {
         };
     }
 
+    /**
+     * Login using OAuth authorization code flow.
+     * Returns the authentication code that can be used to exchange for a token.
+     */
+    public async login(email: string, password: string, clientId: string, codeChallenge: string = 'verifier'): Promise<{
+        authentication_code: string
+    }> {
+        const response = await this.app.getHttpServer()
+            .post('/api/oauth/login')
+            .send({
+                email,
+                password,
+                client_id: clientId,
+                code_challenge_method: 'plain',
+                code_challenge: codeChallenge
+            })
+            .set('Accept', 'application/json');
+
+        expect2xx(response);
+        expect(response.body.authentication_code).toBeDefined();
+        return response.body;
+    }
+
+    public async exchangeCodeForToken(
+        code: string,
+        clientId: string,
+        codeVerifier: string = 'verifier'
+    ): Promise<{
+        access_token?: string,
+        refresh_token?: string,
+        token_type?: string,
+        error?: string,
+        tenants?: Array<{ id: string, name: string, client_id: string, domain: string }>
+    }> {
+        const response = await this.app.getHttpServer()
+            .post('/api/oauth/token')
+            .send({
+                grant_type: 'authorization_code',
+                code,
+                code_verifier: codeVerifier,
+                client_id: clientId,
+            })
+            .set('Accept', 'application/json');
+
+        expect2xx(response);
+
+        // If there's an error response (like ambiguous tenants), return it directly
+        if (response.body.error) {
+            return response.body;
+        }
+
+        // Otherwise, return the token response
+        expect(response.body.access_token).toBeDefined();
+        expect(response.body.token_type).toEqual('Bearer');
+        return response.body;
+    }
+
+    /**
+     * Exchange an authentication code for an access token.
+     * Supports resolving subscription tenant ambiguity by providing subscription_tenant_id.
+     */
+    public async exchangeCodeWithHint(
+        code: string,
+        clientId: string,
+        subscriptionTenantId?: string,
+        codeVerifier: string = 'verifier'
+    ): Promise<{
+        access_token?: string,
+        refresh_token?: string,
+        token_type?: string,
+        error?: string,
+        tenants?: Array<{ id: string, name: string, client_id: string, domain: string }>
+    }> {
+        const response = await this.app.getHttpServer()
+            .post('/api/oauth/token')
+            .send({
+                grant_type: 'authorization_code',
+                code,
+                code_verifier: codeVerifier,
+                client_id: clientId,
+                ...(subscriptionTenantId && {subscriber_tenant_hint: subscriptionTenantId})
+            })
+            .set('Accept', 'application/json');
+
+        expect2xx(response);
+
+        // If there's an error response (like ambiguous tenants), return it directly
+        if (response.body.error) {
+            return response.body;
+        }
+
+        // Otherwise, return the token response
+        expect(response.body.access_token).toBeDefined();
+        expect(response.body.token_type).toEqual('Bearer');
+        return response.body;
+    }
+
+    /**
+     * Check for tenant ambiguity in the authentication flow.
+     * Returns the response containing information about ambiguous tenants if any.
+     */
+    public async checkTenantAmbiguity(authCode: string, clientId: string): Promise<{
+        status: number,
+        body: {
+            hasAmbiguity: boolean,
+            tenants?: Array<{
+                id: string,
+                domain: string,
+                name: string
+            }>
+        }
+    }> {
+        const response = await this.app.getHttpServer()
+            .post('/api/oauth/check-tenant-ambiguity')
+            .send({
+                auth_code: authCode,
+                client_id: clientId
+            })
+            .set('Accept', 'application/json');
+
+        expect2xx(response);
+        return response;
+    }
+
+    /**
+     * Update the subscriber tenant hint for an auth code.
+     */
+    public async updateSubscriberTenantHint(authCode: string, clientId: string, subscriberTenantHint: string): Promise<{
+        status: number,
+        body: any
+    }> {
+        const response = await this.app.getHttpServer()
+            .post('/api/oauth/update-subscriber-tenant-hint')
+            .send({
+                auth_code: authCode,
+                client_id: clientId,
+                subscriber_tenant_hint: subscriberTenantHint
+            })
+            .set('Accept', 'application/json');
+
+        expect2xx(response);
+        return response;
+    }
+
 }
