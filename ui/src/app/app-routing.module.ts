@@ -26,12 +26,16 @@ import {TenantAccessAuthGuard} from './shared/tenant-auth-guard.service';
 import {AP01Component} from './secure/apps/AP01.component';
 import {AuthorizeLoginComponent} from "./open-pages/authorize/authorize-login.component";
 import {TenantSelectionComponent} from './open-pages/tenant-selection/tenant-selection.component';
+import {ForgotPasswordComponent} from './open-pages/forgot-password/forgot-password.component';
+import {ResetPasswordComponent} from './open-pages/reset-password/reset-password.component';
 
 const routes: Routes = [
     {path: 'session-confirm', component: SessionConfirmationComponent},
     {path: 'authorize', component: AuthorizeLoginComponent},
     {path: 'login', component: LoginComponent},
     {path: 'register', component: RegisterComponent},
+    {path: 'forgot-password', component: ForgotPasswordComponent},
+    {path: 'reset-password/:token', component: ResetPasswordComponent},
     {path: 'error/:msg', component: HttpErrorComponent},
     {path: '', redirectTo: 'home', pathMatch: 'full'},
     {

@@ -2,19 +2,14 @@
     <div class="row align-items-center">
         <div class="col-md-12 vh-100">
 
-            <div *ngIf="loading" class="align-middle text-center" style="padding-top:25%">
-                <div class="spinner-border m-5" role="status">
-                    <span class="sr-only">Loading...</span>
+            <app-centered-card
+                imageUrl="/assets/logo-img.jpg"
+            >
+                <div *ngIf="loading" class="align-middle text-center" style="padding-top:25%">
+                    <div class="spinner-border m-5" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
                 </div>
-            </div>
-
-            <div *ngIf="!loading" class="card card-container p-fluid">
-                <img
-                    alt="logo"
-                    class="profile-img-card"
-                    id="profile-img"
-                    src="/assets/logo-img.jpg"
-                />
 
                 <!-- Show registration form if user has not registered successfully yet -->
                 <form
@@ -38,7 +33,9 @@
                                     placeholder="Organization"
                                 />
                             </div>
-                            <div *ngIf="registerForm.get('orgName')?.errors && (registerForm.get('orgName')?.touched || registerForm.get('orgName')?.dirty)" class="alert alert-danger mt-2" role="alert">
+                            <div
+                                *ngIf="registerForm.get('orgName')?.errors && (registerForm.get('orgName')?.touched || registerForm.get('orgName')?.dirty)"
+                                class="alert alert-danger mt-2" role="alert">
                                 Organization is required
                             </div>
                         </div>
@@ -54,7 +51,9 @@
                                     placeholder="Domain"
                                 />
                             </div>
-                            <div *ngIf="registerForm.get('domain')?.errors && (registerForm.get('domain')?.touched || registerForm.get('domain')?.dirty)" class="alert alert-danger mt-2" role="alert">
+                            <div
+                                *ngIf="registerForm.get('domain')?.errors && (registerForm.get('domain')?.touched || registerForm.get('domain')?.dirty)"
+                                class="alert alert-danger mt-2" role="alert">
                                 Domain is required
                             </div>
                         </div>
@@ -81,10 +80,16 @@
                                     placeholder="Name"
                                 />
                             </div>
-                            <div *ngIf="registerForm.get('name')?.errors && (registerForm.get('name')?.touched || registerForm.get('name')?.dirty)" class="alert alert-danger mt-2" role="alert">
+                            <div
+                                *ngIf="registerForm.get('name')?.errors && (registerForm.get('name')?.touched || registerForm.get('name')?.dirty)"
+                                class="alert alert-danger mt-2" role="alert">
                                 <div *ngIf="registerForm.get('name')?.errors?.['required']">Name is required</div>
-                                <div *ngIf="registerForm.get('name')?.errors?.['minlength']">Name must be at least 3 characters</div>
-                                <div *ngIf="registerForm.get('name')?.errors?.['maxlength']">Name must be at most 20 characters</div>
+                                <div *ngIf="registerForm.get('name')?.errors?.['minlength']">Name must be at least 3
+                                    characters
+                                </div>
+                                <div *ngIf="registerForm.get('name')?.errors?.['maxlength']">Name must be at most 20
+                                    characters
+                                </div>
                             </div>
                         </div>
                         <div class="form-group mt-3">
@@ -98,9 +103,13 @@
                                     placeholder="Email"
                                 />
                             </div>
-                            <div *ngIf="registerForm.get('email')?.errors && (registerForm.get('email')?.touched || registerForm.get('email')?.dirty)" class="alert alert-danger mt-2" role="alert">
+                            <div
+                                *ngIf="registerForm.get('email')?.errors && (registerForm.get('email')?.touched || registerForm.get('email')?.dirty)"
+                                class="alert alert-danger mt-2" role="alert">
                                 <div *ngIf="registerForm.get('email')?.errors?.['required']">Email is required</div>
-                                <div *ngIf="registerForm.get('email')?.errors?.['email']">Must be a valid email address</div>
+                                <div *ngIf="registerForm.get('email')?.errors?.['email']">Must be a valid email
+                                    address
+                                </div>
                             </div>
                         </div>
                         <div class="form-group mt-3">
@@ -115,9 +124,14 @@
                                     placeholder="Password"
                                 />
                             </div>
-                            <div *ngIf="registerForm.get('password')?.errors && (registerForm.get('password')?.touched || registerForm.get('password')?.dirty)" class="alert alert-danger mt-2" role="alert">
-                                <div *ngIf="registerForm.get('password')?.errors?.['required']">Password is required</div>
-                                <div *ngIf="registerForm.get('password')?.errors?.['minlength']">Password must be at least 6 characters</div>
+                            <div
+                                *ngIf="registerForm.get('password')?.errors && (registerForm.get('password')?.touched || registerForm.get('password')?.dirty)"
+                                class="alert alert-danger mt-2" role="alert">
+                                <div *ngIf="registerForm.get('password')?.errors?.['required']">Password is required
+                                </div>
+                                <div *ngIf="registerForm.get('password')?.errors?.['minlength']">Password must be at
+                                    least 6 characters
+                                </div>
                             </div>
                         </div>
                         <div class="d-grid gap-2 py-3">
@@ -147,7 +161,7 @@
                         Login
                     </a>
                 </div>
-            </div>
+            </app-centered-card>
         </div>
     </div>
 </div>
