@@ -1,7 +1,5 @@
 import {forwardRef, Module} from "@nestjs/common";
 import {PassportModule} from "@nestjs/passport";
-import {JwtModule} from "@nestjs/jwt";
-import {Environment} from "../config/environment.service";
 import {JwtAuthGuard} from "./jwt-auth.guard";
 import {TypeOrmModule} from "@nestjs/typeorm";
 import {AuthCode} from "../entity/auth_code.entity";
@@ -10,6 +8,7 @@ import {AuthService} from "./auth.service";
 import {AuthCodeService} from "./auth-code.service";
 import {CaslModule} from "../casl/casl.module";
 import {User} from "../entity/user.entity";
+import {JwtServiceHS256, JwtServiceRS256} from "./jwt.service";
 
 @Module({
     imports: [
@@ -17,26 +16,10 @@ import {User} from "../entity/user.entity";
         forwardRef(() => ServiceModule),
         PassportModule,
         TypeOrmModule.forFeature([AuthCode, User]),
-        JwtModule.registerAsync(
-            // Get the configuration settings from the config service asynchronously.
-            {
-                inject: [Environment],
-                useFactory: (configService: Environment) => {
-                    return {
-                        signOptions: {
-                            algorithm: "RS256",
-                            expiresIn: configService.get(
-                                "TOKEN_EXPIRATION_TIME",
-                            ),
-                        },
-                    };
-                },
-            },
-        ),
     ],
     controllers: [],
-    providers: [JwtAuthGuard, AuthService, AuthCodeService],
-    exports: [JwtAuthGuard, AuthService, AuthCodeService],
+    providers: [JwtAuthGuard, AuthService, AuthCodeService, JwtServiceHS256, JwtServiceRS256],
+    exports: [JwtAuthGuard, AuthService, AuthCodeService, JwtServiceHS256, JwtServiceRS256],
 })
 export class AuthModule {
 }
