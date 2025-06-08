@@ -8,35 +8,32 @@ import {lastValueFrom} from 'rxjs';
 @Component({
     selector: 'app-tenant-selection',
     template: `
-        <div class="container mt-5">
-            <div class="row justify-content-center">
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4 class="mb-0">Select Tenant</h4>
-                        </div>
-                        <div class="card-body">
-                            <p class="text-muted mb-4">
-                                You have access to this application through multiple tenants. Please select which tenant you want to use:
-                            </p>
-                            <div class="list-group">
-                                <button *ngFor="let tenant of tenants"
-                                        (click)="selectTenant(tenant)"
-                                        class="list-group-item list-group-item-action">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <h5 class="mb-1">{{tenant.name}}</h5>
-                                            <small class="text-muted">{{tenant.domain}}</small>
-                                        </div>
-                                        <i class="fa fa-chevron-right"></i>
-                                    </div>
-                                </button>
+        <app-centered-card
+            imageUrl="/assets/logo-img.jpg"
+        >
+            <div class="card-header">
+                <h4 class="mb-0">Select Tenant</h4>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-4">
+                    You have access to this application through multiple tenants. Please select which tenant
+                    you want to use:
+                </p>
+                <div class="list-group">
+                    <button *ngFor="let tenant of tenants"
+                            (click)="selectTenant(tenant)"
+                            class="list-group-item list-group-item-action">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="mb-1">{{ tenant.name }}</h5>
+                                <small class="text-muted">{{ tenant.domain }}</small>
                             </div>
+                            <i class="fa fa-chevron-right"></i>
                         </div>
-                    </div>
+                    </button>
                 </div>
             </div>
-        </div>
+        </app-centered-card>
     `,
     styles: [`
         .list-group-item {
@@ -103,4 +100,4 @@ export class TenantSelectionComponent implements OnInit {
             });
         }
     }
-} 
+}
