@@ -8,6 +8,9 @@ import {AppComponent} from './app.component';
 import {LoginComponent} from './open-pages/login/login.component';
 import {RegisterComponent} from './open-pages/register/register.component';
 import {ProfileComponent} from './open-pages/profile/profile.component';
+import {ForgotPasswordComponent} from './open-pages/forgot-password/forgot-password.component';
+import {ResetPasswordComponent} from './open-pages/reset-password/reset-password.component';
+import {CenteredCardComponent} from './component/centered-card/centered-card.component';
 
 import {authInterceptorProviders} from './_helpers/auth.interceptor';
 import {NgbCollapseModule, NgbDropdown, NgbModule,} from '@ng-bootstrap/ng-bootstrap';
@@ -38,7 +41,10 @@ import {TenantSelectionComponent} from './open-pages/tenant-selection/tenant-sel
         SessionConfirmationComponent,
         HttpErrorComponent,
         AuthorizeLoginComponent,
-        TenantSelectionComponent
+        TenantSelectionComponent,
+        ForgotPasswordComponent,
+        ResetPasswordComponent,
+        CenteredCardComponent
     ],
     imports: [
         BrowserModule,
