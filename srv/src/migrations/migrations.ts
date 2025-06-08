@@ -7,6 +7,7 @@ import {SubscriptionAndApps1744497534374} from "./1744497534374-new-migration";
 import {TenantLevelStorage1746655278354} from "./1746655278354-tenant-level-storage";
 import {AddAppIsPublic1747000000000} from "./1747000000000-add-app-is-public";
 import {AddSubscriberTenantHintToAuthCode1710000000000} from "./1710000000000-AddSubscriberTenantHintToAuthCode";
+import {AddEmailRateLimitColumns1710000000000} from "./1710000000000-AddEmailRateLimitColumns";
 
 export const migrations = [
     CreateInitialTables1681147242561,
@@ -17,5 +18,6 @@ export const migrations = [
     SubscriptionAndApps1744497534374,
     TenantLevelStorage1746655278354,
     AddAppIsPublic1747000000000,
-    AddSubscriberTenantHintToAuthCode1710000000000
+    AddSubscriberTenantHintToAuthCode1710000000000,
+    AddEmailRateLimitColumns1710000000000
 ];
