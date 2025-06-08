@@ -1,45 +1,64 @@
 import {Injectable, Logger} from "@nestjs/common";
 import {Environment} from "../config/environment.service";
 import {User} from "../entity/user.entity";
-import * as nodemailer from "nodemailer";
+import {IMailProvider} from './IMailProvider';
+import {SmtpMailProvider} from './SmtpMailProvider';
+import {ResendMailProvider} from './ResendMailProvider';
+import {InjectRepository} from "@nestjs/typeorm";
+import {Repository} from "typeorm";
 
 @Injectable()
 export class MailService {
-    private logger = new Logger("MAIL");
+    private logger = new Logger("MailService");
+    private mailProvider: IMailProvider;
+    private readonly MAX_EMAILS_PER_DAY = 3;
+    private readonly isRateLimitDisabled: boolean;
 
-    private transporter: any;
+    // Common domain aliases mapping
+    private readonly domainAliases: { [key: string]: string } = {
+        'googlemail.com': 'gmail.com',
+        'ymail.com': 'yahoo.com',
+        'outlook.com': 'hotmail.com',
+        'live.com': 'hotmail.com',
+        'msn.com': 'hotmail.com'
+    };
 
-    constructor(private readonly configService: Environment) {
-        this.transporter = nodemailer.createTransport({
-            host: configService.get("MAIL_HOST"),
-            port: configService.get("MAIL_PORT"),
-            secure: configService.get("MAIL_SECURE"),
-            auth: {
-                user: configService.get("MAIL_USER"),
-                pass: configService.get("MAIL_PASSWORD"),
-            },
-        });
+    constructor(
+        private readonly configService: Environment,
+        @InjectRepository(User)
+        private readonly userRepository: Repository<User>
+    ) {
+        const provider = this.configService.get("MAIL_PROVIDER", "smtp");
+        if (provider === 'resend') {
+            this.mailProvider = new ResendMailProvider(this.configService.get("RESEND_API_KEY"));
+        } else {
+            this.mailProvider = new SmtpMailProvider({
+                MAIL_HOST: this.configService.get("MAIL_HOST"),
+                MAIL_PORT: this.configService.get("MAIL_PORT"),
+                MAIL_SECURE: this.configService.get("MAIL_SECURE"),
+                MAIL_USER: this.configService.get("MAIL_USER"),
+                MAIL_PASSWORD: this.configService.get("MAIL_PASSWORD"),
+            });
+        }
+        this.isRateLimitDisabled = this.configService.get("DISABLE_MAIL_RATE_LIMIT", "false");
     }
 
     /**
      * Send a mail.
      */
     async sendMail(options: any): Promise<boolean> {
-        return new Promise((resolve, reject) => {
-            this.transporter.sendMail(options, (error, info) => {
-                if (error) {
-                    this.logger.log(
-                        `Mail from ${options.from} to ${options.to} NOT sent: ${error.message}`,
-                    );
-                    resolve(false);
-                } else {
-                    this.logger.log(
-                        `Mail from ${options.from} to ${options.to} sent`,
-                    );
-                    resolve(true);
-                }
-            });
-        });
+        if (!options?.to) {
+            this.logger.error('No recipient email provided');
+            return false;
+        }
+
+        // Check rate limit for the recipient if not disabled
+        if (!this.isRateLimitDisabled && await this.isRateLimitExceeded(options.to)) {
+            this.logger.warn(`Daily rate limit exceeded for ${options.to}, email not sent`);
+            return false;
+        }
+
+        return this.mailProvider.sendMail(options);
     }
 
     /**
@@ -160,5 +179,97 @@ export class MailService {
         };
 
         return await this.sendMail(options);
+    }
+
+    /**
+     * Validate email format
+     * @param email Email address to validate
+     * @returns true if email is valid
+     */
+    private isValidEmail(email: string): boolean {
+        if (!email || typeof email !== 'string') {
+            return false;
+        }
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        return emailRegex.test(email);
+    }
+
+    /**
+     * Normalize email address to prevent rate limit bypassing with aliases
+     * @param email Email address to normalize
+     * @returns Normalized email address or null if invalid
+     */
+    private normalizeEmail(email: string): string | null {
+        if (!this.isValidEmail(email)) {
+            return null;
+        }
+
+        // Convert to lowercase
+        email = email.toLowerCase();
+
+        // Split into local part and domain
+        const [localPart, domain] = email.split('@');
+        if (!domain) {
+            return null;
+        }
+
+        // Remove everything after + in the local part
+        const normalizedLocalPart = localPart.split('+')[0];
+
+        // Normalize domain (handle common aliases)
+        const normalizedDomain = this.domainAliases[domain] || domain;
+
+        return `${normalizedLocalPart}@${normalizedDomain}`;
+    }
+
+    /**
+     * Check if user has exceeded email rate limit
+     * @param email User's email address
+     * @returns true if rate limit exceeded or email is invalid, false otherwise
+     */
+    private async isRateLimitExceeded(email: string): Promise<boolean> {
+        const normalizedEmail = this.normalizeEmail(email);
+        if (!normalizedEmail) {
+            this.logger.warn(`Invalid email format: ${email}`);
+            return true; // Prevent sending to invalid emails
+        }
+
+        // Find user by email
+        const user = await this.userRepository.findOne({
+            where: {email: normalizedEmail}
+        });
+
+        if (!user) {
+            this.logger.warn(`User not found for email: ${normalizedEmail}`);
+            return true; // Prevent sending to non-existent users
+        }
+
+        const now = new Date();
+
+        // Reset count if it's been more than 24 hours since last reset
+        if (user.emailCountResetAt && (now.getTime() - user.emailCountResetAt.getTime() > 24 * 60 * 60 * 1000)) {
+            user.emailCount = 0;
+            user.emailCountResetAt = now;
+        } else if (!user.emailCountResetAt) {
+            // First time sending email
+            user.emailCountResetAt = now;
+        }
+
+        if (user.emailCount >= this.MAX_EMAILS_PER_DAY) {
+            this.logger.warn(
+                `Daily rate limit exceeded for user ${normalizedEmail}. ` +
+                `Sent ${user.emailCount}/${this.MAX_EMAILS_PER_DAY} emails today.`
+            );
+            return true;
+        }
+
+        // Increment count and save
+        user.emailCount += 1;
+        await this.userRepository.save(user);
+
+        this.logger.log(
+            `Email count for ${normalizedEmail}: ${user.emailCount}/${this.MAX_EMAILS_PER_DAY}`
+        );
+        return false;
     }
 }

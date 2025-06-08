@@ -3,11 +3,13 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {AuthDefaultService} from '../../_services/auth.default.service';
 import {AuthService} from '../../_services/auth.service';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {MessageService} from 'primeng/api';
 
 @Component({
     selector: 'app-register',
     templateUrl: './register.component.html',
     styleUrls: ['./register.component.scss'],
+    providers: [MessageService]
 })
 export class RegisterComponent implements OnInit {
     // Reactive form
@@ -31,6 +33,7 @@ export class RegisterComponent implements OnInit {
         private router: Router,
         private actRoute: ActivatedRoute,
         private fb: FormBuilder,
+        private messageService: MessageService
     ) {
     }
 
@@ -117,6 +120,13 @@ export class RegisterComponent implements OnInit {
                 );
             }
 
+            // Show success toast
+            this.messageService.add({
+                severity: 'success',
+                summary: 'Success',
+                detail: 'Registration successful! Please check your email for verification.'
+            });
+
             // Sign out or redirect after successful registration
             await this.authDefaultService.signOut('/home');
             this.isSuccessful = false;
@@ -124,6 +134,13 @@ export class RegisterComponent implements OnInit {
             console.error(e);
             this.isSignUpFailed = true;
             this.errorMessage = e.error.message;
+            
+            // Show error toast
+            this.messageService.add({
+                severity: 'error',
+                summary: 'Error',
+                detail: e.error.message || 'Registration failed. Please try again.'
+            });
         }
     }
 

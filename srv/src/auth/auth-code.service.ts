@@ -1,7 +1,5 @@
 import {Injectable, Logger, NotFoundException, UnauthorizedException} from "@nestjs/common";
 import {Environment} from "../config/environment.service";
-import {JwtService} from "@nestjs/jwt";
-import {TenantService} from "../services/tenant.service";
 import {InjectRepository} from "@nestjs/typeorm";
 import {IsNull, Not, Repository} from "typeorm";
 import {AuthCode} from "../entity/auth_code.entity";
@@ -19,8 +17,6 @@ export class AuthCodeService {
     constructor(
         private readonly configService: Environment,
         private readonly authUserService: AuthUserService,
-        private readonly tenantService: TenantService,
-        private readonly jwtService: JwtService,
         @InjectRepository(AuthCode)
         private authCodeRepository: Repository<AuthCode>,
         @InjectRepository(User) private usersRepository: Repository<User>,
