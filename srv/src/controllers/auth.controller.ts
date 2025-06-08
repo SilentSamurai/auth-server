@@ -259,8 +259,7 @@ export class AuthController {
         const user: User = await this.authUserService.findUserByEmail(
             body.email,
         );
-        const token: string =
-            await this.authService.createResetPasswordToken(user);
+        const token: string = await this.authService.createResetPasswordToken(user);
 
         let link: any = this.configService.get("RESET_PASSWORD_LINK");
         if (!link || link === "") {

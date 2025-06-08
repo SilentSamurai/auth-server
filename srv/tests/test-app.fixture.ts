@@ -8,6 +8,7 @@ import * as process from "node:process";
 import TestAgent from "supertest/lib/agent";
 import {createFakeSmtpServer, FakeSmtpServer} from "../src/mail/FakeSmtpServer";
 import {setupConsole} from "./helper.fixture";
+import {JwtServiceRS256} from "../src/auth/jwt.service";
 
 export class TestAppFixture {
     private app: INestApplication;
@@ -44,7 +45,7 @@ export class TestAppFixture {
             imports: [AppModule],
         }).compile()
         this.app = this.moduleRef.createNestApplication();
-        this._jwtService = this.app.get<JwtService>(JwtService);
+        this._jwtService = this.app.get<JwtService>(JwtServiceRS256);
         await this.app.init();
         this.app.useLogger(console);
 

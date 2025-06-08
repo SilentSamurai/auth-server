@@ -30,4 +30,12 @@ export class User {
 
     @CreateDateColumn({name: "created_at"})
     createdAt: Date;
+
+    @Column({name: "email_count", default: 0})
+    @Exclude() // Exclude from responses.
+    emailCount: number;
+
+    @Column({name: "email_count_reset_at", nullable: true})
+    @Exclude() // Exclude from responses.
+    emailCountResetAt: Date;
 }
