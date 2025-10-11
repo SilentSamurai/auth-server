@@ -1,100 +1,86 @@
-<div class="container">
-    <div class="row align-items-center">
-        <div class="col-md-12 vh-100">
-            <app-centered-card imageUrl="/assets/logo-img.jpg">
-                <div *ngIf="loading" class="align-middle text-center" style="padding-top:25%">
-                    <div class="spinner-border m-5" role="status">
-                        <span class="sr-only">Loading...</span>
-                    </div>
-                </div>
-
-                <!-- Display client_id as centered text when preset or on step 2 -->
-                <div *ngIf="hasClientIdPreset || currentStep === 2" class="text-center mt-2">
-                    <span class="fw-semibold ms-1">{{ signupForm.get('client_id')?.value }}</span>
-                </div>
-
-                <form (ngSubmit)="onSubmit()" [formGroup]="signupForm" class="mt-3" novalidate>
-                    <!-- STEP 1: Client ID -->
-                    <div class="form-group" *ngIf="!hasClientIdPreset && currentStep === 1">
-                        <label for="client_id">Client ID</label>
-                        <div class="input-group">
-                            <input class="form-control" formControlName="client_id" id="client_id"
-                                   placeholder="Client ID" type="text"/>
-                        </div>
-                        <div
-                            *ngIf="signupForm.get('client_id')?.errors && (signupForm.get('client_id')?.touched || signupForm.get('client_id')?.dirty)"
-                            class="alert alert-danger mt-2" role="alert">
-                            Client ID is required
-                        </div>
-                    </div>
-
-                    <!-- STEP 2: Details (conditionally visible) -->
-                    <div *ngIf="hasClientIdPreset || currentStep === 2" class="form-group mt-3">
-                        <label for="name">Name</label>
-                        <div class="input-group">
-                            <input class="form-control" formControlName="name" id="name" placeholder="Name"
-                                   type="text"/>
-                        </div>
-                        <div
-                            *ngIf="signupForm.get('name')?.errors && (signupForm.get('name')?.touched || signupForm.get('name')?.dirty)"
-                            class="alert alert-danger mt-2" role="alert">
-                            <div *ngIf="signupForm.get('name')?.errors?.['required']">Name is required</div>
-                            <div *ngIf="signupForm.get('name')?.errors?.['minlength']">Name must be at least 3
-                                characters
-                            </div>
-                            <div *ngIf="signupForm.get('name')?.errors?.['maxlength']">Name must be at most 20
-                                characters
-                            </div>
-                        </div>
-                    </div>
-                    <div *ngIf="hasClientIdPreset || currentStep === 2" class="form-group mt-3">
-                        <label for="email">Email</label>
-                        <div class="input-group">
-                            <input class="form-control" formControlName="email" id="email" placeholder="Email"
-                                   type="email"/>
-                        </div>
-                        <div
-                            *ngIf="signupForm.get('email')?.errors && (signupForm.get('email')?.touched || signupForm.get('email')?.dirty)"
-                            class="alert alert-danger mt-2" role="alert">
-                            <div *ngIf="signupForm.get('email')?.errors?.['required']">Email is required</div>
-                            <div *ngIf="signupForm.get('email')?.errors?.['email']">Must be a valid email address</div>
-                        </div>
-                    </div>
-                    <div *ngIf="hasClientIdPreset || currentStep === 2" class="form-group mt-3">
-                        <label for="password">Password</label>
-                        <div class="input-group">
-                            <input [type]="'password'" class="form-control" formControlName="password" id="password"
-                                   minlength="6" placeholder="Password"/>
-                        </div>
-                        <div
-                            *ngIf="signupForm.get('password')?.errors && (signupForm.get('password')?.touched || signupForm.get('password')?.dirty)"
-                            class="alert alert-danger mt-2" role="alert">
-                            <div *ngIf="signupForm.get('password')?.errors?.['required']">Password is required</div>
-                            <div *ngIf="signupForm.get('password')?.errors?.['minlength']">Password must be at least 6
-                                characters
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Actions: Next (step 1) or Submit (step 2) -->
-                    <div *ngIf="!hasClientIdPreset && currentStep === 1" class="d-grid gap-2 py-3">
-                        <button (click)="onNextClick()" class="btn btn-primary btn-block btn-lg" type="button">Next
-                        </button>
-                    </div>
-                    <div *ngIf="hasClientIdPreset || currentStep === 2" class="d-grid gap-2 py-3">
-                        <button [disabled]="signupForm.invalid" class="btn btn-primary btn-block btn-lg">Sign Up
-                        </button>
-                    </div>
-
-                    <div *ngIf="isSignUpFailed" class="alert alert-warning">
-                        Signup failed!<br/>
-                        {{ errorMessage }}
-                    </div>
-                </form>
-                <div class="d-flex justify-content-evenly">
-                    <a class="mt-1" [routerLink]="['/login']" [queryParams]="{ client_id: signupForm.get('client_id')?.value }">Login</a>
-                </div>
-            </app-centered-card>
+<app-centered-card [title]="signupForm.get('client_id')?.value" imageUrl="/assets/logo-img.jpg">
+    <div *ngIf="loading" class="align-middle text-center" style="padding-top:25%">
+        <div class="spinner-border m-5" role="status">
+            <span class="sr-only">Loading...</span>
         </div>
     </div>
-</div>
+
+
+
+    <form (ngSubmit)="onSubmit()" [formGroup]="signupForm" class="mt-3" novalidate>
+        <!-- STEP 1: Client ID -->
+        <div class="form-group" *ngIf="!hasClientIdPreset && currentStep === 1">
+            <label for="client_id">Client ID</label>
+            <div class="input-group">
+                <input class="form-control" formControlName="client_id" id="client_id" placeholder="Client ID"
+                    type="text" />
+            </div>
+            <div *ngIf="signupForm.get('client_id')?.errors && (signupForm.get('client_id')?.touched || signupForm.get('client_id')?.dirty)"
+                class="alert alert-danger mt-2" role="alert">
+                Client ID is required
+            </div>
+        </div>
+
+        <!-- STEP 2: Details (conditionally visible) -->
+        <div *ngIf="hasClientIdPreset || currentStep === 2" class="form-group mt-3">
+            <label for="name">Name</label>
+            <div class="input-group">
+                <input class="form-control" formControlName="name" id="name" placeholder="Name" type="text" />
+            </div>
+            <div *ngIf="signupForm.get('name')?.errors && (signupForm.get('name')?.touched || signupForm.get('name')?.dirty)"
+                class="alert alert-danger mt-2" role="alert">
+                <div *ngIf="signupForm.get('name')?.errors?.['required']">Name is required</div>
+                <div *ngIf="signupForm.get('name')?.errors?.['minlength']">Name must be at least 3
+                    characters
+                </div>
+                <div *ngIf="signupForm.get('name')?.errors?.['maxlength']">Name must be at most 20
+                    characters
+                </div>
+            </div>
+        </div>
+        <div *ngIf="hasClientIdPreset || currentStep === 2" class="form-group mt-3">
+            <label for="email">Email</label>
+            <div class="input-group">
+                <input class="form-control" formControlName="email" id="email" placeholder="Email" type="email" />
+            </div>
+            <div *ngIf="signupForm.get('email')?.errors && (signupForm.get('email')?.touched || signupForm.get('email')?.dirty)"
+                class="alert alert-danger mt-2" role="alert">
+                <div *ngIf="signupForm.get('email')?.errors?.['required']">Email is required</div>
+                <div *ngIf="signupForm.get('email')?.errors?.['email']">Must be a valid email address</div>
+            </div>
+        </div>
+        <div *ngIf="hasClientIdPreset || currentStep === 2" class="form-group mt-3">
+            <label for="password">Password</label>
+            <div class="input-group">
+                <input [type]="'password'" class="form-control" formControlName="password" id="password" minlength="6"
+                    placeholder="Password" />
+            </div>
+            <div *ngIf="signupForm.get('password')?.errors && (signupForm.get('password')?.touched || signupForm.get('password')?.dirty)"
+                class="alert alert-danger mt-2" role="alert">
+                <div *ngIf="signupForm.get('password')?.errors?.['required']">Password is required</div>
+                <div *ngIf="signupForm.get('password')?.errors?.['minlength']">Password must be at least 6
+                    characters
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions: Next (step 1) or Submit (step 2) -->
+        <div *ngIf="!hasClientIdPreset && currentStep === 1" class="d-grid gap-2 py-3">
+            <button (click)="onNextClick()" class="btn btn-primary btn-block btn-lg" type="button">Next
+            </button>
+        </div>
+        <div *ngIf="hasClientIdPreset || currentStep === 2" class="d-grid gap-2 py-3">
+            <button [disabled]="signupForm.invalid" class="btn btn-primary btn-block btn-lg">Sign Up
+            </button>
+        </div>
+
+        <div *ngIf="isSignUpFailed" class="alert alert-warning">
+            Signup failed!<br />
+            {{ errorMessage }}
+        </div>
+    </form>
+    <div class="d-flex justify-content-evenly">
+        <a class="mt-1" [routerLink]="['/login']"
+            [queryParams]="{ client_id: signupForm.get('client_id')?.value }">Login</a>
+    </div>
+</app-centered-card>
