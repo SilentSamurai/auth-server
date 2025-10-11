@@ -47,7 +47,7 @@
             </div>
         </div>
 
-        <!-- Step 2: After freezing client id, show credentials and readonly client id -->
+        <!-- Step 2: After freezing client id, show credentials -->
         <div *ngIf="freezeClientId">
             <div class="form-group">
                 <label for="username">Username</label>
@@ -101,16 +101,7 @@
                 </div>
             </div>
 
-            <div class="form-group mt-3">
-                <label for="client_id_frozen">Client Id</label>
-                <input
-                    class="form-control"
-                    formControlName="client_id"
-                    id="client_id_frozen"
-                    readonly="true"
-                    type="text"
-                />
-            </div>
+            <!-- Client Id input removed on step 2; displayed above under image -->
 
             <div class="form-group d-grid gap-2 py-3">
                 <button [disabled]="loginForm.invalid"
@@ -131,16 +122,12 @@
         Logged in as {{ loginForm.value?.username }}.
     </div>
 
-    <div class="d-flex justify-content-evenly">
-        <a class="mt-1" href="https://silentsamurai.github.io/auth-server">
-            Api Docs
-        </a>
-
+    <div class="d-flex justify-content-between">
         <a class="mt-1" routerLink="/forgot-password">
             Forgot Password
         </a>
 
-        <a class="mt-1" routerLink="/register">
+        <a class="mt-1" [routerLink]="['/signup']" [queryParams]="{ client_id: (client_id || loginForm.get('client_id')?.value) }">
             Sign Up
         </a>
     </div>

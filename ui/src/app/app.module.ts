@@ -31,6 +31,8 @@ import {AuthorizeLoginComponent} from "./open-pages/authorize/authorize-login.co
 import {NgOptimizedImage} from "@angular/common";
 import {TenantSelectionComponent} from './open-pages/tenant-selection/tenant-selection.component';
 import {AdminLoginComponent} from './open-pages/admin-login/admin-login.component';
+import {WelcomeComponent} from './open-pages/welcome/welcome.component';
+import {SignUpComponent} from './open-pages/signup/signup.component';
 
 @NgModule({
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -46,7 +48,9 @@ import {AdminLoginComponent} from './open-pages/admin-login/admin-login.componen
         ForgotPasswordComponent,
         ResetPasswordComponent,
         CenteredCardComponent,
-        AdminLoginComponent
+        AdminLoginComponent,
+        WelcomeComponent,
+        SignUpComponent
     ],
     imports: [
         BrowserModule,
