@@ -28,11 +28,13 @@ import {AuthorizeLoginComponent} from "./open-pages/authorize/authorize-login.co
 import {TenantSelectionComponent} from './open-pages/tenant-selection/tenant-selection.component';
 import {ForgotPasswordComponent} from './open-pages/forgot-password/forgot-password.component';
 import {ResetPasswordComponent} from './open-pages/reset-password/reset-password.component';
+import {AdminLoginComponent} from './open-pages/admin-login/admin-login.component';
 
 const routes: Routes = [
     {path: 'session-confirm', component: SessionConfirmationComponent},
     {path: 'authorize', component: AuthorizeLoginComponent},
     {path: 'login', component: LoginComponent},
+    {path: 'admin-login', component: AdminLoginComponent},
     {path: 'register', component: RegisterComponent},
     {path: 'forgot-password', component: ForgotPasswordComponent},
     {path: 'reset-password/:token', component: ResetPasswordComponent},

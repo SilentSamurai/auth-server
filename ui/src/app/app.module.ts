@@ -30,6 +30,7 @@ import {Ability, createMongoAbility, PureAbility,} from '@casl/ability';
 import {AuthorizeLoginComponent} from "./open-pages/authorize/authorize-login.component";
 import {NgOptimizedImage} from "@angular/common";
 import {TenantSelectionComponent} from './open-pages/tenant-selection/tenant-selection.component';
+import {AdminLoginComponent} from './open-pages/admin-login/admin-login.component';
 
 @NgModule({
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -44,7 +45,8 @@ import {TenantSelectionComponent} from './open-pages/tenant-selection/tenant-sel
         TenantSelectionComponent,
         ForgotPasswordComponent,
         ResetPasswordComponent,
-        CenteredCardComponent
+        CenteredCardComponent,
+        AdminLoginComponent
     ],
     imports: [
         BrowserModule,

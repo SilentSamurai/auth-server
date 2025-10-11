@@ -7,7 +7,7 @@
 # Starts the backend server in development mode with debug options enabled.
 [group('srv')]
 [working-directory('srv')]
-local-start-srv:
+serve-srv:
     # Run development server with debug output (e.g., for local development)
     npm run start:debug
 

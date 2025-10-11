@@ -8,7 +8,7 @@
 # Starts the frontend server in development/watch mode, live-reload JS/CSS when editing source files.
 [group('ui')]
 [working-directory('ui')]
-start-ui:
+serve-ui:
     npm run UI:SERVE:WATCH
 
 # -----------------------------------
