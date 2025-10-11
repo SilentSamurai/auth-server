@@ -29,8 +29,12 @@ import {TenantSelectionComponent} from './open-pages/tenant-selection/tenant-sel
 import {ForgotPasswordComponent} from './open-pages/forgot-password/forgot-password.component';
 import {ResetPasswordComponent} from './open-pages/reset-password/reset-password.component';
 import {AdminLoginComponent} from './open-pages/admin-login/admin-login.component';
+import {WelcomeComponent} from './open-pages/welcome/welcome.component';
+import {SignUpComponent} from './open-pages/signup/signup.component';
 
 const routes: Routes = [
+    {path: 'welcome', component: WelcomeComponent},
+    {path: 'signup', component: SignUpComponent},
     {path: 'session-confirm', component: SessionConfirmationComponent},
     {path: 'authorize', component: AuthorizeLoginComponent},
     {path: 'login', component: LoginComponent},
@@ -39,7 +43,7 @@ const routes: Routes = [
     {path: 'forgot-password', component: ForgotPasswordComponent},
     {path: 'reset-password/:token', component: ResetPasswordComponent},
     {path: 'error/:msg', component: HttpErrorComponent},
-    {path: '', redirectTo: 'home', pathMatch: 'full'},
+    {path: '', redirectTo: 'welcome', pathMatch: 'full'},
     {
         path: '',
         canActivate: [UserAuthGuard],

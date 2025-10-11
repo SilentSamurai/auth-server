@@ -95,7 +95,7 @@ export class AuthService {
     ): Promise<any> {
         return lastValueFrom(
             this.http.post(
-                `api/signup`,
+                `/api/signup`,
                 {
                     name,
                     email,
@@ -116,7 +116,7 @@ export class AuthService {
     ): Promise<any> {
         return lastValueFrom(
             this.http.post(
-                `api/register-domain`,
+                `/api/register-domain`,
                 {
                     name,
                     email,
