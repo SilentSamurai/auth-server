@@ -1,8 +1,8 @@
 # Import Kubernetes build recipes
 
 import './.just/k8s-build.just'
-import './.just/ui.just'
-import './.just/srv.just'
+import './srv/justfile'
+import './ui/justfile'
 
 # Use PowerShell on Windows
 
@@ -24,6 +24,9 @@ build:
 dev-external-start:
     cd ./external-user-app
     node server.js
+
+serve:
+   concurrently --kill-others "just serve-ui" "just serve-srv"
 
 # Run end-to-end tests
 run-e2e-tests:

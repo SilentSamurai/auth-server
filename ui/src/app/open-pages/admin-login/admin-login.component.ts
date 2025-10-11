@@ -7,20 +7,20 @@ import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {MessageService} from 'primeng/api';
 
 @Component({
-    selector: 'app-login',
-    templateUrl: './login.component.html',
-    styleUrls: ['./login.component.scss'],
+    selector: 'app-admin-login',
+    templateUrl: './admin-login.component.html',
+    styleUrls: ['./admin-login.component.scss'],
 })
-export class LoginComponent implements OnInit {
+export class AdminLoginComponent implements OnInit {
     loginForm: FormGroup;
     loading = true;
     isLoggedIn = false;
     isLoginFailed = false;
     errorMessage = '';
-    freezeClientId = false;
     isPasswordVisible = false;
     code_challenge_method: string = 'plain';
-    client_id: string = '';
+    // Preserve default client id behaviour for admin login
+    client_id: string = 'auth.server.com';
 
     constructor(
         private authService: AuthService,
@@ -31,7 +31,6 @@ export class LoginComponent implements OnInit {
         private messageService: MessageService,
     ) {
         this.loginForm = this.fb.group({
-            client_id: ['', Validators.required],
             username: ['', Validators.required],
             password: ['', [Validators.required, Validators.minLength(6)]],
         });
@@ -41,46 +40,26 @@ export class LoginComponent implements OnInit {
         let params = this.route.snapshot.queryParamMap;
         if (params.has('client_id')) {
             this.client_id = params.get('client_id')!;
-            this.loginForm.get('client_id')?.setValue(this.client_id);
-            if (this.client_id && this.client_id.length > 0) {
-                this.freezeClientId = true;
-            }
         }
 
         const code_challenge = await this.tokenStorage.getCodeChallenge(this.code_challenge_method);
 
-        // if auth code is present, then redirect
-        // verify auth-code
         const authCode = this.tokenStorage.getAuthCode();
         if (authCode) {
-            const clientId = this.client_id || this.loginForm.get('client_id')?.value;
-            if (clientId) {
-                await this.redirect(authCode, clientId);
-            }
+            await this.redirect(authCode);
         }
-        // else if (this.tokenStorage.isLoggedIn() && !externalLogin) {
-        //     await this.router.navigateByUrl("/home");
-        // }
         this.loading = false;
     }
 
-    // redirection to home page might not work sometime,
-    // check if internally anything is nav-ing to login page again
     async onSubmit(): Promise<void> {
         this.loading = true;
         const {username, password} = this.loginForm.value;
-        const clientId = this.client_id || this.loginForm.get('client_id')?.value;
-        if (!clientId) {
-            this.loginForm.get('client_id')?.markAsTouched();
-            this.loading = false;
-            return;
-        }
         const code_challenge = await this.tokenStorage.getCodeChallenge(this.code_challenge_method);
         try {
             const data = await this.authService.login(
                 username,
                 password,
-                clientId,
+                this.client_id,
                 code_challenge,
                 this.code_challenge_method,
             );
@@ -88,7 +67,7 @@ export class LoginComponent implements OnInit {
             this.isLoginFailed = false;
             this.isLoggedIn = true;
             this.tokenStorage.saveAuthCode(authenticationCode);
-            await this.redirect(authenticationCode, clientId);
+            await this.redirect(authenticationCode);
         } catch (err: any) {
             console.error(err);
             this.errorMessage = err.error.message;
@@ -98,20 +77,15 @@ export class LoginComponent implements OnInit {
         }
     }
 
-    async redirect(code: string, clientId: string) {
-        await this.setAccessToken(code, clientId);
-        await this.router.navigateByUrl("/home");
-    }
-
-    onContinue() {
-        this.freezeClientId = true;
+    async redirect(code: string) {
+        await this.setAccessToken(code, this.client_id);
+        await this.router.navigateByUrl('/home');
     }
 
     async onSigUpClick() {
-        const clientId = this.client_id || this.loginForm.get('client_id')?.value;
         await this.router.navigate(['/register'], {
             queryParams: {
-                client_id: clientId,
+                client_id: 'auth.server.com',
             },
         });
     }
