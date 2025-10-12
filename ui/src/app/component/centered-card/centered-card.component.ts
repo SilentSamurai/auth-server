@@ -60,7 +60,7 @@ import {Component, Input} from '@angular/core';
             border-radius: 50%;
         }
 
-        [data-bs-theme="dark"] {
+        :host-context([data-bs-theme="dark"]) {
             .card {
                 background-color: var(--bs-dark, #212529);
                 border-color: var(--bs-border-color, #495057);
