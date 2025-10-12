@@ -44,7 +44,8 @@
 
 // @ts-ignore
 Cypress.Commands.add('adminLogin', (email: string, password: string) => {
-    cy.visit("/home");
+    // Go directly to login with a preset client_id so step 2 is visible
+    cy.visit('/admin-login');
     // cy.get('#domain-pre').type("auth.server.com")
 
     // After filtering, we can assert that there is only the one
@@ -71,7 +72,8 @@ Cypress.Commands.add('adminLogin', (email: string, password: string) => {
 
 // @ts-ignore
 Cypress.Commands.add('login', (email: string, password: string, domain: string) => {
-    cy.visit(`/home?client_id=${domain}`);
+    // Ensure we land on the login page with client_id preset so username/password are visible
+    cy.visit(`/login?client_id=${domain}`);
     // cy.get('#domain-pre').type(tenant)
 
     // After filtering, we can assert that there is only the one
