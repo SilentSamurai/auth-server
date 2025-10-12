@@ -1,5 +1,7 @@
 import {SMTPServer, SMTPServerDataStream, SMTPServerOptions, SMTPServerSession,} from "smtp-server";
 import {AddressObject, EmailAddress, ParsedMail, simpleParser,} from "mailparser";
+import * as express from "express";
+import * as http from "http";
 
 /**
  * Interface for environment configuration
@@ -8,6 +10,9 @@ interface ServerConfig {
     port?: number;
     host?: string;
     logLevel?: "none" | "error" | "warn" | "info" | "debug";
+    controlHost?: string;
+    controlPort?: number;
+    controlEnabled?: boolean;
 }
 
 export interface EmailSearchCriteria {
@@ -28,6 +33,8 @@ export class FakeSmtpServer {
     private server: SMTPServer;
     private config: Required<ServerConfig>;
     private logger: Console;
+    private controlApp?: express.Express;
+    private controlServer?: http.Server;
 
     constructor(config: ServerConfig = {}) {
         this.config = this.getFullConfig(config);
@@ -48,7 +55,17 @@ export class FakeSmtpServer {
                     "info",
                     `SMTP Server listening on ${this.config.host}:${this.config.port}`,
                 );
-                resolve(this);
+                // Optionally start control HTTP server
+                if (this.config.controlEnabled) {
+                    this.startControlServer()
+                        .then(() => resolve(this))
+                        .catch((err) => {
+                            this.log("error", "Failed to start control server", err);
+                            resolve(this); // continue even if control fails
+                        });
+                } else {
+                    resolve(this);
+                }
             });
         });
     }
@@ -62,7 +79,13 @@ export class FakeSmtpServer {
                     return reject(error);
                 }
                 this.log("info", "SMTP Server closed");
-                resolve();
+                // Close control server if running
+                if (this.controlServer) {
+                    this.controlServer.close(() => resolve());
+                    this.controlServer = undefined;
+                } else {
+                    resolve();
+                }
             });
         });
     }
@@ -165,7 +188,78 @@ export class FakeSmtpServer {
                 config.logLevel ||
                 (process.env.SMTP_LOG_LEVEL as any) ||
                 "info",
+            controlHost: config.controlHost || process.env.MAIL_CONTROL_HOST || "127.0.0.1",
+            controlPort: config.controlPort || parseInt(process.env.MAIL_CONTROL_PORT || "8899", 10),
+            controlEnabled: config.controlEnabled !== undefined
+                ? config.controlEnabled
+                : (process.env.MAIL_CONTROL_ENABLE || "true").toLowerCase() === "true",
         };
+    }
+
+    /**
+     * Start HTTP control server to retrieve emails
+     */
+    private async startControlServer(): Promise<void> {
+        this.controlApp = express();
+        const app = this.controlApp;
+
+        app.get('/__test__/emails/latest', async (req, res) => {
+            try {
+                const to = req.query.to as string | undefined;
+                const subject = req.query.subject as string | undefined;
+                const timeoutMs = Number(req.query.timeoutMs ?? 10000);
+                const criteria: any = { sort: 'newest', limit: 1 };
+                if (to) criteria.to = to;
+                if (subject) {
+                    try { criteria.subject = new RegExp(subject as string, 'i'); } catch { criteria.subject = subject; }
+                }
+                const email = await this.waitForEmail(criteria, timeoutMs, 500);
+                const links = this.extractLinks(email);
+                const paths = this.extractPaths(email);
+                return res.json({
+                    subject: email.subject,
+                    to: email.to,
+                    from: email.from,
+                    links,
+                    paths,
+                    text: email.text,
+                    html: email.html,
+                    date: email.date,
+                });
+            } catch (e: any) {
+                return res.status(404).json({ error: e?.message || 'No matching email found' });
+            }
+        });
+
+        app.get('/__test__/emails/list', (req, res) => {
+            const to = req.query.to as string | undefined;
+            const subject = req.query.subject as string | undefined;
+            const limit = Number(req.query.limit ?? 10);
+            const criteria: any = { sort: 'newest', limit };
+            if (to) criteria.to = to;
+            if (subject) {
+                try { criteria.subject = new RegExp(subject as string, 'i'); } catch { criteria.subject = subject; }
+            }
+            const emails = this.searchEmails(criteria).map(e => ({
+                subject: e.subject,
+                to: e.to,
+                from: e.from,
+                date: e.date,
+            }));
+            return res.json({ emails });
+        });
+
+        app.post('/__test__/emails/clear', (req, res) => {
+            this.emails.length = 0;
+            return res.status(204).end();
+        });
+
+        await new Promise<void>((resolve) => {
+            this.controlServer = app.listen(this.config.controlPort, this.config.controlHost, () => {
+                this.log('info', `SMTP Control listening on http://${this.config.controlHost}:${this.config.controlPort}`);
+                resolve();
+            });
+        });
     }
 
     /**
