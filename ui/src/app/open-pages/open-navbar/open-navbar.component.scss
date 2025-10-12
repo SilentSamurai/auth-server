@@ -1,32 +1,29 @@
-.hero {
-  min-height: 60vh;
-}
-
-ul {
-  padding-left: 1.2rem;
-}
+/* Navbar component styles (inherits Bootstrap) */
 
 :host-context([data-bs-theme="dark"]) {
-  .hero {
+  .navbar.bg-light {
+    background-color: var(--bs-dark, #212529) !important;
+    border-color: var(--bs-border-color, #495057) !important;
+  }
+
+  .navbar .navbar-brand {
     color: var(--bs-body-color, #f8f9fa);
   }
 
-  .card {
-    background-color: var(--bs-dark, #212529);
+  .navbar .btn.btn-outline-primary,
+  .navbar .btn.btn-outline-secondary {
+    color: var(--bs-body-color, #f8f9fa);
     border-color: var(--bs-border-color, #495057);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
   }
 
-  a {
-    color: var(--bs-link-color, #0d6efd);
+  .navbar .btn.btn-outline-primary:hover,
+  .navbar .btn.btn-outline-secondary:hover {
+    border-color: var(--bs-primary, #0d6efd);
+    color: var(--bs-primary, #0d6efd);
   }
+}
 
-  a:hover {
-    color: var(--bs-link-hover-color, #0a58ca);
-    text-decoration: underline;
-  }
-
-  /* Buttons: ensure contrast and proper hover/focus in dark mode */
+/* Buttons: ensure contrast and proper hover/focus in dark mode */
   .btn-primary {
     background-color: var(--bs-primary, #0d6efd);
     border-color: var(--bs-primary, #0d6efd);
@@ -65,4 +62,3 @@ ul {
       background-color: rgba(13, 110, 253, 0.15) !important;
     }
   }
-}

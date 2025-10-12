@@ -33,6 +33,7 @@ import {TenantSelectionComponent} from './open-pages/tenant-selection/tenant-sel
 import {AdminLoginComponent} from './open-pages/admin-login/admin-login.component';
 import {WelcomeComponent} from './open-pages/welcome/welcome.component';
 import {SignUpComponent} from './open-pages/signup/signup.component';
+import {OpenNavbarComponent} from './open-pages/open-navbar/open-navbar.component';
 
 @NgModule({
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -50,7 +51,8 @@ import {SignUpComponent} from './open-pages/signup/signup.component';
         CenteredCardComponent,
         AdminLoginComponent,
         WelcomeComponent,
-        SignUpComponent
+        SignUpComponent,
+        OpenNavbarComponent
     ],
     imports: [
         BrowserModule,
