@@ -35,8 +35,9 @@ export class TestAppFixture {
     public async init(): Promise<TestAppFixture> {
 
         process.env.ENV_FILE = './envs/.env.testing';
-
+        process.env.ENABLE_FAKE_SMTP_SERVER = "false"
         Environment.setup();
+
 
         this.smtpServer = createFakeSmtpServer();
         await this.smtpServer.listen();

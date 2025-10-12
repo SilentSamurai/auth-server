@@ -41,7 +41,7 @@ export async function prepareApp() {
     // }
 
     // smtp
-    if (!Environment.isProduction()) {
+    if (Environment.get("ENABLE_FAKE_SMTP_SERVER", false)) {
         const {createFakeSmtpServer} = await import("./mail/FakeSmtpServer");
         const server = createFakeSmtpServer({});
         await server.listen();
