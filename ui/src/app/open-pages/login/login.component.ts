@@ -106,7 +106,20 @@ export class LoginComponent implements OnInit {
     }
 
     onContinue() {
+        const clientIdCtrl = this.loginForm.get('client_id');
+        const clientId = (clientIdCtrl?.value || '').trim();
+        if (!clientId) {
+            clientIdCtrl?.markAsTouched();
+            return;
+        }
+        this.client_id = clientId;
         this.freezeClientId = true;
+        // Update URL with client_id without reloading the component
+        this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: { client_id: clientId },
+            queryParamsHandling: 'merge',
+        });
     }
 
     async onSigUpClick() {

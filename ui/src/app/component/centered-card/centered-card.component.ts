@@ -5,7 +5,7 @@ import {Component, Input} from '@angular/core';
     template: `
         <div class="container">
             <div class="row align-items-center">
-                <div class="col-md-12 vh-100">
+                <div class="col-md-12 vh-80">
                     <div class="card card-container">
                         <img
                             *ngIf="imageUrl"
