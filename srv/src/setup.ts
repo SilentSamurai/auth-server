@@ -8,6 +8,10 @@ import {AppModule} from "./app.module";
 import {HttpExceptionFilter} from "./exceptions/filter/http-exception.filter";
 import * as express from "express";
 import * as process from "node:process";
+import type { FakeSmtpServer } from "./mail/FakeSmtpServer";
+
+// Hold reference to SMTP server (if started) so we can close it on shutdown
+let smtpServerRef: FakeSmtpServer | null = null;
 
 export async function prepareApp() {
     Environment.setup();
@@ -45,6 +49,7 @@ export async function prepareApp() {
         const {createFakeSmtpServer} = await import("./mail/FakeSmtpServer");
         const server = createFakeSmtpServer({});
         await server.listen();
+        smtpServerRef = server;
     }
 
     console.log("Application options: ", options);
@@ -86,6 +91,16 @@ export async function run(app: NestExpressApplication) {
     signals.forEach((signal) => {
         process.on(signal, async () => {
             console.log(`Received ${signal}, closing Nest application...`);
+            // Close SMTP server first (if running) to free ports
+            if (smtpServerRef) {
+                try {
+                    await smtpServerRef.close();
+                } catch (e) {
+                    console.error("Error while closing SMTP server:", e);
+                } finally {
+                    smtpServerRef = null;
+                }
+            }
             await app.close();
             console.log("Nest application successfully closed.");
             process.exit(0);
