@@ -35,6 +35,7 @@ export class FakeSmtpServer {
     private logger: Console;
     private controlApp?: express.Express;
     private controlServer?: http.Server;
+    private emailHandler?: (email: ParsedMail) => void;
 
     constructor(config: ServerConfig = {}) {
         this.config = this.getFullConfig(config);
@@ -50,7 +51,15 @@ export class FakeSmtpServer {
 
     public async listen(): Promise<FakeSmtpServer> {
         return new Promise((resolve, reject) => {
+            const onError = (err: Error) => {
+                this.log("error", "SMTP listen error:", err);
+                this.server.removeListener('error', onError);
+                reject(err);
+            };
+            this.server.once('error', onError);
+
             this.server.listen(this.config.port, this.config.host, () => {
+                this.server.removeListener('error', onError);
                 this.log(
                     "info",
                     `SMTP Server listening on ${this.config.host}:${this.config.port}`,
@@ -95,22 +104,7 @@ export class FakeSmtpServer {
      * @param handler Function to handle parsed emails
      */
     public setEmailHandler(handler: (email: ParsedMail) => void): void {
-        this.server.onData = (
-            stream: SMTPServerDataStream,
-            session: SMTPServerSession,
-            callback: () => void,
-        ): void => {
-            simpleParser(stream)
-                .then((parsedEmail: ParsedMail) => {
-                    handler(parsedEmail);
-                })
-                .catch((err: Error) => {
-                    this.log("error", "Error parsing email:", err);
-                })
-                .finally(() => {
-                    callback();
-                });
-        };
+        this.emailHandler = handler;
     }
 
     public searchEmails(criteria: EmailSearchCriteria): ParsedMail[] {
@@ -270,7 +264,6 @@ export class FakeSmtpServer {
             onData: this.handleEmailData.bind(this),
             disabledCommands: ["AUTH", "STARTTLS"],
             secure: false,
-            secured: false,
             allowInsecureAuth: true,
             authOptional: true,
             disableReverseLookup: true,
@@ -280,15 +273,25 @@ export class FakeSmtpServer {
     private handleEmailData(
         stream: SMTPServerDataStream,
         session: SMTPServerSession,
-        callback: () => void,
+        callback: (err?: Error) => void,
     ): void {
         simpleParser(stream)
             .then((parsedEmail) => {
                 this.emails.push(parsedEmail);
                 this.logEmailDetails(parsedEmail);
+                if (this.emailHandler) {
+                    try {
+                        this.emailHandler(parsedEmail);
+                    } catch (handlerErr: any) {
+                        this.log("error", "Email handler error:", handlerErr);
+                    }
+                }
+                callback();
             })
-            .catch((err) => this.log("error", "Error parsing email:", err))
-            .finally(callback);
+            .catch((err) => {
+                this.log("error", "Error parsing email:", err);
+                callback(err);
+            });
     }
 
     private logEmailDetails(parsedEmail: ParsedMail): void {
@@ -304,6 +307,9 @@ export class FakeSmtpServer {
     }
 
     private setupShutdownHandlers(): void {
+        if (require.main !== module) {
+            return;
+        }
         // Handle termination signals
         process.on("SIGTERM", async () => {
             this.log("info", "SMTP Server shutting down (SIGTERM)...");
@@ -384,6 +390,18 @@ export class FakeSmtpServer {
             return false;
         if (criteria.before && email.date && email.date > criteria.before)
             return false;
+
+        if (criteria.containsLink !== undefined) {
+            const links = this.extractLinks(email);
+            if (criteria.containsLink instanceof RegExp) {
+                const re = criteria.containsLink as RegExp;
+                const anyMatches = links.some(l => re.test(l));
+                if (!anyMatches) return false;
+            } else {
+                if (criteria.containsLink && links.length === 0) return false;
+                if (!criteria.containsLink && links.length > 0) return false;
+            }
+        }
         return true;
     }
 }
