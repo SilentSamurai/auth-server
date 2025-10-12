@@ -128,7 +128,9 @@
             Forgot Password
         </a>
 
-        <a class="mt-1" [routerLink]="['/signup']" [queryParams]="{ client_id: (client_id || loginForm.get('client_id')?.value) }">
+        <a class="mt-1" [routerLink]="['/signup']" 
+        [queryParams]="{ client_id: (client_id || loginForm.get('client_id')?.value) }"
+        [queryParamsHandling]="'merge'">
             Sign Up
         </a>
     </div>

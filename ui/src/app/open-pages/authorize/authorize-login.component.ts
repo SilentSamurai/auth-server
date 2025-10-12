@@ -17,6 +17,7 @@ export class AuthorizeLoginComponent implements OnInit {
     isLoggedIn = false;
     isLoginFailed = false;
     errorMessage = '';
+    error = '';
     freezeClientId = false;
     redirectUri = '';
     code_challenge = '';
@@ -47,16 +48,24 @@ export class AuthorizeLoginComponent implements OnInit {
 
         // code_challenge_method
         if (!params.has('code_challenge')) {
-            alert('Invalid challenge || challenge not found!');
+            this.error = 'Invalid challenge || challenge not found!';
+            this.loading = false;
             return;
         }
         this.code_challenge = params.get('code_challenge')!;
 
         if (!params.has('redirect_uri')) {
-            alert('Invalid redirect_uri || redirect_uri not found');
+            this.error = 'Invalid redirect_uri || redirect_uri not found';
+            this.loading = false;
             return;
         }
         this.redirectUri = params.get('redirect_uri')!;
+
+        if (!params.has('client_id')) {
+            this.error = 'Invalid client_id || client_id not found';
+            this.loading = false;
+            return;
+        }
 
         if (params.has('client_id')) {
             const cid = params.get('client_id');
@@ -177,13 +186,14 @@ export class AuthorizeLoginComponent implements OnInit {
         window.location.href = redirectUrl.toString();
     }
 
-    async onSigUpClick() {
-        await this.router.navigate(['/signup'], {
-            queryParams: {
-                client_id: this.loginForm.get('client_id')?.value!,
-            },
-        });
-    }
+    // async onSigUpClick() {
+    //     console.log(this.clientId);
+    //     await this.router.navigate(['/signup'], {
+    //         queryParams: {
+    //             client_id: this.clientId,
+    //         },
+    //     });
+    // }
 
     // protected isAbsoluteUrl(url: string): boolean {
     //     try {
