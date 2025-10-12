@@ -100,7 +100,9 @@ export class LoginComponent implements OnInit {
 
     async redirect(code: string, clientId: string) {
         await this.setAccessToken(code, clientId);
-        await this.router.navigateByUrl("/home");
+        await this.router.navigate(["/home"], {
+            queryParams: { client_id: clientId },
+        });
     }
 
     onContinue() {
