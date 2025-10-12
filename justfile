@@ -11,10 +11,6 @@ set windows-shell := ["powershell.exe", "-c"]
 # Show help by default
 default: help
 
-test:
-    just test-srv
-    just test-ui
-
 # Build both UI and server components
 build:
     just build-ui
@@ -28,10 +24,9 @@ dev-external-start:
 serve:
    concurrently --kill-others "just serve-ui" "just serve-srv"
 
-# Run end-to-end tests
-run-e2e-tests:
-    cd ./e2e
-    npm run test
+test:
+    just test-srv
+    just test-ui
 
 install:
     echo "install"

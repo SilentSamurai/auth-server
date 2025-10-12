@@ -178,7 +178,7 @@ export class AuthorizeLoginComponent implements OnInit {
     }
 
     async onSigUpClick() {
-        await this.router.navigate(['/register'], {
+        await this.router.navigate(['/signup'], {
             queryParams: {
                 client_id: this.loginForm.get('client_id')?.value!,
             },

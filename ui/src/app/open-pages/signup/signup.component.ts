@@ -18,6 +18,7 @@ export class SignUpComponent implements OnInit {
     loading = false;
     currentStep = 1;
     hasClientIdPreset = false;
+    isSuccessful = false;
 
     constructor(
         private fb: FormBuilder,
@@ -79,10 +80,10 @@ export class SignUpComponent implements OnInit {
             this.messageService.add({
                 severity: 'success',
                 summary: 'Success',
-                detail: 'Sign up successful! Please check your email for verification.'
+                detail: 'Sign up successful! Please verify your email, then try logging in again.'
             });
-
-            await this.authDefaultService.signOut('/home');
+            this.isSuccessful = true;
+            // Do not redirect; keep user on this page to read instructions
         } catch (e: any) {
             console.error(e);
             const msg = e?.error?.message || e?.message || 'Registration failed. Please try again.';

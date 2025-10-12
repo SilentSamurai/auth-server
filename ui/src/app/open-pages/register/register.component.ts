@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute, Router} from '@angular/router';
+import {Router} from '@angular/router';
 import {AuthDefaultService} from '../../_services/auth.default.service';
 import {AuthService} from '../../_services/auth.service';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
@@ -21,17 +21,13 @@ export class RegisterComponent implements OnInit {
     errorMessage = '';
     loading = false;
 
-    isSignUp = false;
-    clientId?: string;
-
-    // For multi-step flow (if !isSignUp)
+    // For multi-step flow
     currentStep = 1;
 
     constructor(
         private authService: AuthService,
         private authDefaultService: AuthDefaultService,
         private router: Router,
-        private actRoute: ActivatedRoute,
         private fb: FormBuilder,
         private messageService: MessageService
     ) {
@@ -50,25 +46,13 @@ export class RegisterComponent implements OnInit {
             ],
             email: ['', [Validators.required, Validators.email]],
             password: ['', [Validators.required, Validators.minLength(6)]],
+            orgName: ['', [Validators.required]],
+            domain: ['', [Validators.required]],
         };
-
-        // Check for client_id in URL query params
-        this.clientId = this.actRoute.snapshot.queryParamMap.get('client_id')!;
-        if (this.clientId) {
-            this.isSignUp = true;
-            // For a normal sign-up flow, we skip directly to step 2 (one-step)
-            // so that name/email/password are shown right away
-            this.currentStep = 2;
-        } else {
-            // Also require company fields if not sign-up
-            controls['orgName'] = ['', [Validators.required]];
-            controls['domain'] = ['', [Validators.required]];
-        }
 
         this.registerForm = this.fb.group(controls);
     }
 
-    // Move to step 2 if valid; only used when !isSignUp
     onNextClick(): void {
         const {orgName, domain} = this.registerForm.value;
         if (
@@ -85,8 +69,8 @@ export class RegisterComponent implements OnInit {
     }
 
     async onSubmit(): Promise<void> {
-        // If at step 1 and isSignUp is false, do nothing but move to step 2
-        if (!this.isSignUp && this.currentStep === 1) {
+        // If at step 1, move to step 2 first
+        if (this.currentStep === 1) {
             this.onNextClick();
             return;
         }
@@ -102,23 +86,13 @@ export class RegisterComponent implements OnInit {
         this.isSignUpFailed = false;
 
         try {
-            // If we have a clientId, treat it as sign up
-            if (this.isSignUp) {
-                await this.authService.signUp(
-                    name,
-                    email,
-                    password,
-                    this.clientId!,
-                );
-            } else {
-                await this.authService.registerTenant(
-                    name,
-                    email,
-                    password,
-                    orgName,
-                    domain,
-                );
-            }
+            await this.authService.registerTenant(
+                name,
+                email,
+                password,
+                orgName,
+                domain,
+            );
 
             // Show success toast
             this.messageService.add({

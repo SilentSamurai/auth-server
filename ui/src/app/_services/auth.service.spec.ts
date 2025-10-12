@@ -120,7 +120,7 @@ describe('AuthService', () => {
             'client123',
         );
 
-        const req = httpMock.expectOne('api/signup');
+        const req = httpMock.expectOne('/api/signup');
         expect(req.request.method).toBe('POST');
         expect(req.request.body).toEqual({
             name: 'Test User',
@@ -146,7 +146,7 @@ describe('AuthService', () => {
             'test.com',
         );
 
-        const req = httpMock.expectOne('api/register-domain');
+        const req = httpMock.expectOne('/api/register-domain');
         expect(req.request.method).toBe('POST');
         expect(req.request.body).toEqual({
             name: 'Test User',
