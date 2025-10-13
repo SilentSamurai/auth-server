@@ -3,46 +3,22 @@ describe('Sign Up', () => {
         return `testuser_${Date.now()}@mail.com`;
     }
 
-    beforeEach(() => {
+    it('Should show an error when client_id is missing', () => {
         cy.visit('/signup');
+        cy.contains('.alert.alert-danger', 'client_id').should('be.visible');
+        cy.get('form').should('not.exist');
     });
 
-    it('Should show only client_id first, then reveal other fields after Next', () => {
-        // Step 1: only client_id input should be visible
-        cy.get('input#client_id').should('be.visible');
-        cy.contains('button', 'Next').should('be.visible');
-
-        // Other fields should not be present yet
-        cy.get('input#name').should('not.exist');
-        cy.get('input#email').should('not.exist');
-        cy.get('input#password').should('not.exist');
-
-        // Enter client_id and go next
-        cy.get('input#client_id').type('public');
-        cy.contains('button', 'Next').click();
-
-        // Now step 2 fields should be visible
-        cy.get('input#name').should('be.visible');
-        cy.get('input#email').should('be.visible');
-        cy.get('input#password').should('be.visible');
-    });
-
-    it('Should prefill and hide client_id when provided via query and allow signup', () => {
+    it('Should allow signup when client_id is provided via query', () => {
         const email = uniqueEmail();
-
-        // Navigate with client_id query
         cy.visit('/signup?client_id=shire.local');
 
-        // Client ID input should be hidden in step 2
-        cy.get('input#client_id').should('not.exist');
-
-        // Fill details and submit
-        cy.get('input#name').type('Test User');
+        cy.get('input#name').should('be.visible').type('Test User');
         cy.get('input#email').type(email);
         cy.get('input#password').type('testpass123');
         cy.intercept('POST', '**/api/signup*').as('signUp');
         cy.contains('button', 'Sign Up').click();
-        cy.wait('@signUp').should(({response}) => {
+        cy.wait('@signUp').should(({ response }) => {
             expect(response && response.statusCode).to.be.oneOf([201, 200]);
         });
         cy.contains('Sign up successful! Please verify your email, then try logging in again.').should('exist');
@@ -56,7 +32,7 @@ describe('Sign Up', () => {
         // Clear inbox
         cy.request('POST', `${SMTP_SERVER}/clear`);
 
-        // Go directly to step 2 with client_id preset
+        // Visit with client_id preset
         cy.visit('/signup?client_id=shire.local');
 
         // Fill details and submit
@@ -65,7 +41,7 @@ describe('Sign Up', () => {
         cy.get('input#password').type(password);
         cy.intercept('POST', '**/api/signup*').as('signUp');
         cy.contains('button', 'Sign Up').click();
-        cy.wait('@signUp').should(({response}) => {
+        cy.wait('@signUp').should(({ response }) => {
             expect(response && response.statusCode).to.be.oneOf([201, 200]);
         });
 
