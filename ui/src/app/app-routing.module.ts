@@ -1,12 +1,12 @@
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 
-import {RegisterComponent} from './open-pages/register/register.component';
-import {LoginComponent} from './open-pages/login/login.component';
+import {RegisterComponent} from './open-pages/register.component';
+import {LoginComponent} from './open-pages/login.component';
 import {UR01Component} from './secure/users/UR01.component';
 import {TN01Component} from './secure/tenants/TN01.component';
 import {UR02Component} from './secure/users/UR02.component';
-import {SessionConfirmationComponent} from './open-pages/session/session-confirmation.component';
+import {SessionConfirmationComponent} from './open-pages/session-confirmation.component';
 import {TN02Component} from './secure/tenants/TN02.component';
 import {HomeComponent} from './secure/home.component';
 import {SuperAdminAuthGuard} from './shared/super-admin-auth-guard.service';
@@ -24,13 +24,13 @@ import {UserAuthGuard} from './shared/user-auth-guard.service';
 import {HttpErrorComponent} from './error-pages/HttpError.component';
 import {TenantAccessAuthGuard} from './shared/tenant-auth-guard.service';
 import {AP01Component} from './secure/apps/AP01.component';
-import {AuthorizeLoginComponent} from "./open-pages/authorize/authorize-login.component";
-import {TenantSelectionComponent} from './open-pages/tenant-selection/tenant-selection.component';
-import {ForgotPasswordComponent} from './open-pages/forgot-password/forgot-password.component';
-import {ResetPasswordComponent} from './open-pages/reset-password/reset-password.component';
-import {AdminLoginComponent} from './open-pages/admin-login/admin-login.component';
-import {WelcomeComponent} from './open-pages/welcome/welcome.component';
-import {SignUpComponent} from './open-pages/signup/signup.component';
+import {AuthorizeLoginComponent} from "./open-pages/authorize-login.component";
+import {TenantSelectionComponent} from './open-pages/tenant-selection.component';
+import {ForgotPasswordComponent} from './open-pages/forgot-password.component';
+import {ResetPasswordComponent} from './open-pages/reset-password.component';
+import {AdminLoginComponent} from './open-pages/admin-login.component';
+import {WelcomeComponent} from './open-pages/welcome.component';
+import {SignUpComponent} from './open-pages/signup.component';
 
 const routes: Routes = [
     {path: 'welcome', component: WelcomeComponent},

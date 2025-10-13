@@ -1,3 +1,9 @@
+import {Component, OnInit} from '@angular/core';
+import {SessionService} from '../_services/session.service';
+
+@Component({
+    selector: 'app-profile',
+    template: `
 <app-open-navbar></app-open-navbar>
 <app-centered-card>
     <div *ngIf="currentUser; else loggedOut">
@@ -55,3 +61,25 @@
         Please login.
     </ng-template>
 </app-centered-card>
+`,
+    styles: [`
+/* Profile component specific styles */
+.profile-container { padding: 20px; }
+.profile-header { margin-bottom: 20px; }
+.profile-details { margin-top: 20px; }
+.profile-actions { margin-top: 30px; }
+`],
+})
+export class ProfileComponent implements OnInit {
+    currentUser: any;
+    token: any;
+
+    constructor(private tokenStorageService: SessionService) {
+    }
+
+    ngOnInit(): void {
+        this.currentUser = this.tokenStorageService.getUser();
+        this.token = this.tokenStorageService.getToken();
+        console.log(this.currentUser);
+    }
+}

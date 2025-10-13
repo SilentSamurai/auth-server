@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
-import {AuthService} from '../../_services/auth.service';
-import {SessionService} from '../../_services/session.service';
+import {AuthService} from '../_services/auth.service';
+import {SessionService} from '../_services/session.service';
 import {MessageService} from 'primeng/api';
 import {lastValueFrom} from 'rxjs';
 
