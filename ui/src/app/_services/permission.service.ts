@@ -55,7 +55,10 @@ export class PermissionService {
         //     condition
         // });
         let result: boolean;
-        if (condition) {
+        if (condition === 'all') {
+            // Global permission check (e.g., super admin rules like can(manage, 'all'))
+            result = this.ability.can(action, 'all' as any);
+        } else if (condition) {
             result = this.ability.can(action, subject(subjectStr, condition));
         } else {
             result = this.ability.can(action, subjectStr);
