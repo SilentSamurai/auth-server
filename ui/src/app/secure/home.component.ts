@@ -88,7 +88,7 @@ export class HomeComponent implements OnInit {
                     icon: 'fa-bars',
                     link: ['/TN01'],
                     canActivate: (ps: PermissionService) => {
-                        return ps.isAuthorized(Actions.Manage, Subjects.TENANT);
+                        return ps.isAuthorized(Actions.Manage, Subjects.TENANT, 'all');
                     },
                 },
                 {
@@ -106,7 +106,7 @@ export class HomeComponent implements OnInit {
                     icon: 'fa-magic',
                     link: ['/TNRL01'],
                     canActivate: (ps: PermissionService) => {
-                        return ps.isAuthorized(Actions.Manage, Subjects.TENANT);
+                        return ps.isAuthorized(Actions.Manage, Subjects.TENANT, 'all');
                     },
                 },
             ],
@@ -120,7 +120,7 @@ export class HomeComponent implements OnInit {
                     icon: 'fa-users',
                     link: ['/UR01'],
                     canActivate: (ps: PermissionService) => {
-                        return ps.isAuthorized(Actions.Manage, Subjects.USER);
+                        return ps.isAuthorized(Actions.Manage, Subjects.USER, 'all');
                     },
                 },
                 {
@@ -129,7 +129,7 @@ export class HomeComponent implements OnInit {
                     icon: 'fa-users',
                     link: ['/UR02'],
                     canActivate: (ps: PermissionService) => {
-                        return ps.isAuthorized(Actions.Manage, Subjects.USER);
+                        return ps.isAuthorized(Actions.Manage, Subjects.USER, 'all');
                     },
                 },
             ],
@@ -143,7 +143,7 @@ export class HomeComponent implements OnInit {
                     icon: 'fa-casl',
                     link: ['/RL01'],
                     canActivate: (ps: PermissionService) => {
-                        return ps.isAuthorized(Actions.Manage, Subjects.ROLE);
+                        return ps.isAuthorized(Actions.Manage, Subjects.ROLE, 'all');
                     },
                 },
                 {
@@ -152,7 +152,7 @@ export class HomeComponent implements OnInit {
                     icon: 'fa-role',
                     link: ['/RL02'],
                     canActivate: (ps: PermissionService) => {
-                        return ps.isAuthorized(Actions.Manage, Subjects.ROLE);
+                        return ps.isAuthorized(Actions.Manage, Subjects.ROLE, 'all');
                     },
                 },
             ],
@@ -166,7 +166,7 @@ export class HomeComponent implements OnInit {
                     icon: 'fa-app',
                     link: ['/AP01'],
                     canActivate: (ps: PermissionService) => {
-                        return ps.isAuthorized(Actions.Manage, Subjects.APPS);
+                        return ps.isAuthorized(Actions.Manage, Subjects.APPS, 'all');
                     },
                 },
             ],
@@ -180,7 +180,7 @@ export class HomeComponent implements OnInit {
                     icon: 'fa-group',
                     link: ['/GP01'],
                     canActivate: (ps: PermissionService) => {
-                        return ps.isAuthorized(Actions.Manage, Subjects.GROUP);
+                        return ps.isAuthorized(Actions.Manage, Subjects.GROUP, 'all');
                     },
                 },
                 {
@@ -189,7 +189,7 @@ export class HomeComponent implements OnInit {
                     icon: 'fa-group',
                     link: ['/GP02'],
                     canActivate: (ps: PermissionService) => {
-                        return ps.isAuthorized(Actions.Manage, Subjects.GROUP);
+                        return ps.isAuthorized(Actions.Manage, Subjects.GROUP, 'all');
                     },
                 },
             ],
