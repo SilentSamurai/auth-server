@@ -59,7 +59,8 @@ Cypress.Commands.add('adminLogin', (email: string, password: string) => {
 
     cy.get('#login-btn').click();
 
-    cy.wait('@authCode').should(({request, response}) => {
+    cy.wait('@authCode').should((interception: any) => {
+        const {request, response} = interception;
         expect(response?.statusCode).to.be.oneOf([201, 200]);
         // expect(response && response.body).to.include('authentication_code')
     })
@@ -111,8 +112,9 @@ Cypress.Commands.add('goToTenantObjectPage', (tenantDomain: string) => {
     cy.intercept('GET', '**/api/tenant/*/members').as('getTenantDetails');
     cy.get('#TN02_SEL_CONT_BTN').click();
     cy.url().should('match', /TN02\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/);
-    cy.wait('@getTenantDetails').should(({request, response}) => {
-        expect(response && response.statusCode).to.be.oneOf([200, 304]);
+    cy.wait('@getTenantDetails').should((interception: any) => {
+        const {request, response} = interception;
+        expect(!!response && response.statusCode).to.be.oneOf([200, 304]);
     });
 });
 
@@ -128,8 +130,9 @@ Cypress.Commands.add('createTenant', (tenantName: string, tenantDomain: string) 
     cy.get('#create\\.tenant\\.domain').type(tenantDomain);
     cy.intercept('POST', '**/tenant/create*').as('createTenant');
     cy.get('#CREATE_TENANT_SUBMIT_BTN').click();
-    cy.wait('@createTenant').should(({request, response}) => {
-        expect(response && response.statusCode).to.be.oneOf([201]);
+    cy.wait('@createTenant').should((interception: any) => {
+        const {request, response} = interception;
+        expect(!!response && response.statusCode).to.be.oneOf([201]);
     });
 });
 
@@ -166,8 +169,9 @@ Cypress.Commands.add('subscribeAppFromOverview', (appName: string) => {
     cy.get('#SUBSCRIBE_BTN').click();
 
 
-    cy.wait('@SubscribeApp').should(({request, response}) => {
-        expect(response && (response.statusCode === 201 || response.statusCode === 200)).to.be.true;
+    cy.wait('@SubscribeApp').should((interception: any) => {
+        const {request, response} = interception;
+        expect(!!response && (response.statusCode === 201 || response.statusCode === 200)).to.be.true;
     });
     cy.contains('td', appName).should('exist');
 });
@@ -193,8 +197,9 @@ Cypress.Commands.add('addAppFromOverview', (appName: string, appUrl: string, des
 
     cy.get('.modal-footer').contains('button', 'Create').click();
 
-    cy.wait('@CreateApp').should(({request, response}) => {
-        expect(response && response.statusCode).to.be.oneOf([201, 200]);
+    cy.wait('@CreateApp').should((interception: any) => {
+        const {request, response} = interception;
+        expect(!!response && response.statusCode).to.be.oneOf([201, 200]);
     });
 
     cy.contains("td", appName).should("exist");
@@ -230,8 +235,9 @@ Cypress.Commands.add('unsubscribeFromApp', (appName: string) => {
     cy.get('#CONFIRMATION_YES_BTN').click();
 
 
-    cy.wait('@UnsubscribeApp').should(({request, response}) => {
-        expect(response && (response.statusCode === 200 || response.statusCode === 201)).to.be.true;
+    cy.wait('@UnsubscribeApp').should((interception: any) => {
+        const {request, response} = interception;
+        expect(!!response && (response.statusCode === 200 || response.statusCode === 201)).to.be.true;
     });
 
     cy.contains('td', appName).should('not.exist');
@@ -246,8 +252,9 @@ Cypress.Commands.add('deleteAppFromOverview', (appName: string) => {
         .click();
     cy.intercept('DELETE', '**/api/apps/*').as('DeleteApp');
     cy.get('#CONFIRMATION_YES_BTN').click();
-    cy.wait('@DeleteApp').should(({request, response}) => {
-        expect(response && (response.statusCode === 200 || response.statusCode === 201)).to.be.true;
+    cy.wait('@DeleteApp').should((interception: any) => {
+        const {request, response} = interception;
+        expect(!!response && (response.statusCode === 200 || response.statusCode === 201)).to.be.true;
     });
     cy.contains('td', appName).should('not.exist');
 });
@@ -270,7 +277,8 @@ Cypress.Commands.add('addMemberToTenant', (tenantDomain: string, email: string, 
     cy.get('#add\\.member\\.name').type(email);
     cy.intercept('POST', '**/api/tenant/*/members/add').as('createMember');
     cy.get('#ADD_TENANT_MEMBER_BTN').click();
-    cy.wait('@createMember').should(({response}) => {
+    cy.wait('@createMember').should((interception: any) => {
+        const {response} = interception;
         expect(response?.statusCode).to.be.oneOf([201]);
     });
     cy.contains('td', email).should('exist');
@@ -287,7 +295,8 @@ Cypress.Commands.add('publishApp', (appName: string) => {
         .click();
     cy.intercept('PATCH', '**/api/apps/*/publish').as('publishApp');
     cy.get('#CONFIRMATION_YES_BTN').click();
-    cy.wait('@publishApp').should(({response}) => {
+    cy.wait('@publishApp').should((interception: any) => {
+        const {response} = interception;
         expect(response?.statusCode).to.be.oneOf([200, 201]);
     });
     // Verify app is published by checking that the Publish button is gone
@@ -304,36 +313,6 @@ Cypress.Commands.add('logout', () => {
     cy.url().should('include', '/login');
 });
 
-declare namespace Cypress {
-    interface Chainable<Subject = any> {
-        addAppFromOverview(appName: string, appUrl: string, description: string): Chainable<any>;
-
-        subscribeAppFromOverview(appName: string): Chainable<any>;
-
-        goToTenantObjectPage(tenantDomain: string): Chainable<any>;
-
-        createTenant(tenantName: string, tenantDomain: string): Chainable<any>;
-
-        deleteTenant(tenantDomain: string): Chainable<any>;
-
-        subscribeToApp(tenantDomain: string, appName: string): Chainable<any>;
-
-        openTenantOverviewTile(): Chainable<any>;
-
-        openSubscribedApp(appName: string): Chainable<any>;
-
-        unsubscribeFromApp(appName: string): Chainable<any>;
-
-        deleteAppFromOverview(appName: string): Chainable<any>;
-
-        adminLogin(email: string, password: string): Chainable<any>;
-
-        login(email: string, password: string, domain: string): Chainable<any>;
-        loginWithAmbiguousUser(email: string, password: string, clientId: string): Chainable<any>;
-        addMemberToTenant(tenantDomain: string, email: string, password: string): Chainable<any>;
-        publishApp(appName: string): Chainable<any>;
-        logout(): Chainable<any>;
-    }
-}
+ 
 
 
