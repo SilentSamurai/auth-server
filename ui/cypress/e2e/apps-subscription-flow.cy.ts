@@ -1,3 +1,5 @@
+import type { Interception } from 'cypress/types/net-stubbing';
+
 describe('Apps & Subscription Flow', () => {
     const TENANT_A_ADMIN = 'admin@shire.local';
     const TENANT_A_DOMAIN = 'shire.local';
@@ -55,8 +57,9 @@ describe('Apps & Subscription Flow', () => {
         cy.intercept('POST', '**/api/oauth/token*').as('authToken');
         cy.get('#login-btn').click();
 
-        cy.wait('@authToken').should(({response}) => {
-            expect(response.statusCode).to.be.oneOf([201, 200]);
+        cy.wait('@authToken').should((interception: Interception) => {
+            const {response} = interception;
+            expect(response?.statusCode).to.be.oneOf([201, 200]);
         });
 
         cy.url().should('include', '?code');
