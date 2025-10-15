@@ -31,7 +31,8 @@ describe('Tenant Flow', () => {
         cy.get('#CREATE_USER_SUBMIT_BTN').click();
 
         cy.wait('@createUser').should(({request, response}) => {
-            expect(response.statusCode).to.be.oneOf([201, 200]);
+            expect(response, 'response').to.exist;
+            expect(response!.statusCode).to.be.oneOf([201, 200]);
             // expect(response && response.body).to.include('authentication_code')
         })
 

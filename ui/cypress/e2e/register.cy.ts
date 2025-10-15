@@ -37,7 +37,8 @@ describe('Register', () => {
         cy.get('button.btn-primary').contains('Create Tenant').click();
 
         cy.wait('@registerDomain').should(({response}) => {
-            expect(response && response.statusCode).to.be.oneOf([201, 200]);
+            expect(response, 'response').to.exist;
+            expect(response!.statusCode).to.be.oneOf([201, 200]);
         });
         // cy.contains('Your registration is successful!').should('exist');
     });

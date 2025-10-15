@@ -65,15 +65,17 @@ describe('Ambiguous Tenant Flow', () => {
         cy.get('#login-btn').click();
 
         cy.wait('@login').should(({response}) => {
-            expect(response?.statusCode).to.be.oneOf([201, 200]);
-            expect(response?.body).to.have.property('authentication_code');
+            expect(response, 'response').to.exist;
+            expect(response!.statusCode).to.be.oneOf([201, 200]);
+            expect(response!.body).to.have.property('authentication_code');
         });
 
         cy.wait('@checkAmbiguity').should(({response}) => {
-            expect(response?.statusCode).to.be.oneOf([201, 200]);
-            expect(response.body.hasAmbiguity).to.be.true;
-            expect(response.body.tenants).to.be.an('array');
-            expect(response.body.tenants.length).to.equal(2);
+            expect(response, 'response').to.exist;
+            expect(response!.statusCode).to.be.oneOf([201, 200]);
+            expect(response!.body.hasAmbiguity).to.be.true;
+            expect(response!.body.tenants).to.be.an('array');
+            expect(response!.body.tenants.length).to.equal(2);
         });
 
         // 3. Verify tenant selection page
@@ -84,7 +86,8 @@ describe('Ambiguous Tenant Flow', () => {
 
         // 5. Verify the hint update API was called
         cy.wait('@updateHint').should(({request, response}) => {
-            expect(response?.statusCode).to.be.oneOf([201, 200]);
+            expect(response, 'response').to.exist;
+            expect(response!.statusCode).to.be.oneOf([201, 200]);
             expect(request.body).to.have.property('subscriber_tenant_hint', TENANTS.gondor.domain);
         });
 

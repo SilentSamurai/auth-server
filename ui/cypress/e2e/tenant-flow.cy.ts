@@ -61,7 +61,8 @@ describe('Tenant Flow', () => {
         cy.get('#CONFIRMATION_YES_BTN').click();
 
         cy.wait('@RemoveMember').should(({request, response}) => {
-            expect(response.statusCode).to.be.oneOf([200]);
+            expect(response, 'response').to.exist;
+            expect(response!.statusCode).to.be.oneOf([200]);
         })
 
     })
@@ -91,7 +92,8 @@ describe('Tenant Flow', () => {
         cy.get('#CONFIRMATION_YES_BTN').click();
 
         cy.wait('@RemoveRole').should(({request, response}) => {
-            expect(response.statusCode).to.be.oneOf([200]);
+            expect(response, 'response').to.exist;
+            expect(response!.statusCode).to.be.oneOf([200]);
         })
 
     })
@@ -114,7 +116,8 @@ describe('Tenant Flow', () => {
         cy.get('.modal-footer').contains('button', 'Create').click();
 
         cy.wait('@CreateApp').should(({request, response}) => {
-            expect(response.statusCode).to.be.oneOf([201, 200]);
+            expect(response, 'response').to.exist;
+            expect(response!.statusCode).to.be.oneOf([201, 200]);
         });
 
         cy.contains("td", appName).should("exist");
@@ -138,7 +141,8 @@ describe('Tenant Flow', () => {
         cy.get('#CONFIRMATION_YES_BTN').click();
 
         cy.wait('@DeleteApp').should(({request, response}) => {
-            expect(response.statusCode).to.be.oneOf([201, 200]);
+            expect(response, 'response').to.exist;
+            expect(response!.statusCode).to.be.oneOf([201, 200]);
         });
 
     })

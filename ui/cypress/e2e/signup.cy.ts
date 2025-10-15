@@ -19,7 +19,8 @@ describe('Sign Up', () => {
         cy.intercept('POST', '**/api/signup*').as('signUp');
         cy.contains('button', 'Sign Up').click();
         cy.wait('@signUp').should(({ response }) => {
-            expect(response && response.statusCode).to.be.oneOf([201, 200]);
+            expect(response, 'response').to.exist;
+            expect(response!.statusCode).to.be.oneOf([201, 200]);
         });
         cy.contains('Sign up successful! Please verify your email, then try logging in again.').should('exist');
     });
@@ -42,7 +43,8 @@ describe('Sign Up', () => {
         cy.intercept('POST', '**/api/signup*').as('signUp');
         cy.contains('button', 'Sign Up').click();
         cy.wait('@signUp').should(({ response }) => {
-            expect(response && response.statusCode).to.be.oneOf([201, 200]);
+            expect(response, 'response').to.exist;
+            expect(response!.statusCode).to.be.oneOf([201, 200]);
         });
 
         // Fetch latest email and visit verification link (normalize https->http locally)

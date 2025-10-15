@@ -24,7 +24,8 @@ describe('login', () => {
         cy.get('#login-btn').click();
 
         cy.wait('@authCode').should(({request, response}) => {
-            expect(response.statusCode).to.be.oneOf([201]);
+            expect(response, 'response').to.exist;
+            expect(response!.statusCode).to.be.oneOf([201]);
             // expect(response && response.body).to.include('authentication_code')
         });
 
@@ -53,7 +54,8 @@ describe('login', () => {
         cy.get('#login-btn').click();
 
         cy.wait('@authCode').should(({request, response}) => {
-            expect(response.statusCode).to.be.oneOf([201]);
+            expect(response, 'response').to.exist;
+            expect(response!.statusCode).to.be.oneOf([201]);
             // expect(response && response.body).to.include('authentication_code')
         })
 
@@ -82,7 +84,8 @@ describe('login', () => {
         cy.get('#login-btn').click();
 
         cy.wait('@authCode').should(({request, response}) => {
-            expect(response.statusCode).to.be.oneOf([403]);
+            expect(response, 'response').to.exist;
+            expect(response!.statusCode).to.be.oneOf([403]);
             // expect(response && response.body).to.include('authentication_code')
         });
 
