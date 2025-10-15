@@ -27,7 +27,8 @@ describe('login', () => {
         cy.get('#login-btn').click();
 
         cy.wait('@authToken').should(({request, response}) => {
-            expect(response.statusCode).to.be.oneOf([201, 200]);
+            expect(response, 'response').to.exist;
+            expect(response!.statusCode).to.be.oneOf([201, 200]);
             // expect(response && response.body).to.include('authentication_code')
         });
 

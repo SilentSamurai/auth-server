@@ -39,7 +39,8 @@ describe('Register', () => {
         cy.intercept('POST', '**/api/signup*').as('signup');
         cy.get('button.btn-primary').contains('Sign Up').click();
         cy.wait('@signup').should(({response}) => {
-            expect(response && response.statusCode).to.be.oneOf([201, 200]);
+            expect(response, 'response').to.exist;
+            expect(response!.statusCode).to.be.oneOf([201, 200]);
         });
         cy.contains('Sign up successful! Please verify your email, then try logging in again.').should('exist');
 
