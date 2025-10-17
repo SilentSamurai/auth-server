@@ -23,6 +23,7 @@ import {Tenant} from "../entity/tenant.entity";
 import {SecurityService} from "../casl/security.service";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
+import {Environment} from "../config/environment.service";
 
 @Controller("api/users")
 @UseInterceptors(ClassSerializerInterceptor)
@@ -33,6 +34,7 @@ export class UsersController {
         private readonly tenantService: TenantService,
         private readonly mailService: MailService,
         private readonly securityService: SecurityService,
+        private readonly configService: Environment,
         @InjectRepository(User) private usersRepository: Repository<User>,
     ) {
     }
@@ -65,7 +67,8 @@ export class UsersController {
             user,
             body.email,
         );
-        const link = `https://${headers.host}/api/oauth/change-email/${token}`;
+        const baseBackendUrl = this.configService.get('BASE_BACKEND_URL');
+        const link = `${baseBackendUrl}/api/oauth/change-email/${token}`;
 
         const sent = await this.mailService.sendChangeEmailMail(
             body.email,

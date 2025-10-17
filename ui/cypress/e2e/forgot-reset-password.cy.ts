@@ -57,8 +57,8 @@ describe("Forgot/Reset Password (UI)", () => {
             const verificationUrl = normalizeDevLink(String(link));
             expect(verificationUrl, "verification link").to.match(/^https?:\/\//);
             // Always hit verification via API request, then continue the flow in the UI
-            cy.request({ method: 'GET', url: verificationUrl, failOnStatusCode: false })
-              .its('status').should('be.oneOf', [200, 201, 204, 301, 302, 303, 307, 308]);
+            cy.request({ method: 'GET', url: verificationUrl, followRedirect: false, failOnStatusCode: false })
+              .its('status').should('eq', 302);
             // After API verification, go to login UI to proceed
             cy.visit('/login?client_id=shire.local');
             cy.url().should('include', '/login');

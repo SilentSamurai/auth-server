@@ -31,6 +31,7 @@ import * as argon2 from "argon2";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 import * as yup from "yup";
+import {Environment} from "../config/environment.service";
 
 @Controller("api")
 @UseInterceptors(ClassSerializerInterceptor)
@@ -71,6 +72,7 @@ export class RegisterController {
         private readonly tenantService: TenantService,
         private readonly mailService: MailService,
         private readonly securityService: SecurityService,
+        private readonly configService: Environment,
         @InjectRepository(User) private usersRepository: Repository<User>,
     ) {
     }
@@ -114,7 +116,8 @@ export class RegisterController {
         user = await this.usersRepository.save(user);
 
         const token = await this.authService.createVerificationToken(user);
-        const link = `https://${headers.host}/api/oauth/verify-email/${token}`;
+        const baseBackendUrl = this.configService.get('BASE_BACKEND_URL');
+        const link = `${baseBackendUrl}/api/oauth/verify-email/${token}`;
 
         const sent = await this.mailService.sendVerificationMail(user, link);
         if (!sent) {
@@ -167,7 +170,8 @@ export class RegisterController {
             user = await this.usersRepository.save(user);
 
             const token = await this.authService.createVerificationToken(user);
-            const link = `https://${headers.host}/api/oauth/verify-email/${token}`;
+            const baseBackendUrl = this.configService.get('BASE_BACKEND_URL');
+            const link = `${baseBackendUrl}/api/oauth/verify-email/${token}`;
 
             const sent = await this.mailService.sendVerificationMail(
                 user,

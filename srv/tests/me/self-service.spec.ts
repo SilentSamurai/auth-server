@@ -75,10 +75,10 @@ describe('UsersController (e2e)', () => {
             // Call the verification endpoint
             const response = await app.getHttpServer().get(verificationPath);
 
-            // Verify the response
-            expect(response.status).toBe(200);
-            expect(response.body).toBeDefined();
-            expect(response.body.status).toBe(true);
+            // Verify the response - should redirect to UI login page
+            expect(response.status).toBe(302);
+            expect(response.headers.location).toBeDefined();
+            expect(response.headers.location).toContain('/login');
 
             console.log('User verified successfully');
         });
@@ -145,10 +145,11 @@ describe('UsersController (e2e)', () => {
             // Call the verification endpoint
             const response = await app.getHttpServer().get(verificationPath);
 
-            // Verify the response
-            expect(response.status).toBe(200);
-            expect(response.body).toBeDefined();
-            expect(response.body.status).toBe(true);
+            // Verify the response - should redirect to profile page with success flag
+            expect(response.status).toBe(302);
+            expect(response.headers.location).toBeDefined();
+            expect(response.headers.location).toContain('/profile');
+            expect(response.headers.location).toContain('emailChanged=true');
 
             console.log('User verified successfully');
         });

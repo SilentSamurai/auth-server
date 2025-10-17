@@ -48,20 +48,20 @@ import {MessageService} from 'primeng/api';
                 </button>
             </div>
         </div>
-        <!-- STEP 2: Name, Email, Password (currentStep=2) -->
+        <!-- STEP 2: Username, Email, Password (currentStep=2) -->
         <div *ngIf="currentStep === 2">
             <div class="form-group">
-                <label for="name">Name</label>
+                <label for="username">Username</label>
                 <div class="input-group">
-                    <input class="form-control" formControlName="name" id="name" type="text" placeholder="Name" />
+                    <input class="form-control" formControlName="username" id="username" type="text" placeholder="Username" />
                 </div>
-                <div *ngIf="registerForm.get('name')?.errors && (registerForm.get('name')?.touched || registerForm.get('name')?.dirty)"
+                <div *ngIf="registerForm.get('username')?.errors && (registerForm.get('username')?.touched || registerForm.get('username')?.dirty)"
                     class="alert alert-danger mt-2" role="alert">
-                    <div *ngIf="registerForm.get('name')?.errors?.['required']">Name is required</div>
-                    <div *ngIf="registerForm.get('name')?.errors?.['minlength']">Name must be at least 3
+                    <div *ngIf="registerForm.get('username')?.errors?.['required']">Username is required</div>
+                    <div *ngIf="registerForm.get('username')?.errors?.['minlength']">Username must be at least 3
                         characters
                     </div>
-                    <div *ngIf="registerForm.get('name')?.errors?.['maxlength']">Name must be at most 20
+                    <div *ngIf="registerForm.get('username')?.errors?.['maxlength']">Username must be at most 20
                         characters
                     </div>
                 </div>
@@ -95,7 +95,7 @@ import {MessageService} from 'primeng/api';
                 </div>
             </div>
             <div class="d-grid gap-2 py-3">
-                <button [disabled]="registerForm.invalid" class="btn btn-primary btn-block btn-lg">
+                <button [disabled]="registerForm.invalid || loading" class="btn btn-primary btn-block btn-lg">
                     Create Tenant
                 </button>
             </div>
@@ -164,7 +164,7 @@ export class RegisterComponent implements OnInit {
     ngOnInit(): void {
         // Initialize form controls with validation
         const controls: any = {
-            name: [
+            username: [
                 '',
                 [
                     Validators.required,
@@ -209,13 +209,14 @@ export class RegisterComponent implements OnInit {
         }
 
         // Extract form values
-        const {name, email, password, orgName, domain} =
+        const {username, email, password, orgName, domain} =
             this.registerForm.value;
         this.isSignUpFailed = false;
+        this.loading = true;
 
         try {
             await this.authService.registerTenant(
-                name,
+                username,
                 email,
                 password,
                 orgName,
@@ -243,6 +244,8 @@ export class RegisterComponent implements OnInit {
                 summary: 'Error',
                 detail: e.error.message || 'Registration failed. Please try again.'
             });
+        } finally {
+            this.loading = false;
         }
     }
 

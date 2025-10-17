@@ -235,6 +235,25 @@ export class LoginComponent implements OnInit {
 
     async ngOnInit(): Promise<void> {
         let params = this.route.snapshot.queryParamMap;
+        
+        // Check if user was redirected after email verification
+        if (params.has('verified')) {
+            const verified = params.get('verified') === 'true';
+            if (verified) {
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Email Verified',
+                    detail: 'Your email has been verified successfully. You can now login.'
+                });
+            } else {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Verification Failed',
+                    detail: 'Email verification failed. Please try again or contact support.'
+                });
+            }
+        }
+        
         if (params.has('client_id')) {
             this.client_id = params.get('client_id')!;
             this.loginForm.get('client_id')?.setValue(this.client_id);

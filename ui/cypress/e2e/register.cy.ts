@@ -20,7 +20,7 @@ describe('Register', () => {
     it('Should register a new tenant successfully', () => {
         const orgName = 'Test Org';
         const domain = uniqueDomain();
-        const name = 'Test User';
+        const username = 'Test User';
         const email = uniqueEmail();
         const password = 'testpass123';
 
@@ -30,7 +30,7 @@ describe('Register', () => {
         cy.get('button').contains('Next').click();
 
         // Step 2: Fill user details
-        cy.get('input#name').type(name);
+        cy.get('input#username').type(username);
         cy.get('input#email').type(email);
         cy.get('input#password').type(password);
         cy.intercept('POST', '**/api/register-domain*').as('registerDomain');
@@ -49,7 +49,7 @@ describe('Register', () => {
         cy.get('input#domain').type(uniqueDomain());
         cy.get('button').contains('Next').click();
         // Step 2
-        cy.get('input#name').type('Test User');
+        cy.get('input#username').type('Test User');
         cy.get('input#email').type('not-an-email');
         cy.get('input#password').type('testpass123');
         // cy.get('button.btn-primary').contains('Create Tenant').click();

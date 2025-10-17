@@ -241,11 +241,12 @@ export class AuthController {
     ): Promise<any> {
         const verified: boolean = await this.authService.verifyEmail(token);
 
-        let link: any = this.configService.get("VERIFY_EMAIL_LINK");
-        if (!link || link === "") {
+        const baseUrl = this.configService.get("BASE_URL");
+        if (!baseUrl) {
             response.send({status: verified});
         } else {
-            link += (link.endsWith("/") ? "" : "/") + token;
+            // Redirect to login with verification status
+            const link = `${baseUrl}/login?verified=${verified}`;
             response.redirect(link);
         }
     }
@@ -260,13 +261,8 @@ export class AuthController {
             body.email,
         );
         const token: string = await this.authService.createResetPasswordToken(user);
-
-        let link: any = this.configService.get("RESET_PASSWORD_LINK");
-        if (!link || link === "") {
-            link += "https://" + headers.host + "/reset-password/" + token;
-        } else {
-            link += (link.endsWith("/") ? "" : "/") + token;
-        }
+        const baseUrl = this.configService.get("BASE_URL");
+        const link = `${baseUrl}/reset-password/${token}`;
 
         const sent: boolean = await this.mailService.sendResetPasswordMail(
             user,
@@ -300,10 +296,12 @@ export class AuthController {
         const confirmed: boolean =
             await this.authService.confirmEmailChange(token);
 
-        let link: any = this.configService.get("CHANGE_EMAIL_LINK");
-        if (!link || link === "") {
+        const baseUrl = this.configService.get("BASE_URL");
+        if (!baseUrl) {
             response.send({status: confirmed});
         } else {
+            // Redirect to profile with confirmation status
+            const link = `${baseUrl}/profile?emailChanged=${confirmed}`;
             response.redirect(link);
         }
     }

@@ -56,9 +56,9 @@ describe('Sign Up', () => {
             const raw = body.links.find((l: string) => !l.endsWith(']')) || body.links[0];
             const verifyUrl = (raw || '').replace(/\]$/, '');
             const normalized = verifyUrl.replace(/^https:\/\//, 'http://');
-            cy.request({ url: normalized, followRedirect: true })
+            cy.request({ url: normalized, followRedirect: false, failOnStatusCode: false })
               .its('status')
-              .should('be.oneOf', [200, 301, 302, 303, 307, 308]);
+              .should('eq', 302);
         });
 
         // Now login
