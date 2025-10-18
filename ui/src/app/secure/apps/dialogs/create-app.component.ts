@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {AppService} from '../../../_services/app.service';
 import {SessionService} from '../../../_services/session.service';
@@ -33,7 +33,7 @@ import {SessionService} from '../../../_services/session.service';
         </div>
     `
 })
-export class CreateAppComponent {
+export class CreateAppComponent implements OnInit {
     app: any = {};
     tenantId?: string = undefined;
 
@@ -44,10 +44,21 @@ export class CreateAppComponent {
     ) {
     }
 
+    ngOnInit() {
+        console.log('CreateAppComponent initialized with tenantId:', this.tenantId);
+    }
+
     async onSubmit() {
         try {
+            // Validate tenantId is set
+            if (!this.tenantId) {
+                console.error('tenantId is not set');
+                alert('Error: Tenant ID is missing. Please try again.');
+                return;
+            }
+            
             await this.appService.createApp(
-                this.tenantId!,
+                this.tenantId,
                 this.app.name,
                 this.app.appUrl,
                 this.app.description
