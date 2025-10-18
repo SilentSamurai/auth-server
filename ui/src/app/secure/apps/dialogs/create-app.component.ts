@@ -6,31 +6,30 @@ import {SessionService} from '../../../_services/session.service';
 @Component({
     selector: 'app-create-app',
     template: `
-        <div class="modal-header">
-            <h4 class="modal-title">Create App</h4>
-            <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.dismiss()"></button>
-        </div>
-        <div class="modal-body">
-            <form (ngSubmit)="onSubmit()">
-                <div class="mb-3">
-                    <label for="name" class="form-label">Name</label>
-                    <input type="text" class="form-control" id="name" [(ngModel)]="app.name" name="name" required>
-                </div>
-                <div class="mb-3">
-                    <label for="appUrl" class="form-label">App URL</label>
-                    <input type="text" class="form-control" id="appUrl" [(ngModel)]="app.appUrl" name="appUrl" required>
-                </div>
-                <div class="mb-3">
-                    <label for="description" class="form-label">Description</label>
-                    <textarea class="form-control" id="description" [(ngModel)]="app.description" name="description"
-                              rows="3"></textarea>
-                </div>
-            </form>
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-outline-secondary" (click)="activeModal.dismiss()">Cancel</button>
-            <button type="button" class="btn btn-primary" (click)="onSubmit()">Create</button>
-        </div>
+        <app-standard-dialog title="Create App" subtitle="Add a new application to your tenant">
+            <app-dialog-tab name="App Details">
+                <form (ngSubmit)="onSubmit()">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="name" [(ngModel)]="app.name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="appUrl" class="form-label">App URL</label>
+                        <input type="text" class="form-control" id="appUrl" [(ngModel)]="app.appUrl" name="appUrl" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" [(ngModel)]="app.description" name="description"
+                                  rows="3"></textarea>
+                    </div>
+                </form>
+            </app-dialog-tab>
+
+            <app-dialog-footer>
+                <button type="button" class="btn btn-primary" (click)="onSubmit()">Create</button>
+                <button type="button" class="btn btn-secondary" (click)="activeModal.close()">Cancel</button>
+            </app-dialog-footer>
+        </app-standard-dialog>
     `
 })
 export class CreateAppComponent implements OnInit {
