@@ -567,6 +567,12 @@ export class TN02Component implements OnInit {
     }
 
     async onAddApp() {
+        console.log('Opening create app modal with tenantId:', this.tenant?.id);
+        if (!this.tenant?.id) {
+            console.error('Tenant ID is not available');
+            alert('Error: Tenant information is not loaded. Please refresh the page.');
+            return;
+        }
         const modalRef = await this.modalService.open(CreateAppComponent, {
             initData: {tenantId: this.tenant.id}
         });

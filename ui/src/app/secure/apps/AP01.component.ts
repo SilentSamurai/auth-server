@@ -113,9 +113,16 @@ export class AP01Component implements OnInit {
     }
 
     async openCreateModal() {
+        const tenantId = this.sessionService.userTenantId();
+        console.log('Opening create app modal with tenantId:', tenantId);
+        if (!tenantId) {
+            console.error('User tenant ID is not available');
+            alert('Error: Tenant information is not available. Please log in again.');
+            return;
+        }
         const result = await this.modalService.open(CreateAppComponent, {
             initData: {
-                tenantId: this.sessionService.userTenantId()
+                tenantId: tenantId
             }
         });
         if (result.is_ok()) {
