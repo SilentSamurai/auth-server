@@ -28,6 +28,7 @@ import {subject} from "@casl/ability";
 import {SubjectEnum} from "../entity/subjectEnum";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
+import {CurrentTenantId} from "../auth/current-tenant.decorator";
 import * as yup from 'yup';
 
 // Local MemberOperationSchema for this controller
@@ -48,12 +49,98 @@ export class MemberController {
     ) {
     }
 
-    @Get("/:tenantId/members")
+    // ─── New token-derived routes (no :tenantId in URL) ───
+
+    @Get("/my/members")
     @UseGuards(JwtAuthGuard)
-    async getTenantMembers(
+    async getMyTenantMembers(
         @Request() request: any,
-        @Param("tenantId") tenantId: string,
+        @CurrentTenantId() tenantId: string,
     ): Promise<User[]> {
+        return this._getTenantMembers(request, tenantId);
+    }
+
+    @Post("/my/members/add")
+    @UseGuards(JwtAuthGuard)
+    async addMyMember(
+        @Request() request,
+        @CurrentTenantId() tenantId: string,
+        @Body(new ValidationPipe(MemberOperationSchema))
+            body: { emails: string[] },
+    ): Promise<Tenant> {
+        return this._addMember(request, tenantId, body);
+    }
+
+    @Delete("/my/members/delete")
+    @UseGuards(JwtAuthGuard)
+    async removeMyMember(
+        @Request() request,
+        @CurrentTenantId() tenantId: string,
+        @Body(new ValidationPipe(MemberOperationSchema))
+            body: { emails: string[] },
+    ): Promise<Tenant> {
+        return this._removeMember(request, tenantId, body);
+    }
+
+    @Get("/my/member/:userId")
+    @UseGuards(JwtAuthGuard)
+    async getMyMember(
+        @Request() request,
+        @CurrentTenantId() tenantId: string,
+        @Param("userId") userId: string,
+    ): Promise<any> {
+        return this._getMember(request, tenantId, userId);
+    }
+
+    @Put("/my/member/:userId/roles")
+    @UseGuards(JwtAuthGuard)
+    async setMyMemberRoles(
+        @Request() request,
+        @CurrentTenantId() tenantId: string,
+        @Param("userId") userId: string,
+        @Body(new ValidationPipe(ValidationSchema.OperatingRoleSchema))
+            body: { roles: string[] },
+    ): Promise<Role[]> {
+        return this._setMemberRoles(request, tenantId, userId, body);
+    }
+
+    @Post("/my/member/:userId/roles/add")
+    @UseGuards(JwtAuthGuard)
+    async addRolesToMyMember(
+        @Request() request,
+        @CurrentTenantId() tenantId: string,
+        @Param("userId") userId: string,
+        @Body(new ValidationPipe(ValidationSchema.OperatingRoleSchema))
+            body: { roles: string[] },
+    ): Promise<Role[]> {
+        return this._addRolesToMember(request, tenantId, userId, body);
+    }
+
+    @Delete("/my/member/:userId/roles/remove")
+    @UseGuards(JwtAuthGuard)
+    async removeRolesFromMyMember(
+        @Request() request,
+        @CurrentTenantId() tenantId: string,
+        @Param("userId") userId: string,
+        @Body(new ValidationPipe(ValidationSchema.OperatingRoleSchema))
+            body: { roles: string[] },
+    ): Promise<Role[]> {
+        return this._removeRolesFromMember(request, tenantId, userId, body);
+    }
+
+    @Get("/my/member/:userId/roles")
+    @UseGuards(JwtAuthGuard)
+    async getMyMemberRoles(
+        @Request() request,
+        @CurrentTenantId() tenantId: string,
+        @Param("userId") userId: string,
+    ): Promise<any> {
+        return this._getMemberRoles(request, tenantId, userId);
+    }
+
+    // ─── Shared implementation methods ───
+
+    private async _getTenantMembers(request: any, tenantId: string): Promise<User[]> {
         let tenant = await this.tenantService.findById(request, tenantId);
         this.securityService.check(
             request,
@@ -82,21 +169,14 @@ export class MemberController {
         return members;
     }
 
-    @Post("/:tenantId/members/add")
-    @UseGuards(JwtAuthGuard)
-    async addMember(
-        @Request() request,
-        @Param("tenantId") tenantId: string,
-        @Body(new ValidationPipe(MemberOperationSchema))
-            body: { emails: string[] },
-    ): Promise<Tenant> {
+    private async _addMember(request: any, tenantId: string, body: { emails: string[] }): Promise<Tenant> {
         let tenant = await this.tenantService.findById(request, tenantId);
         this.securityService.check(
             request,
             Action.Update,
             subject(SubjectEnum.TENANT, tenant),
         );
-        const adminContext = await this.securityService.getAdminContextForInternalUse();
+        const adminContext = await this.securityService.getContextForMemberManagement(tenantId);
         for (const email of body.emails) {
             const isPresent = await this.usersService.existByEmail(
                 adminContext,
@@ -112,14 +192,7 @@ export class MemberController {
         return tenant;
     }
 
-    @Delete("/:tenantId/members/delete")
-    @UseGuards(JwtAuthGuard)
-    async removeMember(
-        @Request() request,
-        @Param("tenantId") tenantId: string,
-        @Body(new ValidationPipe(MemberOperationSchema))
-            body: { emails: string[] },
-    ): Promise<Tenant> {
+    private async _removeMember(request: any, tenantId: string, body: { emails: string[] }): Promise<Tenant> {
         let tenant = await this.tenantService.findById(request, tenantId);
         this.securityService.check(
             request,
@@ -136,13 +209,7 @@ export class MemberController {
         }
     }
 
-    @Get("/:tenantId/member/:userId")
-    @UseGuards(JwtAuthGuard)
-    async getMember(
-        @Request() request,
-        @Param("tenantId") tenantId: string,
-        @Param("userId") userId: string,
-    ): Promise<any> {
+    private async _getMember(request: any, tenantId: string, userId: string): Promise<any> {
         const user = await this.usersService.findById(request, userId);
         const tenant = await this.tenantService.findById(request, tenantId);
         this.securityService.check(
@@ -162,15 +229,7 @@ export class MemberController {
         };
     }
 
-    @Put("/:tenantId/member/:userId/roles")
-    @UseGuards(JwtAuthGuard)
-    async setMemberRoles(
-        @Request() request,
-        @Param("tenantId") tenantId: string,
-        @Param("userId") userId: string,
-        @Body(new ValidationPipe(ValidationSchema.OperatingRoleSchema))
-            body: { roles: string[] },
-    ): Promise<Role[]> {
+    private async _setMemberRoles(request: any, tenantId: string, userId: string, body: { roles: string[] }): Promise<Role[]> {
         const user = await this.usersService.findById(request, userId);
         let tenant = await this.tenantService.findById(request, tenantId);
         this.securityService.check(
@@ -186,18 +245,7 @@ export class MemberController {
         );
     }
 
-    /**
-     * Add roles to a given member without affecting existing roles.
-     */
-    @Post("/:tenantId/member/:userId/roles/add")
-    @UseGuards(JwtAuthGuard)
-    async addRolesToMember(
-        @Request() request,
-        @Param("tenantId") tenantId: string,
-        @Param("userId") userId: string,
-        @Body(new ValidationPipe(ValidationSchema.OperatingRoleSchema))
-            body: { roles: string[] },
-    ): Promise<Role[]> {
+    private async _addRolesToMember(request: any, tenantId: string, userId: string, body: { roles: string[] }): Promise<Role[]> {
         const user = await this.usersService.findById(request, userId);
         const tenant = await this.tenantService.findById(request, tenantId);
         this.securityService.check(
@@ -205,26 +253,11 @@ export class MemberController {
             Action.Update,
             subject(SubjectEnum.TENANT, tenant),
         );
-
-        // Only add specified roles
         await this.roleService.addRoles(request, user, tenant, body.roles);
-
-        // Return updated set of roles
         return this.roleService.getMemberRoles(request, tenant, user);
     }
 
-    /**
-     * Remove specified roles from a member without affecting other assigned roles.
-     */
-    @Delete("/:tenantId/member/:userId/roles/remove")
-    @UseGuards(JwtAuthGuard)
-    async removeRolesFromMember(
-        @Request() request,
-        @Param("tenantId") tenantId: string,
-        @Param("userId") userId: string,
-        @Body(new ValidationPipe(ValidationSchema.OperatingRoleSchema))
-            body: { roles: string[] },
-    ): Promise<Role[]> {
+    private async _removeRolesFromMember(request: any, tenantId: string, userId: string, body: { roles: string[] }): Promise<Role[]> {
         const user = await this.usersService.findById(request, userId);
         const tenant = await this.tenantService.findById(request, tenantId);
         this.securityService.check(
@@ -232,21 +265,11 @@ export class MemberController {
             Action.Update,
             subject(SubjectEnum.TENANT, tenant),
         );
-
-        // Remove specified roles
         await this.roleService.removeRoles(request, user, tenant, body.roles);
-
-        // Return updated set of roles
         return this.roleService.getMemberRoles(request, tenant, user);
     }
 
-    @Get("/:tenantId/member/:userId/roles")
-    @UseGuards(JwtAuthGuard)
-    async getMemberRoles(
-        @Request() request,
-        @Param("tenantId") tenantId: string,
-        @Param("userId") userId: string,
-    ): Promise<any> {
+    private async _getMemberRoles(request: any, tenantId: string, userId: string): Promise<any> {
         const user = await this.usersService.findById(request, userId);
         const tenant = await this.tenantService.findById(request, tenantId);
         this.securityService.check(

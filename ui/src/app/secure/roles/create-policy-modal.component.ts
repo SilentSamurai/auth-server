@@ -24,7 +24,6 @@ import {PolicyService} from '../../_services/policy.service';
             "
         >
             <app-dialog-tab name="Policy Details">
-                <!-- Reactive Form -->
                 <form [formGroup]="policyForm" novalidate>
                     <div class="mb-3">
                         <label class="form-label">Effect</label>
@@ -37,7 +36,6 @@ import {PolicyService} from '../../_services/policy.service';
                     <div class="mb-3">
                         <label class="form-label">Action</label>
                         <select class="form-select" formControlName="action">
-                            <!-- Show default actions plus an 'OTHER' option -->
                             <option *ngFor="let act of possibleActions" [value]="act">
                                 {{ act.toUpperCase() }}
                             </option>
@@ -52,7 +50,6 @@ import {PolicyService} from '../../_services/policy.service';
                         </div>
                     </div>
 
-                    <!-- Conditionally show a text field for custom action -->
                     <div class="mb-3" *ngIf="actionCtrl?.value === 'OTHER'">
                         <label class="form-label">Custom Action</label>
                         <input
@@ -112,7 +109,6 @@ import {PolicyService} from '../../_services/policy.service';
                 >
                     {{ viewOnly ? 'Close' : 'Cancel' }}
                 </button>
-                <!-- The type is 'submit' to trigger onSave via (ngSubmit) -->
                 <button
                     *ngIf="!viewOnly"
                     class="btn btn-primary"
@@ -183,7 +179,6 @@ export class CreatePolicyModalComponent implements OnInit {
             customActionControl?.updateValueAndValidity();
         });
 
-        // If viewOnly mode, disable the entire form
         if (this.viewOnly) {
             this.operation = 'VIEW';
             this.policyForm.disable();

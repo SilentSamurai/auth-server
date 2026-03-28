@@ -4,9 +4,7 @@ import {UsersService} from "../services/users.service";
 import {User} from "../entity/user.entity";
 import * as argon2 from "argon2";
 import {Tenant} from "../entity/tenant.entity";
-import {TenantService} from "../services/tenant.service";
 import {CryptUtil} from "../util/crypt.util";
-import {RoleEnum} from "../entity/roleEnum";
 import {ValidationPipe} from "../validation/validation.pipe";
 import {ValidationSchema} from "../validation/validation.schema";
 import {SecurityService} from "../casl/security.service";
@@ -23,6 +21,7 @@ import {
 import {AuthUserService} from "../casl/authUser.service";
 import * as yup from "yup";
 import {JwtServiceHS256, JwtServiceRS256} from "./jwt.service";
+import {TechnicalTokenService} from "../core/technical-token.service";
 
 const SecurityContextSchema = yup.object().shape({
     sub: yup.string().required("token is invalid"),
@@ -44,7 +43,7 @@ export class AuthService {
         private readonly securityService: SecurityService,
         private readonly authUserService: AuthUserService,
         private readonly userService: UsersService,
-        private readonly tenantService: TenantService,
+        private readonly technicalTokenService: TechnicalTokenService,
         private readonly jwtServiceRS256: JwtServiceRS256,
         private readonly jwtServiceHS256: JwtServiceHS256,
     ) {
@@ -58,6 +57,9 @@ export class AuthService {
         const user: User = await this.authUserService.findUserByEmail(email);
         const valid: boolean = await argon2.verify(user.password, password);
         if (!valid) {
+            throw new UnauthorizedException('Invalid credentials');
+        }
+        if (user.locked) {
             throw new UnauthorizedException('Invalid credentials');
         }
         return user;
@@ -78,6 +80,9 @@ export class AuthService {
             payload.domain,
         );
         let user = await this.authUserService.findUserByEmail(payload.email);
+        if (user.locked) {
+            throw new UnauthorizedException('Invalid credentials');
+        }
         await this.jwtServiceRS256.verify(refreshToken, {
             publicKey: tenant.publicKey,
         });
@@ -107,6 +112,9 @@ export class AuthService {
                 let user = await this.authUserService.findUserByEmail(
                     (payload as TenantToken).email,
                 );
+                if (user.locked) {
+                    throw new UnauthorizedException('Invalid credentials');
+                }
             }
             return payload;
         } catch (e) {
@@ -137,30 +145,14 @@ export class AuthService {
     }
 
     createTechnicalToken(tenant: Tenant, roles: string[]): TechnicalToken {
-        roles = roles instanceof Array ? roles : [];
-        return TechnicalToken.create({
-            sub: "oauth",
-            tenant: {
-                id: tenant.id,
-                name: tenant.name,
-                domain: tenant.domain,
-            },
-            scopes: [RoleEnum.TENANT_VIEWER, ...roles]
-        });
+        return this.technicalTokenService.createTechnicalToken(tenant, roles);
     }
 
     async createTechnicalAccessToken(
         tenant: Tenant,
         roles: string[],
     ): Promise<string> {
-        roles = roles instanceof Array ? roles : [];
-        const payload = this.createTechnicalToken(
-            tenant,
-            roles,
-        );
-        return this.jwtServiceRS256.sign(payload.asPlainObject(), {
-            privateKey: tenant.privateKey
-        });
+        return this.technicalTokenService.createTechnicalAccessToken(tenant, roles);
     }
 
     /**

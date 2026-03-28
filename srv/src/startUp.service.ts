@@ -3,6 +3,9 @@ import {Environment} from "./config/environment.service";
 import {UsersService} from "./services/users.service";
 import {RoleService} from "./services/role.service";
 import {TenantService} from "./services/tenant.service";
+import {GroupService} from "./services/group.service";
+import {AppService} from "./services/app.service";
+import {ClientService} from "./services/client.service";
 import {User} from "./entity/user.entity";
 import {readFile} from "fs/promises";
 import {Tenant} from "./entity/tenant.entity";
@@ -19,6 +22,9 @@ export class StartUpService implements OnModuleInit {
         private readonly usersService: UsersService,
         private readonly tenantService: TenantService,
         private readonly roleService: RoleService,
+        private readonly groupService: GroupService,
+        private readonly appService: AppService,
+        private readonly clientService: ClientService,
         private readonly securityService: SecurityService,
         private dataSource: DataSource,
     ) {
@@ -31,6 +37,7 @@ export class StartUpService implements OnModuleInit {
         if (!this.configService.isProduction()) {
             await this.populateDummyUsers();
             await this.createDummyTenantAndUser();
+            await this.createDummyAppsGroupsRoles();
         }
         await this.createAdminUser();
         await this.populateGlobalTenant();
@@ -39,7 +46,7 @@ export class StartUpService implements OnModuleInit {
     async createAdminUser() {
         try {
             let adminContext =
-                await this.securityService.getAdminContextForInternalUse();
+                await this.securityService.getContextForStartup();
             if (
                 !(await this.usersService.existByEmail(
                     adminContext,
@@ -90,7 +97,7 @@ export class StartUpService implements OnModuleInit {
         try {
             // 1) Get admin context for creating data
             const adminContext =
-                await this.securityService.getAdminContextForInternalUse();
+                await this.securityService.getContextForStartup();
 
             // 3) Define a list of dummy tenants to create
             const dummyTenants = [
@@ -162,7 +169,7 @@ export class StartUpService implements OnModuleInit {
         try {
             const data: string = await readFile("./users.json", "utf8");
             const adminContext =
-                await this.securityService.getAdminContextForInternalUse();
+                await this.securityService.getContextForStartup();
             const users = JSON.parse(data);
 
             for (const record of users.records) {
@@ -196,7 +203,7 @@ export class StartUpService implements OnModuleInit {
     async populateGlobalTenant() {
         try {
             let adminContext =
-                await this.securityService.getAdminContextForInternalUse();
+                await this.securityService.getContextForStartup();
             let globalTenantExists = await this.tenantService.existByDomain(
                 adminContext,
                 this.configService.get("SUPER_TENANT_DOMAIN"),
@@ -254,6 +261,122 @@ export class StartUpService implements OnModuleInit {
             }
         } catch (e) {
             console.error(e);
+        }
+    }
+
+    async createDummyAppsGroupsRoles(): Promise<void> {
+        try {
+            const adminContext = await this.securityService.getContextForStartup();
+
+            const dummyData = [
+                {
+                    domain: "shire.local",
+                    roles: ["Editor", "Reviewer"],
+                    groups: ["Hobbits", "Gardeners"],
+                    apps: [
+                        {name: "Shire Portal", appUrl: "https://portal.shire.local", description: "Main portal for Shire residents"},
+                        {name: "Harvest Tracker", appUrl: "https://harvest.shire.local", description: "Track crop yields"},
+                    ],
+                    clients: [
+                        {name: "Shire Web App", redirectUris: ["https://portal.shire.local/callback"], allowedScopes: "openid profile email"},
+                        {name: "Shire Mobile", redirectUris: ["https://mobile.shire.local/callback"], allowedScopes: "openid profile", isPublic: true},
+                    ],
+                },
+                {
+                    domain: "gondor.local",
+                    roles: ["Commander", "Scribe", "Diplomat"],
+                    groups: ["Rangers", "Tower Guard", "Council"],
+                    apps: [
+                        {name: "Gondor Defense", appUrl: "https://defense.gondor.local", description: "Military coordination"},
+                        {name: "Archive System", appUrl: "https://archive.gondor.local", description: "Historical records"},
+                        {name: "Trade Ledger", appUrl: "https://trade.gondor.local", description: "Commerce tracking"},
+                    ],
+                    clients: [
+                        {name: "Gondor Defense Client", redirectUris: ["https://defense.gondor.local/callback"], allowedScopes: "openid profile"},
+                    ],
+                },
+                {
+                    domain: "rohan.local",
+                    roles: ["Marshal", "Stable Master"],
+                    groups: ["Riders", "Horse Breeders"],
+                    apps: [
+                        {name: "Rohan Dispatch", appUrl: "https://dispatch.rohan.local", description: "Rider coordination"},
+                    ],
+                    clients: [],
+                },
+                {
+                    domain: "rivendell.local",
+                    roles: ["Loremaster", "Healer"],
+                    groups: ["Scholars", "Healers Guild"],
+                    apps: [
+                        {name: "Library of Imladris", appUrl: "https://library.rivendell.local", description: "Knowledge repository"},
+                    ],
+                    clients: [
+                        {name: "Rivendell Library Client", redirectUris: ["https://library.rivendell.local/callback"], allowedScopes: "openid profile"},
+                    ],
+                },
+            ];
+
+            for (const entry of dummyData) {
+                let tenant: Tenant;
+                try {
+                    tenant = await this.tenantService.findByDomain(adminContext, entry.domain);
+                } catch {
+                    this.logger.warn(`Tenant ${entry.domain} not found, skipping`);
+                    continue;
+                }
+
+                for (const roleName of entry.roles) {
+                    try {
+                        const exists = await this.roleService.findByNameAndTenant(adminContext, roleName, tenant);
+                        if (exists) continue;
+                    } catch {
+                        await this.roleService.create(adminContext, roleName, tenant);
+                        this.logger.log(`Created role: ${roleName} in ${entry.domain}`);
+                    }
+                }
+
+                for (const groupName of entry.groups) {
+                    try {
+                        const exists = await this.groupService.existsByNameAndTenantId(adminContext, groupName, tenant.id);
+                        if (exists) continue;
+                        await this.groupService.create(adminContext, groupName, tenant);
+                        this.logger.log(`Created group: ${groupName} in ${entry.domain}`);
+                    } catch (e) {
+                        this.logger.warn(`Group ${groupName} in ${entry.domain} may already exist`);
+                    }
+                }
+
+                for (const app of entry.apps) {
+                    try {
+                        await this.appService.createApp(adminContext, tenant.id, app.name, app.appUrl, app.description);
+                        this.logger.log(`Created app: ${app.name} in ${entry.domain}`);
+                    } catch (e) {
+                        this.logger.warn(`App ${app.name} in ${entry.domain} may already exist`);
+                    }
+                }
+
+                for (const client of entry.clients) {
+                    try {
+                        await this.clientService.createClient(
+                            adminContext,
+                            tenant.id,
+                            client.name,
+                            client.redirectUris,
+                            client.allowedScopes,
+                            undefined,
+                            undefined,
+                            undefined,
+                            client.isPublic,
+                        );
+                        this.logger.log(`Created client: ${client.name} in ${entry.domain}`);
+                    } catch (e) {
+                        this.logger.warn(`Client ${client.name} in ${entry.domain} may already exist`);
+                    }
+                }
+            }
+        } catch (error) {
+            this.logger.error("Error creating dummy apps/groups/roles:", error);
         }
     }
 }

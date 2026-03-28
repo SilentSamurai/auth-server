@@ -7,7 +7,7 @@ import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {ProfileComponent} from '../open-pages/profile.component';
 
 @Component({
-    selector: 'nav-bar',
+    selector: 'secure-nav-bar',
     template: `
         <nav
             class="navbar navbar-expand-lg navbar-dark"
@@ -68,6 +68,12 @@ import {ProfileComponent} from '../open-pages/profile.component';
                                     href="https://silentsamurai.github.io/auth-server"
                                 >API Docs</a
                                 >
+                                <a
+                                    *ngIf="isSuperAdmin"
+                                    class="dropdown-item"
+                                    routerLink="/admin"
+                                >Admin Panel</a
+                                >
                                 <div class="dropdown-divider"></div>
                                 <a
                                     class="dropdown-item"
@@ -90,9 +96,10 @@ import {ProfileComponent} from '../open-pages/profile.component';
         `,
     ],
 })
-export class AdminNavBarComponent implements OnInit {
+export class SecureNavBarComponent implements OnInit {
     isLoggedIn = false;
     email?: string;
+    isSuperAdmin = false;
     public isCollapsed = true;
 
     constructor(
@@ -110,6 +117,7 @@ export class AdminNavBarComponent implements OnInit {
         if (this.tokenStorageService.isLoggedIn()) {
             const user = this.tokenStorageService.getUser()!;
             this.email = user.email;
+            this.isSuperAdmin = this.tokenStorageService.isSuperAdmin();
         }
     }
 

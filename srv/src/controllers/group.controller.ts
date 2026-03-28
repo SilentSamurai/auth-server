@@ -17,6 +17,7 @@ import {ValidationSchema} from "../validation/validation.schema";
 import {TenantService} from "../services/tenant.service";
 import {GroupService} from "../services/group.service";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
+import {CurrentTenantId} from "../auth/current-tenant.decorator";
 
 @Controller("/api")
 @UseInterceptors(ClassSerializerInterceptor)
@@ -28,15 +29,19 @@ export class GroupController {
     ) {
     }
 
-    @Get("/tenant/:tenantId/groups")
+    // ─── New token-derived route ───
+
+    @Get("/tenant/my/groups")
     @UseGuards(JwtAuthGuard)
-    async getGroupsInTenant(
+    async getMyTenantGroups(
         @Request() request,
-        @Param("tenantId") tenantId: string,
+        @CurrentTenantId() tenantId: string,
     ): Promise<any> {
         let tenant = await this.tenantService.findById(request, tenantId);
         return await this.groupService.findByTenantId(request, tenant.id);
     }
+
+    // ─── Non-tenant routes (no migration needed) ───
 
     @Post("/group/create")
     @UseGuards(JwtAuthGuard)

@@ -17,7 +17,10 @@ import {Role} from "../entity/role.entity";
 import {TenantMember} from "../entity/tenant.members.entity";
 import {Group} from "../entity/group.entity";
 import {ServiceModule} from "../services/service.module";
-import {AuthController} from "./auth.controller";
+import {OAuthTokenController} from "./oauth-token.controller";
+import {OAuthVerificationController} from "./oauth-verification.controller";
+import {PasswordResetController} from "./password-reset.controller";
+import {EmailController} from "./email.controller";
 import {PolicyController} from "./policy.controller";
 import {GroupController} from "./group.controller";
 import {RoleControllerV2} from "./roleV2.controller";
@@ -25,6 +28,9 @@ import {RegisterController} from "./registration.controller";
 import {AppController} from "./app.controller";
 import {App} from "../entity/app.entity"
 import {TenantBitsController} from "./tenant-bits.controller";
+import {ClientController} from "./client.controller";
+import {Client} from "../entity/client.entity";
+import {AdminTenantController} from "./admin-tenant.controller";
 
 @Module(
     {
@@ -35,7 +41,7 @@ import {TenantBitsController} from "./tenant-bits.controller";
                 MailModule,
                 CaslModule,
                 ServiceModule,
-                TypeOrmModule.forFeature([User, Tenant, Role, TenantMember, Group, App])
+                TypeOrmModule.forFeature([User, Tenant, Role, TenantMember, Group, App, Client])
             ],
         controllers: [
             UsersController,
@@ -45,13 +51,18 @@ import {TenantBitsController} from "./tenant-bits.controller";
             RoleController,
             MainController,
             GenericSearchController,
-            AuthController,
+            OAuthTokenController,
+            OAuthVerificationController,
+            PasswordResetController,
+            EmailController,
             PolicyController,
             GroupController,
             RoleControllerV2,
             RegisterController,
             AppController,
-            TenantBitsController
+            TenantBitsController,
+            ClientController,
+            AdminTenantController
         ],
         providers: [],
         exports: []

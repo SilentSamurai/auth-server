@@ -22,6 +22,7 @@ import {SecurityService} from "../casl/security.service";
 import {SubjectEnum} from "../entity/subjectEnum";
 import {Action} from "../casl/actions.enum";
 import {subject} from "@casl/ability";
+import {CurrentTenantId} from "../auth/current-tenant.decorator";
 import * as yup from "yup";
 
 @Controller("api/tenant")
@@ -60,36 +61,26 @@ export class TenantController {
         return tenant;
     }
 
-    @Patch("/:tenantId")
+    // ─── New token-derived routes (no :tenantId in URL) ───
+
+    @Patch("/my")
     @UseGuards(JwtAuthGuard)
-    async updateTenant(
+    async updateMyTenant(
         @Request() request,
-        @Param("tenantId") tenantId: string,
+        @CurrentTenantId() tenantId: string,
         @Body(new ValidationPipe(TenantController.UpdateTenantSchema))
             body: { name?: string; allowSignUp?: boolean },
     ): Promise<Tenant> {
-        let tenant = await this.tenantService.findById(request, tenantId);
-        this.securityService.check(
-            request,
-            Action.Update,
-            subject(SubjectEnum.TENANT, tenant),
-        );
-        return this.tenantService.updateTenant(request, tenantId, body);
+        return this._updateTenant(request, tenantId, body);
     }
 
-    @Delete("/:tenantId")
+    @Delete("/my")
     @UseGuards(JwtAuthGuard)
-    async deleteTenant(
+    async deleteMyTenant(
         @Request() request,
-        @Param("tenantId") tenantId: string,
+        @CurrentTenantId() tenantId: string,
     ): Promise<Tenant> {
         return this.tenantService.deleteTenant(request, tenantId);
-    }
-
-    @Get("")
-    @UseGuards(JwtAuthGuard)
-    async getTenants(@Request() request): Promise<Tenant[]> {
-        return await this.tenantService.getAllTenants(request);
     }
 
     @Get("/my/credentials")
@@ -114,32 +105,28 @@ export class TenantController {
         };
     }
 
-    @Get("/:tenantId/credentials")
+    @Get("/my/info")
     @UseGuards(JwtAuthGuard)
-    async getTenantCredentials(
+    async getMyTenant(
         @Request() request,
-        @Param("tenantId") tenantId: string,
-    ): Promise<any> {
+        @CurrentTenantId() tenantId: string,
+    ): Promise<Tenant> {
+        return this._getTenant(request, tenantId);
+    }
+
+    // ─── Shared implementation methods ───
+
+    private async _updateTenant(request: any, tenantId: string, body: { name?: string; allowSignUp?: boolean }): Promise<Tenant> {
         let tenant = await this.tenantService.findById(request, tenantId);
         this.securityService.check(
             request,
-            Action.ReadCredentials,
+            Action.Update,
             subject(SubjectEnum.TENANT, tenant),
         );
-        return {
-            id: tenant.id,
-            clientId: tenant.clientId,
-            clientSecret: tenant.clientSecret,
-            publicKey: tenant.publicKey,
-        };
+        return this.tenantService.updateTenant(request, tenantId, body);
     }
 
-    @Get("/:tenantId")
-    @UseGuards(JwtAuthGuard)
-    async getTenant(
-        @Request() request,
-        @Param("tenantId") tenantId: string,
-    ): Promise<Tenant> {
+    private async _getTenant(request: any, tenantId: string): Promise<Tenant> {
         let tenant = await this.tenantService.findById(request, tenantId);
         this.securityService.check(
             request,

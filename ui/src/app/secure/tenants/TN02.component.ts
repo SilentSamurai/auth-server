@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MessageService} from 'primeng/api';
 import {TenantService} from '../../_services/tenant.service';
+import {AdminTenantService} from '../../_services/admin-tenant.service';
 import {SessionService} from '../../_services/session.service';
 import {UpdateTenantComponent} from './dialogs/update-tenant.component';
 import {AddMemberComponent} from './dialogs/add-member.component';
@@ -20,7 +21,7 @@ import {SubscriptionService} from "../../_services/subscription.service";
 @Component({
     selector: 'view-tenant',
     template: `
-        <nav-bar></nav-bar>
+        <secure-nav-bar></secure-nav-bar>
         <app-object-page [loading]="loading">
             <app-op-title>
                 {{ tenant.name }}
@@ -394,6 +395,7 @@ export class TN02Component implements OnInit {
 
     constructor(
         private tenantService: TenantService,
+        private adminTenantService: AdminTenantService,
         private tokenStorageService: SessionService,
         private messageService: MessageService,
         private actRoute: ActivatedRoute,
@@ -417,17 +419,15 @@ export class TN02Component implements OnInit {
             this.tenant_id = this.actRoute.snapshot.params['tenantId'];
             if (this.tokenStorageService.isTenantAdmin()) {
                 this.isTenantAdmin = true;
-                this.credentials = await this.tenantService.getTenantCredentials(
-                    this.tenant_id,
-                );
+                this.credentials = await this.tenantService.getTenantCredentials();
             }
             console.log(this.tenant_id);
-            this.tenant = await this.tenantService.getTenantDetails(this.tenant_id);
-            this.members = await this.tenantService.getMembers(this.tenant_id);
-            this.roles = await this.tenantService.getTenantRoles(this.tenant_id);
+            this.tenant = await this.tenantService.getTenantDetails();
+            this.members = await this.tenantService.getMembers();
+            this.roles = await this.tenantService.getTenantRoles();
 
-            const createdApps = await this.appService.getAppCreatedByTenantId(this.tenant_id);
-            const subscribedApps = await this.subscriptionService.getTenantSubscription(this.tenant_id);
+            const createdApps = await this.appService.getAppCreatedByTenantId();
+            const subscribedApps = await this.subscriptionService.getTenantSubscription();
 
             this.memberDataModel.setData(Array.isArray(this.members) ? this.members : []);
             this.rolesDataModel.setData(Array.isArray(this.roles) ? this.roles : []);
@@ -480,7 +480,6 @@ export class TN02Component implements OnInit {
                 try {
                     let deletedRole = await this.tenantService.deleteRole(
                         role.name,
-                        this.tenant.id,
                     );
                     this.messageService.add({
                         severity: 'success',
@@ -512,7 +511,6 @@ export class TN02Component implements OnInit {
                 try {
                     const removedMember = await this.tenantService.removeMember(
                         user.email,
-                        this.tenant.id,
                     );
                     this.messageService.add({
                         severity: 'success',
@@ -542,9 +540,9 @@ export class TN02Component implements OnInit {
             icon: 'pi pi-info-circle',
             accept: async () => {
                 try {
-                    let deletedTenant = await this.tenantService.deleteTenant(
-                        this.tenant.id,
-                    );
+                    let deletedTenant = this.tokenStorageService.isSuperAdmin()
+                        ? await this.adminTenantService.deleteTenant(this.tenant_id)
+                        : await this.tenantService.deleteTenant();
                     this.messageService.add({
                         severity: 'success',
                         summary: 'Success',
@@ -567,6 +565,12 @@ export class TN02Component implements OnInit {
     }
 
     async onAddApp() {
+        console.log('Opening create app modal with tenantId:', this.tenant?.id);
+        if (!this.tenant?.id) {
+            console.error('Tenant ID is not available');
+            alert('Error: Tenant information is not loaded. Please refresh the page.');
+            return;
+        }
         const modalRef = await this.modalService.open(CreateAppComponent, {
             initData: {tenantId: this.tenant.id}
         });
@@ -630,7 +634,7 @@ export class TN02Component implements OnInit {
             icon: 'pi pi-info-circle',
             accept: async () => {
                 try {
-                    await this.subscriptionService.unsubscribeFromApp(subscription.app.id, this.tenant.id);
+                    await this.subscriptionService.unsubscribeFromApp(subscription.app.id);
                     this.messageService.add({
                         severity: 'success',
                         summary: 'Success',
