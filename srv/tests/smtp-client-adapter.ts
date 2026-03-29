@@ -26,7 +26,8 @@ export interface EmailListResponse {
  * with the shared FakeSmtpServer over HTTP.
  */
 export class SmtpClientAdapter {
-    constructor(private readonly controlBaseUrl: string) {}
+    constructor(private readonly controlBaseUrl: string) {
+    }
 
     async getLatestEmail(params?: { to?: string; subject?: string; timeoutMs?: number }): Promise<EmailResponse> {
         const query = new URLSearchParams();
@@ -64,22 +65,33 @@ export class SmtpClientAdapter {
 
     /**
      * Mirrors FakeSmtpServer.waitForEmail() signature used in existing tests.
-     * Delegates to getLatestEmail with the appropriate params.
+     * Delegates to getLatestEmail with retries — if the server-side poll
+     * times out (404) the client retries the whole request, giving the
+     * NestJS app more time to process under heavy parallel load.
      */
     async waitForEmail(
         criteria: { to?: string; subject?: string | RegExp; containsLink?: boolean; sort?: string; limit?: number },
         timeoutMs = 10000,
         _pollInterval?: number,
+        maxRetries = 3,
     ): Promise<EmailResponse> {
         const subject = criteria.subject instanceof RegExp
             ? criteria.subject.source
             : criteria.subject;
 
-        return this.getLatestEmail({
-            to: criteria.to,
-            subject,
-            timeoutMs,
-        });
+        let lastError: Error | undefined;
+        for (let attempt = 0; attempt < maxRetries; attempt++) {
+            try {
+                return await this.getLatestEmail({
+                    to: criteria.to,
+                    subject,
+                    timeoutMs,
+                });
+            } catch (err: any) {
+                lastError = err;
+            }
+        }
+        throw lastError;
     }
 
     /** Build the full URL for a given path. */
@@ -92,7 +104,9 @@ export class SmtpClientAdapter {
             const url = this.buildUrl(path);
             http.get(url, (res) => {
                 let data = '';
-                res.on('data', (chunk) => { data += chunk; });
+                res.on('data', (chunk) => {
+                    data += chunk;
+                });
                 res.on('end', () => {
                     if (res.statusCode && res.statusCode >= 200 && res.statusCode < 300) {
                         try {
@@ -120,11 +134,13 @@ export class SmtpClientAdapter {
                 port: url.port,
                 path: url.pathname,
                 method: 'POST',
-                headers: { 'Content-Length': '0' },
+                headers: {'Content-Length': '0'},
             };
             const req = http.request(options, (res) => {
                 let data = '';
-                res.on('data', (chunk) => { data += chunk; });
+                res.on('data', (chunk) => {
+                    data += chunk;
+                });
                 res.on('end', () => {
                     if (res.statusCode && res.statusCode >= 200 && res.statusCode < 300) {
                         resolve();

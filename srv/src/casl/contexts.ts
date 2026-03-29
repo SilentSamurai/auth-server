@@ -57,6 +57,7 @@ export interface TenantTokenParams {
     tenant: TenantInfo;
     userTenant: TenantInfo;
     scopes: string[];
+    roles: string[];
     grant_type: GRANT_TYPES;
 }
 
@@ -85,16 +86,31 @@ export class InternalToken implements Token {
         return token;
     }
 
-    isTenantToken(): boolean { return false; }
-    isTechnicalToken(): boolean { return false; }
-    isInternalToken(): boolean { return true; }
-    asTenantToken(): TenantToken { throw new Error("Internal token cannot be cast to TenantToken"); }
-    asTechnicalToken(): TechnicalToken { throw new Error("Internal token cannot be cast to TechnicalToken"); }
+    isTenantToken(): boolean {
+        return false;
+    }
+
+    isTechnicalToken(): boolean {
+        return false;
+    }
+
+    isInternalToken(): boolean {
+        return true;
+    }
+
+    asTenantToken(): TenantToken {
+        throw new Error("Internal token cannot be cast to TenantToken");
+    }
+
+    asTechnicalToken(): TechnicalToken {
+        throw new Error("Internal token cannot be cast to TechnicalToken");
+    }
 }
 
 export class TenantToken implements Token {
     sub: string;
     scopes: string[];
+    roles: string[];
     grant_type: GRANT_TYPES;
     email: string;
     name: string;
@@ -111,6 +127,7 @@ export class TenantToken implements Token {
         token.tenant = params.tenant;
         token.userTenant = params.userTenant;
         token.scopes = params.scopes;
+        token.roles = params.roles;
         token.grant_type = params.grant_type;
         return token;
     }
@@ -136,6 +153,7 @@ export class TenantToken implements Token {
             tenant: this.tenant,
             userTenant: this.userTenant,
             scopes: this.scopes,
+            roles: this.roles,
             grant_type: this.grant_type
         };
     }

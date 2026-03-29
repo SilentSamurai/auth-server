@@ -1,4 +1,4 @@
-import {Injectable, Logger, NotFoundException, UnauthorizedException} from "@nestjs/common";
+import {Inject, Injectable, Logger, NotFoundException, UnauthorizedException} from "@nestjs/common";
 import {Environment} from "../config/environment.service";
 import {UsersService} from "../services/users.service";
 import {User} from "../entity/user.entity";
@@ -21,7 +21,6 @@ import {
 import {AuthUserService} from "../casl/authUser.service";
 import * as yup from "yup";
 import {TechnicalTokenService} from "../core/technical-token.service";
-import {Inject} from "@nestjs/common";
 import {HS256_TOKEN_GENERATOR, RS256_TOKEN_GENERATOR, TokenService} from "../core/token-abstraction";
 
 const SecurityContextSchema = yup.object().shape({
@@ -165,14 +164,11 @@ export class AuthService {
         user: User,
         tenant: Tenant,
         scopes: string[] = [],
+        roles: string[] = [],
     ): Promise<{ accessToken: string; refreshToken: string; scopes: string[] }> {
         if (!user.verified) {
             throw new UnauthorizedException('Email not verified');
         }
-
-        let roles = await this.authUserService.getMemberRoles(tenant, user);
-        let scopesFromRoles = roles.map((role) => role.name);
-        scopesFromRoles.push(...scopes);
 
         const accessTokenPayload = TenantToken.create({
             sub: user.email,
@@ -189,7 +185,8 @@ export class AuthService {
                 name: tenant.name,
                 domain: tenant.domain,
             },
-            scopes: scopesFromRoles,
+            scopes: [...new Set(scopes)].sort(),
+            roles: [...new Set(roles)].sort(),
             grant_type: GRANT_TYPES.PASSWORD,
         });
 
@@ -225,14 +222,11 @@ export class AuthService {
         issuingTenant: Tenant,
         userTenant: Tenant,
         scopes: string[] = [],
+        roles: string[] = [],
     ): Promise<{ accessToken: string; refreshToken: string; scopes: string[] }> {
         if (!user.verified) {
             throw new UnauthorizedException('Email not verified');
         }
-
-        let roles = await this.authUserService.getMemberRoles(issuingTenant, user);
-        let scopesFromRoles = roles.map((role) => role.name);
-        scopesFromRoles.push(...scopes);
 
         const accessTokenPayload = TenantToken.create({
             sub: user.email,
@@ -249,7 +243,8 @@ export class AuthService {
                 name: userTenant.name,
                 domain: userTenant.domain,
             },
-            scopes: scopesFromRoles,
+            scopes: [...new Set(scopes)].sort(),
+            roles: [...new Set(roles)].sort(),
             grant_type: GRANT_TYPES.PASSWORD,
         });
 

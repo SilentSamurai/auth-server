@@ -110,7 +110,8 @@ export class StartUpService implements OnModuleInit {
                 {name: "Lothlorien Tenant", domain: "lothlorien.local", signUp: false},
                 {name: "Mirkwood Tenant", domain: "mirkwood.local", signUp: true},
                 {name: "Erebor Tenant", domain: "erebor.local", signUp: false},
-                {name: "Isengard Tenant", domain: "isengard.local", signUp: false}
+                {name: "Isengard Tenant", domain: "isengard.local", signUp: false},
+                {name: "Perm Test Tenant", domain: "perm-test.local", signUp: false}
             ];
 
             // 4) Create each tenant and assign the existing user as owner
@@ -274,12 +275,29 @@ export class StartUpService implements OnModuleInit {
                     roles: ["Editor", "Reviewer"],
                     groups: ["Hobbits", "Gardeners"],
                     apps: [
-                        {name: "Shire Portal", appUrl: "https://portal.shire.local", description: "Main portal for Shire residents"},
-                        {name: "Harvest Tracker", appUrl: "https://harvest.shire.local", description: "Track crop yields"},
+                        {
+                            name: "Shire Portal",
+                            appUrl: "https://portal.shire.local",
+                            description: "Main portal for Shire residents"
+                        },
+                        {
+                            name: "Harvest Tracker",
+                            appUrl: "https://harvest.shire.local",
+                            description: "Track crop yields"
+                        },
                     ],
                     clients: [
-                        {name: "Shire Web App", redirectUris: ["https://portal.shire.local/callback"], allowedScopes: "openid profile email"},
-                        {name: "Shire Mobile", redirectUris: ["https://mobile.shire.local/callback"], allowedScopes: "openid profile", isPublic: true},
+                        {
+                            name: "Shire Web App",
+                            redirectUris: ["https://portal.shire.local/callback"],
+                            allowedScopes: "openid profile email tenant.read tenant.write"
+                        },
+                        {
+                            name: "Shire Mobile",
+                            redirectUris: ["https://mobile.shire.local/callback"],
+                            allowedScopes: "openid profile",
+                            isPublic: true
+                        },
                     ],
                 },
                 {
@@ -287,12 +305,24 @@ export class StartUpService implements OnModuleInit {
                     roles: ["Commander", "Scribe", "Diplomat"],
                     groups: ["Rangers", "Tower Guard", "Council"],
                     apps: [
-                        {name: "Gondor Defense", appUrl: "https://defense.gondor.local", description: "Military coordination"},
-                        {name: "Archive System", appUrl: "https://archive.gondor.local", description: "Historical records"},
+                        {
+                            name: "Gondor Defense",
+                            appUrl: "https://defense.gondor.local",
+                            description: "Military coordination"
+                        },
+                        {
+                            name: "Archive System",
+                            appUrl: "https://archive.gondor.local",
+                            description: "Historical records"
+                        },
                         {name: "Trade Ledger", appUrl: "https://trade.gondor.local", description: "Commerce tracking"},
                     ],
                     clients: [
-                        {name: "Gondor Defense Client", redirectUris: ["https://defense.gondor.local/callback"], allowedScopes: "openid profile"},
+                        {
+                            name: "Gondor Defense Client",
+                            redirectUris: ["https://defense.gondor.local/callback"],
+                            allowedScopes: "openid profile"
+                        },
                     ],
                 },
                 {
@@ -300,7 +330,11 @@ export class StartUpService implements OnModuleInit {
                     roles: ["Marshal", "Stable Master"],
                     groups: ["Riders", "Horse Breeders"],
                     apps: [
-                        {name: "Rohan Dispatch", appUrl: "https://dispatch.rohan.local", description: "Rider coordination"},
+                        {
+                            name: "Rohan Dispatch",
+                            appUrl: "https://dispatch.rohan.local",
+                            description: "Rider coordination"
+                        },
                     ],
                     clients: [],
                 },
@@ -309,11 +343,26 @@ export class StartUpService implements OnModuleInit {
                     roles: ["Loremaster", "Healer"],
                     groups: ["Scholars", "Healers Guild"],
                     apps: [
-                        {name: "Library of Imladris", appUrl: "https://library.rivendell.local", description: "Knowledge repository"},
+                        {
+                            name: "Library of Imladris",
+                            appUrl: "https://library.rivendell.local",
+                            description: "Knowledge repository"
+                        },
                     ],
                     clients: [
-                        {name: "Rivendell Library Client", redirectUris: ["https://library.rivendell.local/callback"], allowedScopes: "openid profile"},
+                        {
+                            name: "Rivendell Library Client",
+                            redirectUris: ["https://library.rivendell.local/callback"],
+                            allowedScopes: "openid profile"
+                        },
                     ],
+                },
+                {
+                    domain: "perm-test.local",
+                    roles: ["CustomTestRole"],
+                    groups: [],
+                    apps: [],
+                    clients: [],
                 },
             ];
 

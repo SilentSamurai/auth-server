@@ -8,6 +8,9 @@ import {AuthCodeService} from "./auth-code.service";
 import {User} from "../entity/user.entity";
 import {Tenant} from "../entity/tenant.entity";
 import {AuthContext} from "../casl/contexts";
+import {ScopeResolverService} from "../casl/scope-resolver.service";
+import {ClientService} from "../services/client.service";
+import {ScopeNormalizer} from "../casl/scope-normalizer";
 
 export interface TokenResponse {
     access_token: string;
@@ -20,6 +23,7 @@ export interface TokenResponse {
 export interface IssueTokenOptions {
     subscriberTenantHint?: string;
     authCode?: string;
+    requestedScope?: string;
 }
 
 @Injectable()
@@ -31,7 +35,10 @@ export class TokenIssuanceService {
         private readonly securityService: SecurityService,
         private readonly configService: Environment,
         private readonly authCodeService: AuthCodeService,
-    ) {}
+        private readonly scopeResolverService: ScopeResolverService,
+        private readonly clientService: ClientService,
+    ) {
+    }
 
     /**
      * Given a resolved user and tenant, handles the full pipeline:
@@ -47,12 +54,22 @@ export class TokenIssuanceService {
             throw new BadRequestException("User is not a member of the tenant and does not have a valid app subscription");
         }
 
+        // Resolve client allowedScopes for scope intersection
+        const clientAllowedScopes = await this.getClientAllowedScopes(tenant);
+
         if (isSubscribed) {
-            return this.issueSubscribedToken(adminContext, user, tenant, options);
+            return this.issueSubscribedToken(adminContext, user, tenant, clientAllowedScopes, options);
         }
 
+        const roles = await this.tenantService.getMemberRoles(adminContext, tenant.id, user);
+        const roleNames = roles.map(r => r.name);
+        const grantedScopes = this.scopeResolverService.resolveScopes(
+            options?.requestedScope ?? null,
+            clientAllowedScopes,
+        );
+
         const {accessToken, refreshToken, scopes} =
-            await this.authService.createUserAccessToken(user, tenant, []);
+            await this.authService.createUserAccessToken(user, tenant, grantedScopes, roleNames);
 
         return this.formatResponse(accessToken, refreshToken, scopes);
     }
@@ -105,6 +122,7 @@ export class TokenIssuanceService {
         adminContext: AuthContext,
         user: User,
         tenant: Tenant,
+        clientAllowedScopes: string,
         options?: IssueTokenOptions,
     ): Promise<TokenResponse> {
         let hint = options?.subscriberTenantHint;
@@ -127,11 +145,17 @@ export class TokenIssuanceService {
         }
 
         const subscribingTenant = ambiguityResult.resolvedTenant!;
-        let additionalScopes = await this.tenantService.getMemberRoles(adminContext, subscribingTenant.id, user);
+        let additionalRoles = await this.tenantService.getMemberRoles(adminContext, subscribingTenant.id, user);
+        const allRoleNames = additionalRoles.map(r => r.name);
+
+        const grantedScopes = this.scopeResolverService.resolveScopes(
+            options?.requestedScope ?? null,
+            clientAllowedScopes,
+        );
 
         const {accessToken, refreshToken, scopes} =
             await this.authService.createSubscribedUserAccessToken(
-                user, tenant, subscribingTenant, additionalScopes.map(r => r.name),
+                user, tenant, subscribingTenant, grantedScopes, allRoleNames,
             );
 
         return this.formatResponse(accessToken, refreshToken, scopes);
@@ -143,7 +167,19 @@ export class TokenIssuanceService {
             expires_in: this.configService.get("TOKEN_EXPIRATION_TIME_IN_SECONDS"),
             token_type: "Bearer",
             refresh_token: refreshToken,
-            ...(scopes?.length ? {scope: scopes.join(" ")} : {}),
+            scope: ScopeNormalizer.format(scopes || []),
         };
+    }
+
+    private async getClientAllowedScopes(tenant: Tenant): Promise<string> {
+        try {
+            const clients = await this.clientService.findByTenantId(tenant.id);
+            if (clients.length > 0 && clients[0].allowedScopes) {
+                return clients[0].allowedScopes;
+            }
+        } catch {
+            // Fall through to default
+        }
+        return 'openid profile email';
     }
 }
