@@ -3,8 +3,8 @@
  * 
  * This service is responsible for:
  * - Validating user credentials (email/password)
- * - Validating refresh tokens
  * - Validating client credentials (client_id/client_secret)
+ * - Creating access tokens (JWT) for users and technical clients
  * - Creating security context from tokens
  * 
  * It implements OAuth 2.0 token validation per RFC 6749 and JWT token handling.
@@ -24,7 +24,6 @@ import {
     ChangeEmailToken,
     EmailVerificationToken,
     GRANT_TYPES,
-    RefreshToken,
     ResetPasswordToken,
     TechnicalToken,
     TenantToken,
@@ -77,30 +76,6 @@ export class AuthService {
             throw OAuthException.invalidGrant('Invalid email or password');
         }
         return user;
-    }
-
-    async validateRefreshToken(
-        refreshToken: string,
-    ): Promise<{ tenant: Tenant; user: User }> {
-        let validationPipe = new ValidationPipe(
-            ValidationSchema.RefreshTokenSchema,
-        );
-        let payload: RefreshToken = (await validationPipe.transform(
-            this.tokenGenerator.decode(refreshToken),
-            null,
-        )) as RefreshToken;
-
-        let tenant = await this.authUserService.findTenantByDomain(
-            payload.domain,
-        );
-        let user = await this.authUserService.findUserByEmail(payload.email);
-        if (user.locked) {
-            throw OAuthException.invalidGrant('The refresh token is invalid or has expired');
-        }
-        await this.tokenGenerator.verify(refreshToken, {
-            publicKey: tenant.publicKey,
-        });
-        return {tenant, user};
     }
 
     async validateAccessToken(token: string): Promise<Token> {
@@ -158,6 +133,27 @@ export class AuthService {
         return tenant;
     }
 
+    /**
+     * Validate that a public client exists by its client_id.
+     *
+     * Per RFC 6749 §6, public clients cannot authenticate with a secret
+     * but must still provide a valid client_id so the server can verify
+     * the refresh token was issued to that client.
+     */
+    async validatePublicClient(clientId: string): Promise<Tenant> {
+        const tenant: Tenant =
+            await this.authUserService.findTenantByClientId(clientId);
+        const valid: boolean = CryptUtil.verifyClientId(
+            tenant.clientSecret,
+            clientId,
+            tenant.secretSalt,
+        );
+        if (!valid) {
+            throw OAuthException.invalidClient('Client authentication failed');
+        }
+        return tenant;
+    }
+
     createTechnicalToken(tenant: Tenant, roles: string[]): TechnicalToken {
         return this.technicalTokenService.createTechnicalToken(tenant, roles);
     }
@@ -177,7 +173,7 @@ export class AuthService {
         tenant: Tenant,
         scopes: string[] = [],
         roles: string[] = [],
-    ): Promise<{ accessToken: string; refreshToken: string; scopes: string[] }> {
+    ): Promise<{ accessToken: string; scopes: string[] }> {
         if (!user.verified) {
             throw new UnauthorizedException('Email not verified');
         }
@@ -202,27 +198,13 @@ export class AuthService {
             grant_type: GRANT_TYPES.PASSWORD,
         });
 
-        const refreshTokenPayload: RefreshToken = {
-            email: user.email,
-            domain: tenant.domain,
-        };
-
         const accessToken = await this.tokenGenerator.sign(accessTokenPayload.asPlainObject(), {
                 privateKey: tenant.privateKey,
                 issuer: this.configService.get("SUPER_TENANT_DOMAIN"),
             },
         );
 
-        const refreshToken = await this.tokenGenerator.sign(refreshTokenPayload, {
-                privateKey: tenant.privateKey,
-                expiresIn: this.configService.get(
-                    "REFRESH_TOKEN_EXPIRATION_TIME",
-                ),
-                issuer: this.configService.get("SUPER_TENANT_DOMAIN"),
-            },
-        );
-
-        return {accessToken, refreshToken, scopes: accessTokenPayload.scopes};
+        return {accessToken, scopes: accessTokenPayload.scopes};
     }
 
     /**
@@ -235,7 +217,7 @@ export class AuthService {
         userTenant: Tenant,
         scopes: string[] = [],
         roles: string[] = [],
-    ): Promise<{ accessToken: string; refreshToken: string; scopes: string[] }> {
+    ): Promise<{ accessToken: string; scopes: string[] }> {
         if (!user.verified) {
             throw new UnauthorizedException('Email not verified');
         }
@@ -260,27 +242,13 @@ export class AuthService {
             grant_type: GRANT_TYPES.PASSWORD,
         });
 
-        const refreshTokenPayload: RefreshToken = {
-            email: user.email,
-            domain: issuingTenant.domain,
-        };
-
         const accessToken = await this.tokenGenerator.sign(accessTokenPayload.asPlainObject(), {
                 privateKey: issuingTenant.privateKey,
                 issuer: this.configService.get("SUPER_TENANT_DOMAIN"),
             },
         );
 
-        const refreshToken = await this.tokenGenerator.sign(refreshTokenPayload, {
-                privateKey: issuingTenant.privateKey,
-                expiresIn: this.configService.get(
-                    "REFRESH_TOKEN_EXPIRATION_TIME",
-                ),
-                issuer: this.configService.get("SUPER_TENANT_DOMAIN"),
-            },
-        );
-
-        return {accessToken, refreshToken, scopes: accessTokenPayload.scopes};
+        return {accessToken, scopes: accessTokenPayload.scopes};
     }
 
     /**

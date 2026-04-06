@@ -12,6 +12,9 @@ import {ScopeResolverService} from "../casl/scope-resolver.service";
 import {ClientService} from "../services/client.service";
 import {ScopeNormalizer} from "../casl/scope-normalizer";
 import {IdTokenService} from "./id-token.service";
+import {RefreshTokenService} from "./refresh-token.service";
+import {UsersService} from "../services/users.service";
+import {OAuthException} from "../exceptions/oauth-exception";
 
 export interface TokenResponse {
     access_token: string;
@@ -40,6 +43,8 @@ export class TokenIssuanceService {
         private readonly scopeResolverService: ScopeResolverService,
         private readonly clientService: ClientService,
         private readonly idTokenService: IdTokenService,
+        private readonly refreshTokenService: RefreshTokenService,
+        private readonly usersService: UsersService,
     ) {
     }
 
@@ -71,8 +76,15 @@ export class TokenIssuanceService {
             clientAllowedScopes,
         );
 
-        const {accessToken, refreshToken, scopes} =
+        const {accessToken, scopes} =
             await this.authService.createUserAccessToken(user, tenant, grantedScopes, roleNames);
+
+        const {plaintext: refreshToken} = await this.refreshTokenService.create({
+            userId: user.id,
+            clientId: tenant.clientId,
+            tenantId: tenant.id,
+            scope: ScopeNormalizer.format(scopes),
+        });
 
         const idToken = await this.idTokenService.generateIdToken({
             user: {id: user.id, email: user.email, name: user.name},
@@ -163,10 +175,17 @@ export class TokenIssuanceService {
             clientAllowedScopes,
         );
 
-        const {accessToken, refreshToken, scopes} =
+        const {accessToken, scopes} =
             await this.authService.createSubscribedUserAccessToken(
                 user, tenant, subscribingTenant, grantedScopes, allRoleNames,
             );
+
+        const {plaintext: refreshToken} = await this.refreshTokenService.create({
+            userId: user.id,
+            clientId: tenant.clientId,
+            tenantId: tenant.id,
+            scope: ScopeNormalizer.format(scopes),
+        });
 
         const idToken = await this.idTokenService.generateIdToken({
             user: {id: user.id, email: user.email, name: user.name},
@@ -179,8 +198,51 @@ export class TokenIssuanceService {
     }
 
     /**
+     * Orchestrates the refresh_token grant:
+     * consume + rotate → resolve user/tenant → check locked → re-fetch roles → issue access token → format response.
+     */
+    async refreshToken(
+        plaintextToken: string,
+        clientId: string,
+        requestedScope?: string,
+    ): Promise<TokenResponse> {
+        const {plaintext: newRefreshToken, record} = await this.refreshTokenService.consumeAndRotate({
+            plaintextToken,
+            clientId,
+            requestedScope,
+        });
+
+        const adminContext = await this.securityService.getContextForTokenIssuance(record.tenantId);
+
+        const user = await this.usersService.findById(adminContext, record.userId);
+        if (user.locked) {
+            throw OAuthException.invalidGrant("The refresh token is invalid or has expired");
+        }
+
+        const tenant = await this.tenantService.findById(adminContext, record.tenantId);
+
+        const roles = await this.tenantService.getMemberRoles(adminContext, tenant.id, user);
+        const roleNames = roles.map(r => r.name);
+
+        const grantedScopes = ScopeNormalizer.parse(record.scope);
+
+        const {accessToken, scopes} =
+            await this.authService.createUserAccessToken(user, tenant, grantedScopes, roleNames);
+
+        const idToken = await this.idTokenService.generateIdToken({
+            user: {id: user.id, email: user.email, name: user.name},
+            tenant: {privateKey: tenant.privateKey},
+            clientId: tenant.clientId,
+            grantedScopes: scopes,
+        });
+
+        return this.formatResponse(accessToken, newRefreshToken, scopes, idToken);
+    }
+
+    /**
      * Issues a token for client_credentials grant (machine-to-machine).
      * No refresh_token or id_token — there is no user identity.
+     * Per RFC 6749 §4.4.3, the response MUST NOT include a refresh_token.
      */
     async issueClientCredentialsToken(
         tenant: Tenant,
@@ -204,10 +266,8 @@ export class TokenIssuanceService {
         scopes: string[],
         idToken?: string,
     ): TokenResponse {
-        const expiresIn = parseInt(
-            this.configService.get("TOKEN_EXPIRATION_TIME_IN_SECONDS"),
-            10,
-        );
+        const raw = this.configService.get("TOKEN_EXPIRATION_TIME_IN_SECONDS", "3600");
+        const expiresIn = parseInt(raw, 10);
 
         if (!Number.isFinite(expiresIn) || !Number.isInteger(expiresIn) || expiresIn <= 0) {
             throw new InternalServerErrorException(
@@ -233,11 +293,16 @@ export class TokenIssuanceService {
         return response;
     }
 
+    /**
+     * Resolve the allowed scopes for a specific tenant's client.
+     * Uses the tenant's clientId to find the exact client rather than
+     * arbitrarily picking the first client in the tenant.
+     */
     private async getClientAllowedScopes(tenant: Tenant): Promise<string> {
         try {
-            const clients = await this.clientService.findByTenantId(tenant.id);
-            if (clients.length > 0 && clients[0].allowedScopes) {
-                return clients[0].allowedScopes;
+            const client = await this.clientService.findByClientId(tenant.clientId);
+            if (client?.allowedScopes) {
+                return client.allowedScopes;
             }
         } catch {
             // Fall through to default
