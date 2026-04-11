@@ -31,8 +31,11 @@ import {TenantBitsController} from "./tenant-bits.controller";
 import {ClientController} from "./client.controller";
 import {Client} from "../entity/client.entity";
 import {AdminTenantController} from "./admin-tenant.controller";
+import {TenantKey} from "../entity/tenant-key.entity";
 import {IntrospectionController} from "./introspection.controller";
 import {RevocationController} from "./revocation.controller";
+import {JwksController} from "./jwks.controller";
+import {AdminKeysController} from "./admin-keys.controller";
 
 @Module(
     {
@@ -43,7 +46,7 @@ import {RevocationController} from "./revocation.controller";
                 MailModule,
                 CaslModule,
                 ServiceModule,
-                TypeOrmModule.forFeature([User, Tenant, Role, TenantMember, Group, App, Client])
+                TypeOrmModule.forFeature([User, Tenant, Role, TenantMember, Group, App, Client, TenantKey])
             ],
         controllers: [
             UsersController,
@@ -66,7 +69,9 @@ import {RevocationController} from "./revocation.controller";
             ClientController,
             AdminTenantController,
             IntrospectionController,
-            RevocationController
+            RevocationController,
+            JwksController,
+            AdminKeysController
         ],
         providers: [],
         exports: []

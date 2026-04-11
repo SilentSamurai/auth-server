@@ -101,6 +101,12 @@ tasks:
       - npm test
       - npm run e2e:test
 
+  "cypress:spec":
+    desc: "Run a single Cypress spec file (usage: task cypress:spec -- cypress/e2e/admin-keys.cy.ts)"
+    dir: ./ui
+    cmds:
+      - npm run e2e:spec --spec={{.CLI_ARGS}}
+
   # ─── Kubernetes ───
 
   download-and-import-image:
@@ -152,3 +158,16 @@ tasks:
     dir: ./helm
     cmds:
       - helm upgrade --install auth-server ./auth-server --namespace auth-server --create-namespace --dry-run --debug
+
+  kill-ports:
+    desc: Kill processes listening on ports 9001 and 4200
+    cmds:
+      - cmd: powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/kill-ports.ps1
+        platforms: [windows]
+        ignore_error: true
+      - cmd: kill -9 $(lsof -t -i:9001) 2>/dev/null || true
+        platforms: [linux, darwin]
+        ignore_error: true
+      - cmd: kill -9 $(lsof -t -i:4200) 2>/dev/null || true
+        platforms: [linux, darwin]
+        ignore_error: true

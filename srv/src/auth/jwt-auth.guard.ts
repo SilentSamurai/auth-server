@@ -16,6 +16,7 @@ import {AuthService} from "./auth.service";
 import {CaslAbilityFactory} from "../casl/casl-ability.factory";
 import {GRANT_TYPES, TechnicalToken, TenantToken, Token} from "../casl/contexts";
 import {Response} from "express";
+import {parseBasicAuthHeader} from "../util/http.util";
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
@@ -73,7 +74,7 @@ export class JwtAuthGuard implements CanActivate {
                 throw new UnauthorizedException("Invalid or expired JWT token");
             }
         } else if (authHeader.startsWith("Basic ")) {
-            const credentials = extractBasicAuthCredentials(authHeader);
+            const credentials = parseBasicAuthHeader(authHeader);
             if (!credentials) {
                 response.setHeader('WWW-Authenticate', 'Bearer realm="auth-server"');
                 throw new UnauthorizedException("Invalid Basic Authentication credentials",);
@@ -94,7 +95,7 @@ export class JwtAuthGuard implements CanActivate {
             response.setHeader('WWW-Authenticate', 'Bearer realm="auth-server"');
             throw new UnauthorizedException("Unsupported authentication type");
         }
-        if (payload.grant_type === GRANT_TYPES.PASSWORD) {
+        if (payload.isTenantToken()) {
             request["user"] = payload;
         }
         const ability = this.caslAbilityFactory.createForSecurityContext(payload);
@@ -105,7 +106,7 @@ export class JwtAuthGuard implements CanActivate {
         if (payload.isTenantToken()) {
             const tenantToken = payload as TenantToken;
             request["RESOLVED_TENANT_ID"] = tenantToken.tenant.id;
-            request["RESOLVED_USER_TENANT_ID"] = tenantToken.userTenant.id;
+            request["RESOLVED_USER_TENANT_ID"] = tenantToken.userTenant?.id;
         } else if (payload.isTechnicalToken()) {
             const technicalToken = payload as TechnicalToken;
             request["RESOLVED_TENANT_ID"] = technicalToken.tenant.id;
@@ -137,16 +138,4 @@ export class JwtAuthGuard implements CanActivate {
 function extractTokenFromHeader(request: any) {
     let extractor = ExtractJwt.fromAuthHeaderAsBearerToken();
     return extractor(request);
-}
-
-function extractBasicAuthCredentials(
-    authHeader: string,
-): { username: string; password: string } | null {
-    const base64Credentials = authHeader.split(" ")[1];
-    const decoded = Buffer.from(base64Credentials, "base64").toString("utf-8");
-    const [username, password] = decoded.split(":");
-    if (!username || !password) {
-        return null;
-    }
-    return {username, password};
 }

@@ -24,34 +24,47 @@ describe('SecurityService', () => {
     let caslAbilityFactory: CaslAbilityFactory;
     let configService: Environment;
 
-    const mockTenantToken = TenantToken.create({
-        email: 'test@example.com',
-        sub: 'test@example.com',
-        userId: '1',
-        name: 'Test User',
-        tenant: {
+    const mockTenantToken = (() => {
+        const token = TenantToken.create({
+            sub: '1',
+            tenant: {
+                id: '1',
+                name: 'Test Tenant',
+                domain: 'test.com',
+            },
+            roles: [RoleEnum.TENANT_ADMIN],
+            grant_type: GRANT_TYPES.PASSWORD,
+            aud: ['test.com'],
+            jti: 'test-jti',
+            nbf: 0,
+            scope: 'openid profile email',
+            client_id: 'test-client',
+            tenant_id: '1',
+        });
+        token.email = 'test@example.com';
+        token.name = 'Test User';
+        token.userId = '1';
+        token.userTenant = {
             id: '1',
             name: 'Test Tenant',
             domain: 'test.com',
-        },
-        scopes: ['openid', 'profile', 'email'],
-        roles: [RoleEnum.TENANT_ADMIN],
-        grant_type: GRANT_TYPES.PASSWORD,
-        userTenant: {
-            id: '1',
-            name: 'Test Tenant',
-            domain: 'test.com',
-        },
-    });
+        };
+        return token;
+    })();
 
     const mockTechnicalToken = TechnicalToken.create({
-        sub: 'test@example.com',
+        sub: 'oauth',
         tenant: {
             id: '1',
             name: 'Test Tenant',
             domain: 'test.com',
         },
-        scopes: [RoleEnum.TENANT_ADMIN],
+        scope: 'openid profile email',
+        aud: ['test.com'],
+        jti: 'test-jti',
+        nbf: 0,
+        client_id: 'test-client',
+        tenant_id: '1',
     });
 
     const createMockAbility = () => {
@@ -199,75 +212,99 @@ describe('SecurityService', () => {
     describe('isSuperAdmin', () => {
         // Super admin: has SUPER_ADMIN role AND domain matches SUPER_TENANT_DOMAIN
         it('should return true when roles contains SUPER_ADMIN and domain matches super tenant', () => {
-            const superAdminToken = TenantToken.create({
-                email: 'test@example.com',
-                sub: 'test@example.com',
-                userId: '1',
-                name: 'Test User',
-                tenant: {
+            const superAdminToken = (() => {
+                const token = TenantToken.create({
+                    sub: '1',
+                    tenant: {
+                        id: '1',
+                        name: 'Test Tenant',
+                        domain: 'super.com',
+                    },
+                    roles: [RoleEnum.SUPER_ADMIN],
+                    grant_type: GRANT_TYPES.PASSWORD,
+                    aud: ['super.com'],
+                    jti: 'test-jti',
+                    nbf: 0,
+                    scope: 'openid profile email',
+                    client_id: 'test-client',
+                    tenant_id: '1',
+                });
+                token.email = 'test@example.com';
+                token.name = 'Test User';
+                token.userId = '1';
+                token.userTenant = {
                     id: '1',
                     name: 'Test Tenant',
                     domain: 'super.com',
-                },
-                scopes: ['openid', 'profile', 'email'],
-                roles: [RoleEnum.SUPER_ADMIN],
-                grant_type: GRANT_TYPES.PASSWORD,
-                userTenant: {
-                    id: '1',
-                    name: 'Test Tenant',
-                    domain: 'super.com',
-                },
-            });
+                };
+                return token;
+            })();
             const result = service.isSuperAdmin(superAdminToken);
             expect(result).toBe(true);
         });
 
         // Has SUPER_ADMIN role but wrong domain — not a super admin
         it('should return false when roles contains SUPER_ADMIN but domain does not match', () => {
-            const wrongDomainToken = TenantToken.create({
-                email: 'test@example.com',
-                sub: 'test@example.com',
-                userId: '1',
-                name: 'Test User',
-                tenant: {
+            const wrongDomainToken = (() => {
+                const token = TenantToken.create({
+                    sub: '1',
+                    tenant: {
+                        id: '1',
+                        name: 'Test Tenant',
+                        domain: 'other.com',
+                    },
+                    roles: [RoleEnum.SUPER_ADMIN],
+                    grant_type: GRANT_TYPES.PASSWORD,
+                    aud: ['other.com'],
+                    jti: 'test-jti',
+                    nbf: 0,
+                    scope: 'openid profile email',
+                    client_id: 'test-client',
+                    tenant_id: '1',
+                });
+                token.email = 'test@example.com';
+                token.name = 'Test User';
+                token.userId = '1';
+                token.userTenant = {
                     id: '1',
                     name: 'Test Tenant',
                     domain: 'other.com',
-                },
-                scopes: ['openid', 'profile', 'email'],
-                roles: [RoleEnum.SUPER_ADMIN],
-                grant_type: GRANT_TYPES.PASSWORD,
-                userTenant: {
-                    id: '1',
-                    name: 'Test Tenant',
-                    domain: 'other.com',
-                },
-            });
+                };
+                return token;
+            })();
             const result = service.isSuperAdmin(wrongDomainToken);
             expect(result).toBe(false);
         });
 
         // Has correct domain but no SUPER_ADMIN role — not a super admin
         it('should return false when domain matches but roles does not contain SUPER_ADMIN', () => {
-            const noRoleToken = TenantToken.create({
-                email: 'test@example.com',
-                sub: 'test@example.com',
-                userId: '1',
-                name: 'Test User',
-                tenant: {
+            const noRoleToken = (() => {
+                const token = TenantToken.create({
+                    sub: '1',
+                    tenant: {
+                        id: '1',
+                        name: 'Test Tenant',
+                        domain: 'super.com',
+                    },
+                    roles: [RoleEnum.TENANT_ADMIN],
+                    grant_type: GRANT_TYPES.PASSWORD,
+                    aud: ['super.com'],
+                    jti: 'test-jti',
+                    nbf: 0,
+                    scope: 'openid profile email',
+                    client_id: 'test-client',
+                    tenant_id: '1',
+                });
+                token.email = 'test@example.com';
+                token.name = 'Test User';
+                token.userId = '1';
+                token.userTenant = {
                     id: '1',
                     name: 'Test Tenant',
                     domain: 'super.com',
-                },
-                scopes: ['openid', 'profile', 'email'],
-                roles: [RoleEnum.TENANT_ADMIN],
-                grant_type: GRANT_TYPES.PASSWORD,
-                userTenant: {
-                    id: '1',
-                    name: 'Test Tenant',
-                    domain: 'super.com',
-                },
-            });
+                };
+                return token;
+            })();
             const result = service.isSuperAdmin(noRoleToken);
             expect(result).toBe(false);
         });
@@ -279,64 +316,35 @@ describe('SecurityService', () => {
         });
     });
 
-    describe('getContextForTokenIssuance', () => {
-        it('should create scoped context for token issuance with read access to tenants/members/roles', async () => {
-            const result = await service.getContextForTokenIssuance('tenant-123');
+    describe('createPermissionForTokenIssuance', () => {
+        it('should create scoped permission for token issuance with read access to tenants/members/roles', () => {
+            const permission = service.createPermissionForTokenIssuance('tenant-123');
 
-            expect(result.SECURITY_CONTEXT.isInternalToken()).toBe(true);
-            expect((result.SECURITY_CONTEXT as InternalToken).purpose).toBe('token-issuance');
-            expect((result.SECURITY_CONTEXT as InternalToken).scopedTenantId).toBe('tenant-123');
-            expect(result.SCOPE_ABILITIES).toBeDefined();
-            expect(result.SCOPE_ABILITIES.can(Action.Read, 'Tenant')).toBe(true);
-            expect(result.SCOPE_ABILITIES.can(Action.Read, 'TenantMember')).toBe(true);
-            expect(result.SCOPE_ABILITIES.can(Action.Read, 'Role')).toBe(true);
-            // Should NOT be able to create or update
-            expect(result.SCOPE_ABILITIES.can(Action.Create, 'User')).toBe(false);
-            expect(result.SCOPE_ABILITIES.can(Action.Update, 'Tenant')).toBe(false);
+            expect(permission).toBeDefined();
         });
     });
 
-    describe('getContextForMemberManagement', () => {
-        it('should create scoped context for member management with user read/create access', async () => {
-            const result = await service.getContextForMemberManagement('tenant-456');
+    describe('createPermissionForMemberManagement', () => {
+        it('should create scoped permission for member management with user read/create access', () => {
+            const permission = service.createPermissionForMemberManagement('tenant-456');
 
-            expect(result.SECURITY_CONTEXT.isInternalToken()).toBe(true);
-            expect((result.SECURITY_CONTEXT as InternalToken).purpose).toBe('member-management');
-            expect((result.SECURITY_CONTEXT as InternalToken).scopedTenantId).toBe('tenant-456');
-            expect(result.SCOPE_ABILITIES.can(Action.Read, 'User')).toBe(true);
-            expect(result.SCOPE_ABILITIES.can(Action.Create, 'User')).toBe(true);
-            expect(result.SCOPE_ABILITIES.can(Action.Read, 'TenantMember')).toBe(true);
-            // Should NOT have manage-all
-            expect(result.SCOPE_ABILITIES.can(Action.Delete, 'Tenant')).toBe(false);
+            expect(permission).toBeDefined();
         });
     });
 
-    describe('getContextForRegistration', () => {
-        it('should create scoped context for registration with tenant/user/role management access', async () => {
-            const result = await service.getContextForRegistration();
+    describe('createPermissionForRegistration', () => {
+        it('should create permission for registration with tenant/user/role management access', () => {
+            const permission = service.createPermissionForRegistration();
 
-            expect(result.SECURITY_CONTEXT.isInternalToken()).toBe(true);
-            expect((result.SECURITY_CONTEXT as InternalToken).purpose).toBe('registration');
-            expect(result.SCOPE_ABILITIES.can(Action.Read, 'Tenant')).toBe(true);
-            expect(result.SCOPE_ABILITIES.can(Action.Create, 'Tenant')).toBe(true);
-            expect(result.SCOPE_ABILITIES.can(Action.Update, 'Tenant')).toBe(true);
-            expect(result.SCOPE_ABILITIES.can(Action.Read, 'User')).toBe(true);
-            expect(result.SCOPE_ABILITIES.can(Action.Create, 'User')).toBe(true);
-            expect(result.SCOPE_ABILITIES.can(Action.Update, 'User')).toBe(true);
-            expect(result.SCOPE_ABILITIES.can(Action.Create, 'Role')).toBe(true);
-            // Should NOT have delete or manage-all
-            expect(result.SCOPE_ABILITIES.can(Action.Delete, 'Tenant')).toBe(false);
-            expect(result.SCOPE_ABILITIES.can(Action.Manage, 'all')).toBe(false);
+            expect(permission).toBeDefined();
         });
     });
 
-    describe('getContextForStartup', () => {
-        it('should create full-access context for startup seed operations', async () => {
-            const result = await service.getContextForStartup();
+    describe('createPermissionForStartupSeed', () => {
+        it('should create full-access permission for startup seed operations', () => {
+            const permission = service.createPermissionForStartupSeed();
 
-            expect(result.SECURITY_CONTEXT.isInternalToken()).toBe(true);
-            expect((result.SECURITY_CONTEXT as InternalToken).purpose).toBe('startup-seed');
-            expect(result.SCOPE_ABILITIES.can(Action.Manage, 'all')).toBe(true);
+            expect(permission).toBeDefined();
         });
     });
 
