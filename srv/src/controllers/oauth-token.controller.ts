@@ -14,13 +14,16 @@ import {
     Body,
     ClassSerializerInterceptor,
     Controller,
+    Get,
     Logger,
     Post,
+    Query,
     Req,
+    Res,
     UseFilters,
     UseInterceptors,
 } from "@nestjs/common";
-import {Request as ExpressRequest} from "express";
+import {Request as ExpressRequest, Response} from "express";
 
 import {User} from "../entity/user.entity";
 import {AuthService} from "../auth/auth.service";
@@ -32,12 +35,15 @@ import {GRANT_TYPES} from "../casl/contexts";
 import {AuthUserService} from "../casl/authUser.service";
 import {TokenIssuanceService} from "../auth/token-issuance.service";
 import {OAuthException} from "../exceptions/oauth-exception";
+import {AuthorizeRedirectException} from "../exceptions/authorize-redirect.exception";
 import {OAuthExceptionFilter} from "../exceptions/filter/oauth-exception.filter";
+import {AuthorizeService, AuthorizeQueryParams} from "../auth/authorize.service";
 import {CryptUtil} from "../util/crypt.util";
 import {parseBasicAuthHeader} from "../util/http.util";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Client} from "../entity/client.entity";
 import {Repository} from "typeorm";
+import {LoginSessionService} from "../auth/login-session.service";
 
 const logger = new Logger("OAuthTokenController");
 
@@ -50,9 +56,47 @@ export class OAuthTokenController {
         private readonly authCodeService: AuthCodeService,
         private readonly authUserService: AuthUserService,
         private readonly tokenIssuanceService: TokenIssuanceService,
+        private readonly authorizeService: AuthorizeService,
+        private readonly loginSessionService: LoginSessionService,
         @InjectRepository(Client)
         private readonly clientRepository: Repository<Client>,
     ) {
+    }
+
+    @Get("/authorize")
+    async authorize(@Query() query: AuthorizeQueryParams, @Res() res: Response): Promise<void> {
+        try {
+            const validated = await this.authorizeService.validateAuthorizeRequest(query);
+
+            const params = new URLSearchParams();
+            params.set('client_id', validated.clientId);
+            params.set('redirect_uri', validated.redirectUri);
+            params.set('scope', validated.scope);
+            params.set('state', validated.state);
+            if (validated.codeChallenge) {
+                params.set('code_challenge', validated.codeChallenge);
+            }
+            if (validated.codeChallenge) {
+                params.set('code_challenge_method', validated.codeChallengeMethod);
+            }
+            if (validated.nonce) {
+                params.set('nonce', validated.nonce);
+            }
+
+            res.redirect(302, `/authorize?${params.toString()}`);
+        } catch (error) {
+            if (error instanceof AuthorizeRedirectException) {
+                const params = new URLSearchParams();
+                params.set('error', error.errorCode);
+                params.set('error_description', error.errorDescription);
+                if (error.state) {
+                    params.set('state', error.state);
+                }
+                res.redirect(302, `${error.redirectUri}?${params.toString()}`);
+                return;
+            }
+            throw error;
+        }
     }
 
     @Post("/login")
@@ -115,6 +159,9 @@ export class OAuthTokenController {
             }
         }
 
+        // Validate redirect_uri against registered URIs before proceeding
+        await this.authorizeService.validateRedirectUriForClient(body.client_id, body.redirect_uri);
+
         const result = await this.tokenIssuanceService.resolveLoginAccess(
             user, tenant, body.subscriber_tenant_hint,
         );
@@ -126,6 +173,8 @@ export class OAuthTokenController {
             };
         }
 
+        const session = await this.loginSessionService.createSession(user.id, tenant.id);
+
         const auth_code = await this.authCodeService.createAuthToken(
             user,
             tenant,
@@ -136,6 +185,7 @@ export class OAuthTokenController {
             body.redirect_uri,
             body.scope,
             body.nonce,
+            session.sid,
         );
 
         // Update pkceMethodUsed if client used S256 for the first time
@@ -220,10 +270,17 @@ export class OAuthTokenController {
             throw OAuthException.invalidGrant("The authorization code was not issued to this client or the client_id is invalid.");
         }
 
-        // Verify redirect_uri binding
+        // Verify redirect_uri binding (RFC 6749 §4.1.3)
         if (authCode.redirectUri) {
-            if (!body.redirect_uri || body.redirect_uri !== authCode.redirectUri) {
-                throw OAuthException.invalidGrant("redirect_uri does not match");
+            if (!body.redirect_uri) {
+                throw OAuthException.invalidGrant(
+                    'The redirect_uri parameter is required when it was included in the authorization request'
+                );
+            }
+            if (body.redirect_uri !== authCode.redirectUri) {
+                throw OAuthException.invalidGrant(
+                    'The redirect_uri does not match the value used in the authorization request'
+                );
             }
         }
 
@@ -241,6 +298,7 @@ export class OAuthTokenController {
             subscriberTenantHint: authCode.subscriberTenantHint,
             requestedScope: body.scope || authCode.scope,
             nonce: authCode.nonce ?? undefined,
+            sid: authCode.sid ?? undefined,
             grant_type: GRANT_TYPES.CODE,
         });
     }
