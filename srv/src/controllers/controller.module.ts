@@ -37,6 +37,8 @@ import {RevocationController} from "./revocation.controller";
 import {JwksController} from "./jwks.controller";
 import {AdminKeysController} from "./admin-keys.controller";
 import {UserInfoController} from "./userinfo.controller";
+import {UserConsent} from "../entity/user-consent.entity";
+import {DiscoveryController} from "./discovery.controller";
 
 @Module(
     {
@@ -47,7 +49,7 @@ import {UserInfoController} from "./userinfo.controller";
                 MailModule,
                 CaslModule,
                 ServiceModule,
-                TypeOrmModule.forFeature([User, Tenant, Role, TenantMember, Group, App, Client, TenantKey])
+                TypeOrmModule.forFeature([User, Tenant, Role, TenantMember, Group, App, Client, TenantKey, UserConsent])
             ],
         controllers: [
             UsersController,
@@ -73,7 +75,8 @@ import {UserInfoController} from "./userinfo.controller";
             RevocationController,
             JwksController,
             AdminKeysController,
-            UserInfoController
+            UserInfoController,
+            DiscoveryController
         ],
         providers: [],
         exports: []

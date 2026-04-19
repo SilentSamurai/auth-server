@@ -20,6 +20,12 @@ import {AppModule} from '../src/app.module';
 import {HttpExceptionFilter} from '../src/exceptions/filter/http-exception.filter';
 import {createFakeSmtpServer, FakeSmtpServer} from '../src/mail/FakeSmtpServer';
 import {createTenantAppServer, TenantAppServer} from './apps_&_subscription/tenant-app-server';
+import {TestUtilsController} from './test-utils.controller';
+import {TypeOrmModule} from '@nestjs/typeorm';
+import {LoginSession} from '../src/entity/login-session.entity';
+import {AuthCode} from '../src/entity/auth_code.entity';
+import {User} from '../src/entity/user.entity';
+import {CorsOriginService} from '../src/services/cors-origin.service';
 
 declare global {
     var __SHARED_TEST_APP__: INestApplication | undefined;
@@ -50,12 +56,38 @@ export default async function globalSetup(): Promise<void> {
         await webhookServer.listen();
 
         // 4. Compile and start the NestJS app on a dynamic port
+        //    Register TestUtilsController for test-only endpoints (session expiry, auth code lookup)
         const moduleRef = await Test.createTestingModule({
-            imports: [AppModule],
+            imports: [AppModule, TypeOrmModule.forFeature([LoginSession, AuthCode, User])],
+            controllers: [TestUtilsController],
         }).compile();
 
         app = moduleRef.createNestApplication();
         app.useGlobalFilters(new HttpExceptionFilter());
+
+        // Enable CORS with dynamic origin validation (mirrors setup.ts)
+        if (Environment.get("ENABLE_CORS")) {
+            const corsOriginService = app.get(CorsOriginService);
+            app.enableCors({
+                origin: async (origin, callback) => {
+                    if (!origin) {
+                        callback(null, true);
+                        return;
+                    }
+                    try {
+                        const allowed = await corsOriginService.isAllowedOrigin(origin);
+                        callback(null, allowed ? origin : false);
+                    } catch (error) {
+                        console.warn(`CORS origin validation error for origin "${origin}":`, error);
+                        callback(null, false);
+                    }
+                },
+                methods: ['GET', 'POST', 'OPTIONS'],
+                allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+                credentials: true,
+            });
+        }
+
         await app.listen(0);
 
         const addr = app.getHttpServer().address();

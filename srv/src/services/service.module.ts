@@ -21,6 +21,8 @@ import {Role} from "../entity/role.entity";
 import {UserRole} from "../entity/user.roles.entity";
 import {TenantKey} from "../entity/tenant-key.entity";
 import {JwksService} from "./jwks.service";
+import {DiscoveryService} from "./discovery.service";
+import {CorsOriginService} from "./cors-origin.service";
 
 @Module(
     {
@@ -30,8 +32,8 @@ import {JwksService} from "./jwks.service";
             CoreModule,
         ],
         controllers: [],
-        providers: [GroupService, AppService, TenantBitsService, ClientService, JwksService],
-        exports: [GroupService, AppService, TenantBitsService, ClientService, CoreModule, JwksService],
+        providers: [GroupService, AppService, TenantBitsService, ClientService, JwksService, DiscoveryService, CorsOriginService],
+        exports: [GroupService, AppService, TenantBitsService, ClientService, CoreModule, JwksService, DiscoveryService, CorsOriginService],
     })
 export class ServiceModule {
 }
