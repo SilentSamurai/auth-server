@@ -8,7 +8,7 @@ import {HttpExceptionFilter} from "./exceptions/filter/http-exception.filter";
 import * as express from "express";
 import * as process from "node:process";
 import type {FakeSmtpServer} from "./mail/FakeSmtpServer";
-import {CorsOriginService} from "./services/cors-origin.service";
+import {CorsInterceptor} from "./interceptors/cors.interceptor";
 import * as cookieParser from "cookie-parser";
 
 // Hold reference to SMTP server (if started) so we can close it on shutdown
@@ -71,7 +71,18 @@ export async function prepareApp() {
     }
     app.use(cookieParser(cookieSecret));
 
-    // Add HEAD / handler
+    // OPTIONS preflight: allow all origins (no auth needed)
+    app.use('/', (req, res, next) => {
+        if (req.method === 'OPTIONS') {
+            res.setHeader("Access-Control-Allow-Origin", "*");
+            res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
+            res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept");
+            return res.status(204).end();
+        }
+        next();
+    });
+
+    // HEAD / handler
     app.use('/', (req, res, next) => {
         if (req.method === 'HEAD' && req.path === '/') {
             return res.status(200).end();
@@ -79,30 +90,9 @@ export async function prepareApp() {
         next();
     });
 
-    if (Environment.get("ENABLE_CORS")) {
-        const corsOriginService = app.get(CorsOriginService);
-        app.enableCors({
-            origin: async (origin, callback) => {
-                // Non-browser requests (server-to-server) — allow
-                if (!origin) {
-                    callback(null, true);
-                    return;
-                }
-
-                try {
-                    const allowed = await corsOriginService.isAllowedOrigin(origin);
-                    callback(null, allowed ? origin : false);
-                } catch (error) {
-                    // Fail-closed: on error, reject the origin
-                    console.warn(`CORS origin validation error for origin "${origin}":`, error);
-                    callback(null, false);
-                }
-            },
-            methods: ['GET', 'POST', 'OPTIONS'],
-            allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
-            credentials: true,
-        });
-    }
+    // Register CORS interceptor globally
+    const corsInterceptor = app.get(CorsInterceptor);
+    app.useGlobalInterceptors(corsInterceptor);
 
     app.use(
         express.json({

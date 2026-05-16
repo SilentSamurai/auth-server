@@ -97,4 +97,10 @@ export class ClientService {
             this.http.delete<void>(`${API_URL}/clients/${clientId}`)
         );
     }
+
+    async getDiscoveryDocument(domain: string): Promise<any> {
+        return lastValueFrom(
+            this.http.get(`/${domain}/.well-known/openid-configuration`)
+        );
+    }
 }

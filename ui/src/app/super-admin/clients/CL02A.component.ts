@@ -74,7 +74,7 @@ import {EditClientAdminComponent} from './dialogs/edit-client-admin.component';
                                >{{ client.tenant.name }}</a>
                         </app-attribute>
                         <app-attribute label="Discovery URL">
-                            <div class="d-flex align-items-center gap-1">
+                            <div class="d-flex align-items-center gap-1 mb-1">
                                 <code class="small text-wrap text-break">{{ getDiscoveryPath() }}</code>
                                 <button class="btn btn-sm btn-outline-secondary p-0 px-1"
                                         type="button"
@@ -88,6 +88,18 @@ import {EditClientAdminComponent} from './dialogs/edit-client-admin.component';
                                         aria-label="Open discovery URL in new tab">
                                     <i class="fa fa-external-link"></i>
                                 </button>
+                                <button class="btn btn-sm btn-outline-info p-0 px-1"
+                                        type="button"
+                                        (click)="toggleDiscoveryDocument()"
+                                        aria-label="Toggle discovery document view">
+                                    <i class="fa" [ngClass]="showDiscoveryDoc ? 'fa-eye-slash' : 'fa-eye'"></i>
+                                </button>
+                            </div>
+                            <div *ngIf="showDiscoveryDoc" class="mt-1">
+                                <div *ngIf="discoveryLoading" class="text-muted small">Loading...</div>
+                                <pre *ngIf="discoveryDocument" class="bg-light p-2 rounded small"
+                                     style="max-height: 400px; overflow-y: auto; white-space: pre-wrap;">{{ discoveryDocument | json }}</pre>
+                                <div *ngIf="discoveryError" class="text-danger small">{{ discoveryError }}</div>
                             </div>
                         </app-attribute>
                         <app-attribute label="Response Types">
@@ -115,6 +127,10 @@ import {EditClientAdminComponent} from './dialogs/edit-client-admin.component';
 export class CL02AComponent implements OnInit {
     loading: boolean = false;
     client: Client | null = null;
+    showDiscoveryDoc = false;
+    discoveryLoading = false;
+    discoveryDocument: any = null;
+    discoveryError = '';
 
     constructor(
         private clientService: ClientService,
@@ -238,5 +254,26 @@ export class CL02AComponent implements OnInit {
 
     openDiscoveryUrl() {
         window.open(this.getDiscoveryUrl(), '_blank');
+    }
+
+    async toggleDiscoveryDocument() {
+        if (this.showDiscoveryDoc) {
+            this.showDiscoveryDoc = false;
+            return;
+        }
+        if (this.discoveryDocument) {
+            this.showDiscoveryDoc = true;
+            return;
+        }
+        this.showDiscoveryDoc = true;
+        this.discoveryLoading = true;
+        this.discoveryError = '';
+        try {
+            this.discoveryDocument = await this.clientService.getDiscoveryDocument(this.client!.tenant.domain);
+        } catch (e) {
+            this.discoveryError = 'Failed to load discovery document';
+        } finally {
+            this.discoveryLoading = false;
+        }
     }
 }
