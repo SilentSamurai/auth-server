@@ -48,6 +48,7 @@ import {LoginSessionService} from "../auth/login-session.service";
 import {ConsentService} from "../auth/consent.service";
 import {ScopeResolverService} from "../casl/scope-resolver.service";
 import {ClientService} from "../services/client.service";
+import {CorsOriginService} from "../services/cors-origin.service";
 import {ResourceIndicatorValidator} from "../auth/resource-indicator.validator";
 import {Environment} from "../config/environment.service";
 import {RefreshTokenService} from "../auth/refresh-token.service";
@@ -81,6 +82,7 @@ export class OAuthTokenController {
         private readonly appService: AppService,
         private readonly flowIdCookieService: FlowIdCookieService,
         private readonly csrfTokenService: CsrfTokenService,
+        private readonly corsOriginService: CorsOriginService,
     ) {
     }
 
@@ -600,6 +602,7 @@ export class OAuthTokenController {
     @Post("/token")
     async oauthToken(
         @Req() req: ExpressRequest,
+        @Res({passthrough: true}) res: Response,
         @Body() body: any,
     ): Promise<any> {
         let clientId = body.client_id;
@@ -611,6 +614,19 @@ export class OAuthTokenController {
         }
         body.client_id = clientId;
         body.client_secret = clientSecret;
+
+        const origin = req.headers.origin;
+        if (origin && clientId) {
+            try {
+                if (await this.corsOriginService.isOriginAllowedForClient(origin, clientId)) {
+                    res.setHeader("Access-Control-Allow-Origin", origin);
+                    res.setHeader("Access-Control-Allow-Credentials", "true");
+                    res.setHeader("Vary", "Origin");
+                }
+            } catch {
+                // Client lookup failed — let the grant handler produce the error response
+            }
+        }
 
         switch (body.grant_type) {
             case GRANT_TYPES.CODE:

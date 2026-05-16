@@ -76,7 +76,6 @@ docker run -d \
 | `REFRESH_TOKEN_EXPIRATION_TIME` | Refresh token lifetime                        | `7d`                    |
 | `PORT`                          | Backend HTTP port                             | `9001`                  |
 | `ENABLE_HTTPS`                  | Enable TLS                                    | `false`                 |
-| `ENABLE_CORS`                   | Enable CORS protection                        | `true`                  |
 
 > **Note:** Change `SUPER_ADMIN_PASSWORD` before exposing the server publicly. The defaults are for local development only.
 
@@ -180,7 +179,6 @@ Available profiles: `development`, `testing`, `production`, `cf`, `aws`.
 | `NODE_ENV`                | Environment mode (`development`/`production`) | `development` |
 | `DATABASE_HOST`           | PostgreSQL host                               | `localhost`   |
 | `ENABLE_FAKE_SMTP_SERVER` | Enable built-in dev SMTP server               | `true`        |
-| `ENABLE_CORS`             | Enable CORS protection                        | `true`        |
 | `ENABLE_HTTPS`            | Enable TLS/HTTPS                              | `false`       |
 
 ---

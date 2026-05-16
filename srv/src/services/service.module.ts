@@ -25,6 +25,7 @@ import {DiscoveryService} from "./discovery.service";
 import {CorsOriginService} from "./cors-origin.service";
 import {SubscriptionService} from "./subscription.service";
 import {AppClientAuditLogger} from "../log/app-client-audit.logger";
+import {CorsInterceptor} from "../interceptors/cors.interceptor";
 
 @Module(
     {
@@ -34,8 +35,8 @@ import {AppClientAuditLogger} from "../log/app-client-audit.logger";
             CoreModule,
         ],
         controllers: [],
-        providers: [GroupService, AppService, TenantBitsService, ClientService, JwksService, DiscoveryService, CorsOriginService, SubscriptionService, AppClientAuditLogger],
-        exports: [GroupService, AppService, TenantBitsService, ClientService, CoreModule, JwksService, DiscoveryService, CorsOriginService, SubscriptionService, AppClientAuditLogger],
+        providers: [GroupService, AppService, TenantBitsService, ClientService, JwksService, DiscoveryService, CorsOriginService, SubscriptionService, AppClientAuditLogger, CorsInterceptor],
+        exports: [GroupService, AppService, TenantBitsService, ClientService, CoreModule, JwksService, DiscoveryService, CorsOriginService, SubscriptionService, AppClientAuditLogger, CorsInterceptor],
     })
 export class ServiceModule {
 }

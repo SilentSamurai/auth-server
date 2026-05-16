@@ -28,7 +28,7 @@ import {LoginSession} from '../src/entity/login-session.entity';
 import {AuthCode} from '../src/entity/auth_code.entity';
 import {User} from '../src/entity/user.entity';
 import {Tenant} from '../src/entity/tenant.entity';
-import {CorsOriginService} from '../src/services/cors-origin.service';
+import {CorsInterceptor} from '../src/interceptors/cors.interceptor';
 import {getTestPorts, TestPorts} from './test-ports';
 import * as cookieParser from "cookie-parser";
 import * as express from "express";
@@ -133,6 +133,17 @@ export default async function globalSetup(): Promise<void> {
         }
         app.use(cookieParser(cookieSecret));
 
+        // OPTIONS preflight: allow all origins (mirrors setup.ts)
+        app.use('/', (req, res, next) => {
+            if (req.method === 'OPTIONS') {
+                res.setHeader("Access-Control-Allow-Origin", "*");
+                res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
+                res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept");
+                return res.status(204).end();
+            }
+            next();
+        });
+
         // Add HEAD / handler (mirrors setup.ts)
         app.use('/', (req, res, next) => {
             if (req.method === 'HEAD' && req.path === '/') {
@@ -155,28 +166,9 @@ export default async function globalSetup(): Promise<void> {
             }),
         );
 
-        // Enable CORS with dynamic origin validation (mirrors setup.ts)
-        if (Environment.get("ENABLE_CORS")) {
-            const corsOriginService = app.get(CorsOriginService);
-            app.enableCors({
-                origin: async (origin, callback) => {
-                    if (!origin) {
-                        callback(null, true);
-                        return;
-                    }
-                    try {
-                        const allowed = await corsOriginService.isAllowedOrigin(origin);
-                        callback(null, allowed ? origin : false);
-                    } catch (error) {
-                        console.warn(`CORS origin validation error for origin "${origin}":`, error);
-                        callback(null, false);
-                    }
-                },
-                methods: ['GET', 'POST', 'OPTIONS'],
-                allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
-                credentials: true,
-            });
-        }
+        // Register CORS interceptor globally (mirrors setup.ts)
+        const corsInterceptor = app.get(CorsInterceptor);
+        app.useGlobalInterceptors(corsInterceptor);
 
         await app.listen(ports.app);
 
