@@ -40,11 +40,6 @@ export async function prepareApp() {
         };
     }
 
-    // logger
-    // if (Environment.isProduction()) {
-    //     options.logger = new JsonConsoleLogger();
-    // }
-
     // smtp
     if (Environment.get("ENABLE_FAKE_SMTP_SERVER", false)) {
         const {createFakeSmtpServer} = await import("./mail/FakeSmtpServer");
