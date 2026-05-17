@@ -20,7 +20,7 @@ import {Test} from '@nestjs/testing';
 import {Environment} from '../src/config/environment.service';
 import {AppModule} from '../src/app.module';
 import {HttpExceptionFilter} from '../src/exceptions/filter/http-exception.filter';
-import {createFakeSmtpServer, FakeSmtpServer} from '../src/mail/FakeSmtpServer';
+import {createFakeSmtpServer, FakeSmtpServer} from './smtp/FakeSmtpServer';
 import {createTenantAppServer, TenantAppServer} from './apps_&_subscription/tenant-app-server';
 import {TestUtilsController} from './test-utils.controller';
 import {TypeOrmModule} from '@nestjs/typeorm';

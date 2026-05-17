@@ -13,149 +13,91 @@ behavior. Updated from deep-dive audit (May 2026).
 |--------|----------|-------------|
 | `oauth-token.controller.ts` | High | 881 lines, 7 routes, 17 injected services — monolithic |
 | Property-based tests | High | 87 files (47% of all tests), many exercising same flows |
-| Dead code | High | 4 unused files found (`RoleGuard`, `BackendError`, `JsonConsoleLogger`, commented-out blocks) |
-| `token-issuance.service.ts` | High | 593 lines, not flagged for splitting |
-| `startUp.service.ts` | High | 564 lines mixing startup logic with seed data |
+| Dead code | High | ~~4 unused files found~~ (already deleted in Phase 0) |
+| `token-issuance.service.ts` | High | 668 lines, not flagged for splitting |
+| `startUp.service.ts` | High | 596 lines mixing startup logic with seed data |
 | Inline DTOs scattered | Medium | 8+ controllers define Yup schemas inline; only 1 file in `dto/` |
 | `roleV2.controller.ts` | Medium | V2 endpoints added alongside V1 instead of consolidating |
 | `contexts.ts` mixed concerns | Medium | 277 lines merging grant types, token classes, auth context |
-| `search-filter.utils.ts` misplaced | Medium | Utility file living in `controllers/` directory |
+| `search-filter.utils.ts` misplaced | ~~Medium~~ | ~~Utility file living in `controllers/` directory~~ (moved to `util/`) |
 | `GET /api/oauth/logout` defined in 2 controllers | Medium | OAuthTokenController + RevocationController — latent routing conflict |
 | Dual CORS handling | Medium | Global `CorsInterceptor` (DB-driven) bypassed by `*` OPTIONS handler |
-| `FakeSmtpServer.ts` in `src/mail/` | Medium | 409-line test support file inside application source |
-| Duplicate `theme.service.ts` | Low | Byte-identical file in `_services/` and `component/theme/` |
-| Inline Angular templates | Low | 112 `template:`, only 1 `templateUrl:` |
+| `FakeSmtpServer.ts` in `src/mail/` | ~~Medium~~ | ~~409-line test support file inside application source~~ (moved to `tests/smtp/`) |
+| Duplicate `theme.service.ts` | ~~Low~~ | ~~Byte-identical file in `_services/` and `component/theme/`~~ (resolved — duplicate deleted) |
+| Inline Angular templates | Low | 114 `template:`, only 1 `templateUrl:` |
 | Mirrored UI components | Medium | 18 mirror pairs found (8 claimed, 10 newly identified) |
 | No barrel files | Low | All imports reference individual files directly |
-| `util/` vs `utils/` | Low | Two directories, same purpose, different AI sessions |
-| `migrations/` | Medium | 28 files (+1 registry); could be squashed to ~5 milestones |
-| `OWH32` non-standard hash | Low | Custom FNV-1a in `crypt.util.ts` bypassing RFC 7636 S256 |
+| `util/` vs `utils/` | ~~Low~~ | ~~Two directories, same purpose~~ (merged into `util/`) |
+| `migrations/` | Medium | 28 files (+1 registry `migrations/migrations.ts`); could be squashed to ~5 milestones |
+| `OWH32` non-standard hash | Medium | Custom FNV-1a in `crypt.util.ts` bypassing RFC 7636 S256 — **actively used** as optional PKCE method |
 
 ---
 
-## Phase 0 — Delete Dead Code
+## Phase 0 — Delete Dead Code ✅ COMPLETED
 
-Zero risk, immediate payoff. Clean up files and code that serve no purpose.
+Zero risk, immediate payoff. All dead files were already removed from the codebase.
 
-### 0.1 Delete unused `RoleGuard`
+### 0.1 Delete unused `RoleGuard` ✅
 
-**Files affected:**
-- Delete `srv/src/auth/role.guard.ts` (58 lines, 5 injected services, zero imports)
-- No import updates needed — nothing references it
+**Status:** Done. File `srv/src/auth/role.guard.ts` no longer exists. Zero references remain.
 
-**Risk:** Trivial. Dead code removal.
+### 0.2 Delete unused `BackendError` class ✅
 
-### 0.2 Delete unused `BackendError` class
+**Status:** Done. File `srv/src/exceptions/backend-error.class.ts` no longer exists. Zero references remain.
 
-**Files affected:**
-- Delete `srv/src/exceptions/backend-error.class.ts` (7 lines, zero imports)
+### 0.3 Delete dead `JsonConsoleLogger` ✅
 
-**Risk:** Trivial.
+**Status:** Done. File `srv/src/log/JsonConsoleLogger.ts` no longer exists. No logger registration in `setup.ts` (lines 44-46 are live SMTP setup code, not logger registration).
 
-### 0.3 Delete dead `JsonConsoleLogger`
+### 0.4 Remove commented-out cluster code ✅
 
-**Files affected:**
-- Delete `srv/src/log/JsonConsoleLogger.ts` (37 lines)
-- Remove commented-out logger registration in `srv/src/setup.ts` lines 44-46
+**Status:** N/A. `main.ts` is 8 lines with no commented-out code. No cluster code ever existed in this file.
 
-**Risk:** Trivial.
+### 0.5 Remove empty `static {}` block ✅
 
-### 0.4 Remove commented-out cluster code
+**Status:** N/A. `http-exception.filter.ts` has a `static exceptionResolver` Map (line 15) but no `static {}` block. The static field is initialized to an empty Map — intentional, not dead code.
 
-**Files affected:**
-- `srv/src/main.ts` — remove lines 6-35 (commented-out multi-process clustering)
+### 0.6 Delete empty `test-utils/` directory ✅
 
-**Risk:** Trivial.
-
-### 0.5 Remove empty `static {}` block
-
-**Files affected:**
-- `srv/src/exceptions/filter/http-exception.filter.ts` — remove empty `static exceptionResolver` map and empty `static {}` block (lines 15-19)
-
-**Risk:** Trivial.
-
-### 0.6 Delete empty `test-utils/` directory
-
-**Files affected:**
-- `srv/src/test-utils/` (already empty)
-
-**Risk:** Trivial.
+**Status:** N/A. `srv/src/test-utils/` directory does not exist.
 
 ---
 
-## Phase 1 — Quick Wins
+## Phase 1 — Quick Wins ✅ COMPLETED
 
 Low risk, high consistency gain. Can be done in any order.
 
-### 1.1 Merge `util/` + `utils/` into single `util/` directory
+### 1.1 Merge `util/` + `utils/` into single `util/` directory ✅
 
-**Files affected:**
-- Move `srv/src/utils/slug.util.ts` → `srv/src/util/slug.util.ts`
-- Move `srv/src/utils/redirect-uri.validator.ts` → `srv/src/util/redirect-uri.validator.ts`
-- Update imports in `srv/src/services/app.service.ts` (2 imports)
-- Delete `srv/src/utils/`
+**Status:** Done. `srv/src/utils/` no longer exists. All utility files now live in `srv/src/util/` (6 files). Imports in `app.service.ts` updated.
 
-**Risk:** Trivial. No functional overlap between the files.
+### 1.2 Remove duplicate `theme.service.ts` ✅
 
-### 1.2 Remove duplicate `theme.service.ts`
+**Status:** Done. `ui/src/app/_services/theme.service.ts` deleted. Zero stale imports remain.
 
-**Files affected:**
-- Delete `ui/src/app/_services/theme.service.ts`
-- Update any imports pointing to `_services/theme.service` → `component/theme/theme.service`
+### 1.3 Add barrel files ✅
 
-**Risk:** Low. Check that no consumer still references the deleted path.
+**Status:** Done. Barrel files (`index.ts`) already existed in all four directories (`controllers/`, `services/`, `auth/`, `entity/`) and were comprehensive. Added `RoleEnum` export to `entity/index.ts` to complete coverage.
 
-### 1.3 Add barrel files
+### 1.4 Move `search-filter.utils.ts` to `util/` ✅
 
-Create `index.ts` in major directories for cleaner imports:
+**Status:** Done. Now at `srv/src/util/search-filter.utils.ts`. Import in `generic-search.controller.ts` updated.
 
-- `srv/src/controllers/index.ts`
-- `srv/src/services/index.ts`
-- `srv/src/auth/index.ts`
-- `srv/src/entity/index.ts` (already has `entities.ts` — may just need renames)
+### 1.5 Fix `SubjectEnum.APPS` naming inconsistency ✅
 
-**Risk:** Low. Barrels are additive; old import paths still work.
+**Status:** Done. `SubjectEnum` uses `APP` (singular). Zero references to `APPS` remain.
 
-### 1.4 Move `search-filter.utils.ts` to `util/`
+### 1.6 Remove unused `CorsInterceptor` provider registration ✅
 
-**Files affected:**
-- Move `srv/src/controllers/search-filter.utils.ts` → `srv/src/util/search-filter.utils.ts`
-- Update imports in consuming controllers
+**Status:** Done. Removed `CorsInterceptor` from `providers` and `exports` in `srv/src/services/service.module.ts`. The global registration in `setup.ts` (L89-90) remains intact — this was the intended single point of registration.
 
-**Risk:** Low. It's a utility, not a controller.
+### 1.7 Move `FakeSmtpServer.ts` from `src/mail/` to `tests/` ✅
 
-### 1.5 Fix `SubjectEnum.APPS` naming inconsistency
+**Status:** Done. Now at `srv/tests/smtp/FakeSmtpServer.ts`. All imports updated.
 
-**Files affected:**
-- `srv/src/entity/subjectEnum.ts` — rename `APPS` → `APP` to match singular convention
-- Update all references across the codebase (grep for `SubjectEnum.APPS`)
+### 1.8 Organize orphaned root test support files ✅
 
-**Risk:** Low. Mechanical rename.
-
-### 1.6 Remove unused `CorsInterceptor` provider registration
-
-**Files affected:**
-- `srv/src/services/service.module.ts` — remove `CorsInterceptor` from `providers` array (it's already registered globally in `setup.ts`)
-
-**Risk:** Low.
-
-### 1.7 Move `FakeSmtpServer.ts` from `src/mail/` to `tests/`
-
-**Files affected:**
-- Move `srv/src/mail/FakeSmtpServer.ts` → `srv/tests/smtp/FakeSmtpServer.ts`
-- Update import in test files that reference it
-
-**Risk:** Low. Not used in production code.
-
-### 1.8 Organize orphaned root test support files
-
-Move scattered support files from `srv/tests/` root into appropriate subdirectories:
-- `fetch-utils.ts` → `api-client/`
-- `test-ports.ts` → `tests/` root config (or inline)
-- `smtp-client-adapter.ts` → `smtp/`
-- `webhook-client-adapter.ts` → `tests/` root or `api-client/`
-
-**Risk:** Low.
+**Status:** Done. `fetch-utils.ts` → `api-client/`, `smtp-client-adapter.ts` → `smtp/`, `webhook-client-adapter.ts` → `api-client/`. `test-ports.ts` intentionally stays at root.
 
 ---
 
@@ -205,7 +147,7 @@ Split the 881-line monolith into focused controllers. Current state: 7 routes, 1
 
 **Risk:** Low. Routes don't overlap. Same 4 injected services in both controllers.
 
-### 2.3 Split `token-issuance.service.ts` (593 lines)
+### 2.3 Split `token-issuance.service.ts` (668 lines)
 
 **Proposed split:**
 - `TokenClaimsService` — claim assembly, scope resolution, claim validation
@@ -214,7 +156,7 @@ Split the 881-line monolith into focused controllers. Current state: 7 routes, 1
 
 **Risk:** Medium. Needs careful dependency analysis to avoid circular imports.
 
-### 2.4 Split `startUp.service.ts` (564 lines)
+### 2.4 Split `startUp.service.ts` (596 lines)
 
 Separate seed/test data logic from application startup:
 - `startUp.service.ts` — bootstrapping only (validate env, run startup checks)
@@ -222,12 +164,12 @@ Separate seed/test data logic from application startup:
 
 **Risk:** Low. Seed data is only used in development/testing.
 
-### 2.5 Split `contexts.ts` (277 lines)
+### 2.5 Split `contexts.ts` (277 lines, located at `srv/src/casl/contexts.ts`)
 
 **Proposed split:**
-- `auth/token-types.ts` — `Token`, `TenantToken`, `TechnicalToken`, `InternalToken` classes, `TenantTokenParams`, `TechnicalTokenParams` interfaces
-- `auth/grant-types.ts` — `GRANT_TYPES` enum
-- `auth/auth-context.ts` — `AuthContext` class, `TenantInfo` interface
+- `casl/token-types.ts` — `Token`, `TenantToken`, `TechnicalToken`, `InternalToken` classes, `TenantTokenParams`, `TechnicalTokenParams` interfaces
+- `casl/grant-types.ts` — `GRANT_TYPES` enum
+- `casl/auth-context.ts` — `AuthContext` class, `TenantInfo` interface
 
 **Risk:** Low. Pure extraction, no behavioral change.
 
@@ -237,7 +179,8 @@ Extract all inline Yup schemas from controllers into `srv/src/dto/`:
 
 | Current location | Inline schema | Target file |
 |---|---|---|
-| `admin-tenant.controller.ts` | `UpdateTenantSchema`, `MemberOperationSchema`, `OperatingRoleSchema` | `dto/tenant.dto.ts` |
+| `admin-tenant.controller.ts` | `UpdateTenantSchema`, `MemberOperationSchema` | `dto/tenant.dto.ts` |
+| `admin-tenant.controller.ts` | (uses shared `ValidationSchema.OperatingRoleSchema`) | `dto/tenant.dto.ts` |
 | `policy.controller.ts` | `CreateSchema`, `UpdateSchema` | `dto/policy.dto.ts` |
 | `registration.controller.ts` | `RegisterDomainSchema`, `SignUpSchema` | `dto/registration.dto.ts` |
 | `members.controller.ts` | `MemberOperationSchema` | `dto/tenant.dto.ts` |
@@ -245,7 +188,7 @@ Extract all inline Yup schemas from controllers into `srv/src/dto/`:
 | `tenant.controller.ts` | `UpdateTenantSchema` | `dto/tenant.dto.ts` |
 | `roleV2.controller.ts` | `UpdateRoleSchema` | `dto/role.dto.ts` |
 
-Also break up `validation/validation.schema.ts` (368 lines) into per-domain files under `dto/`.
+Also break up `validation/validation.schema.ts` (410 lines) into per-domain files under `dto/`.
 
 **Risk:** Low. Pure extraction; all imports update to point to new paths.
 
@@ -298,7 +241,7 @@ No consolidation pressure on API clients; structure is reasonable.
 ### 4.1 Externalize inline templates
 
 Move backtick-string templates to `.html` files and inline styles to `.scss`.
-This affects **112 TypeScript files** with inline templates (only 1 uses `templateUrl`).
+This affects **114 TypeScript files** with inline templates (only 1 uses `templateUrl`).
 
 **Approach:**
 1. New file per component: `foo.component.html`, `foo.component.scss`
@@ -356,11 +299,11 @@ Two CORS mechanisms coexist:
 
 ### 5.2 Review `OWH32` non-standard hash
 
-`util/crypt.util.ts` implements `oneWayHash()` using a custom FNV-1a-based algorithm named `OWH32` for PKCE code challenge method. This is **not RFC 7636 compliant** (the spec mandates plain S256).
+`util/crypt.util.ts` implements `oneWayHash()` using a custom FNV-1a-based algorithm named `OWH32` for PKCE code challenge method. This is **not RFC 7636 compliant** (the spec mandates plain S256). **OWH32 is actively used** — it is accepted as a valid `code_challenge_method` in `validation.schema.ts` and has dedicated tests. Not dead code.
 
-**Action:** Verify whether `OWH32` is actually used at runtime or is experimental dead code. If used, replace with proper S256. If dead code, remove.
+**Action:** Replace with proper S256 or remove the OWH32 option from the validation schema.
 
-**Risk:** Low to medium depending on usage.
+**Risk:** Medium — requires updating any clients relying on the `OWH32` code challenge method.
 
 ---
 
@@ -386,25 +329,23 @@ Group 28 migrations into logical milestones:
 
 | Directory | Files |
 |---|---|
-| `controllers/` | 27 (includes `search-filter.utils.ts` — should be in `util/`) |
+| `controllers/` | 27 |
 | `auth/` | 25 |
 | `entity/` | 21 |
-| `migrations/` | 28 (+1 registry `migrations.ts`) |
+| `migrations/` | 28 (+1 registry `migrations/migrations.ts`) |
 | `services/` | 16 (+ `key-management.service.ts` not in previous inventory) |
 | `casl/` | 12 |
 | `core/` | 8 |
-| `mail/` | 6 (includes `FakeSmtpServer.ts` — should be in `tests/`) |
+| `mail/` | 5 (FakeSmtpServer.ts moved to `tests/smtp/`) |
 | `exceptions/` | 4 (+ 2 in `filter/` subdirectory) |
 | `log/` | 4 |
 | `interceptors/` | 1 (missing from previous inventory) |
-| `util/` | 3 |
-| `utils/` | 2 |
+| `util/` | 6 (`utils/` merged — no longer exists) |
 | `config/` | 2 |
 | `security/` | 2 |
 | `validation/` | 2 |
 | `dto/` | 1 |
 | root | 4 (`app.module.ts`, `main.ts`, `setup.ts`, `startUp.service.ts`) |
-| `test-utils/` | 0 (empty — delete) |
 | **Total** | **~168** |
 
 ### Frontend (`ui/src/app/`)
@@ -439,7 +380,7 @@ Group 28 migrations into logical milestones:
 | `features/` | 3 |
 | `consent/` | 2 |
 | `onboarding/` | 2 |
-| `apps_&_subscription/` | 1 (rename to `apps-and-subscription/`) |
+| `apps_&_subscription/` | 2 (rename to `apps-and-subscription/`) |
 | `client/` | 1 |
 | `group/` | 1 |
 | `password-grant/` | 1 |

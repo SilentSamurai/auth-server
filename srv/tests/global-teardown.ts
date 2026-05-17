@@ -1,5 +1,5 @@
 import {INestApplication} from '@nestjs/common';
-import {FakeSmtpServer} from '../src/mail/FakeSmtpServer';
+import {FakeSmtpServer} from './smtp/FakeSmtpServer';
 import {TenantAppServer} from './apps_&_subscription/tenant-app-server';
 
 declare global {

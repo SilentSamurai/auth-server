@@ -1,6 +1,6 @@
 import * as fc from 'fast-check';
 import * as http from 'http';
-import {SmtpClientAdapter} from '../smtp-client-adapter';
+import {SmtpClientAdapter} from '../smtp/smtp-client-adapter';
 
 /**
  * Feature: shared-test-infrastructure, Property 3: SMTP search parameter forwarding

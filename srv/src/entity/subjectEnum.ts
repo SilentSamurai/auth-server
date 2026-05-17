@@ -16,7 +16,7 @@ export class SubjectEnum {
     public static GROUP = Group.name;
     public static GROUP_ROLE = GroupRole.name;
     public static POLICY = Policy.name;
-    public static APPS = App.name;
+    public static APP = App.name;
     public static CLIENT = Client.name;
 
     public static entityMap = {
@@ -25,7 +25,7 @@ export class SubjectEnum {
         TenantMembers: SubjectEnum.MEMBER,
         Roles: SubjectEnum.ROLE,
         Groups: SubjectEnum.GROUP,
-        Apps: SubjectEnum.APPS,
+        Apps: SubjectEnum.APP,
         Clients: SubjectEnum.CLIENT
     };
 

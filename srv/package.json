@@ -16,7 +16,7 @@
         "test": "set CUSTOM_LOG=1 && jest --silent=true --maxWorkers=25%",
         "test:watch": "set CUSTOM_LOG=1 && jest --watch --verbose --silent=false",
         "package": "node create-zip.js",
-        "start:mail-server": "ts-node src/mail/FakeSmtpServer.ts",
+        "start:mail-server": "ts-node tests/smtp/FakeSmtpServer.ts",
         "release": "npm run build && npm run test "
     },
     "dependencies": {

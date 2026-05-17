@@ -25,7 +25,7 @@ import {SubjectEnum} from "../entity/subjectEnum";
 import {App} from "../entity/app.entity";
 import {Client} from "../entity/client.entity";
 import {AuthContext} from "../casl/contexts";
-import {buildWhere, getRelations, SearchFilter} from "./search-filter.utils";
+import {buildWhere, getRelations, SearchFilter} from "../util/search-filter.utils";
 import * as yup from "yup";
 import {ValidationPipe} from "../validation/validation.pipe";
 

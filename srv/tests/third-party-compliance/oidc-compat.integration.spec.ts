@@ -5,7 +5,7 @@ import {TokenFixture} from '../token.fixture';
 import {SearchClient} from '../api-client/search-client';
 import {ClientEntityClient} from '../api-client/client-entity-client';
 import {expect2xx} from "../api-client/client";
-import {confirmSession, extractCookie, extractFlowContext, extractFlowIdCookieAndCsrf, grantConsent, login} from '../fetch-utils';
+import {confirmSession, extractCookie, extractFlowContext, extractFlowIdCookieAndCsrf, grantConsent, login} from '../api-client/fetch-utils';
 
 /**
  * OAuth 2.0 / OIDC Compatibility Tests (Ported from compat-tests/oidc-compat.test.mjs)

@@ -12,6 +12,7 @@ import {ServiceModule} from "./services/service.module";
 import {migrations} from "./migrations/migrations";
 import {entities} from "./entity/entities";
 import {SecurityModule} from "./security/security.module";
+import {CorsInterceptor} from "./interceptors/cors.interceptor";
 
 @Module({
     imports: [
@@ -66,7 +67,7 @@ import {SecurityModule} from "./security/security.module";
         SecurityModule,
     ],
     controllers: [],
-    providers: [StartUpService],
+    providers: [StartUpService, CorsInterceptor],
 })
 export class AppModule implements NestModule, OnModuleInit {
     constructor(private readonly configService: Environment) {

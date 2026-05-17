@@ -7,7 +7,7 @@ import {AppModule} from "./app.module";
 import {HttpExceptionFilter} from "./exceptions/filter/http-exception.filter";
 import * as express from "express";
 import * as process from "node:process";
-import type {FakeSmtpServer} from "./mail/FakeSmtpServer";
+import type {FakeSmtpServer} from "../tests/smtp/FakeSmtpServer";
 import {CorsInterceptor} from "./interceptors/cors.interceptor";
 import * as cookieParser from "cookie-parser";
 
@@ -42,7 +42,7 @@ export async function prepareApp() {
 
     // smtp
     if (Environment.get("ENABLE_FAKE_SMTP_SERVER", false)) {
-        const {createFakeSmtpServer} = await import("./mail/FakeSmtpServer");
+        const {createFakeSmtpServer} = await import("../tests/smtp/FakeSmtpServer");
         const server = createFakeSmtpServer({});
         await server.listen();
         smtpServerRef = server;
