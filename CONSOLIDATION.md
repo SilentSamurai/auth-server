@@ -126,14 +126,11 @@ Medium effort, clear architectural benefit.
 
 **Risk:** Low. No route conflicts. Same 4 injected services. All 185 test suites, 1207 tests pass.
 
-### 2.3 Split `token-issuance.service.ts` (668 lines)
+### 2.3 Split `token-issuance.service.ts` ✅
 
-**Proposed split:**
-- `TokenClaimsService` — claim assembly, scope resolution, claim validation
-- `TokenSigningService` — JWT signing, key selection, kid header
-- `TokenIssuanceService` — orchestration (keeps the coordination logic)
+**Status:** Done. Extracted `TokenClaimsService` from the 668-line monolith. The new service handles scope resolution, role fetching/formatting, audience construction, session resolution, and refresh token decisions. `TokenIssuanceService` retained orchestration only (membership checks, auth code hint resolution, JWT signing via AuthService, ID token generation, refresh token lifecycle, security logging). JWT signing was already handled by `AuthService` — no `TokenSigningService` was needed. No circular dependencies. `token-issuance.service.ts` reduced from 668 → ~365 lines.
 
-**Risk:** Medium. Needs careful dependency analysis to avoid circular imports.
+**Risk:** Medium. Dependencies carefully analyzed; no circular imports introduced.
 
 ### 2.4 Split `startUp.service.ts` (596 lines)
 

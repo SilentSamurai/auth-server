@@ -2,6 +2,7 @@ export {AuthModule} from './auth.module';
 export {AuthService} from './auth.service';
 export {AuthCodeService} from './auth-code.service';
 export {TokenIssuanceService} from './token-issuance.service';
+export {TokenClaimsService} from './token-claims.service';
 export {JwtAuthGuard} from './jwt-auth.guard';
 export {TenantResolutionGuard} from './tenant-resolution.guard';
 export {SuperAdminGuard} from './super-admin.guard';

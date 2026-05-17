@@ -31,6 +31,7 @@ import {FirstPartyResolver} from "./first-party-resolver";
 import {CsrfTokenService} from "./csrf-token.service";
 import {FlowIdCookieService} from "./flow-id-cookie.service";
 import {SessionHelperService} from "./session-helper.service";
+import {TokenClaimsService} from "./token-claims.service";
 import {TenantMember} from "../entity/tenant.members.entity";
 import {Subscription} from "../entity/subscription.entity";
 import {Tenant} from "../entity/tenant.entity";
@@ -47,8 +48,8 @@ import {Client} from "../entity/client.entity";
         TypeOrmModule.forFeature([AuthCode, User, RefreshToken, LoginSession, UserConsent, TenantMember, Subscription, Tenant, App, Client]),
     ],
     controllers: [],
-    providers: [JwtAuthGuard, AuthService, AuthCodeService, TokenIssuanceService, TenantResolutionGuard, SuperAdminGuard, IdTokenService, TokenIntrospectionService, RefreshTokenService, TokenRevocationService, ClaimsResolverService, AuthorizeService, LoginSessionService, ConsentService, PromptService, IdTokenHintValidator, TenantAmbiguityService, FirstPartyResolver, CsrfTokenService, FlowIdCookieService, SessionHelperService],
-    exports: [JwtAuthGuard, AuthService, AuthCodeService, TokenIssuanceService, TenantResolutionGuard, SuperAdminGuard, IdTokenService, TokenIntrospectionService, RefreshTokenService, TokenRevocationService, ClaimsResolverService, AuthorizeService, LoginSessionService, ConsentService, PromptService, IdTokenHintValidator, TenantAmbiguityService, FirstPartyResolver, CsrfTokenService, FlowIdCookieService, SessionHelperService],
+    providers: [JwtAuthGuard, AuthService, AuthCodeService, TokenIssuanceService, TokenClaimsService, TenantResolutionGuard, SuperAdminGuard, IdTokenService, TokenIntrospectionService, RefreshTokenService, TokenRevocationService, ClaimsResolverService, AuthorizeService, LoginSessionService, ConsentService, PromptService, IdTokenHintValidator, TenantAmbiguityService, FirstPartyResolver, CsrfTokenService, FlowIdCookieService, SessionHelperService],
+    exports: [JwtAuthGuard, AuthService, AuthCodeService, TokenIssuanceService, TokenClaimsService, TenantResolutionGuard, SuperAdminGuard, IdTokenService, TokenIntrospectionService, RefreshTokenService, TokenRevocationService, ClaimsResolverService, AuthorizeService, LoginSessionService, ConsentService, PromptService, IdTokenHintValidator, TenantAmbiguityService, FirstPartyResolver, CsrfTokenService, FlowIdCookieService, SessionHelperService],
 })
 export class AuthModule {
 }

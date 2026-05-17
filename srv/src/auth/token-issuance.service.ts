@@ -7,21 +7,17 @@ import {Environment} from "../config/environment.service";
 import {AuthCodeService} from "./auth-code.service";
 import {User} from "../entity/user.entity";
 import {Tenant} from "../entity/tenant.entity";
-import {Role} from "../entity/role.entity";
 import {GRANT_TYPES} from "../casl/contexts";
 import {Permission} from "../auth/auth.decorator";
-import {ScopeResolverService} from "../casl/scope-resolver.service";
 import {ClientService} from "../services/client.service";
 import {ScopeNormalizer} from "../casl/scope-normalizer";
 import {IdTokenService} from "./id-token.service";
 import {RefreshTokenService} from "./refresh-token.service";
 import {UsersService} from "../services/users.service";
 import {OAuthException} from "../exceptions/oauth-exception";
-import {randomUUID} from "crypto";
-import {LoginSessionService} from "./login-session.service";
 import {SecurityEventLogger} from "../security/security-event-logger.service";
 import {Client} from "../entity/client.entity";
-import {PolicyResolutionService} from "../casl/policy-resolution.service";
+import {TokenClaimsService} from "./token-claims.service";
 
 /**
  * Decision result for refresh token eligibility.
@@ -42,24 +38,8 @@ interface RefreshTokenDecision {
  * - Refresh Token (via refreshToken)
  * - Client Credentials (via issueClientCredentialsToken)
  *
- * ## Core Responsibilities
- *
- * 1. **Scope Resolution**: Performs two-way intersection between requested scopes
- *    and client-allowed scopes via ScopeResolverService. Never includes roles in scopes.
- *
- * 2. **Role Fetching**: Retrieves user roles from the database for tenant members.
- *    Roles are kept separate from OAuth scopes per the token architecture.
- *
- * 3. **Membership & Subscription Validation**: Verifies the user is either a direct
- *    tenant member or has a valid app subscription before issuing tokens.
- *
- * 4. **Subscription Ambiguity Resolution**: When a user has subscriptions to multiple
- *    tenants, resolves which tenant context to use (may require user hint).
- *
- * 5. **Token Assembly**: Coordinates with:
- *    - AuthService — creates the signed JWT access token with scopes + roles
- *    - IdTokenService — generates the OIDC ID token for user identity
- *    - RefreshTokenService — creates, rotates, and validates refresh tokens
+ * Delegates claim assembly, scope resolution, role formatting, audience construction,
+ * session resolution, and refresh token decisions to TokenClaimsService.
  *
  * ## Token Types Produced
  *
@@ -79,7 +59,7 @@ interface RefreshTokenDecision {
  * - refresh_token: Only for user grants (not client_credentials)
  * - id_token: Only for user grants with 'openid' scope
  *
- * @see ScopeResolverService — two-way scope intersection logic
+ * @see TokenClaimsService — delegated claim assembly, scope resolution, role formatting
  * @see AuthService — JWT signing and claims assembly
  * @see IdTokenService — OIDC ID token generation
  * @see RefreshTokenService — refresh token lifecycle management
@@ -115,14 +95,12 @@ export class TokenIssuanceService {
         private readonly securityService: SecurityService,
         private readonly configService: Environment,
         private readonly authCodeService: AuthCodeService,
-        private readonly scopeResolverService: ScopeResolverService,
         private readonly clientService: ClientService,
         private readonly idTokenService: IdTokenService,
         private readonly refreshTokenService: RefreshTokenService,
         private readonly usersService: UsersService,
-        private readonly loginSessionService: LoginSessionService,
         private readonly securityEventLogger: SecurityEventLogger,
-        private readonly policyResolutionService: PolicyResolutionService,
+        private readonly claimsService: TokenClaimsService,
     ) {
     }
 
@@ -150,52 +128,29 @@ export class TokenIssuanceService {
             return this.issueSubscribedToken(permission, user, tenant, client, options);
         }
 
-        // Fetch tenant-local roles
-        const tenantLocalRoles = await this.tenantService.getMemberRoles(permission, tenant.id, user);
-        
-        // Fetch app-owned roles (cross-tenant roles assigned via subscriptions)
-        // Requirements: 7.1, 7.2, 7.3
-        const appOwnedRoles = await this.policyResolutionService.getAppOwnedRolesForUser(user.id, tenant.id);
-        
-        // Combine both role sets for token inclusion
-        const allRoles = [...tenantLocalRoles, ...appOwnedRoles];
-        const roleNames = this.formatRoleNamesForToken(allRoles);
-        
-        const grantedScopes = this.scopeResolverService.resolveScopes(
+        const roleNames = await this.claimsService.fetchAndFormatRoles(permission, tenant.id, user);
+
+        const grantedScopes = this.claimsService.resolveScopes(
             options?.requestedScope ?? null,
-            client.allowedScopes || 'openid profile email',
+            client,
         );
 
         // Construct audience with resource indicator if present
-        const audience = options?.resource
-            ? [options.resource, this.configService.get("SUPER_TENANT_DOMAIN")]
-            : [this.configService.get("SUPER_TENANT_DOMAIN")];
+        const audience = this.claimsService.buildAudience(options?.resource, this.configService.get("SUPER_TENANT_DOMAIN"));
 
         const {accessToken, scopes} =
             await this.authService.createUserAccessToken(user, tenant, grantedScopes, roleNames, options?.grant_type ?? GRANT_TYPES.PASSWORD, audience, client.clientId);
 
-        // Resolve session: validate existing sid or create new session for password grant
-        let authTime: number;
-        let sessionId: string;
-        if (options?.sid) {
-            const session = await this.loginSessionService.validateSession(options.sid);
-            authTime = session.authTime;
-            sessionId = session.sid;
-        } else if (options?.grant_type === GRANT_TYPES.PASSWORD || !options?.grant_type) {
-            const session = await this.loginSessionService.createSession(user.id, tenant.id);
-            authTime = session.authTime;
-            sessionId = session.sid;
-        } else {
-            // When requireAuthTime is true, we MUST have a session sid - throw error instead of fallback
-            if (options?.requireAuthTime) {
-                throw new BadRequestException("auth_time is required but no session was provided");
-            }
-            authTime = Math.floor(Date.now() / 1000);
-            sessionId = randomUUID();
-        }
+        const {authTime, sessionId} = await this.claimsService.resolveUserSession(
+            options?.sid,
+            options?.grant_type,
+            user.id,
+            tenant.id,
+            options?.requireAuthTime,
+        );
 
         // Determine refresh token eligibility (Requirements: 1.1, 1.2, 1.3, 2.1, 2.2, 8.1, 8.2, 8.3)
-        const refreshTokenDecision = this.shouldIssueRefreshToken(
+        const refreshTokenDecision = this.claimsService.shouldIssueRefreshToken(
             scopes,
             client,
             options?.grant_type ?? GRANT_TYPES.PASSWORD,
@@ -332,38 +287,17 @@ export class TokenIssuanceService {
         // Requirements: 3.2, 3.3, 3.6
         const client = await this.resolveClient(tenant);
 
-        // Fetch tenant-local roles
-        const tenantLocalRoles = await this.tenantService.getMemberRoles(permission, tenant.id, user);
-        
-        // Fetch app-owned roles (cross-tenant roles assigned via subscriptions)
-        // Requirements: 7.1, 7.2, 7.3
-        const appOwnedRoles = await this.policyResolutionService.getAppOwnedRolesForUser(user.id, tenant.id);
-        
-        // Combine both role sets for token inclusion
-        const allRoles = [...tenantLocalRoles, ...appOwnedRoles];
-        const roleNames = this.formatRoleNamesForToken(allRoles);
+        const roleNames = await this.claimsService.fetchAndFormatRoles(permission, tenant.id, user);
 
         const grantedScopes = ScopeNormalizer.parse(record.scope);
 
         // Construct audience with resource indicator if present
-        const audience = resource
-            ? [resource, this.configService.get("SUPER_TENANT_DOMAIN")]
-            : [this.configService.get("SUPER_TENANT_DOMAIN")];
+        const audience = this.claimsService.buildAudience(resource, this.configService.get("SUPER_TENANT_DOMAIN"));
 
         const {accessToken, scopes} =
             await this.authService.createUserAccessToken(user, tenant, grantedScopes, roleNames, GRANT_TYPES.REFRESH_TOKEN, audience, client.clientId);
 
-        // Resolve session from the refresh token's sid
-        let authTime: number;
-        let sessionId: string;
-        if (record.sid) {
-            const session = await this.loginSessionService.validateSession(record.sid);
-            authTime = session.authTime;
-            sessionId = session.sid;
-        } else {
-            authTime = Math.floor(Date.now() / 1000);
-            sessionId = randomUUID();
-        }
+        const {authTime, sessionId} = await this.claimsService.resolveRefreshSession(record.sid);
 
         const idToken = await this.idTokenService.generateIdToken({
             user: {id: user.id, email: user.email, name: user.name, verified: user.verified},
@@ -401,15 +335,13 @@ export class TokenIssuanceService {
         requestedScope: string | null,
         resource?: string,
     ): Promise<TokenResponse> {
-        const grantedScopes = this.scopeResolverService.resolveScopes(
+        const grantedScopes = this.claimsService.resolveScopes(
             requestedScope,
-            client.allowedScopes || 'openid profile email',
+            client,
         );
 
         // Construct audience with resource indicator if present
-        const audience = resource
-            ? [resource, this.configService.get("SUPER_TENANT_DOMAIN")]
-            : [this.configService.get("SUPER_TENANT_DOMAIN")];
+        const audience = this.claimsService.buildAudience(resource, this.configService.get("SUPER_TENANT_DOMAIN"));
 
         const accessToken = await this.authService.createTechnicalAccessToken(
             client,
@@ -457,55 +389,32 @@ export class TokenIssuanceService {
         }
 
         const subscribingTenant = ambiguityResult.resolvedTenant!;
-        
-        // Fetch tenant-local roles (internal roles like TENANT_ADMIN)
-        const tenantLocalRoles = await this.tenantService.getMemberRoles(permission, subscribingTenant.id, user);
-        
-        // Fetch app-owned roles (cross-tenant roles assigned via subscriptions)
-        // Requirements: 7.1, 7.2, 7.3
-        const appOwnedRoles = await this.policyResolutionService.getAppOwnedRolesForUser(user.id, subscribingTenant.id);
-        
-        // Combine both role sets for token inclusion
-        const allRoles = [...tenantLocalRoles, ...appOwnedRoles];
-        const allRoleNames = this.formatRoleNamesForToken(allRoles);
 
-        const grantedScopes = this.scopeResolverService.resolveScopes(
+        const allRoleNames = await this.claimsService.fetchAndFormatRoles(permission, subscribingTenant.id, user);
+
+        const grantedScopes = this.claimsService.resolveScopes(
             options?.requestedScope ?? null,
-            client.allowedScopes || 'openid profile email',
+            client,
         );
 
         // Construct audience with resource indicator if present
-        const audience = options?.resource
-            ? [options.resource, this.configService.get("SUPER_TENANT_DOMAIN")]
-            : [this.configService.get("SUPER_TENANT_DOMAIN")];
+        const audience = this.claimsService.buildAudience(options?.resource, this.configService.get("SUPER_TENANT_DOMAIN"));
 
         const {accessToken, scopes} =
             await this.authService.createSubscribedUserAccessToken(
                 user, tenant, subscribingTenant, grantedScopes, allRoleNames, options?.grant_type ?? GRANT_TYPES.PASSWORD, audience, client.clientId,
             );
 
-        // Resolve session: validate existing sid or create new session for password grant
-        let authTime: number;
-        let sessionId: string;
-        if (options?.sid) {
-            const session = await this.loginSessionService.validateSession(options.sid);
-            authTime = session.authTime;
-            sessionId = session.sid;
-        } else if (options?.grant_type === GRANT_TYPES.PASSWORD || !options?.grant_type) {
-            const session = await this.loginSessionService.createSession(user.id, tenant.id);
-            authTime = session.authTime;
-            sessionId = session.sid;
-        } else {
-            // When requireAuthTime is true, we MUST have a session sid - throw error instead of fallback
-            if (options?.requireAuthTime) {
-                throw new BadRequestException("auth_time is required but no session was provided");
-            }
-            authTime = Math.floor(Date.now() / 1000);
-            sessionId = randomUUID();
-        }
+        const {authTime, sessionId} = await this.claimsService.resolveUserSession(
+            options?.sid,
+            options?.grant_type,
+            user.id,
+            tenant.id,
+            options?.requireAuthTime,
+        );
 
         // Determine refresh token eligibility (Requirements: 1.1, 1.2, 2.1, 2.2, 8.1, 8.2, 8.3)
-        const refreshTokenDecision = this.shouldIssueRefreshToken(
+        const refreshTokenDecision = this.claimsService.shouldIssueRefreshToken(
             scopes,
             client,
             options?.grant_type ?? GRANT_TYPES.PASSWORD,
@@ -602,25 +511,6 @@ export class TokenIssuanceService {
      * Falls back to the tenant's default client (by domain alias) when no oauthClientId is given.
      * Requirements: 3.1
      */
-    /**
-     * Formats role names for token inclusion based on role type:
-     * - App-owned roles (role.app is set): format as "{appName}:{roleName}"
-     * - Tenant-local roles (role.app is null): include name as-is
-     * - Internal roles (SUPER_ADMIN, TENANT_ADMIN, TENANT_VIEWER): include name as-is
-     * Requirements: 7.1, 7.2, 7.3, 7.4
-     */
-    private formatRoleNamesForToken(roles: Role[]): string[] {
-        return roles.map(role => {
-            if (role.app) {
-                // App-owned role: format as "{appName}:{roleName}"
-                return `${role.app.name}:${role.name}`;
-            } else {
-                // Tenant-local or internal role: include name as-is
-                return role.name;
-            }
-        });
-    }
-
     private async resolveClient(tenant: Tenant, oauthClientId?: string): Promise<Client> {
         try {
             const client = oauthClientId
@@ -633,36 +523,5 @@ export class TokenIssuanceService {
             // Fall through to throw error
         }
         throw OAuthException.invalidClient('Client not found');
-    }
-
-    /**
-     * Determines whether a refresh token should be issued based on:
-     * 1. Grant type eligibility (client_credentials is never eligible per RFC 6749 §4.4.3)
-     * 2. Presence of offline_access scope in granted scopes (OIDC Core §11)
-     * 3. Client's allowRefreshToken flag (per-client override for trusted first-party clients)
-     *
-     * Requirements: 1.1, 1.2, 1.3, 2.1, 2.2, 3.1
-     */
-    private shouldIssueRefreshToken(
-        grantedScopes: string[],
-        client: Client,
-        grantType: string,
-    ): RefreshTokenDecision {
-        // Per RFC 6749 §4.4.3, client_credentials grant MUST NOT include a refresh token
-        if (grantType === GRANT_TYPES.CLIENT_CREDENTIALS) {
-            return {eligible: false, reason: 'refresh_token_not_eligible'};
-        }
-
-        // Check if offline_access scope is present in granted scopes (OIDC Core §11)
-        if (grantedScopes.includes('offline_access')) {
-            return {eligible: true, reason: 'offline_access_scope'};
-        }
-
-        // Check client's allowRefreshToken flag (per-client override)
-        if (client?.allowRefreshToken === true) {
-            return {eligible: true, reason: 'client_allow_refresh_token'};
-        }
-
-        return {eligible: false, reason: 'refresh_token_not_eligible'};
     }
 }
