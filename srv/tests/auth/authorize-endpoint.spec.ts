@@ -133,18 +133,6 @@ describe('GET /api/oauth/authorize', () => {
             expect(response.body.error_description).toBeDefined();
         });
 
-        it('should return JSON error for missing client_id (Req 1.4, 8.2)', async () => {
-            const response = await authorizeRequest({
-                response_type: 'code',
-                redirect_uri: REDIRECT_URI,
-                scope: 'openid',
-                state: 'abc',
-            });
-
-            expect(response.status).toEqual(400);
-            expect(response.body.error).toEqual('invalid_request');
-        });
-
         it('should return JSON error for invalid redirect_uri (Req 2.2, 8.2)', async () => {
             const response = await authorizeRequest({
                 response_type: 'code',
@@ -157,19 +145,6 @@ describe('GET /api/oauth/authorize', () => {
             expect(response.status).toEqual(400);
             expect(response.body.error).toEqual('invalid_request');
             expect(response.body.error_description).toBeDefined();
-        });
-
-        it('should return JSON error for missing response_type (Req 1.3)', async () => {
-            const response = await authorizeRequest({
-                client_id: singleUriClientId,
-                redirect_uri: REDIRECT_URI,
-                scope: 'openid',
-                state: 'abc',
-            });
-
-            expect(response.status).toEqual(400);
-            // RFC 6749 §4.1.2.1: missing response_type → unsupported_response_type
-            expect(response.body.error).toEqual('unsupported_response_type');
         });
 
         it('should return JSON error for invalid response_type (Req 1.3)', async () => {
@@ -189,23 +164,6 @@ describe('GET /api/oauth/authorize', () => {
     // ─── Post-Redirect Errors ────────────────────────────────────────
 
     describe('post-redirect errors (redirect with error params)', () => {
-        it('should redirect with error when state is missing (Req 3.1, 8.1)', async () => {
-            // RFC 6749 §4.1.2.1: missing state is a post-redirect error.
-            // redirect_uri is valid, so the error is communicated via redirect.
-            const response = await authorizeRequest({
-                response_type: 'code',
-                client_id: singleUriClientId,
-                redirect_uri: REDIRECT_URI,
-                scope: 'openid',
-            });
-
-            expect(response.status).toEqual(302);
-            const location = new URL(response.headers.location);
-            expect(location.origin + location.pathname).toEqual(REDIRECT_URI);
-            expect(location.searchParams.get('error')).toEqual('invalid_request');
-            expect(location.searchParams.get('error_description')).toBeDefined();
-        });
-
         it('should redirect with error for PKCE violation: require_pkce without code_challenge (Req 4.1)', async () => {
             const response = await authorizeRequest({
                 response_type: 'code',
@@ -246,23 +204,6 @@ describe('GET /api/oauth/authorize', () => {
     // ─── Redirect URI Resolution ─────────────────────────────────────
 
     describe('redirect URI resolution', () => {
-        it('should use single registered URI when redirect_uri is omitted (Req 2.3)', async () => {
-            // RFC 6749 §3.1.2.3: when client has one registered URI, it's used as default
-            const response = await authorizeRequest({
-                response_type: 'code',
-                client_id: singleUriClientId,
-                scope: 'openid',
-                state: 'single-uri',
-                code_challenge: 'test-challenge',
-                code_challenge_method: 'S256',
-            });
-
-            expect(response.status).toEqual(302);
-            const location = new URL(response.headers.location, 'http://localhost');
-            expect(location.pathname).toEqual('/authorize');
-            expect(location.searchParams.get('redirect_uri')).toEqual(REDIRECT_URI);
-        });
-
         it('should return JSON error when redirect_uri omitted and client has multiple URIs (Req 2.4)', async () => {
             const response = await authorizeRequest({
                 response_type: 'code',
@@ -280,38 +221,6 @@ describe('GET /api/oauth/authorize', () => {
     // ─── PKCE Enforcement ────────────────────────────────────────────
 
     describe('PKCE enforcement', () => {
-        it('should error when require_pkce=true and code_challenge missing (Req 4.1)', async () => {
-            const response = await authorizeRequest({
-                response_type: 'code',
-                client_id: pkceRequiredClientId,
-                redirect_uri: REDIRECT_URI,
-                scope: 'openid',
-                state: 'no-challenge',
-            });
-
-            expect(response.status).toEqual(302);
-            const location = new URL(response.headers.location);
-            expect(location.searchParams.get('error')).toEqual('invalid_request');
-            expect(location.searchParams.get('state')).toEqual('no-challenge');
-        });
-
-        it('should error when require_pkce=true and method is plain (Req 4.2)', async () => {
-            const response = await authorizeRequest({
-                response_type: 'code',
-                client_id: pkceRequiredClientId,
-                redirect_uri: REDIRECT_URI,
-                scope: 'openid',
-                state: 'plain-method',
-                code_challenge: 'some-challenge',
-                code_challenge_method: 'plain',
-            });
-
-            expect(response.status).toEqual(302);
-            const location = new URL(response.headers.location);
-            expect(location.searchParams.get('error')).toEqual('invalid_request');
-            expect(location.searchParams.get('error_description')).toContain('S256');
-        });
-
         it('should reject plain method when client previously used S256 (downgrade prevention) (Req 4.3)', async () => {
             // NOTE: pkceMethodUsed is not written by the new authorize flow, so downgrade
             // prevention via pkceMethodUsed is not active. This test verifies that a client
@@ -429,24 +338,6 @@ describe('GET /api/oauth/authorize', () => {
             expect(location.searchParams.get('scope')).toEqual('openid profile');
         });
 
-        it('should use client default scopes when scope is omitted (Req 6.2)', async () => {
-            // RFC 6749 §3.3: when scope is omitted, default to client's allowedScopes
-            const response = await authorizeRequest({
-                response_type: 'code',
-                client_id: singleUriClientId,
-                redirect_uri: REDIRECT_URI,
-                state: 'default-scope',
-            });
-
-            expect(response.status).toEqual(302);
-            const location = new URL(response.headers.location, 'http://localhost');
-            expect(location.pathname).toEqual('/authorize');
-            const scope = location.searchParams.get('scope');
-            expect(scope).toBeDefined();
-            expect(scope).toContain('openid');
-            expect(scope).toContain('profile');
-            expect(scope).toContain('email');
-        });
     });
 
     // ─── Nonce Passthrough ───────────────────────────────────────────

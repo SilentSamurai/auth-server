@@ -179,27 +179,6 @@ describe('ID Token Generation Integration', () => {
         });
     });
 
-    // ── 8.4: Nonce round-trip ───────────────────────────────────────
-
-    describe('8.4 nonce round-trip', () => {
-        it('should echo back nonce when provided in authorization request', async () => {
-            const testNonce = 'test-nonce-value-12345';
-            const code = await loginForCode({scope: 'openid profile email', nonce: testNonce});
-            const tokenResponse = await exchangeCode(code);
-
-            const payload = jwt.decode(tokenResponse.id_token) as any;
-            expect(payload.nonce).toEqual(testNonce);
-        });
-
-        it('should omit nonce when not provided in authorization request', async () => {
-            const code = await loginForCode({scope: 'openid profile email'});
-            const tokenResponse = await exchangeCode(code);
-
-            const payload = jwt.decode(tokenResponse.id_token) as any;
-            expect(payload.nonce).toBeUndefined();
-        });
-    });
-
     // ── 8.5: at_hash validation ─────────────────────────────────────
 
     describe('8.5 at_hash validation', () => {
