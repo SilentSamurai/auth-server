@@ -53,9 +53,6 @@ export class PKCEService {
         if (method === 'S256') {
             return this.sha256Challenge(verifier);
         }
-        if (method === 'OWH32') {
-            return this.oneWayHash(verifier);
-        }
         return verifier;
     }
 
@@ -74,19 +71,6 @@ export class PKCEService {
         }
     }
 
-    private oneWayHash(plain: string): string {
-        // Using FNV-1a hash algorithm as a legacy fallback
-        const FNV_PRIME = 16777619;
-        const OFFSET_BASIS = 2166136261;
-        let hash = OFFSET_BASIS;
-
-        for (let i = 0; i < plain.length; i++) {
-            hash ^= plain.charCodeAt(i);
-            hash = (hash * FNV_PRIME) >>> 0; // Force to 32-bit integer
-        }
-        const finalHash = hash >>> 0;
-        return `${finalHash}`; // Convert to unsigned 32-bit integer
-    }
 }
 
 /**

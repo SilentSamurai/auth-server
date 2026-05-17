@@ -39,7 +39,7 @@ import {AdminTenantService} from '../../../_services/admin-tenant.service';
                 <button
                     class="btn btn-primary"
                     type="submit"
-                    (click)="addRoleForm.onSubmit(submitRef)"
+                    (click)="addRoleForm.onSubmit($event)"
                     id="ADD_TENANT_ROLE_BTN"
                 >
                     Create
@@ -56,7 +56,6 @@ export class AddRoleAdminComponent implements OnInit {
     form = {
         name: '',
     };
-    submitRef: any;
 
     constructor(
         private adminTenantService: AdminTenantService,

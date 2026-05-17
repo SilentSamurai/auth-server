@@ -70,7 +70,7 @@ import {MessageService} from 'primeng/api';
             <app-dialog-footer>
                 <button
                     class="btn btn-primary"
-                    (click)="createTenantForm.onSubmit(krishna)"
+                    (click)="createTenantForm.onSubmit($event)"
                     type="submit"
                     id="CREATE_TENANT_SUBMIT_BTN"
                 >
@@ -88,8 +88,6 @@ export class CreateTenantComponent implements OnInit {
         name: '',
         domain: '',
     };
-
-    krishna: any;
 
     constructor(
         private adminTenantService: AdminTenantService,

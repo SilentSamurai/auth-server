@@ -5,7 +5,7 @@
 The server implements a custom OAuth 2.0-inspired authentication system:
 
 - 4 grant types: `authorization_code`, `password`, `client_credentials`, `refresh_token`
-- PKCE support (S256, plain, OWH32)
+- PKCE support (S256, plain)
 - RS256-signed JWTs with per-tenant RSA key pairs
 - HTTP Basic Auth for client authentication
 - Multi-tenant architecture

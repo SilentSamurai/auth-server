@@ -97,7 +97,7 @@ export const ConsentSchema = yup.object().shape({
     code_challenge_method: yup
         .string()
         .optional()
-        .matches(/^(plain|S256|OWH32)$/, "method must be plain, S256, or OWH32"),
+        .matches(/^(plain|S256)$/, "method must be plain or S256"),
     approved_scopes: yup
         .array()
         .of(yup.string())
@@ -138,7 +138,7 @@ export const AuthorizeSchema = yup.object().shape({
     code_challenge_method: yup
         .string()
         .optional()
-        .oneOf(["plain", "S256", "OWH32"], "code_challenge_method must be one of: plain, S256, OWH32"),
+        .oneOf(["plain", "S256"], "code_challenge_method must be one of: plain, S256"),
     nonce: yup
         .string()
         .optional(),

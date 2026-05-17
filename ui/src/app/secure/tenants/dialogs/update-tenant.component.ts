@@ -79,7 +79,7 @@ import {NoChangesException, TenantService,} from '../../../_services/tenant.serv
                     id="UPDATE_TENANT_SAVE_BTN"
                     class="btn btn-primary"
                     type="submit"
-                    (click)="updateTenantForm.onSubmit(krishna)"
+                    (click)="updateTenantForm.onSubmit($event)"
                 >
                     Update
                 </button>
@@ -99,7 +99,6 @@ export class UpdateTenantComponent implements OnInit {
         domain: '',
         allowSignUp: false,
     };
-    krishna: any;
 
     constructor(
         private tenantService: TenantService,

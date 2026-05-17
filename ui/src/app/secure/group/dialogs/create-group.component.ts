@@ -39,7 +39,7 @@ import {GroupService} from '../../../_services/group.service';
                 <button
                     class="btn btn-primary"
                     type="submit"
-                    (click)="createGroupForm.onSubmit(submitTrigger)"
+                    (click)="createGroupForm.onSubmit($event)"
                 >
                     Create
                 </button>
@@ -51,7 +51,6 @@ import {GroupService} from '../../../_services/group.service';
 export class CreateGroupComponent implements OnInit {
     tenantId: string = '';
     form = {name: ''};
-    submitTrigger: any;
 
     constructor(
         private groupService: GroupService,

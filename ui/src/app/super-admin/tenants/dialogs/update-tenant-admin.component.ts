@@ -64,7 +64,7 @@ import {AdminTenantService} from '../../../_services/admin-tenant.service';
                     id="UPDATE_TENANT_SAVE_BTN"
                     class="btn btn-primary"
                     type="submit"
-                    (click)="updateTenantForm.onSubmit(submitRef)"
+                    (click)="updateTenantForm.onSubmit($event)"
                 >
                     Update
                 </button>
@@ -84,7 +84,6 @@ export class UpdateTenantAdminComponent implements OnInit {
         domain: '',
         allowSignUp: false,
     };
-    submitRef: any;
 
     constructor(
         private adminTenantService: AdminTenantService,

@@ -11,7 +11,7 @@ import {GroupService} from '../../../_services/group.service';
                 <form
                     #updateGroupForm="ngForm"
                     (ngSubmit)="updateGroupForm.form.valid && onSubmit()"
-                    name="createGroupForm"
+                    name="updateGroupForm"
                     novalidate
                 >
                     <div class="mb-3 form-group">
@@ -22,7 +22,7 @@ import {GroupService} from '../../../_services/group.service';
                             #name="ngModel"
                             [(ngModel)]="form.name"
                             class="form-control"
-                            id="create.group.name"
+                            id="update.group.name"
                             name="name"
                             required
                             type="text"
@@ -41,7 +41,7 @@ import {GroupService} from '../../../_services/group.service';
                 <button
                     class="btn btn-primary"
                     type="submit"
-                    (click)="updateGroupForm.onSubmit(krishna)"
+                    (click)="updateGroupForm.onSubmit($event)"
                 >
                     Update
                 </button>
@@ -57,7 +57,6 @@ export class UpdateGroupComponent implements OnInit {
         name: '',
     };
     groupId: string = '';
-    krishna: any;
 
     constructor(
         private groupService: GroupService,

@@ -4,7 +4,7 @@ import {MessageService} from 'primeng/api';
 import {TenantService} from '../../../_services/tenant.service';
 
 @Component({
-    selector: 'app-create-tenant',
+    selector: 'app-add-role',
     template: `
         <app-standard-dialog title="Add Role">
             <app-dialog-tab>
@@ -42,7 +42,7 @@ import {TenantService} from '../../../_services/tenant.service';
                 <button
                     class="btn btn-primary"
                     type="submit"
-                    (click)="addRoleForm.onSubmit(krishna)"
+                    (click)="addRoleForm.onSubmit($event)"
                     id="ADD_TENANT_ROLE_BTN"
                 >
                     Create
@@ -59,7 +59,6 @@ export class AddRoleComponent implements OnInit {
     form = {
         name: '',
     };
-    krishna: any;
 
     constructor(
         private tenantService: TenantService,
