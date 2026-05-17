@@ -105,24 +105,20 @@ Low risk, high consistency gain. Can be done in any order.
 
 Medium effort, clear architectural benefit.
 
-### 2.1 Break up `oauth-token.controller.ts`
+### 2.1 Break up `oauth-token.controller.ts` ✅
 
-Split the 881-line monolith into focused controllers. Current state: 7 routes, 17 injected services, 10 private methods across 5 concerns.
-
-**Proposed split:**
+**Status:** Done. Split the 881-line monolith into 4 focused controllers + shared `SessionHelperService`:
 
 | Controller | Routes | Est. Lines | Key Services |
 |---|---|---|---|
-| `AuthorizeController` | GET /authorize, POST /login | ~350 | AuthorizeService, AuthService, LoginSessionService, FlowIdCookieService, CsrfTokenService |
-| `TokenController` | POST /token, POST /exchange | ~250 | AuthService, AuthCodeService, TokenIssuanceService, ClientService, RefreshTokenService |
-| `SessionController` | GET /session-info, GET /logout | ~100 | AuthService, LoginSessionService, TenantAmbiguityService |
-| `ConsentController` | POST /consent | ~100 | ConsentService, ScopeResolverService, CsrfTokenService |
+| `AuthorizeController` | GET /authorize, POST /login | ~238 | AuthorizeService, AuthService, LoginSessionService, FlowIdCookieService, CsrfTokenService, ClientService, ScopeResolverService, ConsentService, FirstPartyResolver, TenantAmbiguityService |
+| `TokenController` | POST /token, POST /exchange | ~293 | AuthService, AuthCodeService, TokenIssuanceService, ClientService, RefreshTokenService, CorsOriginService |
+| `SessionController` | GET /session-info, GET /logout | ~61 | LoginSessionService, AuthUserService |
+| `ConsentController` | POST /consent | ~74 | ConsentService, ScopeResolverService, CsrfTokenService, LoginSessionService, ClientService |
 
-**Shared logic** (private helpers: `resolveSession()`, `issueCodeAndRedirect()`, `redirectToAuthorizeUI()`, `redirectWithError()`, `getSidCookieOptions()`) moves to `auth/session-helper.service.ts`.
+**Shared helpers** (`resolveSession()`, `issueCodeAndRedirect()`, `redirectToAuthorizeUI()`, `redirectWithError()`, `getSidCookieOptions()`) moved to `auth/session-helper.service.ts`.
 
-**Also:** Resolve `GET /api/oauth/logout` conflict — currently defined in both `OAuthTokenController` (redirect to UI) and `RevocationController` (returns 405). Last-registered wins at runtime. Decision needed on which behavior is correct.
-
-**Risk:** Medium. Route paths stay the same; only NestJS module registration changes. Requires careful review of inter-helper dependencies. Extract shared service first, then split.
+**Conflict resolved:** Removed `@Get('logout')` from `RevocationController` (was returning 405, shadowing the RP-Initiated Logout redirect). The `SessionController` now owns `GET /logout` for RP-Initiated Logout; `RevocationController` only handles `POST /logout`.
 
 ### 2.2 Merge `roleV2.controller.ts` into `role.controller.ts`
 
