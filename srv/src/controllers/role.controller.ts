@@ -1,13 +1,16 @@
 import {
+    Body,
     ClassSerializerInterceptor,
     Controller,
     Delete,
     Get,
     Param,
+    Patch,
     Post,
     UseGuards,
     UseInterceptors,
 } from "@nestjs/common";
+import * as yup from "yup";
 import {Environment} from "../config/environment.service";
 import {TenantService} from "../services/tenant.service";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
@@ -17,10 +20,18 @@ import {Action} from "../casl/actions.enum";
 import {SubjectEnum} from "../entity/subjectEnum";
 import {UsersService} from "../services/users.service";
 import {CurrentPermission, CurrentTenantId, Permission} from "../auth/auth.decorator";
+import {ValidationPipe} from "../validation/validation.pipe";
 
-@Controller("api/tenant")
+@Controller("api")
 @UseInterceptors(ClassSerializerInterceptor)
 export class RoleController {
+
+    static UpdateRoleSchema = yup.object().shape({
+        name: yup.string().optional(),
+        description: yup.string().optional(),
+        appId: yup.string().optional().nullable(),
+    });
+
     constructor(
         private readonly configService: Environment,
         private readonly tenantService: TenantService,
@@ -29,9 +40,9 @@ export class RoleController {
     ) {
     }
 
-    // ─── New token-derived routes (no :tenantId in URL) ───
+    // ─── V1 routes (token-derived, no :tenantId in URL) ───
 
-    @Post("/my/role/:name")
+    @Post("/tenant/my/role/:name")
     @UseGuards(JwtAuthGuard)
     async createMyRole(
         @CurrentPermission() permission: Permission,
@@ -41,7 +52,7 @@ export class RoleController {
         return this._createRole(permission, tenantId, name);
     }
 
-    @Delete("/my/role/:name")
+    @Delete("/tenant/my/role/:name")
     @UseGuards(JwtAuthGuard)
     async deleteMyRole(
         @CurrentPermission() permission: Permission,
@@ -51,7 +62,7 @@ export class RoleController {
         return this._deleteRole(permission, tenantId, name);
     }
 
-    @Get("/my/roles")
+    @Get("/tenant/my/roles")
     @UseGuards(JwtAuthGuard)
     async getMyTenantRoles(
         @CurrentPermission() permission: Permission,
@@ -60,14 +71,39 @@ export class RoleController {
         return this._getTenantRoles(permission, tenantId);
     }
 
-    @Get("/my/role/:name")
+    @Get("/tenant/my/role/:name")
     @UseGuards(JwtAuthGuard)
     async getMyRole(
         @CurrentPermission() permission: Permission,
         @CurrentTenantId() tenantId: string,
         @Param("name") name: string,
     ): Promise<any> {
-        return this._getRole(permission, tenantId, name);
+        return this._getRoleWithUsers(permission, tenantId, name);
+    }
+
+    // ─── V2 routes ───
+
+    @Patch("/role/:roleId")
+    @UseGuards(JwtAuthGuard)
+    async updateRoleDescription(
+        @CurrentPermission() permission: Permission,
+        @Param("roleId") roleId: string,
+        @Body(new ValidationPipe(RoleController.UpdateRoleSchema))
+        body: { name: string; description: string; appId?: string },
+    ): Promise<Role> {
+        return this.roleService.updateRole(permission, roleId, body.name, body.description, body.appId);
+    }
+
+    @Get("/role/:roleId")
+    @UseGuards(JwtAuthGuard)
+    async getRole(
+        @CurrentPermission() permission: Permission,
+        @Param("roleId") roleId: string,
+    ): Promise<any> {
+        const role = await this.roleService.findById(permission, roleId);
+        permission.isAuthorized(Action.Read, SubjectEnum.TENANT, role.tenant);
+        const users = await this.userService.findByRole(permission, role);
+        return {role, users};
     }
 
     // ─── Shared implementation methods ───
@@ -90,7 +126,7 @@ export class RoleController {
         return this.tenantService.getTenantRoles(permission, tenant);
     }
 
-    private async _getRole(permission: Permission, tenantId: string, name: string): Promise<any> {
+    private async _getRoleWithUsers(permission: Permission, tenantId: string, name: string): Promise<any> {
         const tenant = await this.tenantService.findById(permission, tenantId);
         permission.isAuthorized(Action.Read, SubjectEnum.TENANT, tenant);
         const role = await this.roleService.findByNameAndTenant(permission, name, tenant);

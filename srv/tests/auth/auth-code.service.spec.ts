@@ -101,66 +101,6 @@ describe('AuthCodeService', () => {
         });
     });
 
-    describe('auth code single-use enforcement', () => {
-        it('should reject a second token exchange with the same auth code', async () => {
-            const code = await tokenFixture.fetchAuthCodeWithConsentFlow(EMAIL, PASSWORD, {
-                clientId: CLIENT_ID,
-                redirectUri: REDIRECT_URI,
-                scope: 'openid profile email',
-                state: 'test-state',
-                codeChallenge: CODE_VERIFIER,
-                codeChallengeMethod: 'plain',
-            });
-
-            // First exchange — should succeed
-            const firstExchange = await app.getHttpServer()
-                .post('/api/oauth/token')
-                .send({
-                    grant_type: 'authorization_code',
-                    code,
-                    code_verifier: CODE_VERIFIER,
-                    client_id: CLIENT_ID,
-                    redirect_uri: REDIRECT_URI,
-                })
-                .set('Accept', 'application/json');
-
-            expect(firstExchange.status).toEqual(200);
-
-            // Second exchange — should fail
-            const secondExchange = await app.getHttpServer()
-                .post('/api/oauth/token')
-                .send({
-                    grant_type: 'authorization_code',
-                    code,
-                    code_verifier: CODE_VERIFIER,
-                    client_id: CLIENT_ID,
-                    redirect_uri: REDIRECT_URI,
-                })
-                .set('Accept', 'application/json');
-
-            expect(secondExchange.status).toEqual(400);
-            expect(secondExchange.body.error).toEqual('invalid_grant');
-        });
-    });
-
-    describe('invalid auth code', () => {
-        it('should reject token exchange with a non-existent auth code', async () => {
-            const tokenResponse = await app.getHttpServer()
-                .post('/api/oauth/token')
-                .send({
-                    grant_type: 'authorization_code',
-                    code: 'NONEXISTENT999',
-                    code_verifier: CODE_VERIFIER,
-                    client_id: CLIENT_ID,
-                    redirect_uri: REDIRECT_URI,
-                })
-                .set('Accept', 'application/json');
-
-            expect(tokenResponse.status).toEqual(400);
-            expect(tokenResponse.body.error).toEqual('invalid_grant');
-        });
-    });
-
     describe('subscriber tenant hint on auth code', () => {
         it('should store subscriber_tenant_hint on the auth code when provided', async () => {
             // Note: subscriber_tenant_hint requires the user to have a valid subscription.

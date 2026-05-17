@@ -140,22 +140,6 @@ export class RevocationController {
     }
 
     /**
-     * GET /api/oauth/logout
-     *
-     * Returns 405 Method Not Allowed. Logout requires POST.
-     * This prevents 404 noise from health-check probes (e.g. Portainer).
-     */
-    @Get('logout')
-    @HttpCode(405)
-    @Header('Allow', 'POST')
-    getLogout(): { error: string; error_description: string } {
-        return {
-            error: 'method_not_allowed',
-            error_description: 'Use POST to logout.',
-        };
-    }
-
-    /**
      * GET /api/oauth/revoke
      *
      * Returns 405 Method Not Allowed. Revocation requires POST.

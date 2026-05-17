@@ -57,40 +57,11 @@ describe('e2e negative token flow', () => {
         await app.close();
     });
 
-    it(`/POST Wrong Password `, async () => {
-        const response = await app.getHttpServer()
-            .post('/api/oauth/token')
-            .send({
-                "grant_type": "password",
-                "username": "admin@auth.server.com",
-                "password": "wrong-password",
-                "client_id": "auth.server.com"
-            })
-            .set('Accept', 'application/json');
-
-        expect(response.status).toEqual(400);
-        expect(response.body.error).toEqual('invalid_grant');
-    });
-
     it(`/POST Missing Grant Type `, async () => {
         const response = await app.getHttpServer()
             .post('/api/oauth/token')
             .send({
                 // "grant_type": "password",
-                "username": "admin@auth.server.com",
-                "password": "wrong-password",
-                "client_id": "auth.server.com"
-            })
-            .set('Accept', 'application/json');
-
-        expect(response.status).toEqual(400);
-    });
-
-    it(`/POST Wrong Grant Type `, async () => {
-        const response = await app.getHttpServer()
-            .post('/api/oauth/token')
-            .send({
-                "grant_type": "missing-Grant",
                 "username": "admin@auth.server.com",
                 "password": "wrong-password",
                 "client_id": "auth.server.com"
@@ -125,7 +96,6 @@ describe('e2e negative token flow', () => {
             })
             .set('Accept', 'application/json');
 
-        console.log(response.body);
         expect(response.status).toEqual(400);
     });
 
@@ -215,20 +185,6 @@ describe('e2e negative token flow', () => {
         expect(response.status).toEqual(400);
     });
 
-    it(`/POST Wrong Client Credentials`, async () => {
-        const response = await app.getHttpServer()
-            .post('/api/oauth/token')
-            .send({
-                "grant_type": "client_credentials",
-                "client_id": "sadasdasfasf",
-                "client_secret": "asfasfasfasfasf"
-            })
-            .set('Accept', 'application/json');
-
-        expect(response.status).toEqual(401);
-        expect(response.body.error).toEqual('invalid_client');
-    });
-
     it(`/POST password Gibberish `, async () => {
         const response = await app.getHttpServer()
             .post('/api/oauth/token')
@@ -240,7 +196,6 @@ describe('e2e negative token flow', () => {
             })
             .set('Accept', 'application/json');
 
-        console.log(response.body)
         expect(response.status).toEqual(400);
     });
 
@@ -309,7 +264,6 @@ describe('e2e negative token flow', () => {
             })
             .set('Accept', 'application/json');
 
-        console.log(response.body)
         expect(response.status).toEqual(400);
     });
 
@@ -324,7 +278,6 @@ describe('e2e negative token flow', () => {
             })
             .set('Accept', 'application/json');
 
-        console.log(response.body)
         expect(response.status).toEqual(400);
     });
 

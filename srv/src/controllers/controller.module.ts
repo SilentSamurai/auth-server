@@ -17,13 +17,15 @@ import {Role} from "../entity/role.entity";
 import {TenantMember} from "../entity/tenant.members.entity";
 import {Group} from "../entity/group.entity";
 import {ServiceModule} from "../services/service.module";
-import {OAuthTokenController} from "./oauth-token.controller";
+import {AuthorizeController} from "./authorize.controller";
+import {TokenController} from "./token.controller";
+import {SessionController} from "./session.controller";
+import {ConsentController} from "./consent.controller";
 import {OAuthVerificationController} from "./oauth-verification.controller";
 import {PasswordResetController} from "./password-reset.controller";
 import {EmailController} from "./email.controller";
 import {PolicyController} from "./policy.controller";
 import {GroupController} from "./group.controller";
-import {RoleControllerV2} from "./roleV2.controller";
 import {RegisterController} from "./registration.controller";
 import {AppController} from "./app.controller";
 import {App} from "../entity/app.entity"
@@ -65,13 +67,15 @@ import {UserRole} from "../entity/user.roles.entity";
             RoleController,
             MainController,
             GenericSearchController,
-            OAuthTokenController,
+            AuthorizeController,
+            TokenController,
+            SessionController,
+            ConsentController,
             OAuthVerificationController,
             PasswordResetController,
             EmailController,
             PolicyController,
             GroupController,
-            RoleControllerV2,
             RegisterController,
             AppController,
             TenantBitsController,

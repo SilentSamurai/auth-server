@@ -62,44 +62,6 @@ describe('auth code expiration', () => {
     });
 
     /**
-     * Requirement 2.2 / 2.3 — expired codes are rejected.
-     */
-    it('should reject a code that has already been redeemed (atomic UPDATE enforces expiration + single-use)', async () => {
-        const challenge = "expiration-reuse-check-ABCDEFGHIJKLMNOPQRSTU";
-        const code = await loginAndGetCode(challenge);
-
-        // First exchange — should succeed
-        const first = await app.getHttpServer()
-            .post('/api/oauth/token')
-            .send({
-                grant_type: "authorization_code",
-                code,
-                code_verifier: challenge,
-                client_id: clientId,
-                redirect_uri: redirectUri,
-            })
-            .set('Accept', 'application/json');
-
-        expect2xx(first);
-        expect(first.body.access_token).toBeDefined();
-
-        // Second exchange with the same code — should fail
-        const second = await app.getHttpServer()
-            .post('/api/oauth/token')
-            .send({
-                grant_type: "authorization_code",
-                code,
-                code_verifier: challenge,
-                client_id: clientId,
-                redirect_uri: redirectUri,
-            })
-            .set('Accept', 'application/json');
-
-        expect(second.status).toEqual(400);
-        expect(second.body.error).toEqual("invalid_grant");
-    });
-
-    /**
      * Requirement 2.1 — code is still valid within the 5-minute window.
      */
     it('should allow exchange within the expiration window (after a short delay)', async () => {

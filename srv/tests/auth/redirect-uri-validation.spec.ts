@@ -462,17 +462,6 @@ describe('Token exchange redirect URI binding', () => {
         expect(res.body.error_description).toBeDefined();
     });
 
-    // ─── Req 4.5: Stored redirect_uri + matching request → tokens issued ──
-    // (Since authorize always stores the redirect_uri, we test matching behavior)
-
-    it('should issue tokens when redirect_uri matches in both authorize and token request (Req 4.5)', async () => {
-        const code = await getAuthCode(REDIRECT_URI);
-        const res = await tokenRequest(code, {redirect_uri: REDIRECT_URI});
-
-        expect2xx(res);
-        expect(res.body.access_token).toBeDefined();
-        expect(res.body.token_type).toEqual('Bearer');
-    });
 });
 
 

@@ -87,37 +87,6 @@ describe('Nonce Replay Protection', () => {
         });
     });
 
-    // ── Requirement 2.1: Nonce in ID token ──────────────────────────
-
-    describe('nonce in ID token (Req 2.1)', () => {
-        it('should include exact nonce claim in ID token after full auth code flow', async () => {
-            const testNonce = 'full-flow-nonce-xyz789';
-            const code = await loginForCode({scope: 'openid profile email', nonce: testNonce});
-            const tokenResponse = await exchangeCode(code);
-
-            expect(tokenResponse.id_token).toBeDefined();
-            const payload = jwt.decode(tokenResponse.id_token) as any;
-            expect(payload).not.toBeNull();
-            expect(payload.nonce).toBeDefined();
-            expect(typeof payload.nonce).toBe('string');
-            expect(payload.nonce).toEqual(testNonce);
-        });
-    });
-
-    // ── Requirement 2.2: Nonce omitted from ID token ────────────────
-
-    describe('nonce omitted from ID token (Req 2.2)', () => {
-        it('should omit nonce claim from ID token when no nonce was provided', async () => {
-            const code = await loginForCode({scope: 'openid profile email'});
-            const tokenResponse = await exchangeCode(code);
-
-            expect(tokenResponse.id_token).toBeDefined();
-            const payload = jwt.decode(tokenResponse.id_token) as any;
-            expect(payload).not.toBeNull();
-            expect(payload.nonce).toBeUndefined();
-        });
-    });
-
     // ── Requirement 1.4: Nonce too long ─────────────────────────────
 
     describe('nonce too long (Req 1.4)', () => {

@@ -1,5 +1,5 @@
 import * as fc from 'fast-check';
-import {EmailResponse, SmtpClientAdapter} from '../smtp-client-adapter';
+import {EmailResponse, SmtpClientAdapter} from '../smtp/smtp-client-adapter';
 
 /**
  * Feature: shared-test-infrastructure, Property 4: URL extraction from email responses

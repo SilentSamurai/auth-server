@@ -9,8 +9,8 @@ import {Permission} from "../auth/auth.decorator";
 import {Action} from "../casl/actions.enum";
 import {SubjectEnum} from '../entity/subjectEnum';
 import {ClientService} from './client.service';
-import {deriveSlug, buildAlias} from '../utils/slug.util';
-import {isValidRedirectUri} from '../utils/redirect-uri.validator';
+import {deriveSlug, buildAlias} from '../util/slug.util';
+import {isValidRedirectUri} from '../util/redirect-uri.validator';
 import {AppClientAuditLogger} from '../log/app-client-audit.logger';
 import {TechnicalTokenService} from '../core/technical-token.service';
 
