@@ -39,12 +39,10 @@ export async function prepareApp() {
         };
     }
 
-    // smtp
+    // smtp — launch external FakeSmtpServer as a separate process
     if (Environment.get("ENABLE_FAKE_SMTP_SERVER", false)) {
-        const {createFakeSmtpServer} = await import("../tests/smtp/FakeSmtpServer");
-        const server = createFakeSmtpServer({});
-        await server.listen();
-        smtpServerRef = server;
+        const {launchFakeSmtpServer} = await import("./smtp/launch-fake-smtp");
+        smtpServerRef = await launchFakeSmtpServer();
     }
 
     console.log("Application options: ", options);

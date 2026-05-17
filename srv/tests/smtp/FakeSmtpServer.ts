@@ -445,5 +445,12 @@ export const createFakeSmtpServer = (
 // Auto-start server if this file is executed directly
 if (require.main === module) {
     const server = createFakeSmtpServer({});
-    server.listen().catch((err) => console.log(err));
+    server.listen()
+        .then(() => {
+            process.stdout.write("FAKE_SMTP_READY\n");
+        })
+        .catch((err) => {
+            console.error("Fake SMTP server failed to start:", err);
+            process.exit(1);
+        });
 }

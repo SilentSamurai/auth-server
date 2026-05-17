@@ -53,6 +53,8 @@ describe('Super Admin — Client Cross-Tenant CRUD Flow', () => {
         cy.get('pre').should('be.visible').invoke('text').should('not.be.empty');
         cy.get('.modal-footer').contains('button', 'Close').click();
 
+        cy.get('#FILTER_FIELD_name').clear().type(SHIRE_CLIENT);
+        cy.get('#default_FILTER_BAR_GO_BTN').click();
         cy.contains('td', SHIRE_CLIENT).should('exist');
     });
 
@@ -83,6 +85,8 @@ describe('Super Admin — Client Cross-Tenant CRUD Flow', () => {
         cy.get('pre').should('be.visible').invoke('text').should('not.be.empty');
         cy.get('.modal-footer').contains('button', 'Close').click();
 
+        cy.get('#FILTER_FIELD_name').clear().type(BREE_CLIENT);
+        cy.get('#default_FILTER_BAR_GO_BTN').click();
         cy.contains('td', BREE_CLIENT).should('exist');
     });
 
@@ -90,6 +94,8 @@ describe('Super Admin — Client Cross-Tenant CRUD Flow', () => {
     it('Verify Tenant A client detail shows correct owner tenant', function () {
         cy.goToAdminPage('CL01');
 
+        cy.get('#FILTER_FIELD_name').clear().type(SHIRE_CLIENT);
+        cy.get('#default_FILTER_BAR_GO_BTN').click();
         cy.contains('td a', SHIRE_CLIENT).click();
         cy.url().should('include', '/admin/CL02/');
 
@@ -102,6 +108,8 @@ describe('Super Admin — Client Cross-Tenant CRUD Flow', () => {
     it('Verify Tenant B client detail shows correct owner tenant', function () {
         cy.goToAdminPage('CL01');
 
+        cy.get('#FILTER_FIELD_name').clear().type(BREE_CLIENT);
+        cy.get('#default_FILTER_BAR_GO_BTN').click();
         cy.contains('td a', BREE_CLIENT).click();
         cy.url().should('include', '/admin/CL02/');
 
@@ -115,6 +123,8 @@ describe('Super Admin — Client Cross-Tenant CRUD Flow', () => {
     it('Edit Tenant A client name from admin CL02', function () {
         cy.goToAdminPage('CL01');
 
+        cy.get('#FILTER_FIELD_name').clear().type(SHIRE_CLIENT);
+        cy.get('#default_FILTER_BAR_GO_BTN').click();
         cy.contains('td a', SHIRE_CLIENT).click();
         cy.url().should('include', '/admin/CL02/');
 
@@ -138,6 +148,8 @@ describe('Super Admin — Client Cross-Tenant CRUD Flow', () => {
     it('Rotate secret on Tenant A client', function () {
         cy.goToAdminPage('CL01');
 
+        cy.get('#FILTER_FIELD_name').clear().type(SHIRE_CLIENT_EDITED);
+        cy.get('#default_FILTER_BAR_GO_BTN').click();
         cy.contains('td a', SHIRE_CLIENT_EDITED).click();
         cy.url().should('include', '/admin/CL02/');
 
@@ -162,6 +174,8 @@ describe('Super Admin — Client Cross-Tenant CRUD Flow', () => {
     it('Delete Tenant A client from admin CL02 detail page', function () {
         cy.goToAdminPage('CL01');
 
+        cy.get('#FILTER_FIELD_name').clear().type(SHIRE_CLIENT_EDITED);
+        cy.get('#default_FILTER_BAR_GO_BTN').click();
         cy.contains('td a', SHIRE_CLIENT_EDITED).click();
         cy.url().should('include', '/admin/CL02/');
 
@@ -176,12 +190,17 @@ describe('Super Admin — Client Cross-Tenant CRUD Flow', () => {
         });
 
         cy.url().should('include', '/admin/CL01');
+        cy.get('#FILTER_FIELD_name').clear().type(SHIRE_CLIENT_EDITED);
+        cy.get('#default_FILTER_BAR_GO_BTN').click();
         cy.contains('td', SHIRE_CLIENT_EDITED).should('not.exist');
     });
 
     // Delete Tenant B's client from the admin CL01 list via row action button
     it('Delete Tenant B client from admin CL01 list via row action', function () {
         cy.goToAdminPage('CL01');
+
+        cy.get('#FILTER_FIELD_name').clear().type(BREE_CLIENT);
+        cy.get('#default_FILTER_BAR_GO_BTN').click();
 
         cy.contains('td', BREE_CLIENT).should('exist');
 
