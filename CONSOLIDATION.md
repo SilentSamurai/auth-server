@@ -28,7 +28,7 @@ behavior. Updated from deep-dive audit (May 2026).
 | Mirrored UI components | Medium | 18 mirror pairs found (8 claimed, 10 newly identified) |
 | No barrel files | Low | All imports reference individual files directly |
 | `util/` vs `utils/` | ~~Low~~ | ~~Two directories, same purpose~~ (merged into `util/`) |
-| `migrations/` | Medium | 28 files (+1 registry `migrations/migrations.ts`); could be squashed to ~5 milestones |
+| `migrations/` | ~~Medium~~ | ~~28 files (+1 registry)~~ — squashed to 5 milestone files ✅ |
 | `OWH32` non-standard hash | Medium | Custom FNV-1a in `crypt.util.ts` bypassing RFC 7636 S256 — **actively used** as optional PKCE method |
 
 ---
@@ -290,19 +290,21 @@ Two CORS mechanisms coexist:
 
 ---
 
-## Phase 6 — Migration Squash (Lower Priority)
+## Phase 6 — Migration Squash ✅ COMPLETED
 
-Group 28 migrations into logical milestones:
+Grouped 28 migrations into 5 logical milestones:
 
-| Milestone | Migrations | Topic |
-|---|---|---|
-| 1 | 1681147242561 through 1718012430697 (earliest ~5) | Initial schema + OIDC core |
-| 2 | 1698765432100 through 1747000000000 (next ~5) | Authorization tables, subscriptions, apps |
-| 3 | 1748000000000 through 1752000000000 (next ~6) | Clients, PKCE, refresh tokens |
-| 4 | 1753000000000 through 1758000000000 (next ~6) | Refresh tokens, sessions, consents, aliases |
-| 5 | 1759000000000 through 1771000000000 (latest ~6) | Resource indicators, app client identity, onboarding config |
+| Milestone | File | Topic | Merged Migrations |
+|---|---|---|---|
+| 1 | `1800000000000-milestone-1-initial-schema.ts` | Initial schema + OIDC core | 7 files: users, tenants, roles, tenant_members, user_roles, auth_code, authorization, groups, group_users, group_roles |
+| 2 | `1800000000001-milestone-2-apps-subscriptions.ts` | Auth tables, subscriptions, apps | 3 files: apps, subscriptions, tenant_bits, app_id → roles, is_public |
+| 3 | `1800000000002-milestone-3-clients-pkce.ts` | Clients, PKCE | 6 files: clients table, user locked, redirect_uri + binding columns on auth_code, pkce_method_used, nullable PKCE columns |
+| 4 | `1800000000003-milestone-4-refresh-sessions-consents.ts` | Refresh tokens, sessions, consents | 6 files: refresh_tokens, tenant_keys, drop legacy keys, nonce, login_sessions, sid columns, user_consents, alias on clients |
+| 5 | `1800000000004-milestone-5-resource-indicators-onboarding.ts` | Resource indicators, app identity, onboarding | 6 files: require_auth_time, allowed_resources/resource, drop tenant creds, skip_session_confirm, app client_id FK, onboarding config |
 
-**Risk:** Medium. Requires a fresh DB to apply. Must preserve column/table names and data transformations exactly.
+**Status:** Done. All 28 old migration files deleted. Registry (`migrations.ts`) updated to reference only the 5 milestone files. No behavioral changes — all table/column names, types, and constraints preserved exactly.
+
+**Risk:** Requires a fresh DB to apply (existing DBs continue using previously-applied old migrations).
 
 ---
 
@@ -315,7 +317,7 @@ Group 28 migrations into logical milestones:
 | `controllers/` | 27 |
 | `auth/` | 25 |
 | `entity/` | 21 |
-| `migrations/` | 28 (+1 registry `migrations/migrations.ts`) |
+| `migrations/` | 5 (+1 registry `migrations/migrations.ts`) — squashed from 28 |
 | `services/` | 16 (+ `key-management.service.ts` not in previous inventory) |
 | `casl/` | 15 |
 | `core/` | 8 |
