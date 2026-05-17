@@ -4,7 +4,6 @@ export {UsersAdminController} from './users.admin.controller';
 export {TenantController} from './tenant.controller';
 export {MemberController} from './members.controller';
 export {RoleController} from './role.controller';
-export {RoleControllerV2} from './roleV2.controller';
 export {GroupController} from './group.controller';
 export {AppController} from './app.controller';
 export {ClientController} from './client.controller';

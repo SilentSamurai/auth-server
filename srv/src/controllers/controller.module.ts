@@ -26,7 +26,6 @@ import {PasswordResetController} from "./password-reset.controller";
 import {EmailController} from "./email.controller";
 import {PolicyController} from "./policy.controller";
 import {GroupController} from "./group.controller";
-import {RoleControllerV2} from "./roleV2.controller";
 import {RegisterController} from "./registration.controller";
 import {AppController} from "./app.controller";
 import {App} from "../entity/app.entity"
@@ -77,7 +76,6 @@ import {UserRole} from "../entity/user.roles.entity";
             EmailController,
             PolicyController,
             GroupController,
-            RoleControllerV2,
             RegisterController,
             AppController,
             TenantBitsController,

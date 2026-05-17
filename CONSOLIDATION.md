@@ -120,28 +120,11 @@ Medium effort, clear architectural benefit.
 
 **Conflict resolved:** Removed `@Get('logout')` from `RevocationController` (was returning 405, shadowing the RP-Initiated Logout redirect). The `SessionController` now owns `GET /logout` for RP-Initiated Logout; `RevocationController` only handles `POST /logout`.
 
-### 2.2 Merge `roleV2.controller.ts` into `role.controller.ts`
+### 2.2 Merge `roleV2.controller.ts` into `role.controller.ts` ✅
 
-**V1 routes** (`@Controller("api/tenant")`):
-- `POST /api/tenant/my/role/:name` — create role
-- `DELETE /api/tenant/my/role/:name` — delete role
-- `GET /api/tenant/my/roles` — list roles
-- `GET /api/tenant/my/role/:name` — get role by name
+**Status:** Done. V2 routes `PATCH /api/role/:roleId` and `GET /api/role/:roleId` merged into `RoleController`. Controller prefix changed from `api/tenant` to `api`; V1 routes adjusted to `/tenant/my/...`. Shared `_getRoleWithUsers()` helper deduplicates role-by-name and role-by-ID lookups. `RoleControllerV2` class and file deleted.
 
-**V2 routes** (`@Controller("api/role")`):
-- `PATCH /api/role/:roleId` — update role description
-- `GET /api/role/:roleId` — get role by ID
-
-**Files affected:**
-- Add PATCH + GET-by-ID routes to `role.controller.ts`
-- Change `RoleController` prefix from `api/tenant` to `api` and adjust V1 paths to `/tenant/my/...`
-- Create shared private helper `_getRoleWithUsers()` to deduplicate the get-role-by-name (V1) and get-role-by-ID (V2) logic
-- Copy static `UpdateRoleSchema` to `RoleController`
-- Add missing imports (`Body`, `Patch`, `ValidationPipe`)
-- Delete `roleV2.controller.ts`
-- Remove `RoleControllerV2` import from `controller.module.ts`
-
-**Risk:** Low. Routes don't overlap. Same 4 injected services in both controllers.
+**Risk:** Low. No route conflicts. Same 4 injected services. All 185 test suites, 1207 tests pass.
 
 ### 2.3 Split `token-issuance.service.ts` (668 lines)
 
