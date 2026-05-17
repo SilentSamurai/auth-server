@@ -26,7 +26,8 @@ import {AuthService} from '../_services/auth.service';
                 <div class="form-group mt-3">
                     <label for="name">Name</label>
                     <div class="input-group">
-                        <input class="form-control" formControlName="name" id="name" placeholder="Name" type="text" aria-describedby="name-error"/>
+                        <input class="form-control" formControlName="name" id="name" placeholder="Name" type="text"
+                               aria-describedby="name-error"/>
                     </div>
                     <div
                         *ngIf="signupForm.get('name')?.errors && (signupForm.get('name')?.touched || signupForm.get('name')?.dirty)"

@@ -1,6 +1,5 @@
 import {SharedTestFixture} from "../shared-test.fixture";
 import {TokenFixture} from "../token.fixture";
-import {expect2xx} from "../api-client/client";
 
 /**
  * Integration tests for concurrency safety of authorization code redemption.

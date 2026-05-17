@@ -120,7 +120,9 @@ Cypress.Commands.add('adminAddAppToTenant', (domain: string, appName: string, ap
     cy.addAppFromOverview(appName, appUrl, description);
 });
 
-Cypress.Commands.add('addAppFromOverview', (appName: string, appUrl: string, description: string, options?: { onboardingEnabled?: boolean }) => {
+Cypress.Commands.add('addAppFromOverview', (appName: string, appUrl: string, description: string, options?: {
+    onboardingEnabled?: boolean
+}) => {
     cy.contains('button', 'Apps').click();
     cy.contains('button', 'Create').click();
 

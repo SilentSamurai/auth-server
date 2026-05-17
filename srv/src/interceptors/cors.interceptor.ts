@@ -1,13 +1,14 @@
-import { Injectable, NestInterceptor, ExecutionContext, CallHandler, Logger } from "@nestjs/common";
-import { Observable } from "rxjs";
-import { Request, Response } from "express";
-import { CorsOriginService } from "../services/cors-origin.service";
+import {CallHandler, ExecutionContext, Injectable, Logger, NestInterceptor} from "@nestjs/common";
+import {Observable} from "rxjs";
+import {Request, Response} from "express";
+import {CorsOriginService} from "../services/cors-origin.service";
 
 @Injectable()
 export class CorsInterceptor implements NestInterceptor {
     private readonly logger = new Logger(CorsInterceptor.name);
 
-    constructor(private readonly corsOriginService: CorsOriginService) {}
+    constructor(private readonly corsOriginService: CorsOriginService) {
+    }
 
     async intercept(context: ExecutionContext, next: CallHandler): Promise<Observable<any>> {
         const ctx = context.switchToHttp();

@@ -160,7 +160,8 @@ describe('Feature: prompt-none-no-session, Property 7: prompt=none with no sessi
             expect(url.pathname).toBe('/authorize');
             expect(url.searchParams.get('view')).toBe('consent');
         } finally {
-            await clientApi.deleteClient(freshClientId).catch(() => {});
+            await clientApi.deleteClient(freshClientId).catch(() => {
+            });
         }
     });
 });

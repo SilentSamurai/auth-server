@@ -1,6 +1,7 @@
 # Multi-Tenant Onboarding
 
-The onboarding endpoint allows apps to programmatically provision tenants, subscriptions, and initial admin users in a single API call. It supports two patterns:
+The onboarding endpoint allows apps to programmatically provision tenants, subscriptions, and initial admin users in a
+single API call. It supports two patterns:
 
 - **Enterprise onboarding** — create a dedicated tenant per customer
 - **Community onboarding** — add users to a shared pre-existing tenant
@@ -15,18 +16,20 @@ The onboarding endpoint allows apps to programmatically provision tenants, subsc
 
 `protected (technical token)`  `application/json`
 
-Creates a tenant and subscription for the given app, optionally provisioning an initial admin user with all of the app's roles assigned.
+Creates a tenant and subscription for the given app, optionally provisioning an initial admin user with all of the app's
+roles assigned.
 
 ### Authorization
 
-This endpoint requires a **technical token** obtained via the `client_credentials` grant. The token's tenant must match the app's owner tenant.
+This endpoint requires a **technical token** obtained via the `client_credentials` grant. The token's tenant must match
+the app's owner tenant.
 
-| Condition | Result |
-|-----------|--------|
-| Missing or invalid `Authorization` header | `401 Unauthorized` |
-| User token (not a technical token) | `403 Forbidden` |
-| Technical token from a tenant that does not own the app | `403 Forbidden` |
-| `appId` does not reference a valid app | `404 Not Found` |
+| Condition                                               | Result             |
+|---------------------------------------------------------|--------------------|
+| Missing or invalid `Authorization` header               | `401 Unauthorized` |
+| User token (not a technical token)                      | `403 Forbidden`    |
+| Technical token from a tenant that does not own the app | `403 Forbidden`    |
+| `appId` does not reference a valid app                  | `404 Not Found`    |
 
 To obtain a technical token:
 
@@ -43,14 +46,15 @@ Content-Type: application/json
 
 ### Request
 
-| Parameter    | Type   | Required | Description |
-|--------------|--------|----------|-------------|
-| `tenantName` | string | Yes      | Display name for the new tenant |
-| `tenantDomain` | string | Yes   | Unique domain identifier for the tenant |
-| `userEmail`  | string | No       | Email address for the initial admin user |
-| `userName`   | string | No       | Full name for the initial admin user. Required when `userEmail` is provided |
+| Parameter      | Type   | Required | Description                                                                 |
+|----------------|--------|----------|-----------------------------------------------------------------------------|
+| `tenantName`   | string | Yes      | Display name for the new tenant                                             |
+| `tenantDomain` | string | Yes      | Unique domain identifier for the tenant                                     |
+| `userEmail`    | string | No       | Email address for the initial admin user                                    |
+| `userName`     | string | No       | Full name for the initial admin user. Required when `userEmail` is provided |
 
-When `userEmail` and `userName` are provided, the endpoint creates the user, adds them as a tenant member, and assigns all of the app's roles. The user receives an email with a temporary password.
+When `userEmail` and `userName` are provided, the endpoint creates the user, adds them as a tenant member, and assigns
+all of the app's roles. The user receives an email with a temporary password.
 
 When user fields are omitted, only the tenant and subscription are created.
 
@@ -80,12 +84,12 @@ When user fields are omitted, only the tenant and subscription are created.
 
 ### Error Responses
 
-| Status | Condition |
-|--------|-----------|
-| `400 Bad Request` | Missing required fields or invalid input (e.g., invalid email format, `userName` missing when `userEmail` provided) |
-| `401 Unauthorized` | Missing or invalid authorization token |
-| `403 Forbidden` | Token is not a technical token, or token's tenant does not own the app |
-| `404 Not Found` | `appId` does not reference a valid app |
+| Status             | Condition                                                                                                           |
+|--------------------|---------------------------------------------------------------------------------------------------------------------|
+| `400 Bad Request`  | Missing required fields or invalid input (e.g., invalid email format, `userName` missing when `userEmail` provided) |
+| `401 Unauthorized` | Missing or invalid authorization token                                                                              |
+| `403 Forbidden`    | Token is not a technical token, or token's tenant does not own the app                                              |
+| `404 Not Found`    | `appId` does not reference a valid app                                                                              |
 
 ---
 
@@ -97,7 +101,8 @@ When `tenantDomain` does not match any existing tenant, the endpoint:
 
 1. Creates the tenant with the given `tenantName` and `tenantDomain`
 2. Creates a subscription linking the tenant to the app
-3. If user fields are provided: creates the user, adds them to `tenant_members`, assigns all app roles via `user_roles`, and sends a password reset email
+3. If user fields are provided: creates the user, adds them to `tenant_members`, assigns all app roles via `user_roles`,
+   and sends a password reset email
 
 ### Existing Tenant — Already Subscribed
 
@@ -120,7 +125,8 @@ When the tenant exists but has no subscription to the app:
 Duplicate requests are safe. The endpoint uses database unique constraints to prevent duplicate records:
 
 - Calling with the same `tenantDomain` twice returns the same `tenantId` and `subscriptionId`
-- Calling with the same `userEmail` for an already-onboarded user returns the existing `userId` without creating duplicates
+- Calling with the same `userEmail` for an already-onboarded user returns the existing `userId` without creating
+  duplicates
 - Role assignments use the composite primary key `(tenant_id, user_id, role_id)` to prevent duplicate rows
 
 Network retries and race conditions will not produce inconsistent state.
@@ -157,13 +163,15 @@ Content-Type: application/json
 }
 ```
 
-The user `admin@acme-corp.com` receives an email with a temporary password and login instructions. They are assigned all of the app's roles and can manage role assignments for subsequent users via the tenant admin UI.
+The user `admin@acme-corp.com` receives an email with a temporary password and login instructions. They are assigned all
+of the app's roles and can manage role assignments for subsequent users via the tenant admin UI.
 
 ---
 
 ## Community Tenant Onboarding Example
 
-Add a free-tier user to a shared community tenant. The community tenant is pre-created by the app owner before onboarding begins.
+Add a free-tier user to a shared community tenant. The community tenant is pre-created by the app owner before
+onboarding begins.
 
 **Step 1 — Pre-create the community tenant** (one-time setup)
 
@@ -213,18 +221,19 @@ Content-Type: application/json
 }
 ```
 
-Since the tenant already exists and is subscribed, the endpoint adds the user as a member and assigns all app roles. Subsequent calls with the same `userEmail` are idempotent.
+Since the tenant already exists and is subscribed, the endpoint adds the user as a member and assigns all app roles.
+Subsequent calls with the same `userEmail` are idempotent.
 
 ---
 
 ## Email Notifications
 
-| Scenario | Email sent? |
-|----------|-------------|
-| New user created during onboarding | Yes — temporary password / reset link |
-| Existing user added to a new tenant | No |
-| Duplicate onboarding call for same user | No |
-| Onboarding without user fields | No |
+| Scenario                                | Email sent?                           |
+|-----------------------------------------|---------------------------------------|
+| New user created during onboarding      | Yes — temporary password / reset link |
+| Existing user added to a new tenant     | No                                    |
+| Duplicate onboarding call for same user | No                                    |
+| Onboarding without user fields          | No                                    |
 
 Email delivery failures are logged but do not roll back the onboarding transaction.
 
@@ -232,7 +241,8 @@ Email delivery failures are logged but do not roll back the onboarding transacti
 
 ## Transaction Guarantees
 
-All database operations within a single onboarding call (tenant creation, subscription, user creation, role assignment) are wrapped in a single transaction. If any step fails, the entire operation rolls back — no partial state is persisted.
+All database operations within a single onboarding call (tenant creation, subscription, user creation, role assignment)
+are wrapped in a single transaction. If any step fails, the entire operation rolls back — no partial state is persisted.
 
 Email delivery happens after the transaction commits and does not affect the transaction outcome.
 

@@ -18,6 +18,7 @@ interface JwtPayload {
     client_id?: string;
     aud?: string | string[];
     jti?: string;
+
     [key: string]: any;
 }
 
@@ -115,7 +116,7 @@ export class TokenFixture {
             ? new URL(location, 'http://localhost').searchParams.get('csrf_token') ?? ''
             : '';
 
-        return { flowIdCookie, csrfToken };
+        return {flowIdCookie, csrfToken};
     }
 
     /**
@@ -190,7 +191,7 @@ export class TokenFixture {
         const location: string = res.headers['location'] ?? '';
         const updatedFlowId = extractCookie(res.headers, 'flow_id') || flowIdCookie;
 
-        return { location, flowIdCookie: updatedFlowId };
+        return {location, flowIdCookie: updatedFlowId};
     }
 
     /**
@@ -230,7 +231,7 @@ export class TokenFixture {
         sidCookie: string,
         flowIdCookie: string,
     ): Promise<string> {
-        const { location } = await this.checkAuthorize(params, sidCookie, flowIdCookie);
+        const {location} = await this.checkAuthorize(params, sidCookie, flowIdCookie);
 
         expect(location).toBeDefined();
         const redirectUrl = new URL(location, 'http://localhost');
@@ -322,7 +323,7 @@ export class TokenFixture {
         const sidCookie = await this.login(email, password, params.clientId, csrfContext);
 
         // Check if consent is required
-        const { location, flowIdCookie } = await this.checkAuthorize(params, sidCookie, csrfContext.flowIdCookie);
+        const {location, flowIdCookie} = await this.checkAuthorize(params, sidCookie, csrfContext.flowIdCookie);
 
         if (location.includes('view=consent')) {
             const csrfToken = new URL(location, 'http://localhost').searchParams.get('csrf_token') ?? '';
@@ -393,7 +394,7 @@ export class TokenFixture {
         expect(res.body.refresh_token).toBeDefined();
         expect(res.body.token_type).toEqual('Bearer');
 
-        const jwt = this.app.jwtService().decode(res.body.access_token, { json: true }) as JwtPayload;
+        const jwt = this.app.jwtService().decode(res.body.access_token, {json: true}) as JwtPayload;
         expect(jwt.sub).toBeDefined();
         expect(jwt.tenant.id).toBeDefined();
 
@@ -451,7 +452,7 @@ export class TokenFixture {
         expect(res.body.access_token).toBeDefined();
         expect(res.body.token_type).toEqual('Bearer');
 
-        const jwt = this.app.jwtService().decode(res.body.access_token, { json: true }) as JwtPayload;
+        const jwt = this.app.jwtService().decode(res.body.access_token, {json: true}) as JwtPayload;
 
         return {
             accessToken: res.body.access_token,
@@ -469,7 +470,7 @@ export class TokenFixture {
      * This is a flow because it calls fetchAccessTokenFlow internally.
      */
     public async getUserFlow(email: string, password: string): Promise<any> {
-        const { accessToken } = await this.fetchAccessTokenFlow(email, password, "auth.server.com");
+        const {accessToken} = await this.fetchAccessTokenFlow(email, password, "auth.server.com");
         const res = await this.app.getHttpServer()
             .get("/api/users/me")
             .set('Authorization', `Bearer ${accessToken}`)
@@ -493,7 +494,7 @@ export class TokenFixture {
         const sidCookie = await this.login(email, password, params.clientId, csrfContext);
 
         // Hit /authorize to get consent redirect
-        const { location, flowIdCookie } = await this.checkAuthorize(params, sidCookie, csrfContext.flowIdCookie);
+        const {location, flowIdCookie} = await this.checkAuthorize(params, sidCookie, csrfContext.flowIdCookie);
 
         if (!location.includes('view=consent')) {
             return; // Consent not required

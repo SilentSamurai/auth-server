@@ -1,4 +1,5 @@
 import {
+    ClassSerializerInterceptor,
     Controller,
     Get,
     Header,
@@ -8,7 +9,6 @@ import {
     UnauthorizedException,
     UseFilters,
     UseInterceptors,
-    ClassSerializerInterceptor,
 } from "@nestjs/common";
 import {Request as ExpressRequest, Response} from "express";
 

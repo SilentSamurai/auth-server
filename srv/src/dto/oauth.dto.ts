@@ -1,5 +1,5 @@
 import * as yup from "yup";
-import {PASSWORD_REGEXP, PASSWORD_MESSAGE} from "./validation-common";
+import {PASSWORD_MESSAGE, PASSWORD_REGEXP} from "./validation-common";
 
 export const PasswordGrantSchema = yup.object().shape({
     grant_type: yup

@@ -30,15 +30,11 @@
  * in the body.
  */
 
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { catchError, lastValueFrom, throwError, timeout, TimeoutError } from 'rxjs';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {Injectable} from '@angular/core';
+import {catchError, lastValueFrom, throwError, timeout, TimeoutError} from 'rxjs';
 
-import {
-    ConsentBody,
-    LoginBody,
-    LoginResponse,
-} from './authorize.types';
+import {ConsentBody, LoginBody, LoginResponse,} from './authorize.types';
 
 /**
  * Base path for the OAuth HTTP endpoints. Matches the NestJS routes declared
@@ -61,7 +57,7 @@ const POST_TIMEOUT_MS = 15_000;
  * current login session and verify the CSRF token.
  */
 const HTTP_OPTIONS = {
-    headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+    headers: new HttpHeaders({'Content-Type': 'application/json'}),
     withCredentials: true,
 };
 
@@ -109,7 +105,7 @@ function assertCsrfToken(csrfToken: string): void {
     }
 }
 
-@Injectable({ providedIn: 'root' })
+@Injectable({providedIn: 'root'})
 export class AuthorizeApi {
     constructor(private readonly http: HttpClient) {
     }
@@ -132,7 +128,7 @@ export class AuthorizeApi {
 
         const request$ = this.http.post<LoginResponse>(
             `${AUTH_API}/login`,
-            { ...body, csrf_token: csrfToken },
+            {...body, csrf_token: csrfToken},
             HTTP_OPTIONS,
         ).pipe(
             timeout(POST_TIMEOUT_MS),
@@ -155,7 +151,7 @@ export class AuthorizeApi {
 
         const request$ = this.http.post<{ success: true }>(
             `${AUTH_API}/consent`,
-            { ...body, csrf_token: csrfToken },
+            {...body, csrf_token: csrfToken},
             HTTP_OPTIONS,
         ).pipe(
             timeout(POST_TIMEOUT_MS),
@@ -177,7 +173,7 @@ export class AuthorizeApi {
 
         const request$ = this.http.post<void>(
             `${AUTH_API}/logout`,
-            { csrf_token: csrfToken },
+            {csrf_token: csrfToken},
             HTTP_OPTIONS,
         ).pipe(
             timeout(POST_TIMEOUT_MS),
@@ -196,7 +192,7 @@ export class AuthorizeApi {
         return await lastValueFrom(
             this.http.get<{ email: string }>(
                 `${AUTH_API}/session-info`,
-                { withCredentials: true },
+                {withCredentials: true},
             ),
         );
     }

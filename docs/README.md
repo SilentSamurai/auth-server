@@ -13,12 +13,12 @@ servers.
 
 Auth Server supports the following OAuth 2.0 grant types:
 
-| Grant Type | Description |
-|---|---|
+| Grant Type           | Description                                                                                                            |
+|----------------------|------------------------------------------------------------------------------------------------------------------------|
 | `authorization_code` | Standard authorization code flow with mandatory PKCE support (RFC 7636). Recommended for all user-facing applications. |
-| `client_credentials` | Machine-to-machine authentication. Issues access tokens scoped to the client, with no user context. |
-| `refresh_token` | Exchange a refresh token for a new access token. Supports refresh token rotation for enhanced security. |
-| `password` | Resource Owner Password Credentials (legacy). Direct username/password exchange. Supported for backward compatibility. |
+| `client_credentials` | Machine-to-machine authentication. Issues access tokens scoped to the client, with no user context.                    |
+| `refresh_token`      | Exchange a refresh token for a new access token. Supports refresh token rotation for enhanced security.                |
+| `password`           | Resource Owner Password Credentials (legacy). Direct username/password exchange. Supported for backward compatibility. |
 
 See the [OAuth API](oauth.md) and [Token API](token-api.md) for endpoint details and request examples.
 
@@ -26,16 +26,16 @@ See the [OAuth API](oauth.md) and [Token API](token-api.md) for endpoint details
 
 Auth Server implements the OpenID Connect Core 1.0 specification on top of OAuth 2.0:
 
-| Feature | Description |
-|---|---|
-| **OIDC Discovery** | Auto-configuration endpoint at `/{tenantDomain}/.well-known/openid-configuration`. Clients can discover all server capabilities automatically. |
-| **JWKS Endpoint** | Per-tenant JSON Web Key Set at `/{tenantDomain}/.well-known/jwks.json`. Resource servers use this to verify token signatures. |
-| **ID Tokens** | Signed JWTs issued alongside access tokens when the `openid` scope is requested. Contains user identity claims. |
-| **UserInfo Endpoint** | Returns user profile claims for the authenticated user based on granted scopes. |
-| **Standard Scopes** | Supports `openid`, `profile`, and `email` scopes with their standard claim sets. |
-| **Nonce** | Replay attack prevention via the `nonce` parameter in authorization requests. |
-| **`prompt` parameter** | Controls authentication and consent behavior: `none`, `login`, `consent`, `select_account`. |
-| **`max_age` parameter** | Enforces a maximum authentication age, triggering re-authentication when exceeded. |
+| Feature                 | Description                                                                                                                                    |
+|-------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|
+| **OIDC Discovery**      | Auto-configuration endpoint at `/{tenantDomain}/.well-known/openid-configuration`. Clients can discover all server capabilities automatically. |
+| **JWKS Endpoint**       | Per-tenant JSON Web Key Set at `/{tenantDomain}/.well-known/jwks.json`. Resource servers use this to verify token signatures.                  |
+| **ID Tokens**           | Signed JWTs issued alongside access tokens when the `openid` scope is requested. Contains user identity claims.                                |
+| **UserInfo Endpoint**   | Returns user profile claims for the authenticated user based on granted scopes.                                                                |
+| **Standard Scopes**     | Supports `openid`, `profile`, and `email` scopes with their standard claim sets.                                                               |
+| **Nonce**               | Replay attack prevention via the `nonce` parameter in authorization requests.                                                                  |
+| **`prompt` parameter**  | Controls authentication and consent behavior: `none`, `login`, `consent`, `select_account`.                                                    |
+| **`max_age` parameter** | Enforces a maximum authentication age, triggering re-authentication when exceeded.                                                             |
 
 See [OIDC Discovery](oidc-discovery.md) and [JWKS Endpoint](jwks-endpoint.md) for detailed documentation.
 
@@ -59,10 +59,12 @@ See the [Architecture Overview](architecture.md) for a full description of the s
 ## Feature Documentation
 
 ### Getting Started
+
 - [Getting Started Guide](getting-started.md) — Register a tenant, configure a client, and run your first OAuth flow
 - [Architecture Overview](architecture.md) — System components, token model, and multi-tenant design
 
 ### OAuth 2.0 / OpenID Connect
+
 - [OAuth API](oauth.md) — Authorization endpoint, grant types, and PKCE
 - [OIDC Discovery](oidc-discovery.md) — Auto-configuration endpoint for OAuth clients
 - [JWKS Endpoint](jwks-endpoint.md) — Public key endpoint for resource servers
@@ -74,6 +76,7 @@ See the [Architecture Overview](architecture.md) for a full description of the s
 - [OIDC Compliance Requirements](oauth-oidc-compliance-requirements.md) — Full compliance checklist
 
 ### APIs
+
 - [Client API](client-api.md) — Managing OAuth client registrations
 - [User Management API](user-management-api.md) — User profile, email, password, and tenant membership
 - [Tenant Management API](tenant-management-api.md) — Creating and configuring tenants
@@ -81,6 +84,7 @@ See the [Architecture Overview](architecture.md) for a full description of the s
 - [Registration API](registration-api.md) — User sign-up, sign-down, and email verification
 
 ### Architecture & Advanced Topics
+
 - [Resource Server Verification](resource-server-verification.md) — Verifying Auth Server tokens in your API
 - [Audience Model](audience-model.md) — How the `aud` claim is populated and validated
 - [App-Owned Roles](app-owned-roles.md) — Define roles in your app tenant and apply them across subscriber tenants

@@ -2,7 +2,9 @@
 
 ## Overview
 
-The Tenant Management API provides endpoints for creating and managing tenants. Tenant administrators can update their tenant's settings, retrieve credentials, and view tenant information. Creating a new tenant requires a user with sufficient permissions (typically a super admin).
+The Tenant Management API provides endpoints for creating and managing tenants. Tenant administrators can update their
+tenant's settings, retrieve credentials, and view tenant information. Creating a new tenant requires a user with
+sufficient permissions (typically a super admin).
 
 All endpoints require a valid Bearer access token obtained via the OAuth 2.0 authorization flow.
 
@@ -18,17 +20,18 @@ All endpoints require an `Authorization` header with a valid Bearer token:
 Authorization: Bearer <access_token>
 ```
 
-The tenant context is derived from the token's `tenant` claim — the token determines which tenant the operation applies to. Users can only manage tenants they are a member of, and only if they hold the `TENANT_ADMIN` role for that tenant.
+The tenant context is derived from the token's `tenant` claim — the token determines which tenant the operation applies
+to. Users can only manage tenants they are a member of, and only if they hold the `TENANT_ADMIN` role for that tenant.
 
 ---
 
 ## Roles and Permissions
 
-| Role           | Permissions                                                                 |
-|----------------|-----------------------------------------------------------------------------|
-| `SUPER_ADMIN`  | Can create tenants and manage any tenant                                    |
-| `TENANT_ADMIN` | Can update, read, and delete their own tenant; can read credentials         |
-| `TENANT_VIEWER`| Can read tenant information; cannot update settings or read credentials     |
+| Role            | Permissions                                                             |
+|-----------------|-------------------------------------------------------------------------|
+| `SUPER_ADMIN`   | Can create tenants and manage any tenant                                |
+| `TENANT_ADMIN`  | Can update, read, and delete their own tenant; can read credentials     |
+| `TENANT_VIEWER` | Can read tenant information; cannot update settings or read credentials |
 
 ---
 
@@ -40,7 +43,8 @@ POST /api/tenant/create
 
 `protected`  `application/json`
 
-Creates a new tenant. The authenticated user becomes the first member and is automatically assigned the `TENANT_ADMIN` role in the new tenant. A default OAuth client is created for the tenant automatically.
+Creates a new tenant. The authenticated user becomes the first member and is automatically assigned the `TENANT_ADMIN`
+role in the new tenant. A default OAuth client is created for the tenant automatically.
 
 Requires `SUPER_ADMIN` role (authenticated against the super tenant domain).
 
@@ -53,12 +57,13 @@ Requires `SUPER_ADMIN` role (authenticated against the super tenant domain).
 }
 ```
 
-| Parameter | Required | Description                                                  |
-|-----------|----------|--------------------------------------------------------------|
-| `name`    | Yes      | Display name for the tenant (max 20 chars)                   |
-| `domain`  | Yes      | Unique domain identifier for the tenant (max 100 chars)      |
+| Parameter | Required | Description                                             |
+|-----------|----------|---------------------------------------------------------|
+| `name`    | Yes      | Display name for the tenant (max 20 chars)              |
+| `domain`  | Yes      | Unique domain identifier for the tenant (max 100 chars) |
 
-> **Note:** The `domain` must be unique across all tenants. If the domain is already taken, the request will fail with a `400` error.
+> **Note:** The `domain` must be unique across all tenants. If the domain is already taken, the request will fail with a
+`400` error.
 
 **Response**
 
@@ -74,13 +79,13 @@ Returns the newly created tenant object:
 }
 ```
 
-| Field         | Type    | Description                                              |
-|---------------|---------|----------------------------------------------------------|
-| `id`          | string  | UUID of the newly created tenant                         |
-| `name`        | string  | Display name of the tenant                               |
-| `domain`      | string  | Unique domain identifier                                 |
+| Field         | Type    | Description                                                |
+|---------------|---------|------------------------------------------------------------|
+| `id`          | string  | UUID of the newly created tenant                           |
+| `name`        | string  | Display name of the tenant                                 |
+| `domain`      | string  | Unique domain identifier                                   |
 | `allowSignUp` | boolean | Whether self-registration is enabled (defaults to `false`) |
-| `createdAt`   | string  | ISO 8601 timestamp of tenant creation                    |
+| `createdAt`   | string  | ISO 8601 timestamp of tenant creation                      |
 
 **What happens on creation**
 
@@ -92,11 +97,11 @@ Returns the newly created tenant object:
 
 **Error Responses**
 
-| Status | Description                                          |
-|--------|------------------------------------------------------|
-| `400`  | Invalid request body or domain is already taken      |
-| `401`  | Missing or invalid access token                      |
-| `403`  | Insufficient permissions (requires `SUPER_ADMIN`)    |
+| Status | Description                                       |
+|--------|---------------------------------------------------|
+| `400`  | Invalid request body or domain is already taken   |
+| `401`  | Missing or invalid access token                   |
+| `403`  | Insufficient permissions (requires `SUPER_ADMIN`) |
 
 ---
 
@@ -121,10 +126,10 @@ All fields are optional. Only the fields provided will be updated.
 }
 ```
 
-| Parameter     | Required | Description                                                    |
-|---------------|----------|----------------------------------------------------------------|
-| `name`        | No       | New display name for the tenant (max 128 chars)                |
-| `allowSignUp` | No       | Whether to allow users to self-register to this tenant         |
+| Parameter     | Required | Description                                            |
+|---------------|----------|--------------------------------------------------------|
+| `name`        | No       | New display name for the tenant (max 128 chars)        |
+| `allowSignUp` | No       | Whether to allow users to self-register to this tenant |
 
 **Response**
 
@@ -142,12 +147,12 @@ Returns the updated tenant object:
 
 **Error Responses**
 
-| Status | Description                                              |
-|--------|----------------------------------------------------------|
-| `400`  | Invalid request body                                     |
-| `401`  | Missing or invalid access token                          |
-| `403`  | Insufficient permissions (requires `TENANT_ADMIN` role)  |
-| `404`  | Tenant not found                                         |
+| Status | Description                                             |
+|--------|---------------------------------------------------------|
+| `400`  | Invalid request body                                    |
+| `401`  | Missing or invalid access token                         |
+| `403`  | Insufficient permissions (requires `TENANT_ADMIN` role) |
+| `404`  | Tenant not found                                        |
 
 ---
 
@@ -159,7 +164,8 @@ DELETE /api/tenant/my
 
 `protected`
 
-Deletes the tenant associated with the current access token. This is a destructive operation — all tenant data including members, roles, clients, and groups will be removed. Requires the `TENANT_ADMIN` role.
+Deletes the tenant associated with the current access token. This is a destructive operation — all tenant data including
+members, roles, clients, and groups will be removed. Requires the `TENANT_ADMIN` role.
 
 **Response**
 
@@ -177,11 +183,11 @@ Returns the deleted tenant object:
 
 **Error Responses**
 
-| Status | Description                                              |
-|--------|----------------------------------------------------------|
-| `401`  | Missing or invalid access token                          |
-| `403`  | Insufficient permissions (requires `TENANT_ADMIN` role)  |
-| `404`  | Tenant not found                                         |
+| Status | Description                                             |
+|--------|---------------------------------------------------------|
+| `401`  | Missing or invalid access token                         |
+| `403`  | Insufficient permissions (requires `TENANT_ADMIN` role) |
+| `404`  | Tenant not found                                        |
 
 ---
 
@@ -193,7 +199,8 @@ GET /api/tenant/my/credentials
 
 `protected`  `application/json`
 
-Returns the OAuth credentials and public signing key for the tenant associated with the current access token. Requires the `TENANT_ADMIN` role (or a technical token issued for the tenant).
+Returns the OAuth credentials and public signing key for the tenant associated with the current access token. Requires
+the `TENANT_ADMIN` role (or a technical token issued for the tenant).
 
 **Response**
 
@@ -205,21 +212,22 @@ Returns the OAuth credentials and public signing key for the tenant associated w
 }
 ```
 
-| Field       | Type   | Description                                                        |
-|-------------|--------|--------------------------------------------------------------------|
-| `id`        | string | UUID of the tenant                                                 |
-| `clientId`  | string | The `client_id` of the tenant's default OAuth client (the domain) |
+| Field       | Type   | Description                                                          |
+|-------------|--------|----------------------------------------------------------------------|
+| `id`        | string | UUID of the tenant                                                   |
+| `clientId`  | string | The `client_id` of the tenant's default OAuth client (the domain)    |
 | `publicKey` | string | PEM-encoded RSA public key used to verify JWTs issued by this tenant |
 
-> **Note:** The `client_secret` is not returned by this endpoint. It is only revealed when the client is created or when the secret is rotated via the [Client API](client-api.md).
+> **Note:** The `client_secret` is not returned by this endpoint. It is only revealed when the client is created or when
+> the secret is rotated via the [Client API](client-api.md).
 
 **Error Responses**
 
-| Status | Description                                                          |
-|--------|----------------------------------------------------------------------|
-| `401`  | Missing or invalid access token                                      |
+| Status | Description                                                                |
+|--------|----------------------------------------------------------------------------|
+| `401`  | Missing or invalid access token                                            |
 | `403`  | Insufficient permissions (requires `TENANT_ADMIN` role or technical token) |
-| `404`  | Tenant not found                                                     |
+| `404`  | Tenant not found                                                           |
 
 ---
 
@@ -231,7 +239,8 @@ GET /api/tenant/my/info
 
 `protected`  `application/json`
 
-Returns detailed information about the tenant associated with the current access token, including the default OAuth `client_id`. Requires at least the `TENANT_VIEWER` role.
+Returns detailed information about the tenant associated with the current access token, including the default OAuth
+`client_id`. Requires at least the `TENANT_VIEWER` role.
 
 **Response**
 
@@ -246,22 +255,22 @@ Returns detailed information about the tenant associated with the current access
 }
 ```
 
-| Field         | Type    | Description                                                        |
-|---------------|---------|--------------------------------------------------------------------|
-| `id`          | string  | UUID of the tenant                                                 |
-| `name`        | string  | Display name of the tenant                                         |
-| `domain`      | string  | Unique domain identifier                                           |
-| `allowSignUp` | boolean | Whether self-registration is enabled for this tenant               |
-| `createdAt`   | string  | ISO 8601 timestamp of tenant creation                              |
+| Field         | Type    | Description                                                       |
+|---------------|---------|-------------------------------------------------------------------|
+| `id`          | string  | UUID of the tenant                                                |
+| `name`        | string  | Display name of the tenant                                        |
+| `domain`      | string  | Unique domain identifier                                          |
+| `allowSignUp` | boolean | Whether self-registration is enabled for this tenant              |
+| `createdAt`   | string  | ISO 8601 timestamp of tenant creation                             |
 | `clientId`    | string  | The `client_id` of the tenant's default OAuth client (the domain) |
 
 **Error Responses**
 
-| Status | Description                                                         |
-|--------|---------------------------------------------------------------------|
-| `401`  | Missing or invalid access token                                     |
+| Status | Description                                                        |
+|--------|--------------------------------------------------------------------|
+| `401`  | Missing or invalid access token                                    |
 | `403`  | Insufficient permissions (requires `TENANT_VIEWER` role or higher) |
-| `404`  | Tenant not found                                                    |
+| `404`  | Tenant not found                                                   |
 
 ---
 

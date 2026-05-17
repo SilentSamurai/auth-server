@@ -1,6 +1,11 @@
 import * as fc from 'fast-check';
 import * as crypto from 'crypto';
-import {clampExpiry, generateOpaqueToken, hashToken, validateScopeSubset} from '../../../src/auth/refresh-token.service';
+import {
+    clampExpiry,
+    generateOpaqueToken,
+    hashToken,
+    validateScopeSubset
+} from '../../../src/auth/refresh-token.service';
 import {OAuthException} from '../../../src/exceptions/oauth-exception';
 
 /**

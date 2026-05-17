@@ -1,6 +1,7 @@
 # Token Revocation
 
-This page documents the token revocation and logout endpoints. Both endpoints implement [RFC 7009](https://datatracker.ietf.org/doc/html/rfc7009) semantics and require client authentication.
+This page documents the token revocation and logout endpoints. Both endpoints
+implement [RFC 7009](https://datatracker.ietf.org/doc/html/rfc7009) semantics and require client authentication.
 
 ---
 
@@ -117,8 +118,10 @@ logout rather than calling both separately.
 
 When called, the logout endpoint:
 
-1. **Invalidates the login session** (if `sid` is provided) — marks the session record as invalidated server-side and revokes all refresh tokens tied to that session.
-2. **Revokes the refresh token family** (if `refresh_token` is provided) — revokes the token and all tokens sharing the same `family_id`.
+1. **Invalidates the login session** (if `sid` is provided) — marks the session record as invalidated server-side and
+   revokes all refresh tokens tied to that session.
+2. **Revokes the refresh token family** (if `refresh_token` is provided) — revokes the token and all tokens sharing the
+   same `family_id`.
 3. **Clears session cookies** — always returns `Set-Cookie` headers that immediately expire the browser session cookies.
 
 Client authentication is required using the same methods as `/revoke`.
@@ -134,12 +137,12 @@ Client authentication is required using the same methods as `/revoke`.
 }
 ```
 
-| Field           | Required | Description                                                                                                                                 |
-|-----------------|----------|---------------------------------------------------------------------------------------------------------------------------------------------|
-| `refresh_token` | No       | The refresh token to revoke. If omitted, token revocation is skipped.                                                                       |
-| `sid`           | No       | The login session ID. If provided, the session is invalidated server-side and all refresh tokens associated with that session are revoked.   |
-| `client_id`     | Yes*     | Required when not using HTTP Basic auth or Bearer token                                                                                     |
-| `client_secret` | Yes*     | Required when not using HTTP Basic auth or Bearer token                                                                                     |
+| Field           | Required | Description                                                                                                                                |
+|-----------------|----------|--------------------------------------------------------------------------------------------------------------------------------------------|
+| `refresh_token` | No       | The refresh token to revoke. If omitted, token revocation is skipped.                                                                      |
+| `sid`           | No       | The login session ID. If provided, the session is invalidated server-side and all refresh tokens associated with that session are revoked. |
+| `client_id`     | Yes*     | Required when not using HTTP Basic auth or Bearer token                                                                                    |
+| `client_secret` | Yes*     | Required when not using HTTP Basic auth or Bearer token                                                                                    |
 
 **Response**
 

@@ -1,5 +1,11 @@
 import * as yup from "yup";
-import {PASSWORD_REGEXP, PASSWORD_MESSAGE, USERNAME_REGEXP, USERNAME_MESSAGE, parseDateString} from "./validation-common";
+import {
+    parseDateString,
+    PASSWORD_MESSAGE,
+    PASSWORD_REGEXP,
+    USERNAME_MESSAGE,
+    USERNAME_REGEXP
+} from "./validation-common";
 
 export const SignUpSchema = yup.object().shape({
     name: yup

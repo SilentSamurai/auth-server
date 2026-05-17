@@ -9,7 +9,7 @@ import {Permission} from "../auth/auth.decorator";
 import {Action} from "../casl/actions.enum";
 import {SubjectEnum} from '../entity/subjectEnum';
 import {ClientService} from './client.service';
-import {deriveSlug, buildAlias} from '../util/slug.util';
+import {buildAlias, deriveSlug} from '../util/slug.util';
 import {isValidRedirectUri} from '../util/redirect-uri.validator';
 import {AppClientAuditLogger} from '../log/app-client-audit.logger';
 import {TechnicalTokenService} from '../core/technical-token.service';
@@ -115,7 +115,7 @@ export class AppService {
 
             const reason = error instanceof ConflictException ? 'duplicate_alias'
                 : error instanceof BadRequestException ? 'validation_failed'
-                : 'persistence_error';
+                    : 'persistence_error';
             this.appClientAuditLogger.logCreateFailed({
                 appName: name,
                 ownerTenantId: tenantId,

@@ -36,7 +36,7 @@ import {Repository} from "typeorm";
 import {SIGNING_KEY_PROVIDER, SigningKeyProvider} from "../core/token-abstraction";
 import {TenantKey} from "../entity/tenant-key.entity";
 import {Environment} from "../config/environment.service";
-import {UpdateTenantSchema, MemberOperationSchema} from "../dto/tenant.dto";
+import {MemberOperationSchema, UpdateTenantSchema} from "../dto/tenant.dto";
 
 /**
  * Admin routes that explicitly accept :tenantId because super admins

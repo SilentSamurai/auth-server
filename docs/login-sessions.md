@@ -35,15 +35,15 @@ authenticated and the authorization flow can proceed without re-prompting for cr
 
 Each session is stored in the `login_sessions` table:
 
-| Column           | Description                                                                 |
-|------------------|-----------------------------------------------------------------------------|
-| `sid`            | UUID primary key — the session identifier embedded in the cookie            |
-| `user_id`        | The authenticated user                                                      |
-| `tenant_id`      | The tenant the session belongs to                                           |
-| `auth_time`      | Unix timestamp of when the user authenticated (used for `max_age` checks)  |
-| `expires_at`     | Absolute expiry datetime — session is invalid after this point              |
-| `invalidated_at` | Set when the session is explicitly invalidated (logout or `prompt=login`)   |
-| `created_at`     | Record creation timestamp                                                   |
+| Column           | Description                                                               |
+|------------------|---------------------------------------------------------------------------|
+| `sid`            | UUID primary key — the session identifier embedded in the cookie          |
+| `user_id`        | The authenticated user                                                    |
+| `tenant_id`      | The tenant the session belongs to                                         |
+| `auth_time`      | Unix timestamp of when the user authenticated (used for `max_age` checks) |
+| `expires_at`     | Absolute expiry datetime — session is invalid after this point            |
+| `invalidated_at` | Set when the session is explicitly invalidated (logout or `prompt=login`) |
+| `created_at`     | Record creation timestamp                                                 |
 
 A session is considered **valid** only when all of the following are true:
 
@@ -139,13 +139,13 @@ the server proceeds with the existing session if one is valid.
 
 ### Summary Table
 
-| `prompt` value   | Existing session | No session         | Behavior                                                    |
-|------------------|------------------|--------------------|-------------------------------------------------------------|
-| _(omitted)_      | Use session      | Show login UI      | Normal flow                                                 |
-| `none`           | Issue code       | `login_required`   | Silent auth — no UI interaction allowed                     |
-| `login`          | Invalidate, re-auth | Show login UI   | Always force fresh authentication                           |
-| `consent`        | Show consent UI  | Show login UI      | Always show consent screen                                  |
-| `select_account` | Use session      | Show login UI      | Treated as default behavior                                 |
+| `prompt` value   | Existing session    | No session       | Behavior                                |
+|------------------|---------------------|------------------|-----------------------------------------|
+| _(omitted)_      | Use session         | Show login UI    | Normal flow                             |
+| `none`           | Issue code          | `login_required` | Silent auth — no UI interaction allowed |
+| `login`          | Invalidate, re-auth | Show login UI    | Always force fresh authentication       |
+| `consent`        | Show consent UI     | Show login UI    | Always show consent screen              |
+| `select_account` | Use session         | Show login UI    | Treated as default behavior             |
 
 ---
 
@@ -182,12 +182,12 @@ front-channel logout scenarios.
 
 ## Error Reference
 
-| Error Code          | When it occurs                                                                 |
-|---------------------|--------------------------------------------------------------------------------|
-| `login_required`    | `prompt=none` and no valid session exists, or session is stale for `max_age`   |
-| `consent_required`  | `prompt=none` and consent has not been granted for the requested scopes        |
-| `invalid_request`   | `prompt=none` combined with other prompt values                                |
-| `invalid_grant`     | Session lookup fails during token exchange (session expired or invalidated)    |
+| Error Code         | When it occurs                                                               |
+|--------------------|------------------------------------------------------------------------------|
+| `login_required`   | `prompt=none` and no valid session exists, or session is stale for `max_age` |
+| `consent_required` | `prompt=none` and consent has not been granted for the requested scopes      |
+| `invalid_request`  | `prompt=none` combined with other prompt values                              |
+| `invalid_grant`    | Session lookup fails during token exchange (session expired or invalidated)  |
 
 ---
 

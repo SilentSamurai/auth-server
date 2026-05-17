@@ -1,7 +1,6 @@
 import {
     Body,
     ClassSerializerInterceptor,
-    ConflictException,
     Controller,
     Delete,
     ForbiddenException,
@@ -36,31 +35,6 @@ export class AppController {
         private readonly securityService: SecurityService,
         private readonly onboardingService: OnboardingService
     ) {
-    }
-
-    private mapAppResponse(app: any): any {
-        return {
-            id: app.id,
-            name: app.name,
-            appUrl: app.appUrl,
-            description: app.description,
-            isPublic: app.isPublic,
-            ownerTenantId: app.owner?.id,
-            createdAt: app.createdAt,
-            clientId: app.client?.clientId,
-            alias: app.client?.alias,
-            onboardingEnabled: app.onboardingEnabled,
-            onboardingCallbackUrl: app.onboardingCallbackUrl,
-        };
-    }
-
-    private mapAppDetailResponse(app: any): any {
-        const base = this.mapAppResponse(app);
-        if (app.client) {
-            const {clientSecrets, ...safeClient} = app.client;
-            base.client = safeClient;
-        }
-        return base;
     }
 
     @Post("/create")
@@ -103,8 +77,6 @@ export class AppController {
         return {status: 'success'};
     }
 
-    // ─── New token-derived routes (no :tenantId in URL) ───
-
     @Post('/:appId/my/subscribe')
     @UseGuards(JwtAuthGuard)
     async subscribeMyTenantToApp(
@@ -124,6 +96,8 @@ export class AppController {
     ) {
         return this._unsubscribeFromApp(permission, appId, tenantId);
     }
+
+    // ─── New token-derived routes (no :tenantId in URL) ───
 
     @Get('/my/subscriptions')
     @UseGuards(JwtAuthGuard)
@@ -199,7 +173,7 @@ export class AppController {
     ) {
         // Extract token via SecurityService
         const technicalToken = this.securityService.getTechnicalToken(permission.authContext);
-        
+
         // Get the app with owner relation
         let app;
         try {
@@ -207,20 +181,45 @@ export class AppController {
         } catch (error) {
             throw new NotFoundException('App not found');
         }
-        
+
         // Verify token is TechnicalToken (client_credentials grant) and belongs to app owner
         if (technicalToken.tenant.id !== app.owner.id) {
             throw new ForbiddenException('Technical token does not belong to app owner');
         }
-        
+
         // Call OnboardingService.onboardCustomer()
         const response = await this.onboardingService.onboardCustomer(
             appId,
             app.owner.id,
             body
         );
-        
+
         return response;
+    }
+
+    private mapAppResponse(app: any): any {
+        return {
+            id: app.id,
+            name: app.name,
+            appUrl: app.appUrl,
+            description: app.description,
+            isPublic: app.isPublic,
+            ownerTenantId: app.owner?.id,
+            createdAt: app.createdAt,
+            clientId: app.client?.clientId,
+            alias: app.client?.alias,
+            onboardingEnabled: app.onboardingEnabled,
+            onboardingCallbackUrl: app.onboardingCallbackUrl,
+        };
+    }
+
+    private mapAppDetailResponse(app: any): any {
+        const base = this.mapAppResponse(app);
+        if (app.client) {
+            const {clientSecrets, ...safeClient} = app.client;
+            base.client = safeClient;
+        }
+        return base;
     }
 
     // ─── Shared implementation methods ───

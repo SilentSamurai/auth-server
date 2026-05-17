@@ -283,7 +283,8 @@ describe('GET /api/oauth/authorize', () => {
                 // Redirects to login UI (no session in this request — no cookie sent)
                 expect(location.searchParams.get('error')).toBeNull();
             } finally {
-                await clientApi.deleteClient(clientId).catch(() => {});
+                await clientApi.deleteClient(clientId).catch(() => {
+                });
             }
         });
 

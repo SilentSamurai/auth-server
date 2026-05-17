@@ -119,7 +119,7 @@ import {CloseType, ValueHelpResult} from '../../component/value-help/value-help.
                                 <td>
                                     <a
                                         [routerLink]="['/RL02', tenantId, role.id]"
-                                        
+
                                     >{{ role.name }}</a>
                                 </td>
                                 <td>{{ role.description }}</td>
@@ -170,7 +170,8 @@ export class GP02Component implements OnInit {
         private authDefaultService: AuthDefaultService,
         private confirmationService: ConfirmationService,
         private modalService: ModalService,
-    ) {}
+    ) {
+    }
 
     async ngOnInit() {
         this.loading = true;

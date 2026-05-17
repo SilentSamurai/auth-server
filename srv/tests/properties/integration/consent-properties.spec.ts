@@ -76,7 +76,7 @@ describe('Feature: user-consent-tracking, Property 1: Consent version tracks mut
         const csrfContext = await tokenFixture.initializeFlow(params);
         const sidCookie = await tokenFixture.login(email, password, clientId, csrfContext);
 
-        const { location } = await tokenFixture.checkAuthorize(params, sidCookie, csrfContext.flowIdCookie);
+        const {location} = await tokenFixture.checkAuthorize(params, sidCookie, csrfContext.flowIdCookie);
 
         if (location.includes('view=consent') || location.includes('/consent?')) return true;
 
@@ -271,7 +271,7 @@ describe('Feature: user-consent-tracking, Property 4: Granting consent produces 
         const csrfContext = await tokenFixture.initializeFlow(params);
         const sidCookie = await tokenFixture.login(email, password, clientId, csrfContext);
 
-        const { location } = await tokenFixture.checkAuthorize(params, sidCookie, csrfContext.flowIdCookie);
+        const {location} = await tokenFixture.checkAuthorize(params, sidCookie, csrfContext.flowIdCookie);
 
         if (location.includes('view=consent') || location.includes('/consent?')) return true;
 
@@ -477,7 +477,10 @@ describe('Feature: user-consent-tracking, Property 3: Missing consent record alw
      *   { consentRequired: true }  if /authorize redirected to the consent UI
      *   { consentRequired: false, code }  if /authorize issued a code to redirect_uri
      */
-    async function checkConsent(clientId: string, scopes: string[]): Promise<{ consentRequired: boolean; code?: string }> {
+    async function checkConsent(clientId: string, scopes: string[]): Promise<{
+        consentRequired: boolean;
+        code?: string
+    }> {
         const params = {
             clientId,
             redirectUri: REDIRECT_URI,
@@ -489,7 +492,7 @@ describe('Feature: user-consent-tracking, Property 3: Missing consent record alw
         const csrfContext = await tokenFixture.initializeFlow(params);
         const sidCookie = await tokenFixture.login(email, password, clientId, csrfContext);
 
-        const { location } = await tokenFixture.checkAuthorize(params, sidCookie, csrfContext.flowIdCookie);
+        const {location} = await tokenFixture.checkAuthorize(params, sidCookie, csrfContext.flowIdCookie);
 
         // Consent UI redirect → consent required
         if (location.includes('view=consent') || location.includes('/consent?')) {
@@ -680,7 +683,7 @@ describe('Feature: user-consent-tracking, Property 5: Narrower requests do not m
         const csrfContext = await tokenFixture.initializeFlow(params);
         const sidCookie = await tokenFixture.login(email, password, clientId, csrfContext);
 
-        const { location } = await tokenFixture.checkAuthorize(params, sidCookie, csrfContext.flowIdCookie);
+        const {location} = await tokenFixture.checkAuthorize(params, sidCookie, csrfContext.flowIdCookie);
 
         if (location.includes('view=consent') || location.includes('/consent?')) return true;
 
@@ -941,7 +944,7 @@ describe('Feature: user-consent-tracking, Property 2: Consent required iff reque
         const csrfContext = await tokenFixture.initializeFlow(params);
         const sidCookie = await tokenFixture.login(email, password, clientId, csrfContext);
 
-        const { location } = await tokenFixture.checkAuthorize(params, sidCookie, csrfContext.flowIdCookie);
+        const {location} = await tokenFixture.checkAuthorize(params, sidCookie, csrfContext.flowIdCookie);
 
         if (location.includes('view=consent') || location.includes('/consent?')) {
             return true;

@@ -14,9 +14,9 @@
  * redirects), P8 (one-shot flags isolation).
  */
 
-import { ParamMap } from '@angular/router';
+import {ParamMap} from '@angular/router';
 
-import { OAuthParameters } from './authorize.types';
+import {OAuthParameters} from './authorize.types';
 
 /**
  * The valid set of `view` query values the backend may emit when redirecting
@@ -117,7 +117,7 @@ export function parseOAuthParametersFromUrl(queryMap: ParamMap): ParseOAuthParam
     // by `app-routing.module.ts`. Nothing useful to parse; render the
     // "page no longer exists" error (Req 10.5).
     if (queryMap.get('error') === 'legacy_route') {
-        return { params: null, csrfToken: null, view: null, error: 'legacy_route' };
+        return {params: null, csrfToken: null, view: null, error: 'legacy_route'};
     }
 
     // (2) & (3) Required OAuth parameters. Without these we cannot build an
@@ -125,12 +125,12 @@ export function parseOAuthParametersFromUrl(queryMap: ParamMap): ParseOAuthParam
     // renders the terminal "invalid authorization request" view.
     const clientId = queryMap.get('client_id');
     if (!clientId) {
-        return { params: null, csrfToken: null, view: null, error: 'missing_client_id' };
+        return {params: null, csrfToken: null, view: null, error: 'missing_client_id'};
     }
 
     const redirectUri = queryMap.get('redirect_uri');
     if (!redirectUri) {
-        return { params: null, csrfToken: null, view: null, error: 'missing_redirect_uri' };
+        return {params: null, csrfToken: null, view: null, error: 'missing_redirect_uri'};
     }
 
     // Build the parameter object now — the remaining checks are about how we
@@ -184,7 +184,7 @@ export function parseOAuthParametersFromUrl(queryMap: ParamMap): ParseOAuthParam
     // params are present (Req 1.7).
     const view = rawView && rawView !== '' ? rawView : 'login';
 
-    return { params, csrfToken, view };
+    return {params, csrfToken, view};
 }
 
 /**

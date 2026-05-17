@@ -119,11 +119,11 @@ export class UpdateTenantComponent implements OnInit {
     async onSubmit() {
         try {
             let editedTenant = await this.tenantService.editTenant(
-                    this.tenant.name === this.form.name ? null : this.form.name,
-                    this.tenant.allowSignUp === this.form.allowSignUp
-                        ? null
-                        : this.form.allowSignUp,
-                );
+                this.tenant.name === this.form.name ? null : this.form.name,
+                this.tenant.allowSignUp === this.form.allowSignUp
+                    ? null
+                    : this.form.allowSignUp,
+            );
             this.messageService.add({
                 severity: 'success',
                 summary: 'Success',

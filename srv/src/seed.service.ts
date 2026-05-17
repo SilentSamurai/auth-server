@@ -9,7 +9,6 @@ import {ClientService} from "./services/client.service";
 import {User} from "./entity/user.entity";
 import {readFile} from "fs/promises";
 import {Tenant} from "./entity/tenant.entity";
-import {RoleEnum} from "./entity/roleEnum";
 import {SecurityService} from "./casl/security.service";
 
 function resolveAdminUiCallbackUris(configService: Environment, logger: Logger): string[] {
@@ -84,7 +83,12 @@ export class SeedService {
             const adminUiCallbackUris = resolveAdminUiCallbackUris(this.configService, this.logger);
 
             const dummyTenants: { name: string; domain: string; signUp: boolean; redirectUris?: string[] }[] = [
-                {name: "Shire Tenant", domain: "shire.local", signUp: true, redirectUris: ['http://localhost:3000/', 'http://localhost:3000', 'http://localhost:3000/no-pkce.html']},
+                {
+                    name: "Shire Tenant",
+                    domain: "shire.local",
+                    signUp: true,
+                    redirectUris: ['http://localhost:3000/', 'http://localhost:3000', 'http://localhost:3000/no-pkce.html']
+                },
                 {name: "Bree Tenant", domain: "bree.local", signUp: false},
                 {name: "Rivendell Tenant", domain: "rivendell.local", signUp: false},
                 {name: "Mordor Tenant", domain: "mordor.local", signUp: false},
@@ -95,38 +99,137 @@ export class SeedService {
                 {name: "Erebor Tenant", domain: "erebor.local", signUp: false},
                 {name: "Isengard Tenant", domain: "isengard.local", signUp: false},
                 {name: "Perm Test Tenant", domain: "perm-test.local", signUp: false},
-                {name: "Prompt Test Tenant", domain: "prompt-test.local", signUp: false, redirectUris: ['http://localhost:3000/callback']},
-                {name: "Nonce Test Tenant", domain: "nonce-test.local", signUp: false, redirectUris: ['http://localhost:3000/callback']},
-                {name: "Compliance Test Tenant", domain: "compliance-test.local", signUp: false, redirectUris: ['http://localhost:3000/callback']},
-                {name: "IDToken Test Tenant", domain: "idtoken-test.local", signUp: false, redirectUris: ['http://localhost:3000/callback']},
-                {name: "Auth Cleanup Test Tenant", domain: "auth-cleanup-test.local", signUp: false, redirectUris: ['http://localhost:3000/callback']},
-                {name: "ID Token Aud Test Tenant", domain: "idtoken-aud-test.local", signUp: false, redirectUris: ['http://localhost:3000/callback']},
+                {
+                    name: "Prompt Test Tenant",
+                    domain: "prompt-test.local",
+                    signUp: false,
+                    redirectUris: ['http://localhost:3000/callback']
+                },
+                {
+                    name: "Nonce Test Tenant",
+                    domain: "nonce-test.local",
+                    signUp: false,
+                    redirectUris: ['http://localhost:3000/callback']
+                },
+                {
+                    name: "Compliance Test Tenant",
+                    domain: "compliance-test.local",
+                    signUp: false,
+                    redirectUris: ['http://localhost:3000/callback']
+                },
+                {
+                    name: "IDToken Test Tenant",
+                    domain: "idtoken-test.local",
+                    signUp: false,
+                    redirectUris: ['http://localhost:3000/callback']
+                },
+                {
+                    name: "Auth Cleanup Test Tenant",
+                    domain: "auth-cleanup-test.local",
+                    signUp: false,
+                    redirectUris: ['http://localhost:3000/callback']
+                },
+                {
+                    name: "ID Token Aud Test Tenant",
+                    domain: "idtoken-aud-test.local",
+                    signUp: false,
+                    redirectUris: ['http://localhost:3000/callback']
+                },
                 {name: "Perms Test Tenant", domain: "perms-test.local", signUp: false},
-                {name: "Session Claims Test Tenant", domain: "session-claims-test.local", signUp: false, redirectUris: ['http://localhost:3000/callback']},
-                {name: "Prompt Prop Test Tenant", domain: "prompt-prop-test.local", signUp: false, redirectUris: ['http://localhost:3000/callback']},
-                {name: "Auth Code Expiry Test Tenant", domain: "auth-code-expiry-test.local", signUp: false, redirectUris: ['http://localhost:3000/callback']},
+                {
+                    name: "Session Claims Test Tenant",
+                    domain: "session-claims-test.local",
+                    signUp: false,
+                    redirectUris: ['http://localhost:3000/callback']
+                },
+                {
+                    name: "Prompt Prop Test Tenant",
+                    domain: "prompt-prop-test.local",
+                    signUp: false,
+                    redirectUris: ['http://localhost:3000/callback']
+                },
+                {
+                    name: "Auth Code Expiry Test Tenant",
+                    domain: "auth-code-expiry-test.local",
+                    signUp: false,
+                    redirectUris: ['http://localhost:3000/callback']
+                },
                 {name: "Offline Access Test Tenant", domain: "offline-access-test.local", signUp: false},
-                {name: "Redirect URI Binding Test Tenant", domain: "redirect-uri-test.local", signUp: false, redirectUris: ['https://myapp.example.com/callback']},
-                {name: "Redirect URI Bypass Test Tenant", domain: "redirect-uri-bypass-test.local", signUp: false, redirectUris: ['https://legit-app.example.com/callback']},
+                {
+                    name: "Redirect URI Binding Test Tenant",
+                    domain: "redirect-uri-test.local",
+                    signUp: false,
+                    redirectUris: ['https://myapp.example.com/callback']
+                },
+                {
+                    name: "Redirect URI Bypass Test Tenant",
+                    domain: "redirect-uri-bypass-test.local",
+                    signUp: false,
+                    redirectUris: ['https://legit-app.example.com/callback']
+                },
                 {name: "OIDC Compat Test Tenant", domain: "oidc-compat-test.local", signUp: false},
-                {name: "Client Creds Migration Test Tenant", domain: "client-creds-migration-test.local", signUp: false},
-                {name: "Client Binding Test Tenant", domain: "client-binding-test.local", signUp: false, redirectUris: ['http://localhost:3000/callback']},
-                {name: "Auth Code Single Use Test Tenant", domain: "auth-code-single-use-test.local", signUp: false, redirectUris: ['http://localhost:3000/callback']},
-                {name: "UserInfo Test Tenant", domain: "userinfo-test.local", signUp: false, redirectUris: ['http://localhost:3000/callback']},
-                {name: "Session Threading Test Tenant", domain: "session-threading-test.local", signUp: false, redirectUris: ['http://localhost:3000/callback']},
+                {
+                    name: "Client Creds Migration Test Tenant",
+                    domain: "client-creds-migration-test.local",
+                    signUp: false
+                },
+                {
+                    name: "Client Binding Test Tenant",
+                    domain: "client-binding-test.local",
+                    signUp: false,
+                    redirectUris: ['http://localhost:3000/callback']
+                },
+                {
+                    name: "Auth Code Single Use Test Tenant",
+                    domain: "auth-code-single-use-test.local",
+                    signUp: false,
+                    redirectUris: ['http://localhost:3000/callback']
+                },
+                {
+                    name: "UserInfo Test Tenant",
+                    domain: "userinfo-test.local",
+                    signUp: false,
+                    redirectUris: ['http://localhost:3000/callback']
+                },
+                {
+                    name: "Session Threading Test Tenant",
+                    domain: "session-threading-test.local",
+                    signUp: false,
+                    redirectUris: ['http://localhost:3000/callback']
+                },
                 {name: "Sub Flow A Tenant", domain: "sub-flow-a.local", signUp: true},
                 {name: "Sub Flow B Tenant", domain: "sub-flow-b.local", signUp: false},
                 {name: "Forgot PW Test Tenant", domain: "forgot-pw-test.local", signUp: true},
                 {name: "Onboard Test Tenant", domain: "onboard-test.local", signUp: false},
                 {name: "Onboard App Owner Tenant", domain: "onboard-app-owner.local", signUp: false},
                 {name: "Onboard Subscriber Tenant", domain: "onboard-subscriber.local", signUp: false},
-                {name: "Login Session Test Tenant", domain: "login-session-test.local", signUp: false, redirectUris: ['http://localhost:3000/callback']},
+                {
+                    name: "Login Session Test Tenant",
+                    domain: "login-session-test.local",
+                    signUp: false,
+                    redirectUris: ['http://localhost:3000/callback']
+                },
                 {name: "PKCE Bug Condition Test Tenant", domain: "pkce-bug-condition-test.local", signUp: false},
                 {name: "PKCE Preservation Test Tenant", domain: "pkce-preservation-test.local", signUp: false},
-                {name: "PKCE E2E Test Tenant", domain: "pkce-e2e-test.local", signUp: false, redirectUris: ['http://localhost:3000/no-pkce.html']},
+                {
+                    name: "PKCE E2E Test Tenant",
+                    domain: "pkce-e2e-test.local",
+                    signUp: false,
+                    redirectUris: ['http://localhost:3000/no-pkce.html']
+                },
                 {name: "Client Rotate Test Tenant", domain: "client-rotate-test.local", signUp: false},
-                {name: "Auth Code Reuse Test Tenant", domain: "auth-code-reuse-test.local", signUp: false, redirectUris: ['http://localhost:3000/callback']},
-                {name: "Per-App Client Test Tenant", domain: "per-app-client-test.local", signUp: false, redirectUris: ['http://localhost:3000/callback']},
+                {
+                    name: "Auth Code Reuse Test Tenant",
+                    domain: "auth-code-reuse-test.local",
+                    signUp: false,
+                    redirectUris: ['http://localhost:3000/callback']
+                },
+                {
+                    name: "Per-App Client Test Tenant",
+                    domain: "per-app-client-test.local",
+                    signUp: false,
+                    redirectUris: ['http://localhost:3000/callback']
+                },
                 {name: "Group E2E Test Tenant", domain: "group-e2e-test.local", signUp: false},
             ];
 
@@ -207,16 +310,55 @@ export class SeedService {
                     roles: ["Editor", "Reviewer"],
                     groups: ["Hobbits", "Gardeners"],
                     apps: [
-                        {name: "Shire Portal", appUrl: "https://portal.shire.local", description: "Main portal for Shire residents"},
-                        {name: "Harvest Tracker", appUrl: "https://harvest.shire.local", description: "Track crop yields"},
+                        {
+                            name: "Shire Portal",
+                            appUrl: "https://portal.shire.local",
+                            description: "Main portal for Shire residents"
+                        },
+                        {
+                            name: "Harvest Tracker",
+                            appUrl: "https://harvest.shire.local",
+                            description: "Track crop yields"
+                        },
                     ],
                     clients: [
-                        {name: "Shire Web App", redirectUris: ["https://portal.shire.local/callback"], allowedScopes: "openid profile email tenant.read tenant.write"},
-                        {name: "Shire Mobile", redirectUris: ["https://mobile.shire.local/callback"], allowedScopes: "openid profile", isPublic: true},
-                        {name: "Shire Authorize Test", redirectUris: ["https://authorize-e2e.example.com/callback"], allowedScopes: "openid profile email", isPublic: true},
-                        {name: "Consent E2E Test", redirectUris: ["https://consent-e2e.example.com/callback", "http://localhost:3000/consent-app.html"], allowedScopes: "openid profile email", isPublic: true},
-                        {name: "Shire PKCE Required", redirectUris: ["https://pkce-required-e2e.example.com/callback"], allowedScopes: "openid profile email", isPublic: true, requirePkce: true},
-                        {name: "Shire No PKCE", redirectUris: ["http://localhost:3000/no-pkce.html"], allowedScopes: "openid profile email", isPublic: true, requirePkce: false},
+                        {
+                            name: "Shire Web App",
+                            redirectUris: ["https://portal.shire.local/callback"],
+                            allowedScopes: "openid profile email tenant.read tenant.write"
+                        },
+                        {
+                            name: "Shire Mobile",
+                            redirectUris: ["https://mobile.shire.local/callback"],
+                            allowedScopes: "openid profile",
+                            isPublic: true
+                        },
+                        {
+                            name: "Shire Authorize Test",
+                            redirectUris: ["https://authorize-e2e.example.com/callback"],
+                            allowedScopes: "openid profile email",
+                            isPublic: true
+                        },
+                        {
+                            name: "Consent E2E Test",
+                            redirectUris: ["https://consent-e2e.example.com/callback", "http://localhost:3000/consent-app.html"],
+                            allowedScopes: "openid profile email",
+                            isPublic: true
+                        },
+                        {
+                            name: "Shire PKCE Required",
+                            redirectUris: ["https://pkce-required-e2e.example.com/callback"],
+                            allowedScopes: "openid profile email",
+                            isPublic: true,
+                            requirePkce: true
+                        },
+                        {
+                            name: "Shire No PKCE",
+                            redirectUris: ["http://localhost:3000/no-pkce.html"],
+                            allowedScopes: "openid profile email",
+                            isPublic: true,
+                            requirePkce: false
+                        },
                     ],
                 },
                 {
@@ -224,12 +366,24 @@ export class SeedService {
                     roles: ["Commander", "Scribe", "Diplomat"],
                     groups: ["Rangers", "Tower Guard", "Council"],
                     apps: [
-                        {name: "Gondor Defense", appUrl: "https://defense.gondor.local", description: "Military coordination"},
-                        {name: "Archive System", appUrl: "https://archive.gondor.local", description: "Historical records"},
+                        {
+                            name: "Gondor Defense",
+                            appUrl: "https://defense.gondor.local",
+                            description: "Military coordination"
+                        },
+                        {
+                            name: "Archive System",
+                            appUrl: "https://archive.gondor.local",
+                            description: "Historical records"
+                        },
                         {name: "Trade Ledger", appUrl: "https://trade.gondor.local", description: "Commerce tracking"},
                     ],
                     clients: [
-                        {name: "Gondor Defense Client", redirectUris: ["https://defense.gondor.local/callback"], allowedScopes: "openid profile"},
+                        {
+                            name: "Gondor Defense Client",
+                            redirectUris: ["https://defense.gondor.local/callback"],
+                            allowedScopes: "openid profile"
+                        },
                     ],
                 },
                 {
@@ -237,7 +391,11 @@ export class SeedService {
                     roles: ["Marshal", "Stable Master"],
                     groups: ["Riders", "Horse Breeders"],
                     apps: [
-                        {name: "Rohan Dispatch", appUrl: "https://dispatch.rohan.local", description: "Rider coordination"},
+                        {
+                            name: "Rohan Dispatch",
+                            appUrl: "https://dispatch.rohan.local",
+                            description: "Rider coordination"
+                        },
                     ],
                     clients: [],
                 },
@@ -246,10 +404,18 @@ export class SeedService {
                     roles: ["Loremaster", "Healer"],
                     groups: ["Scholars", "Healers Guild"],
                     apps: [
-                        {name: "Library of Imladris", appUrl: "https://library.rivendell.local", description: "Knowledge repository"},
+                        {
+                            name: "Library of Imladris",
+                            appUrl: "https://library.rivendell.local",
+                            description: "Knowledge repository"
+                        },
                     ],
                     clients: [
-                        {name: "Rivendell Library Client", redirectUris: ["https://library.rivendell.local/callback"], allowedScopes: "openid profile"},
+                        {
+                            name: "Rivendell Library Client",
+                            redirectUris: ["https://library.rivendell.local/callback"],
+                            allowedScopes: "openid profile"
+                        },
                     ],
                 },
                 {

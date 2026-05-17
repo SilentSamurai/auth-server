@@ -25,6 +25,7 @@ import {DiscoveryService} from "./discovery.service";
 import {CorsOriginService} from "./cors-origin.service";
 import {SubscriptionService} from "./subscription.service";
 import {AppClientAuditLogger} from "../log/app-client-audit.logger";
+
 @Module(
     {
         imports: [

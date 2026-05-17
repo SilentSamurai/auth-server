@@ -124,15 +124,11 @@ import {PolicyService} from '../../_services/policy.service';
     `,
 })
 export class CreatePolicyModalComponent implements OnInit {
-    private destroyRef = inject(DestroyRef);
     @Input() role_id: string = '';
     @Input() policyId?: string;
     @Input() viewOnly: boolean = false;
-
     operation: string = 'CREATE';
-
     public possibleActions: string[] = ['read', 'create', 'update', 'delete'];
-
     policyForm: FormGroup = this.fb.group({
         effect: ['ALLOW', Validators.required],
         action: ['', Validators.required],
@@ -140,6 +136,7 @@ export class CreatePolicyModalComponent implements OnInit {
         subject: ['', Validators.required],
         conditions: ['{}'],
     });
+    private destroyRef = inject(DestroyRef);
 
     constructor(
         private fb: FormBuilder,

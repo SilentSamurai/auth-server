@@ -35,7 +35,7 @@ export function extractFlowContext(res: Response, fallbackBase: string): { flowI
     const csrfToken = location
         ? new URL(location, fallbackBase).searchParams.get('csrf_token') ?? ''
         : '';
-    return { flowIdCookie, csrfToken };
+    return {flowIdCookie, csrfToken};
 }
 
 // ---------------------------------------------------------------------------
@@ -57,7 +57,10 @@ export function extractFlowContext(res: Response, fallbackBase: string): { flowI
  * @param authUrl Full `/authorize` URL including all OAuth params
  * @returns `{ flowIdCookie, csrfToken }` to carry through the rest of the flow
  */
-export async function extractFlowIdCookieAndCsrf(authUrl: string): Promise<{ flowIdCookie: string; csrfToken: string }> {
+export async function extractFlowIdCookieAndCsrf(authUrl: string): Promise<{
+    flowIdCookie: string;
+    csrfToken: string
+}> {
     const res = await fetch(authUrl, {redirect: 'manual'});
     expect(res.status).toBe(302);
 

@@ -158,7 +158,8 @@ describe('ID Token Audience Validation Integration', () => {
     });
 
     afterAll(async () => {
-        await clientApi.deleteClient(testClientWithResources.clientId).catch(() => {});
+        await clientApi.deleteClient(testClientWithResources.clientId).catch(() => {
+        });
         await app.close();
     });
 

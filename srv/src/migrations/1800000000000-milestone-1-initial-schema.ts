@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner, Table, TableColumn, TableForeignKey, TableIndex, TableUnique} from "typeorm";
+import {MigrationInterface, QueryRunner, Table, TableColumn, TableForeignKey, TableIndex} from "typeorm";
 
 export class Milestone1InitialSchema1800000000000 implements MigrationInterface {
     name = 'Milestone1InitialSchema1800000000000'
@@ -12,7 +12,14 @@ export class Milestone1InitialSchema1800000000000 implements MigrationInterface 
             new Table({
                 name: "users",
                 columns: [
-                    {name: "id", type: DB_STRING_TYPE, length: "36", generationStrategy: "uuid", isPrimary: true, default: DB_UUID_GENERATOR},
+                    {
+                        name: "id",
+                        type: DB_STRING_TYPE,
+                        length: "36",
+                        generationStrategy: "uuid",
+                        isPrimary: true,
+                        default: DB_UUID_GENERATOR
+                    },
                     {name: "name", type: DB_STRING_TYPE, length: "128", isNullable: false},
                     {name: "password", type: DB_STRING_TYPE, length: "128", isNullable: false},
                     {name: "email", type: DB_STRING_TYPE, isUnique: true, length: "128", isNullable: false},
@@ -28,7 +35,14 @@ export class Milestone1InitialSchema1800000000000 implements MigrationInterface 
             new Table({
                 name: "tenants",
                 columns: [
-                    {name: "id", type: DB_STRING_TYPE, length: "36", generationStrategy: "uuid", isPrimary: true, default: DB_UUID_GENERATOR},
+                    {
+                        name: "id",
+                        type: DB_STRING_TYPE,
+                        length: "36",
+                        generationStrategy: "uuid",
+                        isPrimary: true,
+                        default: DB_UUID_GENERATOR
+                    },
                     {name: "name", type: DB_STRING_TYPE, isNullable: false},
                     {name: "domain", type: DB_STRING_TYPE, isUnique: true, isNullable: false},
                     {name: "client_id", type: DB_STRING_TYPE, isUnique: true, isNullable: false},
@@ -47,7 +61,14 @@ export class Milestone1InitialSchema1800000000000 implements MigrationInterface 
             new Table({
                 name: "roles",
                 columns: [
-                    {name: "id", type: DB_STRING_TYPE, length: "36", generationStrategy: "uuid", isPrimary: true, default: DB_UUID_GENERATOR},
+                    {
+                        name: "id",
+                        type: DB_STRING_TYPE,
+                        length: "36",
+                        generationStrategy: "uuid",
+                        isPrimary: true,
+                        default: DB_UUID_GENERATOR
+                    },
                     {name: "name", type: DB_STRING_TYPE, isNullable: false},
                     {name: "tenant_id", type: DB_STRING_TYPE, length: "36", isNullable: false},
                     {name: "is_removable", type: "boolean", default: true},
@@ -69,8 +90,20 @@ export class Milestone1InitialSchema1800000000000 implements MigrationInterface 
                     {name: "user_id", type: DB_STRING_TYPE, length: "36", isPrimary: true, isNullable: false},
                 ],
                 foreignKeys: [
-                    {name: "fk_tenant_membership_tenant_id", columnNames: ["tenant_id"], referencedColumnNames: ["id"], referencedTableName: "tenants", onDelete: "CASCADE"},
-                    {name: "fk_tenant_membership_user_id", columnNames: ["user_id"], referencedColumnNames: ["id"], referencedTableName: "users", onDelete: "CASCADE"},
+                    {
+                        name: "fk_tenant_membership_tenant_id",
+                        columnNames: ["tenant_id"],
+                        referencedColumnNames: ["id"],
+                        referencedTableName: "tenants",
+                        onDelete: "CASCADE"
+                    },
+                    {
+                        name: "fk_tenant_membership_user_id",
+                        columnNames: ["user_id"],
+                        referencedColumnNames: ["id"],
+                        referencedTableName: "users",
+                        onDelete: "CASCADE"
+                    },
                 ],
             }),
             true,
@@ -87,8 +120,18 @@ export class Milestone1InitialSchema1800000000000 implements MigrationInterface 
                     {name: "from_group", type: "BOOLEAN", isNullable: false, default: "FALSE"},
                 ],
                 foreignKeys: [
-                    {columnNames: ["tenant_id"], referencedColumnNames: ["id"], referencedTableName: "tenants", onDelete: "CASCADE"},
-                    {columnNames: ["user_id"], referencedColumnNames: ["id"], referencedTableName: "users", onDelete: "CASCADE"},
+                    {
+                        columnNames: ["tenant_id"],
+                        referencedColumnNames: ["id"],
+                        referencedTableName: "tenants",
+                        onDelete: "CASCADE"
+                    },
+                    {
+                        columnNames: ["user_id"],
+                        referencedColumnNames: ["id"],
+                        referencedTableName: "users",
+                        onDelete: "CASCADE"
+                    },
                     {columnNames: ["role_id"], referencedColumnNames: ["id"], referencedTableName: "roles"},
                 ],
             }),
@@ -116,7 +159,14 @@ export class Milestone1InitialSchema1800000000000 implements MigrationInterface 
             new Table({
                 name: "authorization",
                 columns: [
-                    {name: "id", type: DB_STRING_TYPE, length: "36", isPrimary: true, default: DB_UUID_GENERATOR, generationStrategy: "uuid"},
+                    {
+                        name: "id",
+                        type: DB_STRING_TYPE,
+                        length: "36",
+                        isPrimary: true,
+                        default: DB_UUID_GENERATOR,
+                        generationStrategy: "uuid"
+                    },
                     {name: "role_id", type: DB_STRING_TYPE, isNullable: false},
                     {name: "tenant_id", type: DB_STRING_TYPE, isNullable: false},
                     {name: "effect", type: "varchar", isNullable: false},
@@ -128,14 +178,42 @@ export class Milestone1InitialSchema1800000000000 implements MigrationInterface 
             true,
         );
 
-        await queryRunner.createIndex("authorization", new TableIndex({name: "IDX_AUTHORIZATION_ROLE_ID", columnNames: ["role_id"]}));
-        await queryRunner.createIndex("authorization", new TableIndex({name: "IDX_AUTHORIZATION_ROLE_TENANT", columnNames: ["role_id", "tenant_id"]}));
-        await queryRunner.createForeignKey("authorization", new TableForeignKey({name: "FK_AUTHORIZATION_ROLE", columnNames: ["role_id"], referencedTableName: "roles", referencedColumnNames: ["id"], onDelete: "CASCADE"}));
-        await queryRunner.createForeignKey("authorization", new TableForeignKey({name: "FK_AUTHORIZATION_TENANT", columnNames: ["tenant_id"], referencedTableName: "tenants", referencedColumnNames: ["id"], onDelete: "CASCADE"}));
+        await queryRunner.createIndex("authorization", new TableIndex({
+            name: "IDX_AUTHORIZATION_ROLE_ID",
+            columnNames: ["role_id"]
+        }));
+        await queryRunner.createIndex("authorization", new TableIndex({
+            name: "IDX_AUTHORIZATION_ROLE_TENANT",
+            columnNames: ["role_id", "tenant_id"]
+        }));
+        await queryRunner.createForeignKey("authorization", new TableForeignKey({
+            name: "FK_AUTHORIZATION_ROLE",
+            columnNames: ["role_id"],
+            referencedTableName: "roles",
+            referencedColumnNames: ["id"],
+            onDelete: "CASCADE"
+        }));
+        await queryRunner.createForeignKey("authorization", new TableForeignKey({
+            name: "FK_AUTHORIZATION_TENANT",
+            columnNames: ["tenant_id"],
+            referencedTableName: "tenants",
+            referencedColumnNames: ["id"],
+            onDelete: "CASCADE"
+        }));
 
         // ── Add description to roles + allow_sign_up to tenants ──
-        await queryRunner.addColumn("roles", new TableColumn({name: "description", type: "varchar", length: "512", isNullable: true}));
-        await queryRunner.addColumn("tenants", new TableColumn({name: "allow_sign_up", type: "boolean", isNullable: false, default: false}));
+        await queryRunner.addColumn("roles", new TableColumn({
+            name: "description",
+            type: "varchar",
+            length: "512",
+            isNullable: true
+        }));
+        await queryRunner.addColumn("tenants", new TableColumn({
+            name: "allow_sign_up",
+            type: "boolean",
+            isNullable: false,
+            default: false
+        }));
 
         // ── Add email rate limit columns to users ──
         await queryRunner.addColumns("users", [
@@ -144,14 +222,25 @@ export class Milestone1InitialSchema1800000000000 implements MigrationInterface 
         ]);
 
         // ── Add subscriber_tenant_hint to auth_code ──
-        await queryRunner.addColumn("auth_code", new TableColumn({name: "subscriber_tenant_hint", type: "varchar", isNullable: true}));
+        await queryRunner.addColumn("auth_code", new TableColumn({
+            name: "subscriber_tenant_hint",
+            type: "varchar",
+            isNullable: true
+        }));
 
         // ── Groups, group_users, group_roles ──
         await queryRunner.createTable(
             new Table({
                 name: "groups",
                 columns: [
-                    {name: "id", type: DB_STRING_TYPE, length: "36", generationStrategy: "uuid", isPrimary: true, default: DB_UUID_GENERATOR},
+                    {
+                        name: "id",
+                        type: DB_STRING_TYPE,
+                        length: "36",
+                        generationStrategy: "uuid",
+                        isPrimary: true,
+                        default: DB_UUID_GENERATOR
+                    },
                     {name: "name", type: DB_STRING_TYPE, isNullable: false},
                     {name: "tenant_id", type: DB_STRING_TYPE, isNullable: false},
                     {name: "created_at", type: "timestamp", default: "now()"},
@@ -171,8 +260,18 @@ export class Milestone1InitialSchema1800000000000 implements MigrationInterface 
                     {name: "created_at", type: "timestamp", default: "now()"},
                 ],
                 foreignKeys: [
-                    {columnNames: ["tenant_id"], referencedColumnNames: ["id"], referencedTableName: "tenants", onDelete: "CASCADE"},
-                    {columnNames: ["user_id"], referencedColumnNames: ["id"], referencedTableName: "users", onDelete: "CASCADE"},
+                    {
+                        columnNames: ["tenant_id"],
+                        referencedColumnNames: ["id"],
+                        referencedTableName: "tenants",
+                        onDelete: "CASCADE"
+                    },
+                    {
+                        columnNames: ["user_id"],
+                        referencedColumnNames: ["id"],
+                        referencedTableName: "users",
+                        onDelete: "CASCADE"
+                    },
                     {columnNames: ["group_id"], referencedColumnNames: ["id"], referencedTableName: "groups"},
                 ],
             }),
@@ -189,8 +288,18 @@ export class Milestone1InitialSchema1800000000000 implements MigrationInterface 
                     {name: "created_at", type: "timestamp", default: "now()"},
                 ],
                 foreignKeys: [
-                    {columnNames: ["tenant_id"], referencedColumnNames: ["id"], referencedTableName: "tenants", onDelete: "CASCADE"},
-                    {columnNames: ["group_id"], referencedColumnNames: ["id"], referencedTableName: "groups", onDelete: "CASCADE"},
+                    {
+                        columnNames: ["tenant_id"],
+                        referencedColumnNames: ["id"],
+                        referencedTableName: "tenants",
+                        onDelete: "CASCADE"
+                    },
+                    {
+                        columnNames: ["group_id"],
+                        referencedColumnNames: ["id"],
+                        referencedTableName: "groups",
+                        onDelete: "CASCADE"
+                    },
                     {columnNames: ["role_id"], referencedColumnNames: ["id"], referencedTableName: "roles"},
                 ],
             }),

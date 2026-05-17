@@ -92,7 +92,8 @@ describe('Feature: session-confirmed-no-bypass-consent, Property 2b: session_con
                     expect(isConsentRedirect).toBe(true);
                     expect(isCodeRedirect).toBe(false);
                 } finally {
-                    await clientApi.deleteClient(thirdPartyClientId).catch(() => {});
+                    await clientApi.deleteClient(thirdPartyClientId).catch(() => {
+                    });
                 }
             }),
             {numRuns: 8},

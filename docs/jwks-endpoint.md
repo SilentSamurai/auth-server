@@ -1,10 +1,13 @@
 # JWKS Endpoint
 
-The Auth Server publishes a JSON Web Key Set (JWKS) for each tenant. Resource servers use this endpoint to fetch the RSA public keys needed to verify the signatures of access tokens and ID tokens issued by that tenant.
+The Auth Server publishes a JSON Web Key Set (JWKS) for each tenant. Resource servers use this endpoint to fetch the RSA
+public keys needed to verify the signatures of access tokens and ID tokens issued by that tenant.
 
 ## Overview
 
-Every token issued by the Auth Server is signed with an RSA private key. The corresponding public key is published at a well-known URL so that any resource server can independently verify token signatures without contacting the Auth Server on every request.
+Every token issued by the Auth Server is signed with an RSA private key. The corresponding public key is published at a
+well-known URL so that any resource server can independently verify token signatures without contacting the Auth Server
+on every request.
 
 The endpoint is **public** — no authentication or authorization is required to access it.
 
@@ -18,7 +21,8 @@ GET /{tenantDomain}/.well-known/jwks.json
 
 `public`  `no authentication required`
 
-Returns the JSON Web Key Set for the specified tenant. The `tenantDomain` is the registered domain of the tenant (e.g., `acme.example.com`).
+Returns the JSON Web Key Set for the specified tenant. The `tenantDomain` is the registered domain of the tenant (e.g.,
+`acme.example.com`).
 
 **Example request**
 
@@ -36,9 +40,11 @@ Each tenant has its own RSA key pair, stored in the `tenant_keys` table. This me
 - Tokens issued for `other.example.com` are signed with `other.example.com`'s private key
 - A token from one tenant **cannot** be verified using another tenant's public key
 
-When verifying a token, you must always fetch the JWKS from the endpoint that corresponds to the **expected tenant** — the tenant whose resources are being accessed. Never use a JWKS from a different tenant to verify a token.
+When verifying a token, you must always fetch the JWKS from the endpoint that corresponds to the **expected tenant** —
+the tenant whose resources are being accessed. Never use a JWKS from a different tenant to verify a token.
 
-The JWT header includes a `kid` (Key ID) claim that identifies which specific key was used to sign the token. Match the `kid` in the JWT header against the `kid` fields in the JWKS to find the correct verification key.
+The JWT header includes a `kid` (Key ID) claim that identifies which specific key was used to sign the token. Match the
+`kid` in the JWT header against the `kid` fields in the JWKS to find the correct verification key.
 
 ---
 
@@ -48,9 +54,11 @@ The Auth Server supports key rotation. When a tenant's signing key is rotated:
 
 1. A new key pair is generated and the new key becomes the active signing key
 2. The old public key **remains in the JWKS** until all tokens signed with it have expired
-3. Resource servers that cache the JWKS will continue to find the old key and can verify existing tokens without interruption
+3. Resource servers that cache the JWKS will continue to find the old key and can verify existing tokens without
+   interruption
 
-This means the `keys` array in the JWKS response may contain more than one key at any given time. Always select the key whose `kid` matches the JWT header — do not assume the first key in the array is the correct one.
+This means the `keys` array in the JWKS response may contain more than one key at any given time. Always select the key
+whose `kid` matches the JWT header — do not assume the first key in the array is the correct one.
 
 ---
 
@@ -78,14 +86,14 @@ This means the `keys` array in the JWKS response may contain more than one key a
 
 ### JWK Fields
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `kty` | `string` | Key type. Always `"RSA"` for this server. |
-| `use` | `string` | Intended use. Always `"sig"` (signature verification). |
-| `alg` | `string` | Algorithm. Always `"RS256"` (RSA Signature with SHA-256). |
+| Field | Type     | Description                                                                                                           |
+|-------|----------|-----------------------------------------------------------------------------------------------------------------------|
+| `kty` | `string` | Key type. Always `"RSA"` for this server.                                                                             |
+| `use` | `string` | Intended use. Always `"sig"` (signature verification).                                                                |
+| `alg` | `string` | Algorithm. Always `"RS256"` (RSA Signature with SHA-256).                                                             |
 | `kid` | `string` | Key ID. Matches the `kid` claim in the JWT header. Use this to select the correct key when multiple keys are present. |
-| `n` | `string` | RSA modulus, Base64url-encoded. |
-| `e` | `string` | RSA public exponent, Base64url-encoded. Typically `"AQAB"` (65537). |
+| `n`   | `string` | RSA modulus, Base64url-encoded.                                                                                       |
+| `e`   | `string` | RSA public exponent, Base64url-encoded. Typically `"AQAB"` (65537).                                                   |
 
 ---
 
@@ -101,7 +109,8 @@ Responses include a `Cache-Control` header that permits caching:
 Cache-Control: public, max-age=3600
 ```
 
-Resource servers may cache the JWKS for the duration indicated by `max-age`. Do not fetch the JWKS on every token verification request — this is unnecessary and adds latency.
+Resource servers may cache the JWKS for the duration indicated by `max-age`. Do not fetch the JWKS on every token
+verification request — this is unnecessary and adds latency.
 
 ### ETag and Conditional GET
 
@@ -118,7 +127,8 @@ GET /acme.example.com/.well-known/jwks.json
 If-None-Match: "a1b2c3d4e5f6..."
 ```
 
-If the key set has not changed, the server responds with `304 Not Modified` and no body, saving bandwidth. If the keys have changed (e.g., after a rotation), the server responds with `200 OK` and the updated JWKS.
+If the key set has not changed, the server responds with `304 Not Modified` and no body, saving bandwidth. If the keys
+have changed (e.g., after a rotation), the server responds with `200 OK` and the updated JWKS.
 
 ### Recommended Caching Strategy
 
@@ -126,7 +136,8 @@ Cache the JWKS in memory, keyed by tenant domain. Use the following approach:
 
 1. **On startup or first request**: fetch the JWKS and cache it along with the ETag
 2. **On subsequent verifications**: use the cached JWKS — do not re-fetch on every request
-3. **On unknown `kid`**: if the JWT header contains a `kid` that is not in the cached JWKS, the key may have been rotated — re-fetch the JWKS using a conditional GET with `If-None-Match`
+3. **On unknown `kid`**: if the JWT header contains a `kid` that is not in the cached JWKS, the key may have been
+   rotated — re-fetch the JWKS using a conditional GET with `If-None-Match`
 4. **On cache expiry**: re-fetch using a conditional GET; use `304 Not Modified` to avoid unnecessary processing
 
 This strategy handles key rotation gracefully without polling the JWKS endpoint continuously.
@@ -186,17 +197,22 @@ async function getVerificationKey(tenantDomain, kid) {
 
 ### Tenant Isolation
 
-Because each tenant has its own key pair, a token from one tenant cannot be verified using another tenant's JWKS. Always use the JWKS endpoint for the **expected** tenant — the one whose resources are being accessed — not the tenant identified in the token's `iss` claim (which is the same for all tenants in the shared-issuer model).
+Because each tenant has its own key pair, a token from one tenant cannot be verified using another tenant's JWKS. Always
+use the JWKS endpoint for the **expected** tenant — the one whose resources are being accessed — not the tenant
+identified in the token's `iss` claim (which is the same for all tenants in the shared-issuer model).
 
-See [Resource Server Verification](resource-server-verification.md) for the complete token verification flow, including how to check the `tenant_id` claim to prevent cross-tenant token reuse.
+See [Resource Server Verification](resource-server-verification.md) for the complete token verification flow, including
+how to check the `tenant_id` claim to prevent cross-tenant token reuse.
 
 ### Algorithm
 
-All tokens are signed with `RS256`. The `alg` field in each JWK will always be `"RS256"`. Reject tokens with any other algorithm.
+All tokens are signed with `RS256`. The `alg` field in each JWK will always be `"RS256"`. Reject tokens with any other
+algorithm.
 
 ### Multiple Keys
 
-During key rotation, the JWKS may contain more than one key. Always select the key by matching `kid` — never assume the first key in the array is the active one.
+During key rotation, the JWKS may contain more than one key. Always select the key by matching `kid` — never assume the
+first key in the array is the active one.
 
 ---
 

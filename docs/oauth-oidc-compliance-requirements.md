@@ -335,7 +335,7 @@ location ^~ /.well-known {
 
 ```sql
 UPDATE auth_code
-SET used = true,
+SET used    = true,
     used_at = NOW()
 WHERE code = ?
   AND used = false RETURNING *

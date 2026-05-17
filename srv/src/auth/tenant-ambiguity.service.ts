@@ -27,7 +27,8 @@ export class TenantAmbiguityService {
         @InjectRepository(App)
         private readonly appRepo: Repository<App>,
         private readonly clientService: ClientService,
-    ) {}
+    ) {
+    }
 
     async findSubscriberTenants(userId: string, clientId: string): Promise<TenantInfo[]> {
         try {

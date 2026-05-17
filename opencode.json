@@ -1,10 +1,19 @@
 {
-  "$schema": "https://opencode.ai/config.json",
+    "$schema": "https://opencode.ai/config.json",
     "lsp": {
         "typescript": {
-            "command": ["typescript-language-server", "--stdio"],
-            "root": ["srv", "ui"],
-            "extensions": [".ts", ".tsx"]
+            "command": [
+                "typescript-language-server",
+                "--stdio"
+            ],
+            "root": [
+                "srv",
+                "ui"
+            ],
+            "extensions": [
+                ".ts",
+                ".tsx"
+            ]
         }
     }
 }

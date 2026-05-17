@@ -1,14 +1,14 @@
-import { Injectable } from "@nestjs/common";
-import { Request, Response } from "express";
-import { LoginSession } from "../entity/login-session.entity";
-import { Client } from "../entity/client.entity";
-import { LoginSessionService } from "./login-session.service";
-import { CsrfTokenService } from "./csrf-token.service";
-import { FlowIdCookieService } from "./flow-id-cookie.service";
-import { AuthUserService } from "../casl/authUser.service";
-import { AuthCodeService } from "./auth-code.service";
-import { Environment } from "../config/environment.service";
-import { AuthorizeQueryParams, ValidatedAuthorizeRequest } from "./authorize.service";
+import {Injectable} from "@nestjs/common";
+import {Request, Response} from "express";
+import {LoginSession} from "../entity/login-session.entity";
+import {Client} from "../entity/client.entity";
+import {LoginSessionService} from "./login-session.service";
+import {CsrfTokenService} from "./csrf-token.service";
+import {FlowIdCookieService} from "./flow-id-cookie.service";
+import {AuthUserService} from "../casl/authUser.service";
+import {AuthCodeService} from "./auth-code.service";
+import {Environment} from "../config/environment.service";
+import {AuthorizeQueryParams, ValidatedAuthorizeRequest} from "./authorize.service";
 
 @Injectable()
 export class SessionHelperService {
@@ -18,7 +18,8 @@ export class SessionHelperService {
         private readonly flowIdCookieService: FlowIdCookieService,
         private readonly authUserService: AuthUserService,
         private readonly authCodeService: AuthCodeService,
-    ) {}
+    ) {
+    }
 
     async resolveSession(req: Request, maxAge?: number): Promise<LoginSession | null> {
         const sid = (req as any).signedCookies?.sid;

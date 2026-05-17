@@ -250,7 +250,11 @@ export class CL02Component implements OnInit {
         const url = this.getDiscoveryUrl();
         try {
             await navigator.clipboard.writeText(url);
-            this.messageService.add({severity: 'success', summary: 'Copied', detail: 'Discovery URL copied to clipboard'});
+            this.messageService.add({
+                severity: 'success',
+                summary: 'Copied',
+                detail: 'Discovery URL copied to clipboard'
+            });
         } catch (e) {
             this.messageService.add({severity: 'error', summary: 'Error', detail: 'Copy not supported'});
         }

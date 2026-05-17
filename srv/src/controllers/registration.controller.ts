@@ -28,7 +28,6 @@ import {Repository} from "typeorm";
 import {Environment} from "../config/environment.service";
 import {CurrentPermission, CurrentUser, Permission} from "../auth/auth.decorator";
 import {RegisterDomainSchema, SignUpSchema as RegistrationSignUpSchema} from "../dto/registration.dto";
-import * as yup from "yup";
 
 @Controller("api")
 @UseInterceptors(ClassSerializerInterceptor)

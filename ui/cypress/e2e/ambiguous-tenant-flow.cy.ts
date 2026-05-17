@@ -39,7 +39,7 @@ describe('Ambiguous Tenant Flow', () => {
     it('should setup Mordor tenant', () => {
         cy.login(`admin@${TENANTS.mordor.domain}`, "admin9000", TENANTS.mordor.domain);
         cy.userOpenTenantOverview();
-        cy.addAppFromOverview(TEST_APP.name, TEST_APP.url, TEST_APP.description, { onboardingEnabled: false });
+        cy.addAppFromOverview(TEST_APP.name, TEST_APP.url, TEST_APP.description, {onboardingEnabled: false});
         cy.userPublishApp(TEST_APP.name);
         cy.logout();
     });

@@ -2,21 +2,24 @@
 
 ## Overview
 
-The Registration API provides endpoints for creating new tenants, registering users to existing tenants, and deleting user accounts. These endpoints support the full onboarding lifecycle — from provisioning a brand-new organization to allowing individual users to self-register.
+The Registration API provides endpoints for creating new tenants, registering users to existing tenants, and deleting
+user accounts. These endpoints support the full onboarding lifecycle — from provisioning a brand-new organization to
+allowing individual users to self-register.
 
 **Endpoints at a glance:**
 
-| Endpoint | Method | Auth Required | Purpose |
-|---|---|---|---|
-| `/api/register-domain` | `POST` | No | Create a new tenant with an admin user |
-| `/api/signup` | `POST` | No | Register a user to an existing tenant |
-| `/api/signdown` | `POST` | Yes | Delete the authenticated user's account |
+| Endpoint               | Method | Auth Required | Purpose                                 |
+|------------------------|--------|---------------|-----------------------------------------|
+| `/api/register-domain` | `POST` | No            | Create a new tenant with an admin user  |
+| `/api/signup`          | `POST` | No            | Register a user to an existing tenant   |
+| `/api/signdown`        | `POST` | Yes           | Delete the authenticated user's account |
 
 ---
 
 ## Email Verification Flow
 
-Both `/api/register-domain` and `/api/signup` (for new accounts) trigger an email verification step before the user can log in.
+Both `/api/register-domain` and `/api/signup` (for new accounts) trigger an email verification step before the user can
+log in.
 
 **Flow:**
 
@@ -34,7 +37,8 @@ Both `/api/register-domain` and `/api/signup` (for new accounts) trigger an emai
    Otherwise, the endpoint returns `{ "status": true }`.
 6. The user can now log in.
 
-> **Important:** If the verification email cannot be sent (mail service error), the user account is automatically deleted and the registration request returns `503 Service Unavailable`. This prevents orphaned unverified accounts.
+> **Important:** If the verification email cannot be sent (mail service error), the user account is automatically
+> deleted and the registration request returns `503 Service Unavailable`. This prevents orphaned unverified accounts.
 
 ---
 
@@ -46,7 +50,8 @@ POST /api/register-domain
 
 `public`  `application/json`
 
-Creates a new tenant (organization) and registers the submitting user as its administrator. This is the entry point for new organizations onboarding to the Auth Server.
+Creates a new tenant (organization) and registers the submitting user as its administrator. This is the entry point for
+new organizations onboarding to the Auth Server.
 
 **What happens:**
 
@@ -57,7 +62,8 @@ Creates a new tenant (organization) and registers the submitting user as its adm
 5. Creates the tenant with the specified domain and organization name.
 6. Associates the new user as the tenant's admin.
 
-> **Note:** If the mail service is unavailable, the user account is rolled back and `503` is returned. The tenant is only created after the verification email is sent successfully.
+> **Note:** If the mail service is unavailable, the user account is rolled back and `503` is returned. The tenant is
+> only created after the verification email is sent successfully.
 
 **Request Body**
 
@@ -71,13 +77,13 @@ Creates a new tenant (organization) and registers the submitting user as its adm
 }
 ```
 
-| Parameter | Required | Description |
-|-----------|----------|-------------|
-| `name`    | Yes      | Display name for the admin user (max 128 chars, alphanumeric and spaces) |
-| `email`   | Yes      | Email address for the admin user (valid email, max 128 chars) |
-| `password`| Yes      | Password for the admin user (max 128 chars, must meet complexity requirements) |
-| `orgName` | Yes      | Display name for the new tenant/organization (max 128 chars) |
-| `domain`  | Yes      | Unique domain identifier for the tenant (max 128 chars, e.g., `acme.example.com`) |
+| Parameter  | Required | Description                                                                       |
+|------------|----------|-----------------------------------------------------------------------------------|
+| `name`     | Yes      | Display name for the admin user (max 128 chars, alphanumeric and spaces)          |
+| `email`    | Yes      | Email address for the admin user (valid email, max 128 chars)                     |
+| `password` | Yes      | Password for the admin user (max 128 chars, must meet complexity requirements)    |
+| `orgName`  | Yes      | Display name for the new tenant/organization (max 128 chars)                      |
+| `domain`   | Yes      | Unique domain identifier for the tenant (max 128 chars, e.g., `acme.example.com`) |
 
 **Response**
 
@@ -87,17 +93,17 @@ Creates a new tenant (organization) and registers the submitting user as its adm
 }
 ```
 
-| Field     | Type    | Description |
-|-----------|---------|-------------|
+| Field     | Type    | Description                                                                      |
+|-----------|---------|----------------------------------------------------------------------------------|
 | `success` | boolean | `true` when the tenant and user were created and the verification email was sent |
 
 **Error Responses**
 
-| Status | Description |
-|--------|-------------|
+| Status | Description                                                                        |
+|--------|------------------------------------------------------------------------------------|
 | `400`  | Validation error (missing/invalid fields) or the requested domain is already taken |
-| `409`  | The email address is already registered |
-| `503`  | Mail service unavailable — account was not created |
+| `409`  | The email address is already registered                                            |
+| `503`  | Mail service unavailable — account was not created                                 |
 
 **Example**
 
@@ -130,21 +136,24 @@ POST /api/signup
 
 `public`  `application/json`
 
-Registers a user to an existing tenant. The tenant must have self-registration enabled (`allowSignUp: true`). This endpoint is intended for end-user sign-up flows embedded in a tenant's own application.
+Registers a user to an existing tenant. The tenant must have self-registration enabled (`allowSignUp: true`). This
+endpoint is intended for end-user sign-up flows embedded in a tenant's own application.
 
 **What happens:**
 
-1. Resolves the target tenant from the `client_id` field — first by looking up a registered OAuth client with that ID or alias, then by looking up a tenant by domain.
+1. Resolves the target tenant from the `client_id` field — first by looking up a registered OAuth client with that ID or
+   alias, then by looking up a tenant by domain.
 2. Checks that the tenant has `allowSignUp` enabled. If not, returns `400`.
 3. If the email is **not** already registered:
-   - Creates a new user account (password hashed with argon2).
-   - Sends a verification email.
-   - If the mail service fails, the account is rolled back and `503` is returned.
+    - Creates a new user account (password hashed with argon2).
+    - Sends a verification email.
+    - If the mail service fails, the account is rolled back and `503` is returned.
 4. If the email **is** already registered:
-   - Validates the provided password against the existing account.
+    - Validates the provided password against the existing account.
 5. Adds the user as a member of the tenant (if not already a member).
 
-> **Note:** A tenant admin can enable or disable self-registration via the [Tenant Management API](tenant-management-api.md).
+> **Note:** A tenant admin can enable or disable self-registration via
+> the [Tenant Management API](tenant-management-api.md).
 
 **Request Body**
 
@@ -157,11 +166,11 @@ Registers a user to an existing tenant. The tenant must have self-registration e
 }
 ```
 
-| Parameter   | Required | Description |
-|-------------|----------|-------------|
-| `name`      | Yes      | Display name for the new user (max 128 chars, alphanumeric and spaces) |
-| `email`     | Yes      | Email address for the new user (valid email, max 128 chars) |
-| `password`  | Yes      | Password for the new user (max 128 chars, must meet complexity requirements) |
+| Parameter   | Required | Description                                                                       |
+|-------------|----------|-----------------------------------------------------------------------------------|
+| `name`      | Yes      | Display name for the new user (max 128 chars, alphanumeric and spaces)            |
+| `email`     | Yes      | Email address for the new user (valid email, max 128 chars)                       |
+| `password`  | Yes      | Password for the new user (max 128 chars, must meet complexity requirements)      |
 | `client_id` | Yes      | The OAuth client ID, client alias, or tenant domain to sign up to (max 128 chars) |
 
 **Response**
@@ -172,17 +181,17 @@ Registers a user to an existing tenant. The tenant must have self-registration e
 }
 ```
 
-| Field     | Type    | Description |
-|-----------|---------|-------------|
+| Field     | Type    | Description                                                 |
+|-----------|---------|-------------------------------------------------------------|
 | `success` | boolean | `true` when the user was registered and added to the tenant |
 
 **Error Responses**
 
-| Status | Description |
-|--------|-------------|
+| Status | Description                                                                        |
+|--------|------------------------------------------------------------------------------------|
 | `400`  | Validation error, tenant not found, or the tenant does not allow self-registration |
-| `401`  | Existing email provided but password is incorrect |
-| `503`  | Mail service unavailable — new account was not created |
+| `401`  | Existing email provided but password is incorrect                                  |
+| `503`  | Mail service unavailable — new account was not created                             |
 
 **Example — new user**
 
@@ -234,7 +243,8 @@ POST /api/signdown
 
 `protected`  `application/json`
 
-Permanently deletes the authenticated user's own account. The user must provide their current password to confirm the deletion.
+Permanently deletes the authenticated user's own account. The user must provide their current password to confirm the
+deletion.
 
 > **Warning:** This action is irreversible. The user account and all associated data are permanently removed.
 
@@ -246,8 +256,8 @@ Permanently deletes the authenticated user's own account. The user must provide 
 }
 ```
 
-| Parameter  | Required | Description |
-|------------|----------|-------------|
+| Parameter  | Required | Description                                                               |
+|------------|----------|---------------------------------------------------------------------------|
 | `password` | Yes      | The user's current password, used to confirm the deletion (max 128 chars) |
 
 **Response**
@@ -258,16 +268,16 @@ Permanently deletes the authenticated user's own account. The user must provide 
 }
 ```
 
-| Field    | Type    | Description |
-|----------|---------|-------------|
+| Field    | Type    | Description                                      |
+|----------|---------|--------------------------------------------------|
 | `status` | boolean | `true` when the account was successfully deleted |
 
 **Error Responses**
 
-| Status | Description |
-|--------|-------------|
+| Status | Description                                |
+|--------|--------------------------------------------|
 | `400`  | Invalid request body or incorrect password |
-| `401`  | Missing or invalid access token |
+| `401`  | Missing or invalid access token            |
 
 **Example**
 
@@ -305,11 +315,11 @@ Passwords exceeding 128 characters are rejected.
 
 ## Endpoint Summary
 
-| Method | Path | Auth | Description |
-|--------|------|------|-------------|
-| `POST` | `/api/register-domain` | Public | Create a new tenant with an admin user |
-| `POST` | `/api/signup` | Public | Register a user to an existing tenant |
-| `POST` | `/api/signdown` | Bearer token | Delete the authenticated user's account |
+| Method | Path                   | Auth         | Description                             |
+|--------|------------------------|--------------|-----------------------------------------|
+| `POST` | `/api/register-domain` | Public       | Create a new tenant with an admin user  |
+| `POST` | `/api/signup`          | Public       | Register a user to an existing tenant   |
+| `POST` | `/api/signdown`        | Bearer token | Delete the authenticated user's account |
 
 ---
 

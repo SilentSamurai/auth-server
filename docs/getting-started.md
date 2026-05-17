@@ -9,13 +9,15 @@ This guide walks you through integrating with the Auth Server from scratch. By t
 3. A working login flow that exchanges an authorization code for tokens
 4. A resource server that verifies those tokens
 
-The Auth Server is multi-tenant. Every tenant has its own domain (e.g., `mytenant.example.com`), its own RSA signing keys, and its own set of users and clients. All OAuth/OIDC endpoints are scoped to a tenant domain.
+The Auth Server is multi-tenant. Every tenant has its own domain (e.g., `mytenant.example.com`), its own RSA signing
+keys, and its own set of users and clients. All OAuth/OIDC endpoints are scoped to a tenant domain.
 
 ---
 
 ## Step 1: Register a Tenant
 
-Before you can issue tokens you need a tenant. The registration endpoint creates a tenant, an initial admin user, and sends a verification email to that user.
+Before you can issue tokens you need a tenant. The registration endpoint creates a tenant, an initial admin user, and
+sends a verification email to that user.
 
 ```http
 POST /api/register-domain
@@ -30,13 +32,13 @@ Content-Type: application/json
 }
 ```
 
-| Field | Required | Description |
-|-------|----------|-------------|
-| `name` | Yes | Display name for the initial admin user |
-| `email` | Yes | Email address for the admin user |
-| `password` | Yes | Password for the admin user |
-| `orgName` | Yes | Display name for the tenant organisation |
-| `domain` | Yes | Unique domain identifier for the tenant (e.g., `acme.example.com`) |
+| Field      | Required | Description                                                        |
+|------------|----------|--------------------------------------------------------------------|
+| `name`     | Yes      | Display name for the initial admin user                            |
+| `email`    | Yes      | Email address for the admin user                                   |
+| `password` | Yes      | Password for the admin user                                        |
+| `orgName`  | Yes      | Display name for the tenant organisation                           |
+| `domain`   | Yes      | Unique domain identifier for the tenant (e.g., `acme.example.com`) |
 
 **Response** `200 OK`
 
@@ -46,21 +48,23 @@ Content-Type: application/json
 }
 ```
 
-> **Email verification required.** The admin user receives a verification email. The account must be verified before the user can log in.
+> **Email verification required.** The admin user receives a verification email. The account must be verified before the
+> user can log in.
 
 **Error responses**
 
-| Status | Condition |
-|--------|-----------|
-| `400 Bad Request` | Domain already exists, or validation failed |
-| `409 Conflict` | Email address is already registered |
+| Status                    | Condition                                        |
+|---------------------------|--------------------------------------------------|
+| `400 Bad Request`         | Domain already exists, or validation failed      |
+| `409 Conflict`            | Email address is already registered              |
 | `503 Service Unavailable` | Mail service error — registration is rolled back |
 
 ---
 
 ## Step 2: Obtain OAuth Client Credentials
 
-After verifying your email and logging in as the tenant admin, create an OAuth client for your application. The client credentials (`client_id` and `client_secret`) are what your application uses to identify itself to the Auth Server.
+After verifying your email and logging in as the tenant admin, create an OAuth client for your application. The client
+credentials (`client_id` and `client_secret`) are what your application uses to identify itself to the Auth Server.
 
 ```http
 POST /api/clients/create
@@ -95,15 +99,18 @@ Content-Type: application/json
 }
 ```
 
-> **Save the `clientSecret` now.** It is only shown once. If you lose it, rotate it via `POST /api/clients/{clientId}/rotate-secret`.
+> **Save the `clientSecret` now.** It is only shown once. If you lose it, rotate it via
+`POST /api/clients/{clientId}/rotate-secret`.
 
-The `client_id` for tenant-scoped flows is the tenant domain (e.g., `acme.example.com`). The UUID returned in `client.id` is the internal identifier used for management operations.
+The `client_id` for tenant-scoped flows is the tenant domain (e.g., `acme.example.com`). The UUID returned in
+`client.id` is the internal identifier used for management operations.
 
 ---
 
 ## Step 3: Authorization Code Flow with PKCE
 
-The Authorization Code flow with PKCE (RFC 7636) is the recommended flow for web and native applications. It prevents authorization code interception attacks without requiring a client secret to be embedded in the browser.
+The Authorization Code flow with PKCE (RFC 7636) is the recommended flow for web and native applications. It prevents
+authorization code interception attacks without requiring a client secret to be embedded in the browser.
 
 ### How it works
 
@@ -123,7 +130,8 @@ Your App                    Auth Server                    User's Browser
 
 ### 3.1 Generate a PKCE Code Pair
 
-PKCE requires a random `code_verifier` and a derived `code_challenge`. Generate these on the client before redirecting the user.
+PKCE requires a random `code_verifier` and a derived `code_challenge`. Generate these on the client before redirecting
+the user.
 
 ```typescript
 import { randomBytes, createHash } from 'crypto';
@@ -214,7 +222,8 @@ const authUrl = buildAuthorizationUrl({
 window.location.href = authUrl;
 ```
 
-The user is redirected to the Auth Server login page. After a successful login, the Auth Server redirects back to your `redirect_uri` with an authorization code:
+The user is redirected to the Auth Server login page. After a successful login, the Auth Server redirects back to your
+`redirect_uri` with an authorization code:
 
 ```
 https://myapp.example.com/callback?code=SplxlOBeZQQYbYS6WxSbIA&state=abc123
@@ -274,13 +283,13 @@ interface TokenResponse {
 
 **Token endpoint request parameters**
 
-| Parameter | Required | Description |
-|-----------|----------|-------------|
-| `grant_type` | Yes | Must be `authorization_code` |
-| `code` | Yes | The authorization code from the callback |
-| `code_verifier` | Yes | The original PKCE verifier (not the challenge) |
-| `client_id` | Yes | Your tenant domain (e.g., `acme.example.com`) |
-| `redirect_uri` | Conditional | Required if included in the authorization request |
+| Parameter       | Required    | Description                                       |
+|-----------------|-------------|---------------------------------------------------|
+| `grant_type`    | Yes         | Must be `authorization_code`                      |
+| `code`          | Yes         | The authorization code from the callback          |
+| `code_verifier` | Yes         | The original PKCE verifier (not the challenge)    |
+| `client_id`     | Yes         | Your tenant domain (e.g., `acme.example.com`)     |
+| `redirect_uri`  | Conditional | Required if included in the authorization request |
 
 **Token endpoint response**
 
@@ -319,11 +328,13 @@ console.log(idTokenPayload);
 // }
 ```
 
-> **Do not trust the ID token payload without verifying the signature** in security-sensitive contexts. Use the access token for API calls and verify it on the resource server as described in Step 4.
+> **Do not trust the ID token payload without verifying the signature** in security-sensitive contexts. Use the access
+> token for API calls and verify it on the resource server as described in Step 4.
 
 ### 3.5 Refresh the Access Token
 
-Access tokens expire (default: 1 hour). Use the refresh token to obtain a new access token without requiring the user to log in again.
+Access tokens expire (default: 1 hour). Use the refresh token to obtain a new access token without requiring the user to
+log in again.
 
 ```typescript
 async function refreshTokens(
@@ -349,13 +360,16 @@ async function refreshTokens(
 }
 ```
 
-> **Important:** The response contains a new `refresh_token`. Always replace the stored refresh token with the new one. Reusing a consumed refresh token revokes the entire token family. See [Refresh Token Rotation](refresh-token-rotation.md) for details.
+> **Important:** The response contains a new `refresh_token`. Always replace the stored refresh token with the new one.
+> Reusing a consumed refresh token revokes the entire token family.
+> See [Refresh Token Rotation](refresh-token-rotation.md) for details.
 
 ---
 
 ## Step 4: Verify Tokens in a Resource Server
 
-Your API (resource server) must verify every incoming access token before trusting it. The Auth Server uses per-tenant RSA key pairs, so verification requires fetching the correct public key for the token's tenant.
+Your API (resource server) must verify every incoming access token before trusting it. The Auth Server uses per-tenant
+RSA key pairs, so verification requires fetching the correct public key for the token's tenant.
 
 ### 4.1 Install dependencies
 
@@ -484,11 +498,13 @@ app.get('/api/profile', (req: Request, res: Response) => {
 });
 ```
 
-> **Do not reveal the reason for rejection** (expired, wrong tenant, bad signature) in the error response. Return a generic `invalid_token` message to prevent information leakage.
+> **Do not reveal the reason for rejection** (expired, wrong tenant, bad signature) in the error response. Return a
+> generic `invalid_token` message to prevent information leakage.
 
 ### 4.4 Cache the JWKS
 
-Fetching the JWKS on every request adds latency. Cache the keys per tenant and refresh only when a token presents an unknown `kid`.
+Fetching the JWKS on every request adds latency. Cache the keys per tenant and refresh only when a token presents an
+unknown `kid`.
 
 ```typescript
 const jwksCache = new Map<string, { keys: any[]; fetchedAt: number }>();
@@ -513,22 +529,25 @@ async function getJwks(tenantDomain: string): Promise<any[]> {
 
 ### 4.5 Access token claims reference
 
-| Claim | Description | Example |
-|-------|-------------|---------|
-| `sub` | User ID (UUID) | `550e8400-e29b-41d4-a716-446655440000` |
-| `email` | User email (requires `email` scope) | `alice@example.com` |
-| `name` | Display name (requires `profile` scope) | `Alice Admin` |
-| `tenant_id` | Issuing tenant UUID | `a1b2c3d4-e5f6-7890-abcd-ef1234567890` |
-| `scope` | Space-delimited granted scopes | `openid profile email` |
-| `roles` | Array of role names (user tokens only) | `["TENANT_ADMIN"]` |
-| `client_id` | OAuth client that requested the token | `acme.example.com` |
-| `iss` | Issuer — always the Auth Server domain | `auth.server.com` |
-| `aud` | Audience — intended recipients | `["my-api"]` |
-| `exp` | Expiration time (Unix timestamp) | `1700003600` |
-| `iat` | Issued at (Unix timestamp) | `1700000000` |
-| `grant_type` | OAuth grant used | `authorization_code` |
+| Claim        | Description                             | Example                                |
+|--------------|-----------------------------------------|----------------------------------------|
+| `sub`        | User ID (UUID)                          | `550e8400-e29b-41d4-a716-446655440000` |
+| `email`      | User email (requires `email` scope)     | `alice@example.com`                    |
+| `name`       | Display name (requires `profile` scope) | `Alice Admin`                          |
+| `tenant_id`  | Issuing tenant UUID                     | `a1b2c3d4-e5f6-7890-abcd-ef1234567890` |
+| `scope`      | Space-delimited granted scopes          | `openid profile email`                 |
+| `roles`      | Array of role names (user tokens only)  | `["TENANT_ADMIN"]`                     |
+| `client_id`  | OAuth client that requested the token   | `acme.example.com`                     |
+| `iss`        | Issuer — always the Auth Server domain  | `auth.server.com`                      |
+| `aud`        | Audience — intended recipients          | `["my-api"]`                           |
+| `exp`        | Expiration time (Unix timestamp)        | `1700003600`                           |
+| `iat`        | Issued at (Unix timestamp)              | `1700000000`                           |
+| `grant_type` | OAuth grant used                        | `authorization_code`                   |
 
-> **Scopes vs roles:** `scope` contains OIDC values (`openid`, `profile`, `email`). `roles` contains authorization roles (`TENANT_ADMIN`, `TENANT_VIEWER`, or custom roles). These are independent — never use scope values for authorization decisions in your resource server. See [Token API](token-api.md) for the full roles format including app-owned roles.
+> **Scopes vs roles:** `scope` contains OIDC values (`openid`, `profile`, `email`). `roles` contains authorization
+> roles (`TENANT_ADMIN`, `TENANT_VIEWER`, or custom roles). These are independent — never use scope values for
+> authorization decisions in your resource server. See [Token API](token-api.md) for the full roles format including
+> app-owned roles.
 
 ---
 

@@ -106,7 +106,8 @@ describe('Resource Indicator Auth Code Flow', () => {
                 const jwtPayload = app.jwtService().decode(tokenResponse.body.access_token, {json: true}) as any;
                 expect(jwtPayload.aud).toContain(VALID_RESOURCE);
             } finally {
-                await clientApi.deleteClient(clientId).catch(() => {});
+                await clientApi.deleteClient(clientId).catch(() => {
+                });
             }
         });
     });
@@ -149,7 +150,8 @@ describe('Resource Indicator Auth Code Flow', () => {
                 expect(jwtPayload.aud).toContain(VALID_RESOURCE);
                 expect(jwtPayload.aud).toContain('auth.server.com');
             } finally {
-                await clientApi.deleteClient(clientId).catch(() => {});
+                await clientApi.deleteClient(clientId).catch(() => {
+                });
             }
         });
 
@@ -189,7 +191,8 @@ describe('Resource Indicator Auth Code Flow', () => {
                 expect(jwtPayload.aud).toContain(VALID_RESOURCE);
                 expect(jwtPayload.aud).not.toContain(VALID_RESOURCE_2);
             } finally {
-                await clientApi.deleteClient(clientId).catch(() => {});
+                await clientApi.deleteClient(clientId).catch(() => {
+                });
             }
         });
     });
@@ -229,7 +232,8 @@ describe('Resource Indicator Auth Code Flow', () => {
                 const jwtPayload = app.jwtService().decode(tokenResponse.body.access_token, {json: true}) as any;
                 expect(jwtPayload.aud).toContain(VALID_RESOURCE);
             } finally {
-                await clientApi.deleteClient(clientId).catch(() => {});
+                await clientApi.deleteClient(clientId).catch(() => {
+                });
             }
         });
     });
@@ -269,7 +273,8 @@ describe('Resource Indicator Auth Code Flow', () => {
                 const jwtPayload = app.jwtService().decode(tokenResponse.body.access_token, {json: true}) as any;
                 expect(jwtPayload.aud).toContain(VALID_RESOURCE);
             } finally {
-                await clientApi.deleteClient(clientId).catch(() => {});
+                await clientApi.deleteClient(clientId).catch(() => {
+                });
             }
         });
     });

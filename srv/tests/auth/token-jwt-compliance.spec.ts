@@ -1,7 +1,6 @@
 import {SharedTestFixture} from "../shared-test.fixture";
 import {TokenFixture} from "../token.fixture";
 import {JwtService} from "@nestjs/jwt";
-import {expect2xx} from "../api-client/client";
 
 const OIDC_SCOPES = ['email', 'openid', 'profile'];
 const ROLE_NAMES = ['SUPER_ADMIN', 'TENANT_ADMIN', 'TENANT_VIEWER'];

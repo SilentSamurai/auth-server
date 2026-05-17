@@ -1,4 +1,4 @@
-import { visitAuthorize, interceptAll } from '../support/unified-authorize';
+import {interceptAll, visitAuthorize} from '../support/unified-authorize';
 
 describe('State Parameter Enforcement', () => {
     const email = () => Cypress.env('shireTenantAdminEmail');

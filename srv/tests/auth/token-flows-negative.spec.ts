@@ -43,10 +43,10 @@ describe('e2e negative token flow', () => {
         // Create a confidential client for client_credentials tests
         const decoded = app.jwtService().decode(accessToken, {json: true}) as any;
         const confCreds = await tokenFixture.createConfidentialClient(
-            accessToken, 
-            decoded.tenant.id, 
-            "Test Confidential Client", 
-            "client_credentials", 
+            accessToken,
+            decoded.tenant.id,
+            "Test Confidential Client",
+            "client_credentials",
             "openid profile email"
         );
         clientId = confCreds.clientId;

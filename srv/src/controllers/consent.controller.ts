@@ -1,13 +1,13 @@
 import {
     BadRequestException,
     Body,
+    ClassSerializerInterceptor,
     Controller,
     Post,
     Req,
     UnauthorizedException,
     UseFilters,
     UseInterceptors,
-    ClassSerializerInterceptor,
 } from "@nestjs/common";
 import {Request as ExpressRequest} from "express";
 
@@ -42,7 +42,7 @@ export class ConsentController {
             csrf_token: string;
             decision: 'grant' | 'deny';
         },
-    ): Promise<{success: true}> {
+    ): Promise<{ success: true }> {
         this.csrfTokenService.verifyOrThrow(
             req.signedCookies?.flow_id,
             body.csrf_token,

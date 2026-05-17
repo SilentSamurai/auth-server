@@ -1,5 +1,6 @@
 import {
     Body,
+    ClassSerializerInterceptor,
     Controller,
     HttpCode,
     Logger,
@@ -8,7 +9,6 @@ import {
     Res,
     UseFilters,
     UseInterceptors,
-    ClassSerializerInterceptor,
 } from "@nestjs/common";
 import {Request as ExpressRequest, Response} from "express";
 

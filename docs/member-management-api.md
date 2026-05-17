@@ -2,9 +2,11 @@
 
 ## Overview
 
-The Member Management API provides endpoints for managing users within a tenant. Tenant administrators can list members, add new members by email, remove members, and manage the roles assigned to each member.
+The Member Management API provides endpoints for managing users within a tenant. Tenant administrators can list members,
+add new members by email, remove members, and manage the roles assigned to each member.
 
-All endpoints require a valid Bearer access token obtained via the OAuth 2.0 authorization flow. The tenant context is derived from the token — the token determines which tenant the operation applies to.
+All endpoints require a valid Bearer access token obtained via the OAuth 2.0 authorization flow. The tenant context is
+derived from the token — the token determines which tenant the operation applies to.
 
 **Base path:** `/api/tenant/my`
 
@@ -18,7 +20,8 @@ All endpoints require an `Authorization` header with a valid Bearer token:
 Authorization: Bearer <access_token>
 ```
 
-The tenant is resolved from the token's `tenant` claim. You do not pass a tenant ID in the URL — the token determines which tenant you are operating on.
+The tenant is resolved from the token's `tenant` claim. You do not pass a tenant ID in the URL — the token determines
+which tenant you are operating on.
 
 ---
 
@@ -41,7 +44,8 @@ GET /api/tenant/my/members
 
 `protected`  `application/json`
 
-Returns all members of the tenant associated with the current access token. Each member object includes their assigned roles within the tenant.
+Returns all members of the tenant associated with the current access token. Each member object includes their assigned
+roles within the tenant.
 
 **Response**
 
@@ -82,24 +86,24 @@ Returns an array of user objects:
 ]
 ```
 
-| Field              | Type   | Description                                          |
-|--------------------|--------|------------------------------------------------------|
-| `id`               | string | UUID of the user                                     |
-| `email`            | string | Email address of the user                            |
-| `name`             | string | Display name of the user                             |
-| `createdAt`        | string | ISO 8601 timestamp of user account creation          |
-| `roles`            | array  | Roles assigned to this user within the tenant        |
-| `roles[].id`       | string | UUID of the role                                     |
-| `roles[].name`     | string | Name of the role (e.g., `TENANT_ADMIN`)              |
-| `roles[].removable`| boolean| Whether the role can be removed from the user        |
+| Field               | Type    | Description                                   |
+|---------------------|---------|-----------------------------------------------|
+| `id`                | string  | UUID of the user                              |
+| `email`             | string  | Email address of the user                     |
+| `name`              | string  | Display name of the user                      |
+| `createdAt`         | string  | ISO 8601 timestamp of user account creation   |
+| `roles`             | array   | Roles assigned to this user within the tenant |
+| `roles[].id`        | string  | UUID of the role                              |
+| `roles[].name`      | string  | Name of the role (e.g., `TENANT_ADMIN`)       |
+| `roles[].removable` | boolean | Whether the role can be removed from the user |
 
 **Error Responses**
 
-| Status | Description                                                         |
-|--------|---------------------------------------------------------------------|
-| `401`  | Missing or invalid access token                                     |
+| Status | Description                                                        |
+|--------|--------------------------------------------------------------------|
+| `401`  | Missing or invalid access token                                    |
 | `403`  | Insufficient permissions (requires `TENANT_VIEWER` role or higher) |
-| `404`  | Tenant not found                                                    |
+| `404`  | Tenant not found                                                   |
 
 ---
 
@@ -111,7 +115,8 @@ POST /api/tenant/my/members/add
 
 `protected`  `application/json`
 
-Adds one or more users to the tenant by email address. If a user with the given email does not yet exist in the system, a shadow account is created automatically. The user is then added as a member of the tenant.
+Adds one or more users to the tenant by email address. If a user with the given email does not yet exist in the system,
+a shadow account is created automatically. The user is then added as a member of the tenant.
 
 Requires the `TENANT_ADMIN` role.
 
@@ -126,9 +131,9 @@ Requires the `TENANT_ADMIN` role.
 }
 ```
 
-| Parameter | Required | Description                                                        |
-|-----------|----------|--------------------------------------------------------------------|
-| `emails`  | Yes      | Array of email addresses to add as members (max 128 chars each)    |
+| Parameter | Required | Description                                                     |
+|-----------|----------|-----------------------------------------------------------------|
+| `emails`  | Yes      | Array of email addresses to add as members (max 128 chars each) |
 
 **Response**
 
@@ -144,7 +149,8 @@ Returns the updated tenant object with the new members reflected:
 }
 ```
 
-> **Note:** Newly added members have no roles assigned by default. Use the [Set Member Roles](#set-member-roles) endpoint to assign roles after adding.
+> **Note:** Newly added members have no roles assigned by default. Use the [Set Member Roles](#set-member-roles)
+> endpoint to assign roles after adding.
 
 **What happens on add**
 
@@ -154,12 +160,12 @@ Returns the updated tenant object with the new members reflected:
 
 **Error Responses**
 
-| Status | Description                                                        |
-|--------|--------------------------------------------------------------------|
-| `400`  | Invalid request body (e.g., malformed email address)               |
-| `401`  | Missing or invalid access token                                    |
-| `403`  | Insufficient permissions (requires `TENANT_ADMIN` role)            |
-| `404`  | Tenant not found                                                   |
+| Status | Description                                             |
+|--------|---------------------------------------------------------|
+| `400`  | Invalid request body (e.g., malformed email address)    |
+| `401`  | Missing or invalid access token                         |
+| `403`  | Insufficient permissions (requires `TENANT_ADMIN` role) |
+| `404`  | Tenant not found                                        |
 
 ---
 
@@ -171,7 +177,8 @@ DELETE /api/tenant/my/members/delete
 
 `protected`  `application/json`
 
-Removes one or more users from the tenant by email address. The user accounts are not deleted — they are only unlinked from the tenant. Requires the `TENANT_ADMIN` role.
+Removes one or more users from the tenant by email address. The user accounts are not deleted — they are only unlinked
+from the tenant. Requires the `TENANT_ADMIN` role.
 
 > **Note:** A tenant admin cannot remove themselves from the tenant.
 
@@ -185,9 +192,9 @@ Removes one or more users from the tenant by email address. The user accounts ar
 }
 ```
 
-| Parameter | Required | Description                                                        |
-|-----------|----------|--------------------------------------------------------------------|
-| `emails`  | Yes      | Array of email addresses to remove from the tenant                 |
+| Parameter | Required | Description                                        |
+|-----------|----------|----------------------------------------------------|
+| `emails`  | Yes      | Array of email addresses to remove from the tenant |
 
 **Response**
 
@@ -205,12 +212,12 @@ Returns the updated tenant object:
 
 **Error Responses**
 
-| Status | Description                                                        |
-|--------|--------------------------------------------------------------------|
-| `400`  | Invalid request body                                               |
-| `401`  | Missing or invalid access token                                    |
+| Status | Description                                                                           |
+|--------|---------------------------------------------------------------------------------------|
+| `400`  | Invalid request body                                                                  |
+| `401`  | Missing or invalid access token                                                       |
 | `403`  | Insufficient permissions (requires `TENANT_ADMIN` role), or attempting to remove self |
-| `404`  | Tenant or user not found                                           |
+| `404`  | Tenant or user not found                                                              |
 
 ---
 
@@ -226,9 +233,9 @@ Returns details for a specific member of the tenant, including their assigned ro
 
 **Path Parameters**
 
-| Parameter | Description                    |
-|-----------|--------------------------------|
-| `userId`  | UUID of the user to look up    |
+| Parameter | Description                 |
+|-----------|-----------------------------|
+| `userId`  | UUID of the user to look up |
 
 **Response**
 
@@ -248,19 +255,19 @@ Returns details for a specific member of the tenant, including their assigned ro
 }
 ```
 
-| Field      | Type   | Description                                          |
-|------------|--------|------------------------------------------------------|
-| `tenantId` | string | UUID of the tenant                                   |
-| `userId`   | string | UUID of the user                                     |
-| `roles`    | array  | Roles assigned to this user within the tenant        |
+| Field      | Type   | Description                                   |
+|------------|--------|-----------------------------------------------|
+| `tenantId` | string | UUID of the tenant                            |
+| `userId`   | string | UUID of the user                              |
+| `roles`    | array  | Roles assigned to this user within the tenant |
 
 **Error Responses**
 
-| Status | Description                                                         |
-|--------|---------------------------------------------------------------------|
-| `401`  | Missing or invalid access token                                     |
+| Status | Description                                                        |
+|--------|--------------------------------------------------------------------|
+| `401`  | Missing or invalid access token                                    |
 | `403`  | Insufficient permissions (requires `TENANT_VIEWER` role or higher) |
-| `404`  | Tenant or user not found                                            |
+| `404`  | Tenant or user not found                                           |
 
 ---
 
@@ -276,9 +283,9 @@ Returns the roles assigned to a specific member within the tenant.
 
 **Path Parameters**
 
-| Parameter | Description                    |
-|-----------|--------------------------------|
-| `userId`  | UUID of the user               |
+| Parameter | Description      |
+|-----------|------------------|
+| `userId`  | UUID of the user |
 
 **Response**
 
@@ -296,22 +303,22 @@ Returns the roles assigned to a specific member within the tenant.
 }
 ```
 
-| Field              | Type    | Description                                          |
-|--------------------|---------|------------------------------------------------------|
-| `roles`            | array   | Roles assigned to this user within the tenant        |
-| `roles[].id`       | string  | UUID of the role                                     |
-| `roles[].name`     | string  | Name of the role                                     |
-| `roles[].description` | string | Human-readable description of the role            |
-| `roles[].removable`| boolean | Whether the role can be removed from the user        |
-| `roles[].createdAt`| string  | ISO 8601 timestamp of role creation                  |
+| Field                 | Type    | Description                                   |
+|-----------------------|---------|-----------------------------------------------|
+| `roles`               | array   | Roles assigned to this user within the tenant |
+| `roles[].id`          | string  | UUID of the role                              |
+| `roles[].name`        | string  | Name of the role                              |
+| `roles[].description` | string  | Human-readable description of the role        |
+| `roles[].removable`   | boolean | Whether the role can be removed from the user |
+| `roles[].createdAt`   | string  | ISO 8601 timestamp of role creation           |
 
 **Error Responses**
 
-| Status | Description                                                         |
-|--------|---------------------------------------------------------------------|
-| `401`  | Missing or invalid access token                                     |
+| Status | Description                                                        |
+|--------|--------------------------------------------------------------------|
+| `401`  | Missing or invalid access token                                    |
 | `403`  | Insufficient permissions (requires `TENANT_VIEWER` role or higher) |
-| `404`  | Tenant or user not found                                            |
+| `404`  | Tenant or user not found                                           |
 
 ---
 
@@ -323,13 +330,14 @@ PUT /api/tenant/my/member/{userId}/roles
 
 `protected`  `application/json`
 
-Replaces the full set of roles for a member. Any roles currently assigned to the user that are not included in the request body will be removed. Requires the `TENANT_ADMIN` role.
+Replaces the full set of roles for a member. Any roles currently assigned to the user that are not included in the
+request body will be removed. Requires the `TENANT_ADMIN` role.
 
 **Path Parameters**
 
-| Parameter | Description                    |
-|-----------|--------------------------------|
-| `userId`  | UUID of the user               |
+| Parameter | Description      |
+|-----------|------------------|
+| `userId`  | UUID of the user |
 
 **Request Body**
 
@@ -342,9 +350,9 @@ Replaces the full set of roles for a member. Any roles currently assigned to the
 }
 ```
 
-| Parameter | Required | Description                                                        |
-|-----------|----------|--------------------------------------------------------------------|
-| `roles`   | Yes      | Array of role names to assign. Replaces the user's current roles.  |
+| Parameter | Required | Description                                                       |
+|-----------|----------|-------------------------------------------------------------------|
+| `roles`   | Yes      | Array of role names to assign. Replaces the user's current roles. |
 
 **Response**
 
@@ -371,12 +379,12 @@ Returns the updated array of role objects assigned to the user:
 
 **Error Responses**
 
-| Status | Description                                                        |
-|--------|--------------------------------------------------------------------|
-| `400`  | Invalid request body                                               |
-| `401`  | Missing or invalid access token                                    |
-| `403`  | Insufficient permissions (requires `TENANT_ADMIN` role)            |
-| `404`  | Tenant, user, or one of the specified roles not found              |
+| Status | Description                                             |
+|--------|---------------------------------------------------------|
+| `400`  | Invalid request body                                    |
+| `401`  | Missing or invalid access token                         |
+| `403`  | Insufficient permissions (requires `TENANT_ADMIN` role) |
+| `404`  | Tenant, user, or one of the specified roles not found   |
 
 ---
 
@@ -392,9 +400,9 @@ Adds one or more roles to a member without affecting their existing roles. Requi
 
 **Path Parameters**
 
-| Parameter | Description                    |
-|-----------|--------------------------------|
-| `userId`  | UUID of the user               |
+| Parameter | Description      |
+|-----------|------------------|
+| `userId`  | UUID of the user |
 
 **Request Body**
 
@@ -406,9 +414,9 @@ Adds one or more roles to a member without affecting their existing roles. Requi
 }
 ```
 
-| Parameter | Required | Description                                                        |
-|-----------|----------|--------------------------------------------------------------------|
-| `roles`   | Yes      | Array of role names to add to the user's existing roles            |
+| Parameter | Required | Description                                             |
+|-----------|----------|---------------------------------------------------------|
+| `roles`   | Yes      | Array of role names to add to the user's existing roles |
 
 **Response**
 
@@ -435,12 +443,12 @@ Returns the full updated array of role objects assigned to the user after the ad
 
 **Error Responses**
 
-| Status | Description                                                        |
-|--------|--------------------------------------------------------------------|
-| `400`  | Invalid request body                                               |
-| `401`  | Missing or invalid access token                                    |
-| `403`  | Insufficient permissions (requires `TENANT_ADMIN` role)            |
-| `404`  | Tenant, user, or one of the specified roles not found              |
+| Status | Description                                             |
+|--------|---------------------------------------------------------|
+| `400`  | Invalid request body                                    |
+| `401`  | Missing or invalid access token                         |
+| `403`  | Insufficient permissions (requires `TENANT_ADMIN` role) |
+| `404`  | Tenant, user, or one of the specified roles not found   |
 
 ---
 
@@ -456,9 +464,9 @@ Removes one or more roles from a member without affecting their other roles. Req
 
 **Path Parameters**
 
-| Parameter | Description                    |
-|-----------|--------------------------------|
-| `userId`  | UUID of the user               |
+| Parameter | Description      |
+|-----------|------------------|
+| `userId`  | UUID of the user |
 
 **Request Body**
 
@@ -470,9 +478,9 @@ Removes one or more roles from a member without affecting their other roles. Req
 }
 ```
 
-| Parameter | Required | Description                                                        |
-|-----------|----------|--------------------------------------------------------------------|
-| `roles`   | Yes      | Array of role names to remove from the user                        |
+| Parameter | Required | Description                                 |
+|-----------|----------|---------------------------------------------|
+| `roles`   | Yes      | Array of role names to remove from the user |
 
 **Response**
 
@@ -492,27 +500,27 @@ Returns the full updated array of role objects assigned to the user after the re
 
 **Error Responses**
 
-| Status | Description                                                        |
-|--------|--------------------------------------------------------------------|
-| `400`  | Invalid request body                                               |
-| `401`  | Missing or invalid access token                                    |
-| `403`  | Insufficient permissions (requires `TENANT_ADMIN` role)            |
-| `404`  | Tenant, user, or one of the specified roles not found              |
+| Status | Description                                             |
+|--------|---------------------------------------------------------|
+| `400`  | Invalid request body                                    |
+| `401`  | Missing or invalid access token                         |
+| `403`  | Insufficient permissions (requires `TENANT_ADMIN` role) |
+| `404`  | Tenant, user, or one of the specified roles not found   |
 
 ---
 
 ## Endpoint Summary
 
-| Method   | Path                                          | Description                          | Required Role   |
-|----------|-----------------------------------------------|--------------------------------------|-----------------|
-| `GET`    | `/api/tenant/my/members`                      | List all members                     | `TENANT_VIEWER` |
-| `POST`   | `/api/tenant/my/members/add`                  | Add members by email                 | `TENANT_ADMIN`  |
-| `DELETE` | `/api/tenant/my/members/delete`               | Remove members by email              | `TENANT_ADMIN`  |
-| `GET`    | `/api/tenant/my/member/{userId}`              | Get a specific member's details      | `TENANT_VIEWER` |
-| `GET`    | `/api/tenant/my/member/{userId}/roles`        | Get a member's roles                 | `TENANT_VIEWER` |
-| `PUT`    | `/api/tenant/my/member/{userId}/roles`        | Replace a member's roles (full set)  | `TENANT_ADMIN`  |
-| `POST`   | `/api/tenant/my/member/{userId}/roles/add`    | Add roles to a member                | `TENANT_ADMIN`  |
-| `DELETE` | `/api/tenant/my/member/{userId}/roles/remove` | Remove roles from a member           | `TENANT_ADMIN`  |
+| Method   | Path                                          | Description                         | Required Role   |
+|----------|-----------------------------------------------|-------------------------------------|-----------------|
+| `GET`    | `/api/tenant/my/members`                      | List all members                    | `TENANT_VIEWER` |
+| `POST`   | `/api/tenant/my/members/add`                  | Add members by email                | `TENANT_ADMIN`  |
+| `DELETE` | `/api/tenant/my/members/delete`               | Remove members by email             | `TENANT_ADMIN`  |
+| `GET`    | `/api/tenant/my/member/{userId}`              | Get a specific member's details     | `TENANT_VIEWER` |
+| `GET`    | `/api/tenant/my/member/{userId}/roles`        | Get a member's roles                | `TENANT_VIEWER` |
+| `PUT`    | `/api/tenant/my/member/{userId}/roles`        | Replace a member's roles (full set) | `TENANT_ADMIN`  |
+| `POST`   | `/api/tenant/my/member/{userId}/roles/add`    | Add roles to a member               | `TENANT_ADMIN`  |
+| `DELETE` | `/api/tenant/my/member/{userId}/roles/remove` | Remove roles from a member          | `TENANT_ADMIN`  |
 
 ---
 

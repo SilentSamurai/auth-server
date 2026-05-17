@@ -638,7 +638,10 @@ export class TN02AComponent implements OnInit {
     }
 
     async onCreateClient() {
-        const result = await this.modalService.open<{ client: any; clientSecret: string | null }>(CreateClientAdminComponent, {
+        const result = await this.modalService.open<{
+            client: any;
+            clientSecret: string | null
+        }>(CreateClientAdminComponent, {
             initData: {tenantId: this.tenant_id}
         });
         if (result.is_ok()) {

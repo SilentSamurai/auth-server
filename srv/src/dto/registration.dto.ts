@@ -1,5 +1,5 @@
 import * as yup from "yup";
-import {PASSWORD_REGEXP, PASSWORD_MESSAGE, USERNAME_REGEXP, USERNAME_MESSAGE} from "./validation-common";
+import {PASSWORD_MESSAGE, PASSWORD_REGEXP, USERNAME_MESSAGE, USERNAME_REGEXP} from "./validation-common";
 
 export const RegisterDomainSchema = yup.object().shape({
     name: yup

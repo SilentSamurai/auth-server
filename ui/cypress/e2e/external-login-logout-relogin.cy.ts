@@ -243,7 +243,7 @@ describe('External Login → Logout → Re-Login', () => {
                     scope: 'openid profile email',
                     session_confirmed: 'true',
                 },
-                headers: { Cookie: `sid=${cookie!.value}` },
+                headers: {Cookie: `sid=${cookie!.value}`},
                 followRedirect: false,
             }).then((resp) => {
                 expect(resp.status).to.eq(302);

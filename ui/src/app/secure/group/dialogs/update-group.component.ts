@@ -56,9 +56,11 @@ export class UpdateGroupComponent implements OnInit {
         private groupService: GroupService,
         private messageService: MessageService,
         public activeModal: NgbActiveModal,
-    ) {}
+    ) {
+    }
 
-    ngOnInit(): void {}
+    ngOnInit(): void {
+    }
 
     async onSubmit() {
         try {

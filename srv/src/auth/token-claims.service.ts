@@ -41,15 +41,6 @@ export class TokenClaimsService {
         return this.formatRoleNamesForToken(allRoles);
     }
 
-    private formatRoleNamesForToken(roles: Role[]): string[] {
-        return roles.map(role => {
-            if (role.app) {
-                return `${role.app.name}:${role.name}`;
-            }
-            return role.name;
-        });
-    }
-
     buildAudience(resource: string | undefined, superTenantDomain: string): string[] {
         return resource
             ? [resource, superTenantDomain]
@@ -62,7 +53,7 @@ export class TokenClaimsService {
         userId: string,
         tenantId: string,
         requireAuthTime?: boolean,
-    ): Promise<{authTime: number; sessionId: string}> {
+    ): Promise<{ authTime: number; sessionId: string }> {
         if (sid) {
             const session = await this.loginSessionService.validateSession(sid);
             return {authTime: session.authTime, sessionId: session.sid};
@@ -77,7 +68,7 @@ export class TokenClaimsService {
         return {authTime: Math.floor(Date.now() / 1000), sessionId: randomUUID()};
     }
 
-    async resolveRefreshSession(sid: string | undefined): Promise<{authTime: number; sessionId: string}> {
+    async resolveRefreshSession(sid: string | undefined): Promise<{ authTime: number; sessionId: string }> {
         if (sid) {
             const session = await this.loginSessionService.validateSession(sid);
             return {authTime: session.authTime, sessionId: session.sid};
@@ -100,6 +91,15 @@ export class TokenClaimsService {
             return {eligible: true, reason: 'client_allow_refresh_token'};
         }
         return {eligible: false, reason: 'refresh_token_not_eligible'};
+    }
+
+    private formatRoleNamesForToken(roles: Role[]): string[] {
+        return roles.map(role => {
+            if (role.app) {
+                return `${role.app.name}:${role.name}`;
+            }
+            return role.name;
+        });
     }
 }
 

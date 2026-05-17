@@ -46,14 +46,14 @@ interaction.
 Consent records are stored in the `user_consents` table. Each record represents the set of scopes a user has approved
 for a specific client.
 
-| Column            | Description                                                                                  |
-|-------------------|----------------------------------------------------------------------------------------------|
-| `user_id`         | The user who granted consent                                                                 |
-| `client_id`       | The OAuth client that received consent (stored as the client's UUID, not its alias)          |
-| `granted_scopes`  | Space-delimited list of approved scopes (e.g., `email openid profile`)                       |
-| `consent_version` | Incremented each time the consent record is updated                                          |
-| `created_at`      | When consent was first granted                                                               |
-| `updated_at`      | When the consent record was last modified                                                    |
+| Column            | Description                                                                         |
+|-------------------|-------------------------------------------------------------------------------------|
+| `user_id`         | The user who granted consent                                                        |
+| `client_id`       | The OAuth client that received consent (stored as the client's UUID, not its alias) |
+| `granted_scopes`  | Space-delimited list of approved scopes (e.g., `email openid profile`)              |
+| `consent_version` | Incremented each time the consent record is updated                                 |
+| `created_at`      | When consent was first granted                                                      |
+| `updated_at`      | When the consent record was last modified                                           |
 
 There is at most one consent record per user+client pair (enforced by a unique constraint on `user_id` + `client_id`).
 
@@ -64,9 +64,9 @@ When the user approves the consent screen, the server:
 1. Validates the approved scopes against the client's `allowedScopes` (intersection — the user cannot approve scopes
    the client is not permitted to request).
 2. Creates or updates the `user_consents` record:
-   - **New record**: `granted_scopes` is set to the approved scopes and `consent_version` is set to `1`.
-   - **Existing record**: `granted_scopes` is updated to the **union** of the existing scopes and the newly approved
-     scopes. `consent_version` is incremented.
+    - **New record**: `granted_scopes` is set to the approved scopes and `consent_version` is set to `1`.
+    - **Existing record**: `granted_scopes` is updated to the **union** of the existing scopes and the newly approved
+      scopes. `consent_version` is incremented.
 3. Issues an authorization code and redirects back to the client.
 
 The union behavior means that granting consent for additional scopes never removes previously granted scopes.
@@ -143,6 +143,7 @@ GET /api/oauth/authorize?...&prompt=login%20consent
 ```
 
 When both are present:
+
 - `prompt=login` forces re-authentication first (all existing sessions are invalidated).
 - `prompt=consent` forces the consent screen after the user logs in.
 - `auth_time` is included in the ID token.
@@ -182,12 +183,12 @@ Third-party clients — those identified by their UUID `client_id` — always go
 
 ## Error Reference
 
-| Error Code          | When it occurs                                                                                  |
-|---------------------|-------------------------------------------------------------------------------------------------|
-| `consent_required`  | `prompt=none` was requested but consent has not been granted for the requested scopes           |
-| `access_denied`     | The user explicitly denied the consent screen                                                   |
-| `invalid_request`   | `prompt=none` was combined with `prompt=consent` or other prompt values                         |
-| `invalid_scope`     | The requested scopes are not a subset of the client's `allowedScopes`                           |
+| Error Code         | When it occurs                                                                        |
+|--------------------|---------------------------------------------------------------------------------------|
+| `consent_required` | `prompt=none` was requested but consent has not been granted for the requested scopes |
+| `access_denied`    | The user explicitly denied the consent screen                                         |
+| `invalid_request`  | `prompt=none` was combined with `prompt=consent` or other prompt values               |
+| `invalid_scope`    | The requested scopes are not a subset of the client's `allowedScopes`                 |
 
 ---
 

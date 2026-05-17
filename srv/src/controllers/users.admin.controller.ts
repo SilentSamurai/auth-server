@@ -22,7 +22,7 @@ import {ValidationSchema} from "../validation/validation.schema";
 import {TenantService} from "../services/tenant.service";
 import {Tenant} from "../entity/tenant.entity";
 import {CurrentPermission, Permission} from "../auth/auth.decorator";
-import {VerifyUserSchema, UpdateUserPasswordSchema} from "../dto/user.dto";
+import {UpdateUserPasswordSchema, VerifyUserSchema} from "../dto/user.dto";
 
 @Controller("api/users")
 @UseInterceptors(ClassSerializerInterceptor)

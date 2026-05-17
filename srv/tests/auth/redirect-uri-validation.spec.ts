@@ -61,9 +61,12 @@ describe('Authorization endpoint redirect URI validation', () => {
     });
 
     afterAll(async () => {
-        await clientApi.deleteClient(singleUriClientId).catch(() => {});
-        await clientApi.deleteClient(multiUriClientId).catch(() => {});
-        await clientApi.deleteClient(noUriClientId).catch(() => {});
+        await clientApi.deleteClient(singleUriClientId).catch(() => {
+        });
+        await clientApi.deleteClient(multiUriClientId).catch(() => {
+        });
+        await clientApi.deleteClient(noUriClientId).catch(() => {
+        });
         await app.close();
     });
 
@@ -242,7 +245,8 @@ describe('Authorize endpoint redirect URI validation', () => {
     });
 
     afterAll(async () => {
-        await clientApi.deleteClient(singleUriClientId).catch(() => {});
+        await clientApi.deleteClient(singleUriClientId).catch(() => {
+        });
         await app.close();
     });
 
@@ -396,7 +400,8 @@ describe('Token exchange redirect URI binding', () => {
     });
 
     afterAll(async () => {
-        await clientApi.deleteClient(singleUriClientId).catch(() => {});
+        await clientApi.deleteClient(singleUriClientId).catch(() => {
+        });
         await app.close();
     });
 
@@ -519,7 +524,8 @@ describe('Error response format compliance', () => {
     });
 
     afterAll(async () => {
-        await clientApi.deleteClient(singleUriClientId).catch(() => {});
+        await clientApi.deleteClient(singleUriClientId).catch(() => {
+        });
         await app.close();
     });
 

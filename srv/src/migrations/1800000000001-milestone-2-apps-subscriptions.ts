@@ -12,7 +12,13 @@ export class Milestone2AppsSubscriptions1800000000001 implements MigrationInterf
             new Table({
                 name: 'apps',
                 columns: [
-                    {name: 'id', type: DB_STRING_TYPE, isPrimary: true, generationStrategy: 'uuid', default: DB_UUID_GENERATOR},
+                    {
+                        name: 'id',
+                        type: DB_STRING_TYPE,
+                        isPrimary: true,
+                        generationStrategy: 'uuid',
+                        default: DB_UUID_GENERATOR
+                    },
                     {name: 'name', type: DB_STRING_TYPE, isNullable: false},
                     {name: 'description', type: DB_STRING_TYPE, isNullable: true},
                     {name: 'app_url', type: DB_STRING_TYPE, isNullable: true},
@@ -36,7 +42,13 @@ export class Milestone2AppsSubscriptions1800000000001 implements MigrationInterf
             new Table({
                 name: 'subscriptions',
                 columns: [
-                    {name: 'id', type: DB_STRING_TYPE, isPrimary: true, generationStrategy: 'uuid', default: DB_UUID_GENERATOR},
+                    {
+                        name: 'id',
+                        type: DB_STRING_TYPE,
+                        isPrimary: true,
+                        generationStrategy: 'uuid',
+                        default: DB_UUID_GENERATOR
+                    },
                     {name: 'subscriber_tenant_id', type: DB_STRING_TYPE, isNullable: false},
                     {name: 'app_id', type: DB_STRING_TYPE, isNullable: false},
                     {name: 'status', type: DB_STRING_TYPE, isNullable: false, length: '64'},
@@ -75,18 +87,40 @@ export class Milestone2AppsSubscriptions1800000000001 implements MigrationInterf
             new Table({
                 name: "tenant_bits",
                 columns: [
-                    {name: "id", type: DB_STRING_TYPE, isPrimary: true, isNullable: false, generationStrategy: "uuid", default: "uuid_generate_v4()"},
+                    {
+                        name: "id",
+                        type: DB_STRING_TYPE,
+                        isPrimary: true,
+                        isNullable: false,
+                        generationStrategy: "uuid",
+                        default: "uuid_generate_v4()"
+                    },
                     {name: "tenant_id", type: DB_STRING_TYPE, isNullable: false},
                     {name: "owner_tenant_id", type: DB_STRING_TYPE, isNullable: false},
                     {name: "key", type: "varchar", isNullable: false},
                     {name: "value", type: "text", isNullable: false},
                 ],
                 uniques: [
-                    new TableUnique({name: "UQ_tenant_bits_key_owner", columnNames: ["tenant_id", "key", "owner_tenant_id"]}),
+                    new TableUnique({
+                        name: "UQ_tenant_bits_key_owner",
+                        columnNames: ["tenant_id", "key", "owner_tenant_id"]
+                    }),
                 ],
                 foreignKeys: [
-                    new TableForeignKey({columnNames: ["tenant_id"], referencedTableName: "tenants", referencedColumnNames: ["id"], onDelete: "CASCADE", name: "FK_tenant_bits_tenant"}),
-                    new TableForeignKey({columnNames: ["owner_tenant_id"], referencedTableName: "tenants", referencedColumnNames: ["id"], onDelete: "CASCADE", name: "FK_tenant_bits_owner_tenant"}),
+                    new TableForeignKey({
+                        columnNames: ["tenant_id"],
+                        referencedTableName: "tenants",
+                        referencedColumnNames: ["id"],
+                        onDelete: "CASCADE",
+                        name: "FK_tenant_bits_tenant"
+                    }),
+                    new TableForeignKey({
+                        columnNames: ["owner_tenant_id"],
+                        referencedTableName: "tenants",
+                        referencedColumnNames: ["id"],
+                        onDelete: "CASCADE",
+                        name: "FK_tenant_bits_owner_tenant"
+                    }),
                 ],
             }),
             true,
