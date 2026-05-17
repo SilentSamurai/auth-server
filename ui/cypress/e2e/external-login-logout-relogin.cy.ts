@@ -57,19 +57,7 @@ describe('External Login → Logout → Re-Login', () => {
                         cy.contains('button', 'Approve').should('be.visible').click();
                     }
                     // No session-confirm after fresh login (session_confirmed=true).
-                    // After Approve, the backend may issue code directly or show
-                    // session-confirm — handle the latter defensively.
-                    cy.url({timeout: 10000}).should('include', 'localhost:3000');
-                    cy.url().then((redirectUrl) => {
-                        // If we're still on /authorize, check for session-confirm
-                        if (redirectUrl.includes('/authorize')) {
-                            cy.get('app-authorize').invoke('attr', 'data-view').then((v) => {
-                                if (v === 'session-confirm') {
-                                    cy.contains('button', 'Continue').should('be.visible').click();
-                                }
-                            });
-                        }
-                    });
+                    // After Approve, backend issues code directly — no session-confirm.
                 });
             }
             // If URL already includes localhost:3000, consent was already granted —

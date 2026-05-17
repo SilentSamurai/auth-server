@@ -231,6 +231,13 @@ export class AuthorizeComponent implements OnInit, OnDestroy {
      */
     private pendingCredentials: { email: string; password: string; clientId: string } | null = null;
     private readonly destroy$ = new Subject<void>();
+    /**
+     * Whether session_confirmed=true was forwarded by the backend in the URL.
+     * Only set when the session was freshly created by a login in this flow;
+     * pre-existing sessions will not have this flag. Used by the consent
+     * handler to decide whether to skip session-confirm after grant.
+     */
+    private _sessionConfirmed = false;
 
     // -----------------------------------------------------------------------
     // Destroy signal — used with takeUntil to cancel in-flight observables
@@ -327,6 +334,10 @@ export class AuthorizeComponent implements OnInit, OnDestroy {
         this.oauthParams = Object.freeze({...result.params!});
         this.csrfToken = result.csrfToken;
 
+        // Capture session_confirmed flag forwarded by the backend so the
+        // consent handler can skip session-confirm for freshly-logged-in users.
+        this._sessionConfirmed = queryMap.get('session_confirmed') === 'true';
+
         // Store RP-provided nonce in sessionStorage so OAuthCallbackComponent
         // can validate it against the ID token later (OIDC Core §3.1.2.1).
         if (this.oauthParams.nonce) {
@@ -364,6 +375,7 @@ export class AuthorizeComponent implements OnInit, OnDestroy {
         this.csrfToken = null;
         this.pendingCredentials = null;
         this._pendingTenants = [];
+        this._sessionConfirmed = false;
         this.errorMessage = null;
         this.userEmail = null;
 
@@ -843,9 +855,13 @@ export class AuthorizeComponent implements OnInit, OnDestroy {
                     // endpoint with the preserved OAuth params. The backend
                     // decides whether to issue the code or the access_denied
                     // error redirect to External_Client.
+                    // Forward session_confirmed only if the backend indicated
+                    // the session was freshly created (fresh login flow).
                     const extras = decision === 'deny'
                         ? {consent_denied: true as const}
-                        : undefined;
+                        : this._sessionConfirmed
+                            ? {session_confirmed: true as const}
+                            : undefined;
                     window.location.href = this.redirectBuilder.toAuthorizeEndpoint(oauthParams, extras);
                 },
                 error: (err: unknown) => {

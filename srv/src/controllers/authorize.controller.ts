@@ -134,16 +134,28 @@ export class AuthorizeController {
             const skipConfirm = client.tenant?.skipSessionConfirm === true;
             const confirmed = query.session_confirmed === 'true';
 
+            // Only propagate session_confirmed to the consent URL when the
+            // session was freshly created by a login in this flow (authTime
+            // within 60s). Pre-existing sessions should re-confirm after
+            // granting consent.
+            const isFreshSession = confirmed && Math.floor(Date.now() / 1000) - session.authTime < 60;
+
             if (validated.prompt === 'consent') {
                 if (!skipConfirm && !confirmed) {
                     const flowId = this.flowIdCookieService.mintIfAbsent(req, res);
                     return this.sessionHelper.redirectToAuthorizeUI(res, query, validated, 'session-confirm', flowId);
+                }
+                if (!isFreshSession) {
+                    query.session_confirmed = undefined;
                 }
                 const flowId = this.flowIdCookieService.mintIfAbsent(req, res);
                 return this.sessionHelper.redirectToAuthorizeUI(res, query, validated, 'consent', flowId);
             }
 
             if (!consentGranted) {
+                if (!isFreshSession) {
+                    query.session_confirmed = undefined;
+                }
                 const flowId = this.flowIdCookieService.mintIfAbsent(req, res);
                 return this.sessionHelper.redirectToAuthorizeUI(res, query, validated, 'consent', flowId);
             }

@@ -108,15 +108,11 @@ describe('Ambiguous Tenant Flow', () => {
             expect(request.body).to.have.property('subscriber_tenant_hint', TENANTS.gondor.domain);
         });
 
-        // 7. Consent — user must grant access before confirming the session
+        // 7. Consent — user must grant access
         cy.get('app-authorize[data-view="consent"]').should('exist');
         cy.get('button').contains('Approve').click();
 
-        // 8. Session-confirm — backend asks user to confirm the active session
-        cy.get('app-authorize[data-view="session-confirm"]').should('exist');
-        cy.get('button').contains('Continue').click();
-
-        // 9. Verify successful completion — redirected back to the app with auth code
+        // 8. Verify successful completion — redirected back to the app with auth code
         cy.url().should('include', 'ambiguous-tenant-app.html');
         cy.url().should('include', 'code=');
         cy.url().should('include', 'state=');

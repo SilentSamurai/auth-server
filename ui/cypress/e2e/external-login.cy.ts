@@ -41,18 +41,8 @@ describe('External Login', () => {
                 cy.get('app-authorize').invoke('attr', 'data-view').then((view) => {
                     if (view === 'consent') {
                         cy.contains('button', 'Approve').should('be.visible').click();
-                        // After Approve, wait for redirect — may go directly to
-                        // external app or show session-confirm.
-                        cy.url({timeout: 10000}).should('include', 'localhost:3000');
-                        cy.url().then((redirectUrl) => {
-                            if (redirectUrl.includes('/authorize')) {
-                                cy.get('app-authorize').invoke('attr', 'data-view').then((v) => {
-                                    if (v === 'session-confirm') {
-                                        cy.contains('button', 'Continue').should('be.visible').click();
-                                    }
-                                });
-                            }
-                        });
+                        // After Approve, backend issues code directly (session_confirmed=true
+                        // is included in the redirect — no session-confirm).
                     }
                 });
             }

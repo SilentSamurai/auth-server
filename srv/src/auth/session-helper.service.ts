@@ -101,6 +101,9 @@ export class SessionHelperService {
         if (validated.subscriberTenantHint) {
             params.set('subscriber_tenant_hint', validated.subscriberTenantHint);
         }
+        if (query.session_confirmed === 'true') {
+            params.set('session_confirmed', 'true');
+        }
 
         res.redirect(302, `${Environment.get('BASE_URL', '')}/authorize?${params.toString()}`);
     }

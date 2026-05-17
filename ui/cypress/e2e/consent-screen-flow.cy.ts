@@ -158,11 +158,7 @@ describe('Consent Screen Flow', () => {
 
             cy.contains('button', 'Approve').click();
 
-            // After consent, flow goes to session-confirm before redirecting to external app
-            cy.get('app-authorize[data-view="session-confirm"]', {timeout: 10000}).should('exist');
-            cy.contains('button', 'Continue').should('be.visible').click();
-
-            // Backend redirects to consent-app.html?code=... — the external app loads
+            // Backend redirects directly to consent-app.html?code=... — the external app loads
             cy.origin('http://localhost:3000', () => {
                 cy.url().should('include', 'code=');
                 cy.get('#auth-code').invoke('text').should('not.be.empty');
@@ -249,10 +245,7 @@ describe('Consent Screen Flow', () => {
             startAuthorizeFlow(['openid', 'profile', 'email']);
             cy.contains('button', 'Approve').click();
 
-            // After consent, flow goes to session-confirm before redirecting to external app
-            cy.get('app-authorize[data-view="session-confirm"]', {timeout: 10000}).should('exist');
-            cy.contains('button', 'Continue').should('be.visible').click();
-
+            // Backend redirects directly to the external app
             cy.origin('http://localhost:3000', () => {
                 cy.get('#auth-code').invoke('text').should('not.be.empty');
             });
