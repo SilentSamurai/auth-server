@@ -65,12 +65,18 @@ export async function prepareApp() {
     }
     app.use(cookieParser(cookieSecret));
 
-    // OPTIONS preflight: allow all origins (no auth needed)
+    // OPTIONS preflight: allow all origins on public OIDC endpoints only (no auth needed)
+    // All other endpoints: deny by default (no ACAO header)
+    const PUBLIC_OIDC_PATHS = ['/api/oauth/token', '/api/oauth/userinfo'];
     app.use('/', (req, res, next) => {
         if (req.method === 'OPTIONS') {
-            res.setHeader("Access-Control-Allow-Origin", "*");
-            res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
-            res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept");
+            const isPublicOidc = PUBLIC_OIDC_PATHS.some(p => req.path.startsWith(p))
+                || req.path.includes('/.well-known/');
+            if (isPublicOidc) {
+                res.setHeader("Access-Control-Allow-Origin", "*");
+                res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
+                res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept");
+            }
             return res.status(204).end();
         }
         next();
