@@ -11,14 +11,14 @@ behavior. Updated from deep-dive audit (May 2026).
 
 | Source | Severity | Description |
 |--------|----------|-------------|
-| `oauth-token.controller.ts` | High | 881 lines, 7 routes, 17 injected services — monolithic |
+| `oauth-token.controller.ts` | High | ~~881 lines — split into 4 controllers + `SessionHelperService`~~ |
 | Property-based tests | High | 87 files (47% of all tests), many exercising same flows |
 | Dead code | High | ~~4 unused files found~~ (already deleted in Phase 0) |
-| `token-issuance.service.ts` | High | 668 lines, not flagged for splitting |
-| `startUp.service.ts` | High | 596 lines mixing startup logic with seed data |
-| Inline DTOs scattered | Medium | 8+ controllers define Yup schemas inline; only 1 file in `dto/` |
+| `token-issuance.service.ts` | High | ~~668 lines — claim assembly extracted to `TokenClaimsService` (now ~365 lines)~~ |
+| `startUp.service.ts` | High | ~~596 lines — seed logic extracted to `seed.service.ts` (now 172 lines)~~ |
+| Inline DTOs scattered | Medium | ~~8+ controllers — all extracted to `dto/` (now 9 files)~~ |
 | `roleV2.controller.ts` | Medium | V2 endpoints added alongside V1 instead of consolidating |
-| `contexts.ts` mixed concerns | Medium | 277 lines merging grant types, token classes, auth context |
+| `contexts.ts` mixed concerns | Medium | ~~277 lines — split into `grant-types.ts`, `token-types.ts`, `auth-context.ts` (now a barrel)~~ |
 | `search-filter.utils.ts` misplaced | ~~Medium~~ | ~~Utility file living in `controllers/` directory~~ (moved to `util/`) |
 | `GET /api/oauth/logout` defined in 2 controllers | Medium | OAuthTokenController + RevocationController — latent routing conflict |
 | Dual CORS handling | Medium | Global `CorsInterceptor` (DB-driven) bypassed by `*` OPTIONS handler |
@@ -132,41 +132,48 @@ Medium effort, clear architectural benefit.
 
 **Risk:** Medium. Dependencies carefully analyzed; no circular imports introduced.
 
-### 2.4 Split `startUp.service.ts` (596 lines)
+### 2.4 Split `startUp.service.ts` (596→172 lines) ✅
 
-Separate seed/test data logic from application startup:
-- `startUp.service.ts` — bootstrapping only (validate env, run startup checks)
-- `seed.service.ts` — `createDummyTenantAndUser()`, `dummyTenants` array, test tenant creation
+**Status:** Done. Extracted dev-only seed methods into `SeedService` (`srv/src/seed.service.ts`):
+- `SeedService` — `populateDummyUsers()`, `createDummyTenantAndUser()`, `createDummyAppsGroupsRoles()`, `resolveAdminUiCallbackUris()`
+- `StartUpService` — slimmed down to bootstrap orchestration only (`onModuleInit()`, `createAdminUser()`, `populateGlobalTenant()`); delegates to `SeedService` for dev/test seeding
+- Registered `SeedService` in `AppModule.providers`
 
-**Risk:** Low. Seed data is only used in development/testing.
+**Risk:** Low. Pure extraction; no behavioral change. All tests pass.
 
-### 2.5 Split `contexts.ts` (277 lines, located at `srv/src/casl/contexts.ts`)
+### 2.5 Split `contexts.ts` (277 lines) ✅
 
-**Proposed split:**
-- `casl/token-types.ts` — `Token`, `TenantToken`, `TechnicalToken`, `InternalToken` classes, `TenantTokenParams`, `TechnicalTokenParams` interfaces
+**Status:** Done. Split into 3 focused files:
 - `casl/grant-types.ts` — `GRANT_TYPES` enum
+- `casl/token-types.ts` — `Token`, `TenantToken`, `TechnicalToken`, `InternalToken` classes; `TenantTokenParams`, `TechnicalTokenParams`, `TenantInfo` interfaces; `ChangeEmailToken`, `ResetPasswordToken`, `EmailVerificationToken`, `RefreshToken` classes
 - `casl/auth-context.ts` — `AuthContext` class, `TenantInfo` interface
+- `contexts.ts` — now a barrel re-exporting all 3 (backward compat for 22 test files)
+- All 16 source imports updated to point to specific files
 
-**Risk:** Low. Pure extraction, no behavioral change.
+**Risk:** Low. Pure extraction; barrel guarantees backward compat for tests.
 
-### 2.6 DTO Standardization
+### 2.6 DTO Standardization ✅
 
-Extract all inline Yup schemas from controllers into `srv/src/dto/`:
+**Status:** Done. Extracted all inline Yup schemas from controllers into per-domain DTO files under `srv/src/dto/`:
 
-| Current location | Inline schema | Target file |
+| New file | Schemas | Source |
 |---|---|---|
-| `admin-tenant.controller.ts` | `UpdateTenantSchema`, `MemberOperationSchema` | `dto/tenant.dto.ts` |
-| `admin-tenant.controller.ts` | (uses shared `ValidationSchema.OperatingRoleSchema`) | `dto/tenant.dto.ts` |
-| `policy.controller.ts` | `CreateSchema`, `UpdateSchema` | `dto/policy.dto.ts` |
-| `registration.controller.ts` | `RegisterDomainSchema`, `SignUpSchema` | `dto/registration.dto.ts` |
-| `members.controller.ts` | `MemberOperationSchema` | `dto/tenant.dto.ts` |
-| `users.admin.controller.ts` | `VerifyUserSchema`, `UpdateUserPasswordSchema` | `dto/user.dto.ts` |
-| `tenant.controller.ts` | `UpdateTenantSchema` | `dto/tenant.dto.ts` |
-| `roleV2.controller.ts` | `UpdateRoleSchema` | `dto/role.dto.ts` |
+| `dto/validation-common.ts` | `USERNAME_REGEXP`, `PASSWORD_REGEXP`, `parseDateString`, yup extension | Shared constants |
+| `dto/user.dto.ts` | `SignUpSchema`–`UpdateUserPasswordSchema` (18 schemas) | validation.schema + users.admin.controller |
+| `dto/tenant.dto.ts` | `CreateTenantSchema`, `UpdateTenantSchema`, `MemberOperationSchema`, `MemberOperationsSchema`, `OperatingRoleSchema` | validation.schema + admin-tenant/tenant/members controllers |
+| `dto/role.dto.ts` | `CreateRoleSchema`, `OperatingRoleSchema`, `UpdateRoleSchema` | validation.schema + role.controller |
+| `dto/oauth.dto.ts` | `PasswordGrantSchema`–`AuthorizeSchema` (11 schemas) | validation.schema |
+| `dto/group.dto.ts` | `CreateGroupSchema`, `UpdateGroupSchema`, `UpdateGroupRole`, `UpdateGroupUser` | validation.schema |
+| `dto/policy.dto.ts` | `CreatePolicySchema`, `UpdatePolicySchema` | policy.controller |
+| `dto/registration.dto.ts` | `RegisterDomainSchema`, `SignUpSchema` | registration.controller |
 
-Also break up `validation/validation.schema.ts` (410 lines) into per-domain files under `dto/`.
+`validation/validation.schema.ts` reduced from 410→59 lines — now a barrel that imports from dto/ and re-exports the original `ValidationSchema` namespace for backward compat.
 
-**Risk:** Low. Pure extraction; all imports update to point to new paths.
+All 7 controllers updated to import from `dto/` instead of inline statics.
+
+**dto/ now has 9 files** (including existing `onboard-customer.dto.ts`).
+
+**Risk:** Low. Pure extraction; backward compat via barrel.
 
 ---
 
@@ -310,7 +317,7 @@ Group 28 migrations into logical milestones:
 | `entity/` | 21 |
 | `migrations/` | 28 (+1 registry `migrations/migrations.ts`) |
 | `services/` | 16 (+ `key-management.service.ts` not in previous inventory) |
-| `casl/` | 12 |
+| `casl/` | 15 |
 | `core/` | 8 |
 | `mail/` | 5 (FakeSmtpServer.ts moved to `tests/smtp/`) |
 | `exceptions/` | 4 (+ 2 in `filter/` subdirectory) |
@@ -320,9 +327,9 @@ Group 28 migrations into logical milestones:
 | `config/` | 2 |
 | `security/` | 2 |
 | `validation/` | 2 |
-| `dto/` | 1 |
-| root | 4 (`app.module.ts`, `main.ts`, `setup.ts`, `startUp.service.ts`) |
-| **Total** | **~168** |
+| `dto/` | 9 |
+| root | 5 (`app.module.ts`, `main.ts`, `setup.ts`, `startUp.service.ts`, `seed.service.ts`) |
+| **Total** | **~175** |
 
 ### Frontend (`ui/src/app/`)
 

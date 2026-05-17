@@ -18,55 +18,21 @@ import {AuthService} from "../auth/auth.service";
 import {MailService} from "../mail/mail.service";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
 import {ValidationPipe} from "../validation/validation.pipe";
-import {
-    PASSWORD_MESSAGE,
-    PASSWORD_REGEXP,
-    USERNAME_MESSAGE,
-    USERNAME_REGEXP,
-    ValidationSchema,
-} from "../validation/validation.schema";
+import {ValidationSchema} from "../validation/validation.schema";
 import {TenantService} from "../services/tenant.service";
 import {SecurityService} from "../casl/security.service";
 import * as argon2 from "argon2";
 import {ClientService} from "../services/client.service";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
-import * as yup from "yup";
 import {Environment} from "../config/environment.service";
 import {CurrentPermission, CurrentUser, Permission} from "../auth/auth.decorator";
+import {RegisterDomainSchema, SignUpSchema as RegistrationSignUpSchema} from "../dto/registration.dto";
+import * as yup from "yup";
 
 @Controller("api")
 @UseInterceptors(ClassSerializerInterceptor)
 export class RegisterController {
-    static RegisterDomainSchema = yup.object().shape({
-        name: yup
-            .string()
-            .required("name is required")
-            .max(128)
-            .matches(USERNAME_REGEXP, USERNAME_MESSAGE),
-        password: yup
-            .string()
-            .required("Password is required")
-            .max(128)
-            .matches(PASSWORD_REGEXP, PASSWORD_MESSAGE),
-        email: yup.string().email().required("Email is required").max(128),
-        orgName: yup.string().required("Org name is required").max(128),
-        domain: yup.string().required("Domain is required").max(128),
-    });
-    static SignUpSchema = yup.object().shape({
-        name: yup
-            .string()
-            .required("name is required")
-            .max(128)
-            .matches(USERNAME_REGEXP, USERNAME_MESSAGE),
-        password: yup
-            .string()
-            .required("Password is required")
-            .max(128)
-            .matches(PASSWORD_REGEXP, PASSWORD_MESSAGE),
-        email: yup.string().email().required("Email is required").max(128),
-        client_id: yup.string().required("Client Id is required").max(128),
-    });
 
     constructor(
         private readonly usersService: UsersService,
@@ -84,7 +50,7 @@ export class RegisterController {
     async registerDomain(
         @Headers() headers,
         @Request() request,
-        @Body(new ValidationPipe(RegisterController.RegisterDomainSchema))
+        @Body(new ValidationPipe(RegisterDomainSchema))
         body: {
             name: string;
             password: string;
@@ -141,7 +107,7 @@ export class RegisterController {
     async signup(
         @Headers() headers,
         @Request() request,
-        @Body(new ValidationPipe(RegisterController.SignUpSchema))
+        @Body(new ValidationPipe(RegistrationSignUpSchema))
         body: {
             name: string;
             password: string;

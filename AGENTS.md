@@ -59,6 +59,8 @@ Testing uses `srv/envs/.env.testing` with in-memory SQLite.
 - UI sections (admin vs user) must be completely independent — no shared components, dialogs, or API services. Duplicate rather than cross-import.
 - Dialogs are plain components; data passed via `ModalService.open(Component, { initData })`. Results via `activeModal.close(data)` / `.dismiss()`.
 - List pages use `DataSource` / `RestApiModel` backed by `POST /api/search/{Entity}` with `{ pageNo, pageSize, where, orderBy, expand }`.
+- DB Calls over caches. 
+- MOST IMPORTANT : ALWAYS BE COMPLIANT WITH RFC
 
 ## Steering Docs
 

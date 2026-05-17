@@ -2,7 +2,7 @@ import {Controller, Get, Header, HttpCode, Post, UseGuards} from '@nestjs/common
 import {JwtAuthGuard} from '../auth/jwt-auth.guard';
 import {ClaimsResolverService, ResolvedClaims} from '../auth/claims-resolver.service';
 import {AuthUserService} from '../casl/authUser.service';
-import {Token} from '../casl/contexts';
+import {Token} from '../casl/token-types';
 import {OAuthException} from '../exceptions/oauth-exception';
 import {CurrentToken} from '../auth/auth.decorator';
 

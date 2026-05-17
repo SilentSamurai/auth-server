@@ -7,12 +7,11 @@ import {AppModule} from "./app.module";
 import {HttpExceptionFilter} from "./exceptions/filter/http-exception.filter";
 import * as express from "express";
 import * as process from "node:process";
-import type {FakeSmtpServer} from "../tests/smtp/FakeSmtpServer";
 import {CorsInterceptor} from "./interceptors/cors.interceptor";
 import * as cookieParser from "cookie-parser";
 
 // Hold reference to SMTP server (if started) so we can close it on shutdown
-let smtpServerRef: FakeSmtpServer | null = null;
+let smtpServerRef: { close(): Promise<void> } | null = null;
 
 export async function prepareApp() {
     Environment.setup();

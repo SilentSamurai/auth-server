@@ -2,7 +2,7 @@ import {Body, Controller, Delete, Get, Post, Query, Request, UseGuards,} from '@
 import {JwtAuthGuard} from '../auth/jwt-auth.guard';
 import {schemaPipe} from '../validation/validation.pipe';
 import * as yup from 'yup';
-import {AuthContext} from "../casl/contexts";
+import {AuthContext} from "../casl/auth-context";
 import {SecurityService} from '../casl/security.service';
 import {TenantBitsService} from "../services/tenant-bits.service";
 

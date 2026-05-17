@@ -1,373 +1,32 @@
-import * as yup from "yup";
-import {isDate, parse} from "date-fns";
+import "../dto/validation-common";
 
-export const USERNAME_REGEXP = /^[a-zA-Z]+(.){2,20}$/;
-export const USERNAME_MESSAGE =
-    "Username must start with an alpha character and contain from 3 to 20 characters";
+import {
+    SignUpSchema, SignDownSchema, LoginSchema, ForgotPasswordSchema, ResetPasswordSchema,
+    UpdateMyUsernameSchema, UpdateUsernameSchema, UpdateMyEmailSchema, UpdateMyPasswordSchema,
+    UpdateMyNameSchema, UpdateNameSchema, UpdateMySurnameSchema, UpdateSurnameSchema,
+    UpdateMyBirthdateSchema, UpdateBirthdateSchema, DeleteUserSchema, CreateUserSchema, UpdateUserSchema,
+} from "../dto/user.dto";
 
-export const PASSWORD_REGEXP = /^[a-zA-Z]+(.){7,20}$/;
-export const PASSWORD_MESSAGE =
-    "Password must start with an alpha character and contain from 8 to 20 characters";
+import {
+    CreateTenantSchema, UpdateTenantSchema, MemberOperationsSchema, OperatingRoleSchema,
+} from "../dto/tenant.dto";
 
-yup.addMethod(
-    yup.string,
-    "defined",
-    function (msg = "Parameter must be defined") {
-        return this.test(
-            "defined",
-            msg,
-            (value) => value !== undefined && value !== null,
-        );
-    },
-);
+import {CreateRoleSchema} from "../dto/role.dto";
 
-function parseDateString(value, originalValue) {
-    const parsedDate: any = isDate(originalValue)
-        ? originalValue
-        : parse(originalValue, "yyyy-MM-dd", new Date());
-    return parsedDate;
-}
+import {
+    PasswordGrantSchema, ClientCredentialGrantSchema, RefreshTokenGrantSchema, CodeGrantSchema,
+    VerifyTokenSchema, ExchangeTokenSchema, RefreshTokenSchema, VerifyAuthCodeSchema,
+    ConsentSchema, AuthorizeSchema,
+} from "../dto/oauth.dto";
 
-const SignUpSchema = yup.object().shape({
-    name: yup
-        .string()
-        .required("name is required")
-        .max(128)
-        .matches(USERNAME_REGEXP, USERNAME_MESSAGE),
-    password: yup
-        .string()
-        .required("Password is required")
-        .max(128)
-        .matches(PASSWORD_REGEXP, PASSWORD_MESSAGE),
-    email: yup.string().email().required("Email is required").max(128),
-});
+import {CreateGroupSchema, UpdateGroupSchema, UpdateGroupRole, UpdateGroupUser} from "../dto/group.dto";
 
-const SignDownSchema = yup.object().shape({
-    password: yup
-        .string()
-        .required("Password is required")
-        .matches(PASSWORD_REGEXP, PASSWORD_MESSAGE)
-        .max(128),
-});
-
-const ForgotPasswordSchema = yup.object().shape({
-    email: yup.string().email().required("Email is required").max(128),
-});
-
-const ResetPasswordSchema = yup.object().shape({
-    password: yup
-        .string()
-        .required("Password is required")
-        .matches(PASSWORD_REGEXP, PASSWORD_MESSAGE)
-        .max(128),
-});
-
-const UpdateMyUsernameSchema = yup.object().shape({
-    username: yup
-        .string()
-        .required("Username is required")
-        .matches(USERNAME_REGEXP, USERNAME_MESSAGE)
-        .max(128),
-    password: yup
-        .string()
-        .required("Password is required")
-        .matches(PASSWORD_REGEXP, PASSWORD_MESSAGE)
-        .max(128),
-});
-
-const UpdateUsernameSchema = yup.object().shape({
-    username: yup
-        .string()
-        .required("Username is required")
-        .matches(USERNAME_REGEXP, USERNAME_MESSAGE)
-        .max(128),
-});
-
-const UpdateMyEmailSchema = yup.object().shape({
-    email: yup.string().email().required("Email is required").max(128),
-});
-
-const UpdateMyPasswordSchema = yup.object().shape({
-    currentPassword: yup
-        .string()
-        .required("Current password is required")
-        .matches(PASSWORD_REGEXP, PASSWORD_MESSAGE)
-        .max(128),
-    newPassword: yup
-        .string()
-        .required("New password is required")
-        .matches(PASSWORD_REGEXP, PASSWORD_MESSAGE)
-        .max(128),
-});
-
-const UpdateMyNameSchema = yup.object().shape({
-    name: yup.string().defined("Name is required").max(128),
-});
-
-const UpdateNameSchema = yup.object().shape({
-    name: yup.string().defined("Name is required").max(128),
-});
-
-const UpdateMySurnameSchema = yup.object().shape({
-    surname: yup.string().defined("Name is required").max(128),
-});
-
-const UpdateSurnameSchema = yup.object().shape({
-    surname: yup.string().defined("Name is required").max(128),
-});
-
-const UpdateMyBirthdateSchema = yup.object().shape({
-    birthdate: yup
-        .date()
-        .required("Birthdate is required")
-        .transform(parseDateString)
-        .typeError("Invalid birthdate format YY/MM/DD"),
-});
-
-const UpdateBirthdateSchema = yup.object().shape({
-    birthdate: yup
-        .date()
-        .required("Birthdate is required")
-        .transform(parseDateString)
-        .typeError("Invalid birthdate format YY/MM/DD"),
-});
-
-const DeleteUserSchema = yup.object().shape({});
-
-const CreateTenantSchema = yup.object().shape({
-    name: yup.string().required("Name is required").max(20),
-    domain: yup.string().required("Domain is required").max(100),
-});
-
-const UpdateTenantSchema = yup.object().shape({
-    name: yup.string().max(20).required(),
-});
-
-const CreateRoleSchema = yup.object().shape({
-    name: yup.string().required("Name is required").max(20),
-    tenantId: yup.string().required("TenantId is required"),
-});
-
-const OperatingRoleSchema = yup.object().shape({
-    scopes: yup.array().of(yup.string().max(20)),
-});
-
-const MemberOperationsSchema = yup.object().shape({
-    tenantId: yup.string().required("TenantId is required"),
-    email: yup.string().required("Email is required").max(128),
-});
-
-const CreateUserSchema = yup.object().shape({
-    email: yup.string().email().required("Email is required").max(128),
-    name: yup.string().required("Name is required").max(128),
-    password: yup
-        .string()
-        .required("Password is required")
-        .matches(PASSWORD_REGEXP, PASSWORD_MESSAGE),
-});
-
-const UpdateUserSchema = yup.object().shape({
-    id: yup.string().required("Id is required"),
-    email: yup.string().max(128).email().nullable(),
-    name: yup.string().max(128).nullable()
-});
-
-const LoginSchema = yup.object().shape({
-    email: yup.string().email().required("Email is required").max(128),
-    password: yup
-        .string()
-        .required("Password is required")
-        .matches(PASSWORD_REGEXP, PASSWORD_MESSAGE)
-        .max(128),
-    client_id: yup.string().required("client_id is required"),
-    // CSRF token bound to the signed `flow_id` cookie. Verified by
-    // `CsrfTokenService.verifyOrThrow` in `OAuthTokenController.login`
-    // before any credential validation (Req 8.3, 12.1–12.4).
-    csrf_token: yup.string().required("csrf_token is required"),
-    subscriber_tenant_hint: yup.string().optional().max(256),
-});
-
-const PasswordGrantSchema = yup.object().shape({
-    grant_type: yup
-        .string()
-        .required()
-        .matches(/^password$/g, {message: "grant type not recognised"}),
-    username: yup.string().email().required("Username is required").max(128),
-    password: yup
-        .string()
-        .required("Password is required")
-        .matches(PASSWORD_REGEXP, PASSWORD_MESSAGE)
-        .max(128),
-    client_id: yup.string().required("client_id is required"),
-    subscriber_tenant_hint: yup.string().nullable(),
-    scope: yup.string().optional(),
-    resource: yup.string().optional(),
-});
-
-const ClientCredentialGrantSchema = yup.object().shape({
-    grant_type: yup
-        .string()
-        .required()
-        .matches(/^client_credentials$/g, {
-            message: "grant type not recognised",
-        }),
-    client_id: yup.string().required("client_id is required"),
-    client_secret: yup.string().required("client_secret is required"),
-    scope: yup.string().optional(),
-    resource: yup.string().optional(),
-});
-
-const RefreshTokenGrantSchema = yup.object().shape({
-    grant_type: yup
-        .string()
-        .required()
-        .matches(/^refresh_token$/g, {message: "grant type not recognised"}),
-    refresh_token: yup.string().required("refresh_token is required"),
-    client_id: yup.string().required("client_id is required"),
-    client_secret: yup.string().optional(),
-    scope: yup.string().optional(),
-    resource: yup.string().optional(),
-});
-
-const CodeGrantSchema = yup.object().shape({
-    grant_type: yup
-        .string()
-        .required()
-        .matches(/^authorization_code$/g, {
-            message: "grant type not recognised",
-        }),
-    code: yup.string().required("code is required"),
-    code_verifier: yup.string()
-        .optional()
-        .min(43, "code_verifier must be at least 43 characters")
-        .max(128, "code_verifier must be at most 128 characters")
-        .matches(/^[A-Za-z0-9\-._~]+$/, "code_verifier contains invalid characters"),
-    client_id: yup.string().required("client_id is required"),
-    subscriber_tenant_hint: yup.string().nullable(),
-    scope: yup.string().optional(),
-    redirect_uri: yup.string().optional(),
-    resource: yup.string().optional(),
-});
-
-const VerifyTokenSchema = yup.object().shape({
-    access_token: yup.string().required("access_token is required"),
-    client_id: yup.string().required("client_id is required"),
-    client_secret: yup.string().required("client_secret is required"),
-});
-
-const ExchangeTokenSchema = yup.object().shape({
-    access_token: yup.string().required("access_token is required"),
-    client_id: yup.string().required("client_id is required"),
-    client_secret: yup.string().required("client_secret is required"),
-});
-
-const RefreshTokenSchema = yup.object().shape({
-    email: yup.string().required("token is invalid").max(128),
-    domain: yup.string().required("token is invalid"),
-});
-
-const CreateGroupSchema = yup.object().shape({
-    name: yup.string().required("Name is required").max(128),
-    tenantId: yup.string().required("tenantId is required").max(100),
-});
-
-const UpdateGroupSchema = yup.object().shape({
-    name: yup.string().required("Name is required").max(128),
-});
-
-const UpdateGroupRole = yup.object().shape({
-    roles: yup.array().of(yup.string().max(128)),
-});
-
-const UpdateGroupUser = yup.object().shape({
-    users: yup.array().of(yup.string().max(128)),
-});
-
-const VerifyAuthCodeSchema = yup.object().shape({
-    auth_code: yup.string().required("auth_code is required"),
-    client_id: yup.string().required("client_id is required"),
-});
-
-const ConsentSchema = yup.object().shape({
-    email: yup.string().email().required("Email is required").max(128),
-    password: yup
-        .string()
-        .required("Password is required")
-        .matches(PASSWORD_REGEXP, PASSWORD_MESSAGE)
-        .max(128),
-    client_id: yup.string().required("client_id is required"),
-    code_challenge: yup.string().optional(),
-    code_challenge_method: yup
-        .string()
-        .optional()
-        .matches(/^(plain|S256|OWH32)$/, "method must be plain, S256, or OWH32"),
-    approved_scopes: yup
-        .array()
-        .of(yup.string())
-        .required("approved_scopes is required"),
-    consent_action: yup
-        .string()
-        .required()
-        .matches(/^(approve|deny)$/, "consent_action must be 'approve' or 'deny'"),
-    redirect_uri: yup.string().optional(),
-    scope: yup.string().optional(),
-    nonce: yup.string().optional().max(512),
-    subscriber_tenant_hint: yup.string().optional().nullable(),
-    prompt: yup.string().optional(),
-    resource: yup.string().optional(),
-});
-
-const AuthorizeSchema = yup.object().shape({
-    // RFC 6749 §4.1.2.1: missing or unsupported response_type → unsupported_response_type.
-    // required() catches missing values, oneOf() catches wrong values.
-    // The service maps both (any error on path 'response_type') to unsupported_response_type.
-    response_type: yup
-        .string()
-        .required("response_type is required")
-        .oneOf(["code"], "The response_type parameter must be \"code\""),
-    client_id: yup
-        .string()
-        .required("client_id is required")
-        .min(1, "client_id must not be empty"),
-    redirect_uri: yup
-        .string()
-        .optional(),
-    // RFC 6749 §3.3: scope is optional; when omitted the server defaults to the client's allowedScopes.
-    scope: yup
-        .string()
-        .optional(),
-    // RFC 6749 §4.1.2.1: missing state is a post-redirect error (redirect with error params),
-    // not a pre-redirect JSON error. Validated in the service after redirect_uri is confirmed.
-    state: yup
-        .string()
-        .optional(),
-    code_challenge: yup
-        .string()
-        .optional(),
-    code_challenge_method: yup
-        .string()
-        .optional()
-        .oneOf(["plain", "S256", "OWH32"], "code_challenge_method must be one of: plain, S256, OWH32"),
-    // Nonce length is a post-redirect error per OIDC Core §3.1.2.6, validated in the service.
-    nonce: yup
-        .string()
-        .optional(),
-    // OIDC Core §3.1.2.1: prompt is a space-delimited list of values.
-    // Basic format validation only — the 'none' exclusivity check is enforced
-    // in AuthorizeService.validateAuthorizeRequest() after redirect_uri is validated,
-    // so the error can be delivered as a redirect per RFC 6749 §4.1.2.1.
-    prompt: yup
-        .string()
-        .optional(),
-    max_age: yup
-        .number()
-        .optional()
-        .integer("max_age must be an integer")
-        .min(0, "max_age must be a non-negative integer"),
-    resource: yup
-        .string()
-        .optional(),
-});
+export {USERNAME_REGEXP, USERNAME_MESSAGE, PASSWORD_REGEXP, PASSWORD_MESSAGE, parseDateString} from "../dto/validation-common";
+export {VerifyUserSchema, UpdateUserPasswordSchema} from "../dto/user.dto";
+export {CreateTenantV1Schema, MemberOperationSchema} from "../dto/tenant.dto";
+export {UpdateRoleSchema} from "../dto/role.dto";
+export {CreatePolicySchema, UpdatePolicySchema} from "../dto/policy.dto";
+export {RegisterDomainSchema, SignUpSchema as RegistrationSignUpSchema} from "../dto/registration.dto";
 
 export const ValidationSchema = {
     SignUpSchema,
@@ -392,8 +51,8 @@ export const ValidationSchema = {
     DeleteUserSchema,
     CreateTenantSchema,
     UpdateTenantSchema,
-    CreateRoleSchema: CreateRoleSchema,
-    OperatingRoleSchema: OperatingRoleSchema,
+    CreateRoleSchema,
+    OperatingRoleSchema,
     MemberOperationsSchema,
     CreateUserSchema,
     UpdateUserSchema,

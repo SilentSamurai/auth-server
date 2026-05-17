@@ -16,7 +16,7 @@ import {AuthService} from "../auth/auth.service";
 import {ValidationPipe} from "../validation/validation.pipe";
 import {ValidationSchema} from "../validation/validation.schema";
 import {AuthCodeService} from "../auth/auth-code.service";
-import {GRANT_TYPES} from "../casl/contexts";
+import {GRANT_TYPES} from "../casl/grant-types";
 import {AuthUserService} from "../casl/authUser.service";
 import {TokenIssuanceService} from "../auth/token-issuance.service";
 import {OAuthException} from "../exceptions/oauth-exception";

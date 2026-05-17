@@ -9,7 +9,7 @@ import {Client} from "../entity/client.entity";
 import {Role} from "../entity/role.entity";
 import {User} from "../entity/user.entity";
 import {Permission} from "./auth.decorator";
-import {GRANT_TYPES} from "../casl/contexts";
+import {GRANT_TYPES} from "../casl/grant-types";
 
 interface RefreshTokenDecision {
     eligible: boolean;

@@ -10,7 +10,6 @@ import {
     UseGuards,
     UseInterceptors,
 } from "@nestjs/common";
-import * as yup from "yup";
 import {Environment} from "../config/environment.service";
 import {TenantService} from "../services/tenant.service";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
@@ -22,15 +21,11 @@ import {UsersService} from "../services/users.service";
 import {CurrentPermission, CurrentTenantId, Permission} from "../auth/auth.decorator";
 import {ValidationPipe} from "../validation/validation.pipe";
 
+import {UpdateRoleSchema} from "../dto/role.dto";
+
 @Controller("api")
 @UseInterceptors(ClassSerializerInterceptor)
 export class RoleController {
-
-    static UpdateRoleSchema = yup.object().shape({
-        name: yup.string().optional(),
-        description: yup.string().optional(),
-        appId: yup.string().optional().nullable(),
-    });
 
     constructor(
         private readonly configService: Environment,
@@ -88,7 +83,7 @@ export class RoleController {
     async updateRoleDescription(
         @CurrentPermission() permission: Permission,
         @Param("roleId") roleId: string,
-        @Body(new ValidationPipe(RoleController.UpdateRoleSchema))
+        @Body(new ValidationPipe(UpdateRoleSchema))
         body: { name: string; description: string; appId?: string },
     ): Promise<Role> {
         return this.roleService.updateRole(permission, roleId, body.name, body.description, body.appId);

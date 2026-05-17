@@ -7,7 +7,7 @@ import {Environment} from "../config/environment.service";
 import {AuthCodeService} from "./auth-code.service";
 import {User} from "../entity/user.entity";
 import {Tenant} from "../entity/tenant.entity";
-import {GRANT_TYPES} from "../casl/contexts";
+import {GRANT_TYPES} from "../casl/grant-types";
 import {Permission} from "../auth/auth.decorator";
 import {ClientService} from "../services/client.service";
 import {ScopeNormalizer} from "../casl/scope-normalizer";

@@ -7,6 +7,7 @@ import {AuthModule} from "./auth/auth.module";
 import {Environment} from "./config/environment.service";
 import {LoggerMiddleware} from "./log/logger.middleware";
 import {StartUpService} from "./startUp.service";
+import {SeedService} from "./seed.service";
 import {ControllersModule} from "./controllers/controller.module";
 import {ServiceModule} from "./services/service.module";
 import {migrations} from "./migrations/migrations";
@@ -67,7 +68,7 @@ import {CorsInterceptor} from "./interceptors/cors.interceptor";
         SecurityModule,
     ],
     controllers: [],
-    providers: [StartUpService, CorsInterceptor],
+    providers: [StartUpService, SeedService, CorsInterceptor],
 })
 export class AppModule implements NestModule, OnModuleInit {
     constructor(private readonly configService: Environment) {

@@ -18,36 +18,17 @@ import {PolicyService} from "../casl/policy.service";
 import {CaslAbilityFactory} from "../casl/casl-ability.factory";
 import {RoleService} from "../services/role.service";
 import {ValidationPipe} from "../validation/validation.pipe";
-import * as yup from "yup";
 import {Action, Effect} from "../casl/actions.enum";
 import {Policy} from "../entity/authorization.entity";
 import {TenantService} from "../services/tenant.service";
 import {UsersService} from "../services/users.service";
 import {CurrentPermission, Permission} from "../auth/auth.decorator";
 import {PolicyResolutionService} from "../casl/policy-resolution.service";
+import {CreatePolicySchema, UpdatePolicySchema} from "../dto/policy.dto";
 
 @Controller("api/v1")
 @UseInterceptors(ClassSerializerInterceptor)
 export class PolicyController {
-    static CreateSchema = yup.object().shape({
-        role: yup.string().uuid().required("role is required"),
-        effect: yup
-            .mixed<Effect>()
-            .required("effect is required")
-            .oneOf(Object.values(Effect)),
-        action: yup
-            .mixed<Action>()
-            .required("action is required")
-            .oneOf(Object.values(Action)),
-        subject: yup.string().required("subject is required"),
-        conditions: yup.object(),
-    });
-    static UpdateSchema = yup.object().shape({
-        effect: yup.mixed<Effect>().oneOf(Object.values(Effect)),
-        action: yup.mixed<Action>().oneOf(Object.values(Action)),
-        subject: yup.string(),
-        conditions: yup.object(),
-    });
 
     constructor(
         private readonly configService: Environment,
@@ -176,7 +157,7 @@ export class PolicyController {
     @UseGuards(JwtAuthGuard)
     async createPermission(
         @CurrentPermission() permission: Permission,
-        @Body(new ValidationPipe(PolicyController.CreateSchema))
+        @Body(new ValidationPipe(CreatePolicySchema))
         body: {
             role: string;
             effect: Effect;
@@ -227,7 +208,7 @@ export class PolicyController {
     async updateAuthorization(
         @CurrentPermission() permission: Permission,
         @Param("id") id: string,
-        @Body(new ValidationPipe(PolicyController.UpdateSchema))
+        @Body(new ValidationPipe(UpdatePolicySchema))
         body: {
             effect?: Effect;
             action?: Action;

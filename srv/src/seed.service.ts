@@ -1,0 +1,346 @@
+import {Injectable, Logger} from "@nestjs/common";
+import {Environment} from "./config/environment.service";
+import {UsersService} from "./services/users.service";
+import {RoleService} from "./services/role.service";
+import {TenantService} from "./services/tenant.service";
+import {GroupService} from "./services/group.service";
+import {AppService} from "./services/app.service";
+import {ClientService} from "./services/client.service";
+import {User} from "./entity/user.entity";
+import {readFile} from "fs/promises";
+import {Tenant} from "./entity/tenant.entity";
+import {RoleEnum} from "./entity/roleEnum";
+import {SecurityService} from "./casl/security.service";
+
+function resolveAdminUiCallbackUris(configService: Environment, logger: Logger): string[] {
+    const baseUrl: string = configService.get('BASE_URL', '');
+    if (baseUrl) {
+        return [`${baseUrl.replace(/\/+$/, '')}/oauth/callback`];
+    }
+    logger.warn(
+        'BASE_URL is not set; admin UI OAuth callback will not be registered on seeded ' +
+        'clients. Set BASE_URL (e.g. http://localhost:4200) in your env file.'
+    );
+    return [];
+}
+
+@Injectable()
+export class SeedService {
+    private readonly logger = new Logger("SeedService");
+
+    constructor(
+        private readonly configService: Environment,
+        private readonly usersService: UsersService,
+        private readonly tenantService: TenantService,
+        private readonly roleService: RoleService,
+        private readonly groupService: GroupService,
+        private readonly appService: AppService,
+        private readonly clientService: ClientService,
+        private readonly securityService: SecurityService,
+    ) {
+    }
+
+    resolveAdminUiCallbackUris(): string[] {
+        return resolveAdminUiCallbackUris(this.configService, this.logger);
+    }
+
+    async populateDummyUsers(): Promise<void> {
+        try {
+            const data: string = await readFile("./users.json", "utf8");
+            const permission = this.securityService.createPermissionForStartupSeed();
+            const users = JSON.parse(data);
+
+            for (const record of users.records) {
+                try {
+                    const isPresent = await this.usersService.existByEmail(
+                        permission,
+                        record.email,
+                    );
+                    if (!isPresent) {
+                        const user: User = await this.usersService.create(
+                            permission,
+                            record.password,
+                            record.email,
+                            record.name,
+                        );
+                        await this.usersService.updateVerified(
+                            permission,
+                            user.id,
+                            true,
+                        );
+                    }
+                } catch (exception: any) {
+                    console.error(exception);
+                }
+            }
+        } catch (error) {
+            console.error("Error populating dummy users:", error);
+        }
+    }
+
+    async createDummyTenantAndUser(): Promise<void> {
+        try {
+            const permission = this.securityService.createPermissionForStartupSeed();
+            const adminUiCallbackUris = resolveAdminUiCallbackUris(this.configService, this.logger);
+
+            const dummyTenants: { name: string; domain: string; signUp: boolean; redirectUris?: string[] }[] = [
+                {name: "Shire Tenant", domain: "shire.local", signUp: true, redirectUris: ['http://localhost:3000/', 'http://localhost:3000', 'http://localhost:3000/no-pkce.html']},
+                {name: "Bree Tenant", domain: "bree.local", signUp: false},
+                {name: "Rivendell Tenant", domain: "rivendell.local", signUp: false},
+                {name: "Mordor Tenant", domain: "mordor.local", signUp: false},
+                {name: "Gondor Tenant", domain: "gondor.local", signUp: true},
+                {name: "Rohan Tenant", domain: "rohan.local", signUp: true},
+                {name: "Lothlorien Tenant", domain: "lothlorien.local", signUp: false},
+                {name: "Mirkwood Tenant", domain: "mirkwood.local", signUp: true},
+                {name: "Erebor Tenant", domain: "erebor.local", signUp: false},
+                {name: "Isengard Tenant", domain: "isengard.local", signUp: false},
+                {name: "Perm Test Tenant", domain: "perm-test.local", signUp: false},
+                {name: "Prompt Test Tenant", domain: "prompt-test.local", signUp: false, redirectUris: ['http://localhost:3000/callback']},
+                {name: "Nonce Test Tenant", domain: "nonce-test.local", signUp: false, redirectUris: ['http://localhost:3000/callback']},
+                {name: "Compliance Test Tenant", domain: "compliance-test.local", signUp: false, redirectUris: ['http://localhost:3000/callback']},
+                {name: "IDToken Test Tenant", domain: "idtoken-test.local", signUp: false, redirectUris: ['http://localhost:3000/callback']},
+                {name: "Auth Cleanup Test Tenant", domain: "auth-cleanup-test.local", signUp: false, redirectUris: ['http://localhost:3000/callback']},
+                {name: "ID Token Aud Test Tenant", domain: "idtoken-aud-test.local", signUp: false, redirectUris: ['http://localhost:3000/callback']},
+                {name: "Perms Test Tenant", domain: "perms-test.local", signUp: false},
+                {name: "Session Claims Test Tenant", domain: "session-claims-test.local", signUp: false, redirectUris: ['http://localhost:3000/callback']},
+                {name: "Prompt Prop Test Tenant", domain: "prompt-prop-test.local", signUp: false, redirectUris: ['http://localhost:3000/callback']},
+                {name: "Auth Code Expiry Test Tenant", domain: "auth-code-expiry-test.local", signUp: false, redirectUris: ['http://localhost:3000/callback']},
+                {name: "Offline Access Test Tenant", domain: "offline-access-test.local", signUp: false},
+                {name: "Redirect URI Binding Test Tenant", domain: "redirect-uri-test.local", signUp: false, redirectUris: ['https://myapp.example.com/callback']},
+                {name: "Redirect URI Bypass Test Tenant", domain: "redirect-uri-bypass-test.local", signUp: false, redirectUris: ['https://legit-app.example.com/callback']},
+                {name: "OIDC Compat Test Tenant", domain: "oidc-compat-test.local", signUp: false},
+                {name: "Client Creds Migration Test Tenant", domain: "client-creds-migration-test.local", signUp: false},
+                {name: "Client Binding Test Tenant", domain: "client-binding-test.local", signUp: false, redirectUris: ['http://localhost:3000/callback']},
+                {name: "Auth Code Single Use Test Tenant", domain: "auth-code-single-use-test.local", signUp: false, redirectUris: ['http://localhost:3000/callback']},
+                {name: "UserInfo Test Tenant", domain: "userinfo-test.local", signUp: false, redirectUris: ['http://localhost:3000/callback']},
+                {name: "Session Threading Test Tenant", domain: "session-threading-test.local", signUp: false, redirectUris: ['http://localhost:3000/callback']},
+                {name: "Sub Flow A Tenant", domain: "sub-flow-a.local", signUp: true},
+                {name: "Sub Flow B Tenant", domain: "sub-flow-b.local", signUp: false},
+                {name: "Forgot PW Test Tenant", domain: "forgot-pw-test.local", signUp: true},
+                {name: "Onboard Test Tenant", domain: "onboard-test.local", signUp: false},
+                {name: "Onboard App Owner Tenant", domain: "onboard-app-owner.local", signUp: false},
+                {name: "Onboard Subscriber Tenant", domain: "onboard-subscriber.local", signUp: false},
+                {name: "Login Session Test Tenant", domain: "login-session-test.local", signUp: false, redirectUris: ['http://localhost:3000/callback']},
+                {name: "PKCE Bug Condition Test Tenant", domain: "pkce-bug-condition-test.local", signUp: false},
+                {name: "PKCE Preservation Test Tenant", domain: "pkce-preservation-test.local", signUp: false},
+                {name: "PKCE E2E Test Tenant", domain: "pkce-e2e-test.local", signUp: false, redirectUris: ['http://localhost:3000/no-pkce.html']},
+                {name: "Client Rotate Test Tenant", domain: "client-rotate-test.local", signUp: false},
+                {name: "Auth Code Reuse Test Tenant", domain: "auth-code-reuse-test.local", signUp: false, redirectUris: ['http://localhost:3000/callback']},
+                {name: "Per-App Client Test Tenant", domain: "per-app-client-test.local", signUp: false, redirectUris: ['http://localhost:3000/callback']},
+                {name: "Group E2E Test Tenant", domain: "group-e2e-test.local", signUp: false},
+            ];
+
+            for (const {name, domain, signUp, redirectUris} of dummyTenants) {
+                const adminEmail = `admin@${domain}`;
+                const isPresent = await this.usersService.existByEmail(
+                    permission,
+                    adminEmail,
+                );
+                if (isPresent) {
+                    continue;
+                }
+
+                const adminUser: User = await this.usersService.create(
+                    permission,
+                    "admin9000",
+                    adminEmail,
+                    "Admin",
+                );
+                await this.usersService.updateVerified(
+                    permission,
+                    adminUser.id,
+                    true,
+                );
+
+                const createdTenant: Tenant = await this.tenantService.create(
+                    permission,
+                    name,
+                    domain,
+                    adminUser,
+                );
+
+                if (signUp) {
+                    await this.tenantService.updateTenant(
+                        permission,
+                        createdTenant.id,
+                        {
+                            allowSignUp: true,
+                        },
+                    );
+                }
+                this.logger.log(
+                    `Created dummy tenant: ${createdTenant.name} (${createdTenant.domain})`,
+                );
+                this.logger.log(
+                    "Admin user used for ownership:",
+                    adminUser.email,
+                );
+
+                try {
+                    const defaultClient = await this.clientService.findByAlias(domain);
+                    const mergedRedirectUris = Array.from(new Set([
+                        ...(defaultClient.redirectUris || []),
+                        ...(redirectUris || []),
+                        ...adminUiCallbackUris,
+                    ]));
+                    await this.clientService.updateClient(permission, defaultClient.clientId, {
+                        allowPasswordGrant: true,
+                        redirectUris: mergedRedirectUris,
+                    });
+                    this.logger.log(`Configured default client for ${domain}`);
+                } catch (e) {
+                    this.logger.warn(`Could not configure default client for ${domain}: ${e}`);
+                }
+            }
+        } catch (error) {
+            this.logger.error("Error creating multiple dummy tenants:", error);
+        }
+    }
+
+    async createDummyAppsGroupsRoles(): Promise<void> {
+        try {
+            const permission = this.securityService.createPermissionForStartupSeed();
+
+            const dummyData = [
+                {
+                    domain: "shire.local",
+                    roles: ["Editor", "Reviewer"],
+                    groups: ["Hobbits", "Gardeners"],
+                    apps: [
+                        {name: "Shire Portal", appUrl: "https://portal.shire.local", description: "Main portal for Shire residents"},
+                        {name: "Harvest Tracker", appUrl: "https://harvest.shire.local", description: "Track crop yields"},
+                    ],
+                    clients: [
+                        {name: "Shire Web App", redirectUris: ["https://portal.shire.local/callback"], allowedScopes: "openid profile email tenant.read tenant.write"},
+                        {name: "Shire Mobile", redirectUris: ["https://mobile.shire.local/callback"], allowedScopes: "openid profile", isPublic: true},
+                        {name: "Shire Authorize Test", redirectUris: ["https://authorize-e2e.example.com/callback"], allowedScopes: "openid profile email", isPublic: true},
+                        {name: "Consent E2E Test", redirectUris: ["https://consent-e2e.example.com/callback", "http://localhost:3000/consent-app.html"], allowedScopes: "openid profile email", isPublic: true},
+                        {name: "Shire PKCE Required", redirectUris: ["https://pkce-required-e2e.example.com/callback"], allowedScopes: "openid profile email", isPublic: true, requirePkce: true},
+                        {name: "Shire No PKCE", redirectUris: ["http://localhost:3000/no-pkce.html"], allowedScopes: "openid profile email", isPublic: true, requirePkce: false},
+                    ],
+                },
+                {
+                    domain: "gondor.local",
+                    roles: ["Commander", "Scribe", "Diplomat"],
+                    groups: ["Rangers", "Tower Guard", "Council"],
+                    apps: [
+                        {name: "Gondor Defense", appUrl: "https://defense.gondor.local", description: "Military coordination"},
+                        {name: "Archive System", appUrl: "https://archive.gondor.local", description: "Historical records"},
+                        {name: "Trade Ledger", appUrl: "https://trade.gondor.local", description: "Commerce tracking"},
+                    ],
+                    clients: [
+                        {name: "Gondor Defense Client", redirectUris: ["https://defense.gondor.local/callback"], allowedScopes: "openid profile"},
+                    ],
+                },
+                {
+                    domain: "rohan.local",
+                    roles: ["Marshal", "Stable Master"],
+                    groups: ["Riders", "Horse Breeders"],
+                    apps: [
+                        {name: "Rohan Dispatch", appUrl: "https://dispatch.rohan.local", description: "Rider coordination"},
+                    ],
+                    clients: [],
+                },
+                {
+                    domain: "rivendell.local",
+                    roles: ["Loremaster", "Healer"],
+                    groups: ["Scholars", "Healers Guild"],
+                    apps: [
+                        {name: "Library of Imladris", appUrl: "https://library.rivendell.local", description: "Knowledge repository"},
+                    ],
+                    clients: [
+                        {name: "Rivendell Library Client", redirectUris: ["https://library.rivendell.local/callback"], allowedScopes: "openid profile"},
+                    ],
+                },
+                {
+                    domain: "perm-test.local",
+                    roles: ["CustomTestRole"],
+                    groups: [],
+                    apps: [],
+                    clients: [],
+                },
+                {
+                    domain: "group-e2e-test.local",
+                    roles: ["Editor", "Reviewer"],
+                    groups: [],
+                    apps: [],
+                    clients: [],
+                },
+            ];
+
+            for (const entry of dummyData) {
+                let tenant: Tenant;
+                try {
+                    tenant = await this.tenantService.findByDomain(permission, entry.domain);
+                } catch {
+                    this.logger.warn(`Tenant ${entry.domain} not found, skipping`);
+                    continue;
+                }
+
+                for (const roleName of entry.roles) {
+                    try {
+                        const exists = await this.roleService.findByNameAndTenant(permission, roleName, tenant);
+                        if (exists) continue;
+                    } catch {
+                        await this.roleService.create(permission, roleName, tenant);
+                        this.logger.log(`Created role: ${roleName} in ${entry.domain}`);
+                    }
+                }
+
+                for (const groupName of entry.groups) {
+                    try {
+                        const exists = await this.groupService.existsByNameAndTenantId(permission, groupName, tenant.id);
+                        if (exists) continue;
+                        await this.groupService.create(permission, groupName, tenant);
+                        this.logger.log(`Created group: ${groupName} in ${entry.domain}`);
+                    } catch (e) {
+                        this.logger.warn(`Group ${groupName} in ${entry.domain} may already exist`);
+                    }
+                }
+
+                for (const app of entry.apps) {
+                    try {
+                        await this.appService.createApp(permission, tenant.id, app.name, app.appUrl, app.description);
+                        this.logger.log(`Created app: ${app.name} in ${entry.domain}`);
+                    } catch (e) {
+                        this.logger.warn(`App ${app.name} in ${entry.domain} may already exist`);
+                    }
+                }
+
+                for (const client of entry.clients) {
+                    try {
+                        await this.clientService.createClient(
+                            permission,
+                            tenant.id,
+                            client.name,
+                            client.redirectUris,
+                            client.allowedScopes,
+                            undefined,
+                            undefined,
+                            undefined,
+                            client.isPublic,
+                            client.requirePkce,
+                        );
+                        this.logger.log(`Created client: ${client.name} in ${entry.domain}`);
+                    } catch (e) {
+                        try {
+                            const tenantClients = await this.clientService.findByTenantId(tenant.id);
+                            const existing = tenantClients.find(c => c.name === client.name);
+                            if (existing && client.redirectUris?.length) {
+                                const merged = Array.from(new Set([...(existing.redirectUris || []), ...client.redirectUris]));
+                                if (merged.length !== (existing.redirectUris || []).length) {
+                                    await this.clientService.updateClient(permission, existing.clientId, {redirectUris: merged});
+                                    this.logger.log(`Updated redirect URIs for client: ${client.name} in ${entry.domain}`);
+                                }
+                            }
+                        } catch {
+                            this.logger.warn(`Client ${client.name} in ${entry.domain} may already exist`);
+                        }
+                    }
+                }
+            }
+        } catch (error) {
+            this.logger.error("Error creating dummy apps/groups/roles:", error);
+        }
+    }
+}

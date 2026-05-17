@@ -22,15 +22,11 @@ import {CurrentPermission, CurrentTenantId, CurrentUser, Permission} from "../au
 import {SIGNING_KEY_PROVIDER, SigningKeyProvider} from "../core/token-abstraction";
 import {ClientService} from "../services/client.service";
 import {User} from "../entity/user.entity";
-import * as yup from "yup";
+import {UpdateTenantSchema} from "../dto/tenant.dto";
 
 @Controller("api/tenant")
 @UseInterceptors(ClassSerializerInterceptor)
 export class TenantController {
-    static UpdateTenantSchema = yup.object().shape({
-        name: yup.string().max(128),
-        allowSignUp: yup.boolean(),
-    });
 
     constructor(
         private readonly configService: Environment,
@@ -59,7 +55,7 @@ export class TenantController {
     async updateMyTenant(
         @CurrentPermission() permission: Permission,
         @CurrentTenantId() tenantId: string,
-        @Body(new ValidationPipe(TenantController.UpdateTenantSchema))
+        @Body(new ValidationPipe(UpdateTenantSchema))
         body: { name?: string; allowSignUp?: boolean },
     ): Promise<Tenant> {
         return this._updateTenant(permission, tenantId, body);
