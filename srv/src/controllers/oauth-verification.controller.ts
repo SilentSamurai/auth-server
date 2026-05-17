@@ -14,7 +14,7 @@ import {AuthService} from "../auth/auth.service";
 import {ValidationPipe} from "../validation/validation.pipe";
 import {ValidationSchema} from "../validation/validation.schema";
 import {AuthCodeService} from "../auth/auth-code.service";
-import {Token} from "../casl/contexts";
+import {Token} from "../casl/token-types";
 import {AuthUserService} from "../casl/authUser.service";
 import {OAuthException} from "../exceptions/oauth-exception";
 import {OAuthExceptionFilter} from "../exceptions/filter/oauth-exception.filter";

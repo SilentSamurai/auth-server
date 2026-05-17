@@ -10,10 +10,10 @@ import {SearchClient} from '../../api-client/search-client';
 
 /**
  * Tests for Requirement 5: First-Party Classification
- * 
+ *
  * First-party status is narrowed to a single stored identity:
  * - The Super_Tenant's Default_Client (alias === 'auth.server.com')
- * 
+ *
  * All other clients (including App_Clients on the super tenant) are NOT first-party.
  */
 describe('Per-App OAuth Client Identity — First-Party Classification', () => {
@@ -56,11 +56,11 @@ describe('Per-App OAuth Client Identity — First-Party Classification', () => {
         // The super tenant's default client has alias === 'auth.server.com'
         // When used as client_id, it should be treated as first-party
         // This is verified by the fact that the authorize flow doesn't require consent
-        
+
         // Get the super tenant's default client
         const clients = await clientEntityClient.getClientsByTenant(SUPER_TENANT_DOMAIN);
         const defaultClient = clients.find((c: any) => c.alias === SUPER_TENANT_DOMAIN);
-        
+
         expect(defaultClient).toBeDefined();
         expect(defaultClient.alias).toBe(SUPER_TENANT_DOMAIN);
     });
@@ -69,7 +69,7 @@ describe('Per-App OAuth Client Identity — First-Party Classification', () => {
     it('should treat Default_Client on non-super tenant as NOT first-party', async () => {
         // Use the pre-seeded test tenant to avoid name length issues
         const testDomain = 'per-app-client-test.local';
-        
+
         // The tenant's default client should NOT be first-party
         // Authorize requests using this client_id should require consent
         const response = await fixture.getHttpServer()
@@ -92,7 +92,7 @@ describe('Per-App OAuth Client Identity — First-Party Classification', () => {
         // Get super tenant ID using the search client
         const tenants = await searchClient.searchTenantByDomain(SUPER_TENANT_DOMAIN);
         expect(tenants.length).toBeGreaterThan(0);
-        
+
         const superTenantId = tenants[0]?.id;
         expect(superTenantId).toBeDefined();
 

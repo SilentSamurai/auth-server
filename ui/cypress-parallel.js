@@ -8,7 +8,7 @@
  * Concurrency is 2 specs per CPU core, capped by available memory.
  * Override with: CYPRESS_PARALLEL=N node cypress-parallel.js
  */
-const { spawn } = require('child_process');
+const {spawn} = require('child_process');
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
@@ -18,7 +18,7 @@ const os = require('os');
 const TESTS_PER_CORE = 1;          // target concurrent Cypress instances per CPU core
 const MEM_PER_INSTANCE_MB = 1024;   // ~1GB per Cypress browser instance (measured)
 const RESERVED_MEM_MB = 6144;      // memory reserved for backend services + OS headroom
-const MAX_CONCURRENCY = 6;         // hard cap — beyond this, resource contention causes flakiness
+const MAX_CONCURRENCY = 4;         // hard cap — beyond this, resource contention causes flakiness
 
 const cpuBased = Math.max(1, os.cpus().length * TESTS_PER_CORE);
 const freeMem = Math.max(0, (os.freemem() / (1024 * 1024)) - RESERVED_MEM_MB);
@@ -39,8 +39,8 @@ const specDir = path.join(__dirname, 'cypress', 'e2e');
 const specs = singleSpec
     ? [singleSpec]
     : fs.readdirSync(specDir)
-          .filter(f => f.endsWith('.cy.ts'))
-          .map(f => path.join('cypress', 'e2e', f));
+        .filter(f => f.endsWith('.cy.ts'))
+        .map(f => path.join('cypress', 'e2e', f));
 
 // --- Screenshot folder management ---
 // Clean screenshots once at startup, then preserve during parallel runs
@@ -48,7 +48,7 @@ const screenshotsDir = path.join(__dirname, 'cypress', 'screenshots');
 
 function cleanScreenshotsFolder() {
     if (fs.existsSync(screenshotsDir)) {
-        fs.rmSync(screenshotsDir, { recursive: true, force: true });
+        fs.rmSync(screenshotsDir, {recursive: true, force: true});
         console.log('Cleaned screenshots folder\n');
     }
 }
@@ -101,7 +101,7 @@ function runSpec(spec, attempt) {
             } else {
                 console.log(`  ✗ ${label} (${elapsed}s)`);
             }
-            resolve({ code, name, output, spec });
+            resolve({code, name, output, spec});
         });
     });
 }
@@ -127,7 +127,7 @@ function worker() {
             }
         }
         if (result.code !== 0) {
-            failed.push({ name: result.name, output: result.output });
+            failed.push({name: result.name, output: result.output});
         }
         return worker();
     })();

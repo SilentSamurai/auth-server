@@ -1,9 +1,4 @@
-import {
-    ConflictException,
-    Injectable,
-    Logger,
-    NotFoundException,
-} from '@nestjs/common';
+import {ConflictException, Injectable, Logger, NotFoundException,} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {DataSource, Repository} from 'typeorm';
 import {Tenant} from '../entity/tenant.entity';
@@ -308,7 +303,7 @@ export class OnboardingService {
     private async findOrCreateUser(
         permission: any,
         request: OnboardCustomerDto,
-    ): Promise<{user: User; isNew: boolean}> {
+    ): Promise<{ user: User; isNew: boolean }> {
         const existingUser = await this.userRepository.findOne({
             where: {email: request.userEmail},
         });

@@ -1,11 +1,10 @@
-import {TestFixture} from "./api-client/client";
+import {expect2xx, TestFixture} from "./api-client/client";
 import {TenantClient} from "./api-client/tenant-client";
 import {RoleClient} from "./api-client/role-client";
 import {GroupClient} from "./api-client/group-client";
 import {UsersClient} from "./api-client/user-client";
 import {AdminTenantClient} from "./api-client/admin-tenant-client";
 import {ClientEntityClient} from "./api-client/client-entity-client";
-import {expect2xx} from "./api-client/client";
 import {TokenFixture} from "./token.fixture";
 
 export class HelperFixture {
@@ -57,7 +56,7 @@ export class HelperFixture {
     /**
      * Sets a user's password via the super admin endpoint.
      * Requires the caller to have super admin privileges.
-     * 
+     *
      * @param userId - The user's ID
      * @param password - The new password to set
      */
@@ -73,7 +72,7 @@ export class HelperFixture {
     /**
      * Verifies a user's email via the super admin endpoint.
      * Requires the caller to have super admin privileges.
-     * 
+     *
      * @param email - The user's email address
      * @param verify - Whether to verify (true) or unverify (false) the user
      */
@@ -89,7 +88,7 @@ export class HelperFixture {
     /**
      * Convenience method to create a tenant, enable password grant, add admin, and promote to TENANT_ADMIN.
      * This is a common pattern used across many test suites.
-     * 
+     *
      * @param name - Tenant name
      * @param domain - Tenant domain
      * @param adminEmail - Admin user email
@@ -101,26 +100,26 @@ export class HelperFixture {
         adminEmail: string,
     ): Promise<{ tenant: any; adminUserId: string }> {
         const adminClient = new AdminTenantClient(this.app, this.accessToken);
-        
+
         // Create tenant
         const tenant = await this.tenant.createTenant(name, domain);
-        
+
         // Enable password grant
         await this.enablePasswordGrant(tenant.id, domain);
-        
+
         // Add admin member
         const addResult = await adminClient.addMembers(tenant.id, [adminEmail]);
         const adminUserId = addResult.members.find((m: any) => m.email === adminEmail).id;
-        
+
         // Promote to TENANT_ADMIN
         await adminClient.updateMemberRoles(tenant.id, adminUserId, ['TENANT_ADMIN']);
-        
-        return { tenant, adminUserId };
+
+        return {tenant, adminUserId};
     }
 
     /**
      * Convenience method to add a user to a tenant with specific roles.
-     * 
+     *
      * @param tenantId - Target tenant ID
      * @param email - User email
      * @param roles - Roles to assign (e.g., ['TENANT_VIEWER'])
@@ -132,21 +131,21 @@ export class HelperFixture {
         roles: string[],
     ): Promise<string> {
         const adminClient = new AdminTenantClient(this.app, this.accessToken);
-        
+
         const addResult = await adminClient.addMembers(tenantId, [email]);
         const userId = addResult.members.find((m: any) => m.email === email).id;
-        
+
         if (roles.length > 0) {
             await adminClient.updateMemberRoles(tenantId, userId, roles);
         }
-        
+
         return userId;
     }
 
     /**
      * Login as a user and return access token.
      * Convenience wrapper around TokenFixture.fetchAccessToken.
-     * 
+     *
      * @param email - User email
      * @param password - User password
      * @param domain - Tenant domain (used as client_id)

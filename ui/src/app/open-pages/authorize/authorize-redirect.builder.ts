@@ -16,10 +16,10 @@
  * complement of this builder's output) and P8 (one-shot flags isolation).
  */
 
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 
-import { serializeOAuthParameters } from './oauth-params.util';
-import { OAuthParameters } from './authorize.types';
+import {serializeOAuthParameters} from './oauth-params.util';
+import {OAuthParameters} from './authorize.types';
 
 /**
  * Extras accepted by `toAuthorizeEndpoint`.
@@ -47,7 +47,7 @@ export type AuthorizeRedirectExtras =
  * continue, after logout, from the "Start Over" error recovery — funnels
  * through `toAuthorizeEndpoint`.
  */
-@Injectable({ providedIn: 'root' })
+@Injectable({providedIn: 'root'})
 export class AuthorizeRedirectBuilder {
     /**
      * Build the redirect URL `/api/oauth/authorize?...`.
@@ -90,7 +90,7 @@ export class AuthorizeRedirectBuilder {
         ) {
             throw new Error(
                 'AuthorizeRedirectBuilder: only one of `session_confirmed`, `from_logout`, ' +
-                    'or `consent_denied` may be set per redirect.',
+                'or `consent_denied` may be set per redirect.',
             );
         }
 

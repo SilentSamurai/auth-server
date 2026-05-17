@@ -8,7 +8,7 @@ import {CanActivate, ExecutionContext, HttpException, Injectable, Logger, Unauth
 import {ExtractJwt} from "passport-jwt";
 import {AuthService} from "./auth.service";
 import {CaslAbilityFactory} from "../casl/casl-ability.factory";
-import {TechnicalToken, TenantToken, Token} from "../casl/contexts";
+import {TechnicalToken, TenantToken, Token} from "../casl/token-types";
 import {Response} from "express";
 import {parseBasicAuthHeader} from "../util/http.util";
 

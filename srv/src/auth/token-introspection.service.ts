@@ -3,7 +3,7 @@ import {AuthService} from './auth.service';
 import {ClientService} from '../services/client.service';
 import {OAuthException} from '../exceptions/oauth-exception';
 import {ScopeNormalizer} from '../casl/scope-normalizer';
-import {Token} from '../casl/contexts';
+import {Token} from '../casl/token-types';
 import {RS256_TOKEN_GENERATOR, TokenService} from '../core/token-abstraction';
 
 /**

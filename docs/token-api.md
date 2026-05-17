@@ -68,15 +68,17 @@
 
 ### JWT Roles Array Format
 
-The `roles` claim in the JWT access token contains all roles assigned to the user. Role names follow different formats depending on their type:
+The `roles` claim in the JWT access token contains all roles assigned to the user. Role names follow different formats
+depending on their type:
 
-| Role Type | Format | Example | Description |
-|-----------|--------|---------|-------------|
-| Internal | `ROLE_NAME` | `SUPER_ADMIN`, `TENANT_ADMIN`, `TENANT_VIEWER` | Built-in auth server roles. No separator. |
-| Tenant-local | `roleName` | `reviewer`, `billing-admin` | Custom roles scoped to a single tenant. No separator. |
-| App-owned | `appName:roleName` | `todo-app:editor`, `crm-app:sales-manager` | Roles defined by a subscribed app. Uses `:` as the namespace separator. |
+| Role Type    | Format             | Example                                        | Description                                                             |
+|--------------|--------------------|------------------------------------------------|-------------------------------------------------------------------------|
+| Internal     | `ROLE_NAME`        | `SUPER_ADMIN`, `TENANT_ADMIN`, `TENANT_VIEWER` | Built-in auth server roles. No separator.                               |
+| Tenant-local | `roleName`         | `reviewer`, `billing-admin`                    | Custom roles scoped to a single tenant. No separator.                   |
+| App-owned    | `appName:roleName` | `todo-app:editor`, `crm-app:sales-manager`     | Roles defined by a subscribed app. Uses `:` as the namespace separator. |
 
-App-owned roles are namespaced with the app name to prevent collisions when a user has roles from multiple subscribed apps. Internal and tenant-local roles never contain the `:` separator.
+App-owned roles are namespaced with the app name to prevent collisions when a user has roles from multiple subscribed
+apps. Internal and tenant-local roles never contain the `:` separator.
 
 **Example JWT payload** — a user with internal, tenant-local, and app-owned roles:
 
@@ -101,6 +103,8 @@ App-owned roles are namespaced with the app name to prevent collisions when a us
 }
 ```
 
-**Technical tokens** (`client_credentials` grant) do **not** include a `roles` field — there is no user context. They carry `scopes` only.
+**Technical tokens** (`client_credentials` grant) do **not** include a `roles` field — there is no user context. They
+carry `scopes` only.
 
-For full details on app-owned role namespacing, policy resolution, and the resource server verification pattern, see [App-Owned Roles](app-owned-roles.md).
+For full details on app-owned role namespacing, policy resolution, and the resource server verification pattern,
+see [App-Owned Roles](app-owned-roles.md).

@@ -1,5 +1,5 @@
 import {SharedTestFixture} from "../shared-test.fixture";
-import {TokenFixture, AuthorizeParams} from "../token.fixture";
+import {AuthorizeParams, TokenFixture} from "../token.fixture";
 
 describe('e2e positive auth code flow', () => {
     let app: SharedTestFixture;

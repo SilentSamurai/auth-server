@@ -165,7 +165,8 @@ export class GP02AComponent implements OnInit {
         private authDefaultService: AuthDefaultService,
         private confirmationService: ConfirmationService,
         private modalService: ModalService,
-    ) {}
+    ) {
+    }
 
     async ngOnInit() {
         this.loading = true;

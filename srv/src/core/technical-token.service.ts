@@ -1,6 +1,6 @@
 import {Inject, Injectable} from "@nestjs/common";
 import {randomUUID} from "crypto";
-import {TechnicalToken} from "../casl/contexts";
+import {TechnicalToken} from "../casl/token-types";
 import {ScopeNormalizer} from "../casl/scope-normalizer";
 import {Environment} from "../config/environment.service";
 import {RS256_TOKEN_GENERATOR, SIGNING_KEY_PROVIDER, SigningKeyProvider, TokenService} from "./token-abstraction";

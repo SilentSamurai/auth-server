@@ -5,7 +5,7 @@ import {AnyAbility} from "@casl/ability/dist/types/PureAbility";
 import {SubjectEnum} from "../entity/subjectEnum";
 import {RoleEnum} from "../entity/roleEnum";
 import {Environment} from "../config/environment.service";
-import {TechnicalToken, TenantToken, Token} from "./contexts";
+import {TechnicalToken, TenantToken, Token} from "./token-types";
 import {User} from "../entity/user.entity";
 
 @Injectable()

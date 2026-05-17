@@ -7,7 +7,8 @@ import {
     Injectable,
     PipeTransform
 } from "@nestjs/common";
-import {AuthContext, TenantToken, Token} from "../casl/contexts";
+import {AuthContext} from "../casl/auth-context";
+import {TenantToken, Token} from "../casl/token-types";
 import {AuthUserService} from "../casl/authUser.service";
 import {SecurityService} from "../casl/security.service";
 import {Action} from "../casl/actions.enum";

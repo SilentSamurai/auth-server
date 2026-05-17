@@ -1,8 +1,8 @@
 import * as superTest from 'supertest';
 import TestAgent from 'supertest/lib/agent';
 import {JwtService} from '@nestjs/jwt';
-import {SmtpClientAdapter} from './smtp-client-adapter';
-import {WebhookClientAdapter} from './webhook-client-adapter';
+import {SmtpClientAdapter} from './smtp/smtp-client-adapter';
+import {WebhookClientAdapter} from './api-client/webhook-client-adapter';
 import {getTestPorts} from './test-ports';
 
 /**

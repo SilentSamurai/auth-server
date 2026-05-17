@@ -39,7 +39,7 @@ import {GroupService} from '../../../_services/group.service';
                 <button
                     class="btn btn-primary"
                     type="submit"
-                    (click)="updateGroupForm.onSubmit(submitTrigger)"
+                    (click)="updateGroupForm.onSubmit($event)"
                 >
                     Update
                 </button>
@@ -51,15 +51,16 @@ import {GroupService} from '../../../_services/group.service';
 export class UpdateGroupComponent implements OnInit {
     groupId: string = '';
     form = {name: ''};
-    submitTrigger: any;
 
     constructor(
         private groupService: GroupService,
         private messageService: MessageService,
         public activeModal: NgbActiveModal,
-    ) {}
+    ) {
+    }
 
-    ngOnInit(): void {}
+    ngOnInit(): void {
+    }
 
     async onSubmit() {
         try {

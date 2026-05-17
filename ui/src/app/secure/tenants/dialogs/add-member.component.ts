@@ -42,7 +42,7 @@ import {TenantService} from '../../../_services/tenant.service';
                     class="btn btn-primary"
                     type="submit"
                     id="ADD_TENANT_MEMBER_BTN"
-                    (click)="addMemberForm.onSubmit(krishna)"
+                    (click)="addMemberForm.onSubmit($event)"
                 >
                     Add Member
                 </button>
@@ -58,7 +58,6 @@ export class AddMemberComponent implements OnInit {
     form = {
         email: '',
     };
-    krishna: any;
 
     constructor(
         private tenantService: TenantService,

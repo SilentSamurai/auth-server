@@ -124,8 +124,10 @@ describe('Consent Flow Integration Tests', () => {
     });
 
     afterAll(async () => {
-        await clientApi.deleteClient(thirdPartyClientId).catch(() => {});
-        await clientApi.deleteClient(narrowScopesClientId).catch(() => {});
+        await clientApi.deleteClient(thirdPartyClientId).catch(() => {
+        });
+        await clientApi.deleteClient(narrowScopesClientId).catch(() => {
+        });
         await app.close();
     });
 
@@ -315,7 +317,8 @@ describe('Consent Flow Integration Tests', () => {
                 expect(url.searchParams.get('state')).toEqual('abc123');
                 expect(url.searchParams.get('csrf_token')).toBeTruthy();
             } finally {
-                await clientApi.deleteClient(clientId).catch(() => {});
+                await clientApi.deleteClient(clientId).catch(() => {
+                });
             }
         });
 
@@ -393,7 +396,8 @@ describe('Consent Flow Integration Tests', () => {
                 expect(url.searchParams.get('code')).toBeTruthy();
                 expect(url.searchParams.has('error')).toBe(false);
             } finally {
-                await clientApi.deleteClient(clientId).catch(() => {});
+                await clientApi.deleteClient(clientId).catch(() => {
+                });
             }
         });
     });
@@ -428,7 +432,8 @@ describe('Consent Flow Integration Tests', () => {
                 expect(tokenRes.body.access_token).toBeTruthy();
                 expect(tokenRes.body.token_type).toEqual('Bearer');
             } finally {
-                await clientApi.deleteClient(clientId).catch(() => {});
+                await clientApi.deleteClient(clientId).catch(() => {
+                });
             }
         });
     });
@@ -469,7 +474,8 @@ describe('Consent Flow Integration Tests', () => {
                 const authorizeAfter = await authorize(sidCookie, clientId, 'openid profile', {state: 'deny-state'});
                 expect(authorizeAfter.status).toEqual(302);
             } finally {
-                await clientApi.deleteClient(clientId).catch(() => {});
+                await clientApi.deleteClient(clientId).catch(() => {
+                });
             }
         });
 
@@ -501,7 +507,8 @@ describe('Consent Flow Integration Tests', () => {
                 const result = await authorize(sidCookie2, clientId, 'openid profile');
                 expect(isConsentRedirect(result.location)).toBe(true);
             } finally {
-                await clientApi.deleteClient(clientId).catch(() => {});
+                await clientApi.deleteClient(clientId).catch(() => {
+                });
             }
         });
     });
@@ -662,7 +669,8 @@ describe('Consent Flow Integration Tests', () => {
                 const csrfToken = extractCsrfToken(result.location);
                 expect(csrfToken).toBeTruthy();
             } finally {
-                await clientApi.deleteClient(clientId).catch(() => {});
+                await clientApi.deleteClient(clientId).catch(() => {
+                });
             }
         });
     });

@@ -1,6 +1,6 @@
 import {CanActivate, ExecutionContext, ForbiddenException, Injectable} from "@nestjs/common";
 import {SecurityService} from "../casl/security.service";
-import {TenantToken, Token} from "../casl/contexts";
+import {TenantToken, Token} from "../casl/token-types";
 
 /**
  * Restricts access to super-admin users only.

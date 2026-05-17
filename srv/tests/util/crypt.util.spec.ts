@@ -27,23 +27,10 @@ describe('CryptUtil', () => {
             expect(typeof challenge).toBe('string');
             expect(challenge.length).toBeGreaterThan(0);
         });
-        it('should return OWH32 code challenge', () => {
-            const verifier = 'testverifier';
-            const challenge = CryptUtil.generateCodeChallenge(verifier, 'OWH32');
-            expect(challenge).toBe(CryptUtil.oneWayHash(verifier));
-        });
         it('should return verifier for unknown method', () => {
             const verifier = 'testverifier';
             const challenge = CryptUtil.generateCodeChallenge(verifier, 'plain');
             expect(challenge).toBe(verifier);
-        });
-    });
-
-    describe('oneWayHash', () => {
-        it('should return a string hash', () => {
-            const hash = CryptUtil.oneWayHash('test');
-            expect(typeof hash).toBe('string');
-            expect(Number.isNaN(Number(hash))).toBe(false);
         });
     });
 

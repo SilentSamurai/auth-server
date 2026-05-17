@@ -77,7 +77,8 @@ docker run -d \
 | `PORT`                          | Backend HTTP port                             | `9001`                  |
 | `ENABLE_HTTPS`                  | Enable TLS                                    | `false`                 |
 
-> **Note:** Change `SUPER_ADMIN_PASSWORD` before exposing the server publicly. The defaults are for local development only.
+> **Note:** Change `SUPER_ADMIN_PASSWORD` before exposing the server publicly. The defaults are for local development
+> only.
 
 ---
 
@@ -166,7 +167,8 @@ npm run ui:serve
 
 ## 🛠️ Configuration
 
-The backend loads configuration from `.env` files located in `srv/envs/`. Set the `ENV` environment variable to select a profile — the app loads `./envs/.env.{ENV}`. Defaults to `development` if not set.
+The backend loads configuration from `.env` files located in `srv/envs/`. Set the `ENV` environment variable to select a
+profile — the app loads `./envs/.env.{ENV}`. Defaults to `development` if not set.
 
 Available profiles: `development`, `testing`, `production`, `cf`, `aws`.
 

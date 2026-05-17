@@ -16,11 +16,11 @@ or its policies, the change takes effect immediately for all subscribers — no 
 
 The system has three categories of roles:
 
-| Type | `app_id` Column | Residency | Token Format | Policy Source |
-|------|-----------------|-----------|--------------|---------------|
-| Internal | N/A (hardcoded) | Auth server code | `SUPER_ADMIN`, `TENANT_ADMIN`, `TENANT_VIEWER` | Hardcoded CASL rules |
-| Tenant-local | `null` | Single tenant | `roleName` | User's tenant |
-| App-owned | Set (FK to `apps`) | Owner tenant only | `appName:roleName` | Owner tenant |
+| Type         | `app_id` Column    | Residency         | Token Format                                   | Policy Source        |
+|--------------|--------------------|-------------------|------------------------------------------------|----------------------|
+| Internal     | N/A (hardcoded)    | Auth server code  | `SUPER_ADMIN`, `TENANT_ADMIN`, `TENANT_VIEWER` | Hardcoded CASL rules |
+| Tenant-local | `null`             | Single tenant     | `roleName`                                     | User's tenant        |
+| App-owned    | Set (FK to `apps`) | Owner tenant only | `appName:roleName`                             | Owner tenant         |
 
 **Internal roles** (`SUPER_ADMIN`, `TENANT_ADMIN`, `TENANT_VIEWER`) are hardcoded in the auth server's CASL ability
 factory. They control access to the auth server's own endpoints and are unaffected by this feature.
@@ -104,11 +104,11 @@ different apps would receive a token with:
 
 ### Namespacing Rules
 
-| Role Type | Format | Example |
-|-----------|--------|---------|
-| Internal | `ROLE_NAME` (no separator) | `SUPER_ADMIN` |
-| Tenant-local | `roleName` (no separator) | `reviewer` |
-| App-owned | `appName:roleName` | `todo-app:editor` |
+| Role Type    | Format                     | Example           |
+|--------------|----------------------------|-------------------|
+| Internal     | `ROLE_NAME` (no separator) | `SUPER_ADMIN`     |
+| Tenant-local | `roleName` (no separator)  | `reviewer`        |
+| App-owned    | `appName:roleName`         | `todo-app:editor` |
 
 The `:` character is the separator. Internal and tenant-local role names never contain `:`, so the presence of a colon
 reliably identifies an app-owned role.
@@ -257,8 +257,8 @@ After:  user_roles entries for app-owned roles are deleted
 For the full token claims reference, see [Resource Server Verification](resource-server-verification.md). The `roles`
 array is the relevant claim for app-owned roles:
 
-| Claim | Description | Example |
-|-------|-------------|---------|
+| Claim   | Description                                                                | Example                               |
+|---------|----------------------------------------------------------------------------|---------------------------------------|
 | `roles` | Array of role names. App-owned roles are namespaced as `appName:roleName`. | `["TENANT_ADMIN", "todo-app:editor"]` |
 
 Technical tokens (`client_credentials` grant) do not have a `roles` field — there is no user context.

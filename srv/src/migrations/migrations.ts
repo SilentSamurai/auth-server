@@ -1,59 +1,15 @@
-import {CreateInitialTables1681147242561} from "./1681147242561-initial-creation";
-import {SessionMigration1684308185392} from "./1684308185392-session-migration";
-import {Migrations1718012430697} from "./1718012430697-migrations";
-import {CreateAuthorizationTable1698765432100} from "./CreateAuthorizationTable1698765432100";
-import {AddDescriptionToRoles1699999999999} from "./1699999999999-add-description-to-roles";
-import {SubscriptionAndApps1744497534374} from "./1744497534374-new-migration";
-import {TenantLevelStorage1746655278354} from "./1746655278354-tenant-level-storage";
-import {AddAppIsPublic1747000000000} from "./1747000000000-add-app-is-public";
-import {AddSubscriberTenantHintToAuthCode1710000000000} from "./1710000000000-AddSubscriberTenantHintToAuthCode";
-import {AddEmailRateLimitColumns1710000000000} from "./1710000000000-AddEmailRateLimitColumns";
-import {CreateClientsTable1748000000000} from "./1748000000000-create-clients-table";
-import {AddUserLocked1749000000000} from "./1749000000000-add-user-locked";
-import {AddRedirectUriToAuthCode1750000000000} from "./1750000000000-AddRedirectUriToAuthCode";
-import {AddAuthCodeBindingColumns1751000000000} from "./1751000000000-AddAuthCodeBindingColumns";
-import {AddPkceMethodUsedToClients1752000000000} from "./1752000000000-AddPkceMethodUsedToClients";
-import {CreateRefreshTokensTable1753000000000} from "./1753000000000-CreateRefreshTokensTable";
-import {CreateTenantKeysAndDropLegacyColumns1754000000000} from "./1754000000000-CreateTenantKeysAndDropLegacyColumns";
-import {AddNonceToAuthCode1755000000000} from "./1755000000000-AddNonceToAuthCode";
-import {CreateLoginSessionsTable1756000000000} from "./1756000000000-CreateLoginSessionsTable";
-import {CreateUserConsentsTable1757000000000} from "./1757000000000-CreateUserConsentsTable";
-import {AddAliasToClients1758000000000} from "./1758000000000-AddAliasToClients";
-import {AddRequireAuthTimeToAuthCode1759000000000} from "./1759000000000-AddRequireAuthTimeToAuthCode";
-import {AddResourceIndicatorSupport1760000000000} from "./1760000000000-AddResourceIndicatorSupport";
-import {RemoveTenantCredentialColumns1762000000000} from "./1762000000000-RemoveTenantCredentialColumns";
-import {MakeAuthCodePkceColumnsNullable1763000000000} from "./1763000000000-MakeAuthCodePkceColumnsNullable";
-import {AddSkipSessionConfirmToTenants1764000000000} from "./1764000000000-AddSkipSessionConfirmToTenants";
-import {AddAppClientIdentity1770000000000} from "./1770000000000-AddAppClientIdentity";
-import {AddAppOnboardingConfig1771000000000} from "./1771000000000-AddAppOnboardingConfig";
+import {Milestone1InitialSchema1800000000000} from "./1800000000000-milestone-1-initial-schema";
+import {Milestone2AppsSubscriptions1800000000001} from "./1800000000001-milestone-2-apps-subscriptions";
+import {Milestone3ClientsPkce1800000000002} from "./1800000000002-milestone-3-clients-pkce";
+import {Milestone4RefreshSessionsConsents1800000000003} from "./1800000000003-milestone-4-refresh-sessions-consents";
+import {
+    Milestone5ResourceIndicatorsOnboarding1800000000004
+} from "./1800000000004-milestone-5-resource-indicators-onboarding";
 
 export const migrations = [
-    CreateInitialTables1681147242561,
-    SessionMigration1684308185392,
-    Migrations1718012430697,
-    CreateAuthorizationTable1698765432100,
-    AddDescriptionToRoles1699999999999,
-    SubscriptionAndApps1744497534374,
-    TenantLevelStorage1746655278354,
-    AddAppIsPublic1747000000000,
-    AddSubscriberTenantHintToAuthCode1710000000000,
-    AddEmailRateLimitColumns1710000000000,
-    CreateClientsTable1748000000000,
-    AddUserLocked1749000000000,
-    AddRedirectUriToAuthCode1750000000000,
-    AddAuthCodeBindingColumns1751000000000,
-    AddPkceMethodUsedToClients1752000000000,
-    CreateRefreshTokensTable1753000000000,
-    CreateTenantKeysAndDropLegacyColumns1754000000000,
-    AddNonceToAuthCode1755000000000,
-    CreateLoginSessionsTable1756000000000,
-    CreateUserConsentsTable1757000000000,
-    AddAliasToClients1758000000000,
-    AddRequireAuthTimeToAuthCode1759000000000,
-    AddResourceIndicatorSupport1760000000000,
-    RemoveTenantCredentialColumns1762000000000,
-    MakeAuthCodePkceColumnsNullable1763000000000,
-    AddSkipSessionConfirmToTenants1764000000000,
-    AddAppClientIdentity1770000000000,
-    AddAppOnboardingConfig1771000000000
+    Milestone1InitialSchema1800000000000,
+    Milestone2AppsSubscriptions1800000000001,
+    Milestone3ClientsPkce1800000000002,
+    Milestone4RefreshSessionsConsents1800000000003,
+    Milestone5ResourceIndicatorsOnboarding1800000000004,
 ];

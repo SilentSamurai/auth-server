@@ -75,7 +75,7 @@ import {DataSource} from '../../../component/model/DataSource';
                 <button
                     class="btn btn-primary"
                     type="submit"
-                    (click)="createGroupForm.onSubmit(krishna)"
+                    (click)="createGroupForm.onSubmit($event)"
                 >
                     Create
                 </button>
@@ -92,7 +92,6 @@ export class CreateGroupComponent implements OnInit {
         tenantId: [] as any[],
     };
     tenantsDM: DataSource<any>;
-    krishna: any;
     private tenants: any[] = [];
 
     constructor(

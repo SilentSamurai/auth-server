@@ -71,7 +71,6 @@ export class CreateUserModalComponent implements OnInit {
             validator: this.ConfirmedValidator('password', 'confirmPassword'),
         },
     );
-    krishna: any;
 
     constructor(
         private userService: UserService,

@@ -17,14 +17,14 @@
  *
  * Requirements: 4, 5, 8, 9
  */
-import { SharedTestFixture } from '../shared-test.fixture';
-import { v4 as uuid } from 'uuid';
-import { AppClient } from '../api-client/app-client';
-import { TokenFixture } from '../token.fixture';
-import { TenantClient } from '../api-client/tenant-client';
-import { AdminTenantClient } from '../api-client/admin-tenant-client';
-import { HelperFixture } from '../helper.fixture';
-import { RoleClient } from '../api-client/role-client';
+import {SharedTestFixture} from '../shared-test.fixture';
+import {v4 as uuid} from 'uuid';
+import {AppClient} from '../api-client/app-client';
+import {TokenFixture} from '../token.fixture';
+import {TenantClient} from '../api-client/tenant-client';
+import {AdminTenantClient} from '../api-client/admin-tenant-client';
+import {HelperFixture} from '../helper.fixture';
+import {RoleClient} from '../api-client/role-client';
 
 describe('Onboard Customer Endpoint', () => {
     let fixture: SharedTestFixture;
@@ -140,7 +140,7 @@ describe('Onboard Customer Endpoint', () => {
             // Associate the role with the app via PATCH /api/role/:roleId
             await fixture.getHttpServer()
                 .patch(`/api/role/${role.id}`)
-                .send({ appId: appId })
+                .send({appId: appId})
                 .set('Authorization', `Bearer ${ownerAdminToken}`)
                 .set('Accept', 'application/json');
         }
@@ -455,7 +455,7 @@ describe('Onboard Customer Endpoint', () => {
 
             // Verify email was sent to the new user
             const email = await fixture.smtp.waitForEmail(
-                { to: userEmail },
+                {to: userEmail},
                 10000,
             );
             expect(email).toBeDefined();
@@ -476,7 +476,7 @@ describe('Onboard Customer Endpoint', () => {
             expect(response.status).toBeLessThan(300);
 
             // Wait briefly and verify no email was sent
-            const emails = await fixture.smtp.listEmails({ limit: 10 });
+            const emails = await fixture.smtp.listEmails({limit: 10});
             // No emails should have been sent after clearing
             expect(emails.emails.length).toBe(0);
         });
@@ -513,7 +513,7 @@ describe('Onboard Customer Endpoint', () => {
                 const role = await roleClient.createRole(`${secondAppName}-${roleName}`, ownerTenantId);
                 await fixture.getHttpServer()
                     .patch(`/api/role/${role.id}`)
-                    .send({ appId: secondApp.id })
+                    .send({appId: secondApp.id})
                     .set('Authorization', `Bearer ${ownerAdminToken}`)
                     .set('Accept', 'application/json');
             }
@@ -531,7 +531,7 @@ describe('Onboard Customer Endpoint', () => {
             expect(response.status).toBeLessThan(300);
 
             // Verify no email was sent (user already existed)
-            const emails = await fixture.smtp.listEmails({ to: sharedEmail, limit: 10 });
+            const emails = await fixture.smtp.listEmails({to: sharedEmail, limit: 10});
             expect(emails.emails.length).toBe(0);
         });
     });

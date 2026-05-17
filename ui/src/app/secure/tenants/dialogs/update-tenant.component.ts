@@ -79,7 +79,7 @@ import {NoChangesException, TenantService,} from '../../../_services/tenant.serv
                     id="UPDATE_TENANT_SAVE_BTN"
                     class="btn btn-primary"
                     type="submit"
-                    (click)="updateTenantForm.onSubmit(krishna)"
+                    (click)="updateTenantForm.onSubmit($event)"
                 >
                     Update
                 </button>
@@ -99,7 +99,6 @@ export class UpdateTenantComponent implements OnInit {
         domain: '',
         allowSignUp: false,
     };
-    krishna: any;
 
     constructor(
         private tenantService: TenantService,
@@ -120,11 +119,11 @@ export class UpdateTenantComponent implements OnInit {
     async onSubmit() {
         try {
             let editedTenant = await this.tenantService.editTenant(
-                    this.tenant.name === this.form.name ? null : this.form.name,
-                    this.tenant.allowSignUp === this.form.allowSignUp
-                        ? null
-                        : this.form.allowSignUp,
-                );
+                this.tenant.name === this.form.name ? null : this.form.name,
+                this.tenant.allowSignUp === this.form.allowSignUp
+                    ? null
+                    : this.form.allowSignUp,
+            );
             this.messageService.add({
                 severity: 'success',
                 summary: 'Success',

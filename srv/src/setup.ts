@@ -7,12 +7,11 @@ import {AppModule} from "./app.module";
 import {HttpExceptionFilter} from "./exceptions/filter/http-exception.filter";
 import * as express from "express";
 import * as process from "node:process";
-import type {FakeSmtpServer} from "./mail/FakeSmtpServer";
 import {CorsInterceptor} from "./interceptors/cors.interceptor";
 import * as cookieParser from "cookie-parser";
 
 // Hold reference to SMTP server (if started) so we can close it on shutdown
-let smtpServerRef: FakeSmtpServer | null = null;
+let smtpServerRef: { close(): Promise<void> } | null = null;
 
 export async function prepareApp() {
     Environment.setup();
@@ -40,17 +39,10 @@ export async function prepareApp() {
         };
     }
 
-    // logger
-    // if (Environment.isProduction()) {
-    //     options.logger = new JsonConsoleLogger();
-    // }
-
-    // smtp
+    // smtp — launch external FakeSmtpServer as a separate process
     if (Environment.get("ENABLE_FAKE_SMTP_SERVER", false)) {
-        const {createFakeSmtpServer} = await import("./mail/FakeSmtpServer");
-        const server = createFakeSmtpServer({});
-        await server.listen();
-        smtpServerRef = server;
+        const {launchFakeSmtpServer} = await import("./smtp/launch-fake-smtp");
+        smtpServerRef = await launchFakeSmtpServer();
     }
 
     console.log("Application options: ", options);
@@ -71,12 +63,18 @@ export async function prepareApp() {
     }
     app.use(cookieParser(cookieSecret));
 
-    // OPTIONS preflight: allow all origins (no auth needed)
+    // OPTIONS preflight: allow all origins on public OIDC endpoints only (no auth needed)
+    // All other endpoints: deny by default (no ACAO header)
+    const PUBLIC_OIDC_PATHS = ['/api/oauth/token', '/api/oauth/userinfo'];
     app.use('/', (req, res, next) => {
         if (req.method === 'OPTIONS') {
-            res.setHeader("Access-Control-Allow-Origin", "*");
-            res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
-            res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept");
+            const isPublicOidc = PUBLIC_OIDC_PATHS.some(p => req.path.startsWith(p))
+                || req.path.includes('/.well-known/');
+            if (isPublicOidc) {
+                res.setHeader("Access-Control-Allow-Origin", "*");
+                res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
+                res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept");
+            }
             return res.status(204).end();
         }
         next();

@@ -6,7 +6,7 @@ import {INestApplication} from '@nestjs/common';
 import {Test, TestingModule} from '@nestjs/testing';
 import {AppModule} from '../src/app.module';
 import {Environment} from '../src/config/environment.service';
-import {createFakeSmtpServer, FakeSmtpServer} from '../src/mail/FakeSmtpServer';
+import {createFakeSmtpServer, FakeSmtpServer} from './smtp/FakeSmtpServer';
 import * as superTest from 'supertest';
 import * as argon2 from 'argon2';
 import * as process from 'node:process';

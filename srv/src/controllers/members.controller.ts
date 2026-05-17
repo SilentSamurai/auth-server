@@ -27,13 +27,8 @@ import {SubjectEnum} from "../entity/subjectEnum";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 import {CurrentPermission, CurrentTenantId, Permission} from "../auth/auth.decorator";
-import {TenantToken} from "../casl/contexts";
-import * as yup from 'yup';
-
-// Local MemberOperationSchema for this controller
-const MemberOperationSchema = yup.object().shape({
-    emails: yup.array().of(yup.string().max(128)),
-});
+import {TenantToken} from "../casl/token-types";
+import {MemberOperationSchema} from "../dto/tenant.dto";
 
 @Controller("api/tenant")
 @UseInterceptors(ClassSerializerInterceptor)

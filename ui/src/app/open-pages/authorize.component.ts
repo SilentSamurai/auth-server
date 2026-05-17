@@ -18,16 +18,16 @@
  * tasks 8.3–8.5.
  */
 
-import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { from, Subject, takeUntil } from 'rxjs';
+import {HttpErrorResponse} from '@angular/common/http';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {ActivatedRoute} from '@angular/router';
+import {from, Subject, takeUntil} from 'rxjs';
 
-import { AuthorizeRedirectBuilder } from './authorize/authorize-redirect.builder';
-import { MissingCsrfTokenError, RequestTimeoutError, AuthorizeApi } from './authorize/authorize.api';
-import { parseOAuthParametersFromUrl } from './authorize/oauth-params.util';
-import { OAuthParameters, TenantInfo, ViewKind } from './authorize/authorize.types';
-import { NonceService } from '../_services/nonce.service';
+import {AuthorizeRedirectBuilder} from './authorize/authorize-redirect.builder';
+import {AuthorizeApi, MissingCsrfTokenError, RequestTimeoutError} from './authorize/authorize.api';
+import {parseOAuthParametersFromUrl} from './authorize/oauth-params.util';
+import {OAuthParameters, TenantInfo, ViewKind} from './authorize/authorize.types';
+import {NonceService} from '../_services/nonce.service';
 
 /**
  * Maps an `OAuthParseError` discriminant to the human-readable message shown
@@ -169,57 +169,15 @@ export class AuthorizeComponent implements OnInit, OnDestroy {
     // Component_State — private, write-once after ngOnInit (P1)
     // -----------------------------------------------------------------------
 
-    /**
-     * Parsed OAuth parameters. Set once in `ngOnInit` and never mutated
-     * thereafter (Property 1: "OAuth parameter immutability"). Stored as
-     * `Readonly<OAuthParameters>` to make the immutability intent explicit at
-     * the type level.
-     */
-    private oauthParams: Readonly<OAuthParameters> | null = null;
-
-    /**
-     * CSRF token captured from the initial URL parse. Forwarded verbatim to
-     * every POST body — never modified, truncated, or re-derived (Property 6:
-     * "CSRF token fidelity").
-     */
-    private csrfToken: string | null = null;
-
-    /**
-     * Transient credentials held only between a `requires_tenant_selection`
-     * login response and the successful re-login with a tenant hint. Cleared
-     * immediately after success or on `ngOnDestroy` (Req 3.5, 3.7, P5).
-     *
-     * Kept private — the template accesses it via the `pendingTenants` getter
-     * below. Credentials are never exposed to the template directly (P2).
-     */
-    private pendingCredentials: { email: string; password: string; clientId: string } | null = null;
-
-    /**
-     * Tenant list returned alongside `requires_tenant_selection`. Cleared
-     * together with `pendingCredentials` (Req 3.7, P5).
-     *
-     * Exposed to the template as a read-only array via the getter below so
-     * the `<app-tenant-selection-view>` can render the list without the
-     * template needing direct access to the private field.
-     */
-    private _pendingTenants: TenantInfo[] = [];
-
-    // -----------------------------------------------------------------------
-    // Template-visible state
-    // -----------------------------------------------------------------------
-
     /** Active view branch. Exactly one of the ViewKind values at all times (P4). */
     viewKind: ViewKind = 'loading';
-
     /** Error message rendered by `<app-error-view>`. */
     errorMessage: string | null = null;
-
     /**
      * Whether the current error view should show a "Start Over" button.
      * False for errors where `oauthParams` is null (no valid redirect URL).
      */
     errorRecoverable = false;
-
     /**
      * Email fetched from `GET /api/oauth/session-info` for the `consent` and
      * `session-confirm` views. `null` while the request is in flight — the
@@ -227,6 +185,9 @@ export class AuthorizeComponent implements OnInit, OnDestroy {
      */
     userEmail: string | null = null;
 
+    // -----------------------------------------------------------------------
+    // Template-visible state
+    // -----------------------------------------------------------------------
     /**
      * Per-button in-flight tracking. Each flag drives the disabled state and
      * in-button spinner for exactly one submit button (Property 9:
@@ -247,15 +208,65 @@ export class AuthorizeComponent implements OnInit, OnDestroy {
         logout: false,
         continue: false,
     };
+    /**
+     * Parsed OAuth parameters. Set once in `ngOnInit` and never mutated
+     * thereafter (Property 1: "OAuth parameter immutability"). Stored as
+     * `Readonly<OAuthParameters>` to make the immutability intent explicit at
+     * the type level.
+     */
+    private oauthParams: Readonly<OAuthParameters> | null = null;
+    /**
+     * CSRF token captured from the initial URL parse. Forwarded verbatim to
+     * every POST body — never modified, truncated, or re-derived (Property 6:
+     * "CSRF token fidelity").
+     */
+    private csrfToken: string | null = null;
+    /**
+     * Transient credentials held only between a `requires_tenant_selection`
+     * login response and the successful re-login with a tenant hint. Cleared
+     * immediately after success or on `ngOnDestroy` (Req 3.5, 3.7, P5).
+     *
+     * Kept private — the template accesses it via the `pendingTenants` getter
+     * below. Credentials are never exposed to the template directly (P2).
+     */
+    private pendingCredentials: { email: string; password: string; clientId: string } | null = null;
+    private readonly destroy$ = new Subject<void>();
+    /**
+     * Whether session_confirmed=true was forwarded by the backend in the URL.
+     * Only set when the session was freshly created by a login in this flow;
+     * pre-existing sessions will not have this flag. Used by the consent
+     * handler to decide whether to skip session-confirm after grant.
+     */
+    private _sessionConfirmed = false;
 
     // -----------------------------------------------------------------------
     // Destroy signal — used with takeUntil to cancel in-flight observables
     // -----------------------------------------------------------------------
 
-    private readonly destroy$ = new Subject<void>();
+    constructor(
+        private readonly route: ActivatedRoute,
+        private readonly api: AuthorizeApi,
+        private readonly redirectBuilder: AuthorizeRedirectBuilder,
+        private readonly nonceService: NonceService,
+    ) {
+    }
 
     // -----------------------------------------------------------------------
     // Template-visible tenant list (read-only proxy for the private field)
+    // -----------------------------------------------------------------------
+
+    /**
+     * Tenant list returned alongside `requires_tenant_selection`. Cleared
+     * together with `pendingCredentials` (Req 3.7, P5).
+     *
+     * Exposed to the template as a read-only array via the getter below so
+     * the `<app-tenant-selection-view>` can render the list without the
+     * template needing direct access to the private field.
+     */
+    private _pendingTenants: TenantInfo[] = [];
+
+    // -----------------------------------------------------------------------
+    // Constructor
     // -----------------------------------------------------------------------
 
     /**
@@ -268,18 +279,22 @@ export class AuthorizeComponent implements OnInit, OnDestroy {
     }
 
     // -----------------------------------------------------------------------
-    // Constructor
-    // -----------------------------------------------------------------------
-
-    constructor(
-        private readonly route: ActivatedRoute,
-        private readonly api: AuthorizeApi,
-        private readonly redirectBuilder: AuthorizeRedirectBuilder,
-        private readonly nonceService: NonceService,
-    ) {}
-
-    // -----------------------------------------------------------------------
     // Lifecycle
+    // -----------------------------------------------------------------------
+
+    /** The parsed OAuth `client_id`, or empty string before parse completes. */
+    get clientId(): string {
+        return this.oauthParams?.client_id ?? '';
+    }
+
+    /** The parsed OAuth `scope`, or null when absent. */
+    get scope(): string | null {
+        return this.oauthParams?.scope ?? null;
+    }
+
+    // -----------------------------------------------------------------------
+    // Template accessors — expose private state to the template in a
+    // controlled, read-only manner
     // -----------------------------------------------------------------------
 
     /**
@@ -309,15 +324,19 @@ export class AuthorizeComponent implements OnInit, OnDestroy {
             const recoverable = !NON_RECOVERABLE_ERRORS.has(result.error);
             // Store params if available so "Start Over" can rebuild the URL
             if (result.params) {
-                this.oauthParams = Object.freeze({ ...result.params });
+                this.oauthParams = Object.freeze({...result.params});
             }
             this.showError(message, recoverable);
             return;
         }
 
         // Successful parse — store immutable copies (P1)
-        this.oauthParams = Object.freeze({ ...result.params! });
+        this.oauthParams = Object.freeze({...result.params!});
         this.csrfToken = result.csrfToken;
+
+        // Capture session_confirmed flag forwarded by the backend so the
+        // consent handler can skip session-confirm for freshly-logged-in users.
+        this._sessionConfirmed = queryMap.get('session_confirmed') === 'true';
 
         // Store RP-provided nonce in sessionStorage so OAuthCallbackComponent
         // can validate it against the ID token later (OIDC Core §3.1.2.1).
@@ -356,6 +375,7 @@ export class AuthorizeComponent implements OnInit, OnDestroy {
         this.csrfToken = null;
         this.pendingCredentials = null;
         this._pendingTenants = [];
+        this._sessionConfirmed = false;
         this.errorMessage = null;
         this.userEmail = null;
 
@@ -374,38 +394,8 @@ export class AuthorizeComponent implements OnInit, OnDestroy {
     }
 
     // -----------------------------------------------------------------------
-    // Template accessors — expose private state to the template in a
-    // controlled, read-only manner
-    // -----------------------------------------------------------------------
-
-    /** The parsed OAuth `client_id`, or empty string before parse completes. */
-    get clientId(): string {
-        return this.oauthParams?.client_id ?? '';
-    }
-
-    /** The parsed OAuth `scope`, or null when absent. */
-    get scope(): string | null {
-        return this.oauthParams?.scope ?? null;
-    }
-
-    // -----------------------------------------------------------------------
     // Error handling
     // -----------------------------------------------------------------------
-
-    /**
-     * Centralised error renderer. Sets `viewKind = 'error'` and records the
-     * message and recoverability flag. All error paths in the component funnel
-     * through this method so no view-specific partial recovery occurs
-     * (Req 13.6, task 8.7).
-     *
-     * @param message     Human-readable error string from the design's error table.
-     * @param recoverable When true, the error view shows a "Start Over" button.
-     */
-    private showError(message: string, recoverable: boolean): void {
-        this.viewKind = 'error';
-        this.errorMessage = message;
-        this.errorRecoverable = recoverable;
-    }
 
     /**
      * Handler for `ErrorViewComponent.startOver`. Redirects to
@@ -420,10 +410,6 @@ export class AuthorizeComponent implements OnInit, OnDestroy {
         }
         window.location.href = this.redirectBuilder.toAuthorizeEndpoint(this.oauthParams);
     }
-
-    // -----------------------------------------------------------------------
-    // Login and tenant-selection handlers (task 8.3)
-    // -----------------------------------------------------------------------
 
     /**
      * Handler for `LoginViewComponent.loginSubmit`.
@@ -488,7 +474,7 @@ export class AuthorizeComponent implements OnInit, OnDestroy {
                 this._pendingTenants = [];
 
                 // After login the session is fresh — skip session-confirm.
-                window.location.href = this.redirectBuilder.toAuthorizeEndpoint(this.oauthParams!, { session_confirmed: true });
+                window.location.href = this.redirectBuilder.toAuthorizeEndpoint(this.oauthParams!, {session_confirmed: true});
             } else if ('requires_tenant_selection' in response && response.requires_tenant_selection === true) {
                 // The user belongs to multiple tenants for this client.
                 // Store credentials and tenant list in Component_State ONLY —
@@ -531,6 +517,10 @@ export class AuthorizeComponent implements OnInit, OnDestroy {
             }
         }
     }
+
+    // -----------------------------------------------------------------------
+    // Login and tenant-selection handlers (task 8.3)
+    // -----------------------------------------------------------------------
 
     /**
      * Handler for `TenantSelectionViewComponent.tenantSelect`.
@@ -593,7 +583,7 @@ export class AuthorizeComponent implements OnInit, OnDestroy {
                 this._pendingTenants = [];
 
                 // After login the session is fresh — skip session-confirm.
-                window.location.href = this.redirectBuilder.toAuthorizeEndpoint(this.oauthParams!, { session_confirmed: true });
+                window.location.href = this.redirectBuilder.toAuthorizeEndpoint(this.oauthParams!, {session_confirmed: true});
             } else {
                 // Unexpected response shape — treat as an error.
                 this.inflight.tenantPick = false;
@@ -624,10 +614,6 @@ export class AuthorizeComponent implements OnInit, OnDestroy {
         }
     }
 
-    // -----------------------------------------------------------------------
-    // Session-confirm handlers (task 8.5)
-    // -----------------------------------------------------------------------
-
     /**
      * Handler for `SessionConfirmViewComponent.continueSession`.
      *
@@ -656,9 +642,13 @@ export class AuthorizeComponent implements OnInit, OnDestroy {
         // redirect URL at the moment of navigation.
         window.location.href = this.redirectBuilder.toAuthorizeEndpoint(
             this.oauthParams,
-            { session_confirmed: true },
+            {session_confirmed: true},
         );
     }
+
+    // -----------------------------------------------------------------------
+    // Session-confirm handlers (task 8.5)
+    // -----------------------------------------------------------------------
 
     /**
      * Handler for `SessionConfirmViewComponent.logout`.
@@ -706,7 +696,7 @@ export class AuthorizeComponent implements OnInit, OnDestroy {
             // redirect URL at the moment of navigation.
             window.location.href = this.redirectBuilder.toAuthorizeEndpoint(
                 this.oauthParams,
-                { from_logout: true },
+                {from_logout: true},
             );
         } catch (err) {
             this.inflight.logout = false;
@@ -741,10 +731,6 @@ export class AuthorizeComponent implements OnInit, OnDestroy {
         }
     }
 
-    // -----------------------------------------------------------------------
-    // Consent handlers (task 8.4)
-    // -----------------------------------------------------------------------
-
     /**
      * Handler for `ConsentViewComponent.grant`.
      *
@@ -769,6 +755,10 @@ export class AuthorizeComponent implements OnInit, OnDestroy {
         this.submitConsent('grant');
     }
 
+    // -----------------------------------------------------------------------
+    // Consent handlers (task 8.4)
+    // -----------------------------------------------------------------------
+
     /**
      * Handler for `ConsentViewComponent.deny`.
      *
@@ -780,6 +770,21 @@ export class AuthorizeComponent implements OnInit, OnDestroy {
      */
     onConsentDeny(): void {
         this.submitConsent('deny');
+    }
+
+    /**
+     * Centralised error renderer. Sets `viewKind = 'error'` and records the
+     * message and recoverability flag. All error paths in the component funnel
+     * through this method so no view-specific partial recovery occurs
+     * (Req 13.6, task 8.7).
+     *
+     * @param message     Human-readable error string from the design's error table.
+     * @param recoverable When true, the error view shows a "Start Over" button.
+     */
+    private showError(message: string, recoverable: boolean): void {
+        this.viewKind = 'error';
+        this.errorMessage = message;
+        this.errorRecoverable = recoverable;
     }
 
     /**
@@ -850,9 +855,13 @@ export class AuthorizeComponent implements OnInit, OnDestroy {
                     // endpoint with the preserved OAuth params. The backend
                     // decides whether to issue the code or the access_denied
                     // error redirect to External_Client.
+                    // Forward session_confirmed only if the backend indicated
+                    // the session was freshly created (fresh login flow).
                     const extras = decision === 'deny'
-                        ? { consent_denied: true as const }
-                        : undefined;
+                        ? {consent_denied: true as const}
+                        : this._sessionConfirmed
+                            ? {session_confirmed: true as const}
+                            : undefined;
                     window.location.href = this.redirectBuilder.toAuthorizeEndpoint(oauthParams, extras);
                 },
                 error: (err: unknown) => {

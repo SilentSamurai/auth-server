@@ -2,7 +2,8 @@
 
 ## Overview
 
-The User Management API provides endpoints for users to manage their own account. All endpoints operate on the currently authenticated user — identified by the `sub` claim in the Bearer access token.
+The User Management API provides endpoints for users to manage their own account. All endpoints operate on the currently
+authenticated user — identified by the `sub` claim in the Bearer access token.
 
 All endpoints require a valid Bearer access token obtained via the OAuth 2.0 authorization flow.
 
@@ -43,20 +44,21 @@ Returns the profile of the currently authenticated user.
 }
 ```
 
-| Field       | Type   | Description                          |
-|-------------|--------|--------------------------------------|
-| `id`        | string | UUID of the user                     |
-| `email`     | string | User's email address                 |
-| `name`      | string | User's display name                  |
+| Field       | Type   | Description                            |
+|-------------|--------|----------------------------------------|
+| `id`        | string | UUID of the user                       |
+| `email`     | string | User's email address                   |
+| `name`      | string | User's display name                    |
 | `createdAt` | string | ISO 8601 timestamp of account creation |
 
-> **Note:** The `password`, `verified`, `locked`, `emailCount`, and `emailCountResetAt` fields are excluded from all responses.
+> **Note:** The `password`, `verified`, `locked`, `emailCount`, and `emailCountResetAt` fields are excluded from all
+> responses.
 
 **Error Responses**
 
-| Status | Description                          |
-|--------|--------------------------------------|
-| `401`  | Missing or invalid access token      |
+| Status | Description                     |
+|--------|---------------------------------|
+| `401`  | Missing or invalid access token |
 
 ---
 
@@ -68,7 +70,8 @@ PATCH /api/users/me/email
 
 `protected`  `application/json`
 
-Initiates an email address change. Rather than changing the email immediately, the server sends a confirmation link to the **new** email address. The change takes effect only after the user clicks the confirmation link.
+Initiates an email address change. Rather than changing the email immediately, the server sends a confirmation link to
+the **new** email address. The change takes effect only after the user clicks the confirmation link.
 
 **Request Body**
 
@@ -78,8 +81,8 @@ Initiates an email address change. Rather than changing the email immediately, t
 }
 ```
 
-| Parameter | Required | Description                                    |
-|-----------|----------|------------------------------------------------|
+| Parameter | Required | Description                                        |
+|-----------|----------|----------------------------------------------------|
 | `email`   | Yes      | The new email address (valid email, max 128 chars) |
 
 **Response**
@@ -90,8 +93,8 @@ Initiates an email address change. Rather than changing the email immediately, t
 }
 ```
 
-| Field    | Type    | Description                                      |
-|----------|---------|--------------------------------------------------|
+| Field    | Type    | Description                                            |
+|----------|---------|--------------------------------------------------------|
 | `status` | boolean | `true` if the confirmation email was sent successfully |
 
 **Email Confirmation Flow**
@@ -103,11 +106,11 @@ Initiates an email address change. Rather than changing the email immediately, t
 
 **Error Responses**
 
-| Status | Description                                      |
-|--------|--------------------------------------------------|
-| `400`  | Invalid request body (missing or invalid email)  |
-| `401`  | Missing or invalid access token                  |
-| `500`  | Failed to send confirmation email                |
+| Status | Description                                     |
+|--------|-------------------------------------------------|
+| `400`  | Invalid request body (missing or invalid email) |
+| `401`  | Missing or invalid access token                 |
+| `500`  | Failed to send confirmation email               |
 
 ---
 
@@ -119,7 +122,8 @@ PATCH /api/users/me/password
 
 `protected`  `application/json`
 
-Changes the authenticated user's password. Requires the current password for verification before the new password is applied.
+Changes the authenticated user's password. Requires the current password for verification before the new password is
+applied.
 
 **Request Body**
 
@@ -130,10 +134,10 @@ Changes the authenticated user's password. Requires the current password for ver
 }
 ```
 
-| Parameter         | Required | Description                                                  |
-|-------------------|----------|--------------------------------------------------------------|
-| `currentPassword` | Yes      | The user's current password (max 128 chars)                  |
-| `newPassword`     | Yes      | The desired new password (max 128 chars)                     |
+| Parameter         | Required | Description                                 |
+|-------------------|----------|---------------------------------------------|
+| `currentPassword` | Yes      | The user's current password (max 128 chars) |
+| `newPassword`     | Yes      | The desired new password (max 128 chars)    |
 
 > **Note:** Passwords must meet the server's password complexity requirements.
 
@@ -145,16 +149,16 @@ Changes the authenticated user's password. Requires the current password for ver
 }
 ```
 
-| Field    | Type    | Description                              |
-|----------|---------|------------------------------------------|
+| Field    | Type    | Description                                     |
+|----------|---------|-------------------------------------------------|
 | `status` | boolean | `true` if the password was changed successfully |
 
 **Error Responses**
 
-| Status | Description                                                  |
-|--------|--------------------------------------------------------------|
-| `400`  | Invalid request body or current password is incorrect        |
-| `401`  | Missing or invalid access token                              |
+| Status | Description                                           |
+|--------|-------------------------------------------------------|
+| `400`  | Invalid request body or current password is incorrect |
+| `401`  | Missing or invalid access token                       |
 
 ---
 
@@ -176,9 +180,9 @@ Updates the authenticated user's display name.
 }
 ```
 
-| Parameter | Required | Description                                  |
-|-----------|----------|----------------------------------------------|
-| `name`    | Yes      | The new display name (max 128 chars)         |
+| Parameter | Required | Description                          |
+|-----------|----------|--------------------------------------|
+| `name`    | Yes      | The new display name (max 128 chars) |
 
 **Response**
 
@@ -195,10 +199,10 @@ Returns the updated user object:
 
 **Error Responses**
 
-| Status | Description                                      |
-|--------|--------------------------------------------------|
-| `400`  | Invalid request body (name exceeds 128 chars)    |
-| `401`  | Missing or invalid access token                  |
+| Status | Description                                   |
+|--------|-----------------------------------------------|
+| `400`  | Invalid request body (name exceeds 128 chars) |
+| `401`  | Missing or invalid access token               |
 
 ---
 
@@ -210,7 +214,8 @@ GET /api/users/me/tenants
 
 `protected`  `application/json`
 
-Returns the list of tenants the authenticated user belongs to. Only tenants where the user has viewer-level access or higher are included.
+Returns the list of tenants the authenticated user belongs to. Only tenants where the user has viewer-level access or
+higher are included.
 
 **Response**
 
@@ -245,13 +250,13 @@ Returns the list of tenants the authenticated user belongs to. Only tenants wher
 ]
 ```
 
-| Field         | Type    | Description                                              |
-|---------------|---------|----------------------------------------------------------|
-| `id`          | string  | UUID of the tenant                                       |
-| `name`        | string  | Display name of the tenant                               |
-| `domain`      | string  | Unique domain identifier for the tenant                  |
-| `allowSignUp` | boolean | Whether the tenant allows self-registration              |
-| `createdAt`   | string  | ISO 8601 timestamp of tenant creation                    |
+| Field         | Type    | Description                                                 |
+|---------------|---------|-------------------------------------------------------------|
+| `id`          | string  | UUID of the tenant                                          |
+| `name`        | string  | Display name of the tenant                                  |
+| `domain`      | string  | Unique domain identifier for the tenant                     |
+| `allowSignUp` | boolean | Whether the tenant allows self-registration                 |
+| `createdAt`   | string  | ISO 8601 timestamp of tenant creation                       |
 | `roles`       | array   | Roles defined in the tenant (not the user's assigned roles) |
 
 **Error Responses**

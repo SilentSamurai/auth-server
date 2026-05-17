@@ -212,26 +212,26 @@ Access tokens are RS256-signed JWTs. The payload contains the following claims:
 
 ### Standard Claims
 
-| Claim | Description                                              | Example                                |
-|-------|----------------------------------------------------------|----------------------------------------|
-| `iss` | Issuer — always the Auth Server domain                   | `auth.server.com`                      |
+| Claim | Description                                                                     | Example                                |
+|-------|---------------------------------------------------------------------------------|----------------------------------------|
+| `iss` | Issuer — always the Auth Server domain                                          | `auth.server.com`                      |
 | `sub` | Subject — user ID (UUID) for user tokens; `oauth` for client_credentials tokens | `550e8400-e29b-41d4-a716-446655440000` |
-| `aud` | Audience — JSON array of intended recipients             | `["my-api", "auth.server.com"]`        |
-| `exp` | Expiration time (Unix timestamp)                         | `1700000000`                           |
-| `nbf` | Not valid before (Unix timestamp)                        | `1699999000`                           |
-| `iat` | Issued at (Unix timestamp)                               | `1699999000`                           |
-| `jti` | JWT ID — unique token identifier                         | `550e8400-e29b-41d4-a716-446655440001` |
+| `aud` | Audience — JSON array of intended recipients                                    | `["my-api", "auth.server.com"]`        |
+| `exp` | Expiration time (Unix timestamp)                                                | `1700000000`                           |
+| `nbf` | Not valid before (Unix timestamp)                                               | `1699999000`                           |
+| `iat` | Issued at (Unix timestamp)                                                      | `1699999000`                           |
+| `jti` | JWT ID — unique token identifier                                                | `550e8400-e29b-41d4-a716-446655440001` |
 
 ### Auth Server Claims
 
-| Claim        | Description                                              | Example                                |
-|--------------|----------------------------------------------------------|----------------------------------------|
-| `tenant_id`  | Issuing tenant's UUID                                    | `550e8400-e29b-41d4-a716-446655440002` |
-| `tenant`     | Issuing tenant object: `{id, name, domain}`              | `{"id":"...","name":"Acme","domain":"acme.local"}` |
-| `scope`      | Space-delimited OIDC scopes (never contains role names)  | `openid profile email`                 |
-| `roles`      | Array of role names (user tokens only; absent on client_credentials tokens) | `["TENANT_ADMIN"]` |
-| `client_id`  | OAuth client that requested the token                    | `my-client.local`                      |
-| `grant_type` | OAuth grant used to obtain the token                     | `authorization_code`, `password`, `client_credentials`, `refresh_token` |
+| Claim        | Description                                                                 | Example                                                                 |
+|--------------|-----------------------------------------------------------------------------|-------------------------------------------------------------------------|
+| `tenant_id`  | Issuing tenant's UUID                                                       | `550e8400-e29b-41d4-a716-446655440002`                                  |
+| `tenant`     | Issuing tenant object: `{id, name, domain}`                                 | `{"id":"...","name":"Acme","domain":"acme.local"}`                      |
+| `scope`      | Space-delimited OIDC scopes (never contains role names)                     | `openid profile email`                                                  |
+| `roles`      | Array of role names (user tokens only; absent on client_credentials tokens) | `["TENANT_ADMIN"]`                                                      |
+| `client_id`  | OAuth client that requested the token                                       | `my-client.local`                                                       |
+| `grant_type` | OAuth grant used to obtain the token                                        | `authorization_code`, `password`, `client_credentials`, `refresh_token` |
 
 ### App-Owned Roles
 
@@ -259,12 +259,12 @@ token also includes a `userTenant` claim identifying the user's home tenant:
 
 ### Token Type Differences
 
-| Claim        | User Token (`TenantToken`)         | Machine Token (`TechnicalToken`)   |
-|--------------|------------------------------------|------------------------------------|
-| `sub`        | User UUID                          | `oauth`                            |
-| `roles`      | Present (array of role names)      | Absent                             |
-| `grant_type` | `authorization_code`, `password`, or `refresh_token` | `client_credentials` |
-| `scope`      | OIDC scopes granted to the user    | OIDC scopes granted to the client  |
+| Claim        | User Token (`TenantToken`)                           | Machine Token (`TechnicalToken`)  |
+|--------------|------------------------------------------------------|-----------------------------------|
+| `sub`        | User UUID                                            | `oauth`                           |
+| `roles`      | Present (array of role names)                        | Absent                            |
+| `grant_type` | `authorization_code`, `password`, or `refresh_token` | `client_credentials`              |
+| `scope`      | OIDC scopes granted to the user                      | OIDC scopes granted to the client |
 
 ---
 

@@ -19,15 +19,15 @@ import * as argon2 from "argon2";
 import {Tenant} from "../entity/tenant.entity";
 import {ValidationPipe} from "../validation/validation.pipe";
 import {SecurityService} from "../casl/security.service";
+import {GRANT_TYPES} from "../casl/grant-types";
 import {
     ChangeEmailToken,
     EmailVerificationToken,
-    GRANT_TYPES,
     ResetPasswordToken,
     TechnicalToken,
     TenantToken,
     Token,
-} from "../casl/contexts";
+} from "../casl/token-types";
 import {AuthUserService} from "../casl/authUser.service";
 import * as yup from "yup";
 import {TechnicalTokenService} from "../core/technical-token.service";

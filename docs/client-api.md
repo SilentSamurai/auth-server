@@ -1,6 +1,7 @@
 # Client API
 
-OAuth clients (applications) are registered per tenant. Each client has a unique `clientId` and, for confidential clients, a `clientSecret`. The secret is only revealed at creation time or when rotated.
+OAuth clients (applications) are registered per tenant. Each client has a unique `clientId` and, for confidential
+clients, a `clientSecret`. The secret is only revealed at creation time or when rotated.
 
 All endpoints require a valid JWT bearer token (`Authorization: Bearer <token>`).
 
@@ -31,7 +32,8 @@ A client object returned by the API has the following shape:
 }
 ```
 
-> **Note:** The `clientSecrets` array (containing hashed secrets) is included in the response but contains only hashed values — the plain-text secret is never returned except at creation or rotation time.
+> **Note:** The `clientSecrets` array (containing hashed secrets) is included in the response but contains only hashed
+> values — the plain-text secret is never returned except at creation or rotation time.
 
 ---
 
@@ -49,20 +51,20 @@ Creates a new OAuth client for a tenant. The caller must have permission to crea
 
 **Request Body**
 
-| Parameter                 | Required | Default                  | Description                                                                 |
-|---------------------------|----------|--------------------------|-----------------------------------------------------------------------------|
-| `tenantId`                | Yes      | —                        | UUID of the tenant to create the client in                                  |
-| `name`                    | Yes      | —                        | Display name for the client (max 128 characters)                            |
-| `redirectUris`            | No       | `[]`                     | Array of valid redirect URIs (must be valid URLs)                           |
-| `allowedScopes`           | No       | `""` (empty)             | Space-delimited scope string (e.g., `"openid profile email"`)               |
-| `grantTypes`              | No       | `"authorization_code"`   | Space-delimited grant types (e.g., `"authorization_code client_credentials"`) |
-| `responseTypes`           | No       | `"code"`                 | Space-delimited response types (e.g., `"code"`)                             |
-| `tokenEndpointAuthMethod` | No       | `"client_secret_basic"`  | Token endpoint auth method (e.g., `"client_secret_post"`, `"none"`)         |
-| `isPublic`                | No       | `false`                  | If `true`, no client secret is generated (for SPAs and native apps)         |
-| `requirePkce`             | No       | `false`                  | If `true`, PKCE is required for authorization code flows                    |
-| `allowPasswordGrant`      | No       | `false`                  | If `true`, the resource owner password grant is enabled                     |
-| `allowRefreshToken`       | No       | `true`                   | If `false`, refresh tokens will not be issued                               |
-| `allowedResources`        | No       | `null`                   | Array of absolute URIs for resource indicators (RFC 8707)                   |
+| Parameter                 | Required | Default                 | Description                                                                   |
+|---------------------------|----------|-------------------------|-------------------------------------------------------------------------------|
+| `tenantId`                | Yes      | —                       | UUID of the tenant to create the client in                                    |
+| `name`                    | Yes      | —                       | Display name for the client (max 128 characters)                              |
+| `redirectUris`            | No       | `[]`                    | Array of valid redirect URIs (must be valid URLs)                             |
+| `allowedScopes`           | No       | `""` (empty)            | Space-delimited scope string (e.g., `"openid profile email"`)                 |
+| `grantTypes`              | No       | `"authorization_code"`  | Space-delimited grant types (e.g., `"authorization_code client_credentials"`) |
+| `responseTypes`           | No       | `"code"`                | Space-delimited response types (e.g., `"code"`)                               |
+| `tokenEndpointAuthMethod` | No       | `"client_secret_basic"` | Token endpoint auth method (e.g., `"client_secret_post"`, `"none"`)           |
+| `isPublic`                | No       | `false`                 | If `true`, no client secret is generated (for SPAs and native apps)           |
+| `requirePkce`             | No       | `false`                 | If `true`, PKCE is required for authorization code flows                      |
+| `allowPasswordGrant`      | No       | `false`                 | If `true`, the resource owner password grant is enabled                       |
+| `allowRefreshToken`       | No       | `true`                  | If `false`, refresh tokens will not be issued                                 |
+| `allowedResources`        | No       | `null`                  | Array of absolute URIs for resource indicators (RFC 8707)                     |
 
 **Response** `201 Created`
 
@@ -90,7 +92,8 @@ Creates a new OAuth client for a tenant. The caller must have permission to crea
 }
 ```
 
-> **Note:** The `clientSecret` is only revealed upon creation. Store it securely — it cannot be retrieved again. For public clients (`isPublic: true`), `clientSecret` will be `null`.
+> **Note:** The `clientSecret` is only revealed upon creation. Store it securely — it cannot be retrieved again. For
+> public clients (`isPublic: true`), `clientSecret` will be `null`.
 
 ---
 
@@ -139,13 +142,14 @@ GET /api/clients/{clientId}
 
 `protected`  `application/json`
 
-Returns details for a specific client by its `clientId` (UUID). The client can also be looked up by its `alias` if one is set.
+Returns details for a specific client by its `clientId` (UUID). The client can also be looked up by its `alias` if one
+is set.
 
 **Path Parameters**
 
-| Parameter  | Description                                    |
-|------------|------------------------------------------------|
-| `clientId` | The client's UUID (`clientId` field) or alias  |
+| Parameter  | Description                                   |
+|------------|-----------------------------------------------|
+| `clientId` | The client's UUID (`clientId` field) or alias |
 
 **Response** `200 OK`
 
@@ -182,13 +186,14 @@ POST /api/clients/{clientId}/rotate-secret
 
 `protected`  `application/json`
 
-Generates a new client secret. The existing secret remains valid for a 24-hour overlap window to allow zero-downtime rotation, after which only the new secret is accepted.
+Generates a new client secret. The existing secret remains valid for a 24-hour overlap window to allow zero-downtime
+rotation, after which only the new secret is accepted.
 
 **Path Parameters**
 
-| Parameter  | Description              |
-|------------|--------------------------|
-| `clientId` | The client's UUID        |
+| Parameter  | Description       |
+|------------|-------------------|
+| `clientId` | The client's UUID |
 
 **Response** `201 Created`
 
@@ -216,7 +221,8 @@ Generates a new client secret. The existing secret remains valid for a 24-hour o
 }
 ```
 
-> **Note:** The new `clientSecret` is only revealed during this rotation operation. The previous secret remains valid for 24 hours to allow a graceful transition.
+> **Note:** The new `clientSecret` is only revealed during this rotation operation. The previous secret remains valid
+> for 24 hours to allow a graceful transition.
 
 ---
 
@@ -228,7 +234,9 @@ PATCH /api/clients/{clientId}
 
 `protected`  `application/json`
 
-Updates mutable properties of a client. The caller must have permission to update clients in the client's tenant. Only the fields listed below can be updated — other fields (such as `grantTypes`, `allowedScopes`, or `tokenEndpointAuthMethod`) are immutable after creation.
+Updates mutable properties of a client. The caller must have permission to update clients in the client's tenant. Only
+the fields listed below can be updated — other fields (such as `grantTypes`, `allowedScopes`, or
+`tokenEndpointAuthMethod`) are immutable after creation.
 
 **Path Parameters**
 
@@ -238,13 +246,13 @@ Updates mutable properties of a client. The caller must have permission to updat
 
 **Request Body** (all fields optional)
 
-| Parameter          | Type       | Description                                              |
-|--------------------|------------|----------------------------------------------------------|
-| `name`             | `string`   | New display name (max 128 characters)                    |
-| `redirectUris`     | `string[]` | Replacement list of redirect URIs (must be valid URLs)   |
-| `requirePkce`      | `boolean`  | Enable or disable PKCE requirement                       |
-| `allowPasswordGrant` | `boolean` | Enable or disable the resource owner password grant     |
-| `allowRefreshToken` | `boolean` | Enable or disable refresh token issuance                |
+| Parameter            | Type       | Description                                            |
+|----------------------|------------|--------------------------------------------------------|
+| `name`               | `string`   | New display name (max 128 characters)                  |
+| `redirectUris`       | `string[]` | Replacement list of redirect URIs (must be valid URLs) |
+| `requirePkce`        | `boolean`  | Enable or disable PKCE requirement                     |
+| `allowPasswordGrant` | `boolean`  | Enable or disable the resource owner password grant    |
+| `allowRefreshToken`  | `boolean`  | Enable or disable refresh token issuance               |
 
 **Response** `200 OK`
 
@@ -260,7 +268,8 @@ DELETE /api/clients/{clientId}
 
 `protected`
 
-Permanently deletes a client. The caller must have permission to delete clients in the client's tenant. This action is irreversible.
+Permanently deletes a client. The caller must have permission to delete clients in the client's tenant. This action is
+irreversible.
 
 **Path Parameters**
 

@@ -21,7 +21,8 @@ interface TestWebhookResponse {
 @Component({
     selector: 'app-test-webhook-admin',
     template: `
-        <app-standard-dialog title="Test Onboarding Webhook" subtitle="Verify your onboard/offboard endpoints are reachable">
+        <app-standard-dialog title="Test Onboarding Webhook"
+                             subtitle="Verify your onboard/offboard endpoints are reachable">
             <app-dialog-tab name="Test Results">
                 <div *ngIf="!result && !loading && !error" class="text-center py-4">
                     <p class="text-muted mb-3">
@@ -60,7 +61,8 @@ interface TestWebhookResponse {
                     </div>
 
                     <!-- No URL configured -->
-                    <div *ngIf="result.onboardingEnabled && !result.onboard && !result.offboard" class="alert alert-warning">
+                    <div *ngIf="result.onboardingEnabled && !result.onboard && !result.offboard"
+                         class="alert alert-warning">
                         <i class="fa fa-info-circle me-2"></i>
                         No App URL or Onboarding Callback URL is configured.
                     </div>
@@ -68,10 +70,12 @@ interface TestWebhookResponse {
                     <!-- Results -->
                     <ng-container *ngIf="result.onboardingEnabled && (result.onboard || result.offboard)">
                         <div class="mb-3">
-                            <ng-container *ngTemplateOutlet="resultCard; context: { label: 'Onboard', r: result.onboard }"></ng-container>
+                            <ng-container
+                                *ngTemplateOutlet="resultCard; context: { label: 'Onboard', r: result.onboard }"></ng-container>
                         </div>
                         <div>
-                            <ng-container *ngTemplateOutlet="resultCard; context: { label: 'Offboard', r: result.offboard }"></ng-container>
+                            <ng-container
+                                *ngTemplateOutlet="resultCard; context: { label: 'Offboard', r: result.offboard }"></ng-container>
                         </div>
                     </ng-container>
 
@@ -112,11 +116,13 @@ interface TestWebhookResponse {
                         <small><i class="fa fa-exclamation-circle me-1"></i>Server returned HTTP {{ r.status }}</small>
                     </div>
                     <div *ngIf="r.ok" class="text-success mt-1">
-                        <small><i class="fa fa-check-circle me-1"></i>Endpoint reachable and responded successfully</small>
+                        <small><i class="fa fa-check-circle me-1"></i>Endpoint reachable and responded
+                            successfully</small>
                     </div>
                     <div *ngIf="r.body" class="mt-2">
                         <small class="text-muted">Response body:</small>
-                        <pre class="mt-1 p-2 rounded bg-body-secondary" style="font-size: 0.7rem; max-height: 80px; overflow-y: auto;">{{ r.body | json }}</pre>
+                        <pre class="mt-1 p-2 rounded bg-body-secondary"
+                             style="font-size: 0.7rem; max-height: 80px; overflow-y: auto;">{{ r.body | json }}</pre>
                     </div>
                 </div>
             </div>

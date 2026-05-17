@@ -25,17 +25,20 @@ import {AppService} from '../../../_services/app.service';
                     <hr>
                     <h6>Onboarding Settings</h6>
                     <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="onboardingEnabled" 
+                        <input type="checkbox" class="form-check-input" id="onboardingEnabled"
                                [(ngModel)]="app.onboardingEnabled" name="onboardingEnabled">
-                        <label class="form-check-label" for="onboardingEnabled">Enable tenant onboarding callbacks</label>
-                        <small class="form-text text-muted d-block">When enabled, the auth server will call your app's onboard/offboard endpoints when tenants subscribe or unsubscribe.</small>
+                        <label class="form-check-label" for="onboardingEnabled">Enable tenant onboarding
+                            callbacks</label>
+                        <small class="form-text text-muted d-block">When enabled, the auth server will call your app's
+                            onboard/offboard endpoints when tenants subscribe or unsubscribe.</small>
                     </div>
                     <div class="mb-3" *ngIf="app.onboardingEnabled">
                         <label for="onboardingCallbackUrl" class="form-label">Onboarding Callback URL (optional)</label>
-                        <input type="text" class="form-control" id="onboardingCallbackUrl" 
+                        <input type="text" class="form-control" id="onboardingCallbackUrl"
                                [(ngModel)]="app.onboardingCallbackUrl" name="onboardingCallbackUrl"
                                placeholder="Leave empty to use App URL">
-                        <small class="form-text text-muted">Base URL for onboarding callbacks. If empty, App URL will be used.</small>
+                        <small class="form-text text-muted">Base URL for onboarding callbacks. If empty, App URL will be
+                            used.</small>
                     </div>
                 </form>
                 <div *ngIf="createdApp" class="app-created-info">
@@ -43,12 +46,16 @@ import {AppService} from '../../../_services/app.service';
                     <div class="mb-2">
                         <strong>Client ID:</strong>
                         <code>{{ createdApp.clientId }}</code>
-                        <button class="btn btn-sm btn-outline-secondary ms-2" (click)="copyToClipboard(createdApp.clientId)">Copy</button>
+                        <button class="btn btn-sm btn-outline-secondary ms-2"
+                                (click)="copyToClipboard(createdApp.clientId)">Copy
+                        </button>
                     </div>
                     <div class="mb-2">
                         <strong>Alias:</strong>
                         <code>{{ createdApp.alias }}</code>
-                        <button class="btn btn-sm btn-outline-secondary ms-2" (click)="copyToClipboard(createdApp.alias)">Copy</button>
+                        <button class="btn btn-sm btn-outline-secondary ms-2"
+                                (click)="copyToClipboard(createdApp.alias)">Copy
+                        </button>
                     </div>
                 </div>
             </app-dialog-tab>
@@ -56,7 +63,9 @@ import {AppService} from '../../../_services/app.service';
             <app-dialog-footer>
                 <button type="button" class="btn btn-primary" (click)="onSubmit()" *ngIf="!createdApp">Create</button>
                 <button type="button" class="btn btn-primary" (click)="close()" *ngIf="createdApp">Done</button>
-                <button type="button" class="btn btn-secondary" (click)="activeModal.close()">{{ createdApp ? 'Cancel' : 'Cancel' }}</button>
+                <button type="button" class="btn btn-secondary"
+                        (click)="activeModal.close()">{{ createdApp ? 'Cancel' : 'Cancel' }}
+                </button>
             </app-dialog-footer>
         </app-standard-dialog>
     `

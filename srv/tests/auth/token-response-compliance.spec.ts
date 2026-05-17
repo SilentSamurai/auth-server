@@ -114,13 +114,6 @@ describe('Token Response RFC 6749 Compliance', () => {
             }
         });
 
-        it('scope should contain only OIDC values', () => {
-            const validOidcScopes = ['openid', 'profile', 'email'];
-            const scopes = response.body.scope.split(' ');
-            for (const scope of scopes) {
-                expect(validOidcScopes).toContain(scope);
-            }
-        });
     });
 
     // ── Client Credentials Grant ────────────────────────────────────

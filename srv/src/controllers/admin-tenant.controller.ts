@@ -36,7 +36,7 @@ import {Repository} from "typeorm";
 import {SIGNING_KEY_PROVIDER, SigningKeyProvider} from "../core/token-abstraction";
 import {TenantKey} from "../entity/tenant-key.entity";
 import {Environment} from "../config/environment.service";
-import * as yup from "yup";
+import {MemberOperationSchema, UpdateTenantSchema} from "../dto/tenant.dto";
 
 /**
  * Admin routes that explicitly accept :tenantId because super admins
@@ -47,14 +47,6 @@ import * as yup from "yup";
 @UseInterceptors(ClassSerializerInterceptor)
 @UseGuards(JwtAuthGuard, SuperAdminGuard)
 export class AdminTenantController {
-    static UpdateTenantSchema = yup.object().shape({
-        name: yup.string().max(128),
-        allowSignUp: yup.boolean(),
-    });
-
-    static MemberOperationSchema = yup.object().shape({
-        emails: yup.array().of(yup.string().max(128)),
-    });
 
     constructor(
         private readonly tenantService: TenantService,
@@ -107,7 +99,7 @@ export class AdminTenantController {
     async updateTenant(
         @CurrentPermission() permission: Permission,
         @Param("tenantId", ParseUUIDPipe) tenantId: string,
-        @Body(new ValidationPipe(AdminTenantController.UpdateTenantSchema))
+        @Body(new ValidationPipe(UpdateTenantSchema))
         body: { name?: string; allowSignUp?: boolean },
     ): Promise<Tenant> {
         return this.tenantService.updateTenant(permission, tenantId, body);
@@ -222,7 +214,7 @@ export class AdminTenantController {
     async addMembers(
         @CurrentPermission() permission: Permission,
         @Param("tenantId", ParseUUIDPipe) tenantId: string,
-        @Body(new ValidationPipe(AdminTenantController.MemberOperationSchema))
+        @Body(new ValidationPipe(MemberOperationSchema))
         body: { emails: string[] },
     ): Promise<Tenant> {
         let tenant = await this.tenantService.findById(permission, tenantId);
@@ -243,7 +235,7 @@ export class AdminTenantController {
         @CurrentPermission() permission: Permission,
         @CurrentUser() currentUser: User,
         @Param("tenantId", ParseUUIDPipe) tenantId: string,
-        @Body(new ValidationPipe(AdminTenantController.MemberOperationSchema))
+        @Body(new ValidationPipe(MemberOperationSchema))
         body: { emails: string[] },
     ): Promise<Tenant> {
         await this.tenantService.findById(permission, tenantId);

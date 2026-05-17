@@ -1,4 +1,3 @@
-import * as crypto from 'crypto';
 import {SharedTestFixture} from '../shared-test.fixture';
 import {TokenFixture} from '../token.fixture';
 import {ClientEntityClient} from '../api-client/client-entity-client';
@@ -70,18 +69,18 @@ describe('Session Auth Flow', () => {
         await app.close();
     });
 
-     // ── Helpers ──────────────────────────────────────────────────────
+    // ── Helpers ──────────────────────────────────────────────────────
 
-     async function loginForCookie(clientId: string): Promise<string> {
-         return tokenFixture.fetchSidCookieFlow(ADMIN_EMAIL, ADMIN_PASSWORD, {
-             clientId,
-             redirectUri: REDIRECT_URI,
-             scope: 'openid profile email',
-             state: 'test-state',
-             codeChallenge: CODE_CHALLENGE,
-             codeChallengeMethod: 'plain',
-         });
-     }
+    async function loginForCookie(clientId: string): Promise<string> {
+        return tokenFixture.fetchSidCookieFlow(ADMIN_EMAIL, ADMIN_PASSWORD, {
+            clientId,
+            redirectUri: REDIRECT_URI,
+            scope: 'openid profile email',
+            state: 'test-state',
+            codeChallenge: CODE_CHALLENGE,
+            codeChallengeMethod: 'plain',
+        });
+    }
 
     function extractSidValue(signedCookie: string): string {
         const cookieValue = signedCookie.split(';')[0].split('=').slice(1).join('=');
@@ -387,7 +386,10 @@ describe('Session Auth Flow', () => {
 
         it('prompt=consent + valid session + third-party → consent UI', async () => {
             const sidCookie = await loginForCookie(thirdPartyClientId);
-            const result = await authorize(sidCookie, thirdPartyClientId, {prompt: 'consent', session_confirmed: 'true'});
+            const result = await authorize(sidCookie, thirdPartyClientId, {
+                prompt: 'consent',
+                session_confirmed: 'true'
+            });
 
             expect(result.status).toEqual(302);
             expect(isConsentRedirect(result.location)).toBe(true);
@@ -428,7 +430,8 @@ describe('Session Auth Flow', () => {
                 expect(result.status).toEqual(302);
                 expect(isConsentRedirect(result.location)).toBe(true);
             } finally {
-                await clientApi.deleteClient(freshClientId).catch(() => {});
+                await clientApi.deleteClient(freshClientId).catch(() => {
+                });
             }
         });
     });

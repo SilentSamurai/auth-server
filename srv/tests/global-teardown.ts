@@ -1,6 +1,6 @@
 import {INestApplication} from '@nestjs/common';
-import {FakeSmtpServer} from '../src/mail/FakeSmtpServer';
-import {TenantAppServer} from './apps_&_subscription/tenant-app-server';
+import {FakeSmtpServer} from './smtp/FakeSmtpServer';
+import {TenantAppServer} from './apps-and-subscription/tenant-app-server';
 
 declare global {
     var __SHARED_TEST_APP__: INestApplication | undefined;

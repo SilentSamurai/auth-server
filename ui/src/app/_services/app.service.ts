@@ -87,8 +87,24 @@ export class AppService {
             this.http.post(`${API_URL}/apps/${appId}/test-webhook`, {}, this.getHttpOptions())
         ) as Promise<{
             onboardingEnabled: boolean;
-            onboard: { url: string; status: number | null; latencyMs: number; ok: boolean; error?: string; bodyValid: boolean; body?: any } | null;
-            offboard: { url: string; status: number | null; latencyMs: number; ok: boolean; error?: string; bodyValid: boolean; body?: any } | null;
+            onboard: {
+                url: string;
+                status: number | null;
+                latencyMs: number;
+                ok: boolean;
+                error?: string;
+                bodyValid: boolean;
+                body?: any
+            } | null;
+            offboard: {
+                url: string;
+                status: number | null;
+                latencyMs: number;
+                ok: boolean;
+                error?: string;
+                bodyValid: boolean;
+                body?: any
+            } | null;
         }>;
     }
 }

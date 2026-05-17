@@ -79,7 +79,7 @@ import {AdminTenantService} from '../../../_services/admin-tenant.service';
                     id="UPDATE_TENANT_SAVE_BTN"
                     class="btn btn-primary"
                     type="submit"
-                    (click)="updateTenantForm.onSubmit(krishna)"
+                    (click)="updateTenantForm.onSubmit($event)"
                 >
                     Update
                 </button>
@@ -99,7 +99,6 @@ export class UpdateTenantComponent implements OnInit {
         domain: '',
         allowSignUp: false,
     };
-    krishna: any;
 
     constructor(
         private adminTenantService: AdminTenantService,

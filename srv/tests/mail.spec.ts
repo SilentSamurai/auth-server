@@ -1,5 +1,5 @@
 // test-send.js
-import {createFakeSmtpServer, EmailSearchCriteria, FakeSmtpServer} from "../src/mail/FakeSmtpServer";
+import {createFakeSmtpServer, EmailSearchCriteria, FakeSmtpServer} from "./smtp/FakeSmtpServer";
 import {setupConsole} from "./helper.fixture";
 
 const nodemailer = require('nodemailer');

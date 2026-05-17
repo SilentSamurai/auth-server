@@ -40,7 +40,7 @@ import {AdminTenantService} from '../../../_services/admin-tenant.service';
                     class="btn btn-primary"
                     type="submit"
                     id="ADD_TENANT_MEMBER_BTN"
-                    (click)="addMemberForm.onSubmit(submitRef)"
+                    (click)="addMemberForm.onSubmit($event)"
                 >
                     Add Member
                 </button>
@@ -56,7 +56,6 @@ export class AddMemberAdminComponent implements OnInit {
     form = {
         email: '',
     };
-    submitRef: any;
 
     constructor(
         private adminTenantService: AdminTenantService,

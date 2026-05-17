@@ -1,5 +1,5 @@
 import {CanActivate, ExecutionContext, Injectable} from "@nestjs/common";
-import {TechnicalToken, TenantToken, Token} from "../casl/contexts";
+import {TechnicalToken, TenantToken, Token} from "../casl/token-types";
 
 /**
  * Derives the tenant from the JWT token and sets RESOLVED_TENANT_ID on the request.

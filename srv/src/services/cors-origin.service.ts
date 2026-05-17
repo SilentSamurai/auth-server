@@ -32,7 +32,7 @@ export class CorsOriginService {
      */
     async isOriginAllowedForClient(origin: string, clientId: string): Promise<boolean> {
         const client = await this.clientRepository.findOne({
-            where: { clientId },
+            where: {clientId},
             select: ["redirectUris"],
         });
         if (!client || !client.redirectUris) {

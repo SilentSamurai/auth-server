@@ -53,22 +53,7 @@ export class CryptUtil {
             const hash = createHash("sha256").update(verifier).digest();
             return base64UrlEncode(hash).replace(/=+$/, "");
         }
-        if (method === "OWH32") {
-            return this.oneWayHash(verifier);
-        }
         return verifier;
-    }
-
-    public static oneWayHash(plain: string) {
-        const FNV_PRIME = 16777619;
-        const OFFSET_BASIS = 2166136261;
-        let hash = OFFSET_BASIS;
-        for (let i = 0; i < plain.length; i++) {
-            hash ^= plain.charCodeAt(i);
-            hash = (hash * FNV_PRIME) >>> 0; // Force to 32-bit integer
-        }
-        const finalHash = hash >>> 0;
-        return `${finalHash}`; // Convert to unsigned 32-bit integer
     }
 
     public static generateRandomString(length: number): string {

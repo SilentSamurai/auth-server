@@ -17,15 +17,14 @@
  *
  * Requirements: 1, 2, 3, 7
  */
-import { SharedTestFixture } from '../shared-test.fixture';
-import { v4 as uuid } from 'uuid';
-import { AppClient } from '../api-client/app-client';
-import { TokenFixture } from '../token.fixture';
-import { TenantClient } from '../api-client/tenant-client';
-import { AdminTenantClient } from '../api-client/admin-tenant-client';
-import { HelperFixture } from '../helper.fixture';
-import { RoleClient } from '../api-client/role-client';
-import { expect2xx } from '../api-client/client';
+import {SharedTestFixture} from '../shared-test.fixture';
+import {AppClient} from '../api-client/app-client';
+import {TokenFixture} from '../token.fixture';
+import {TenantClient} from '../api-client/tenant-client';
+import {AdminTenantClient} from '../api-client/admin-tenant-client';
+import {HelperFixture} from '../helper.fixture';
+import {RoleClient} from '../api-client/role-client';
+import {expect2xx} from '../api-client/client';
 
 describe('App-Owned Roles', () => {
     let fixture: SharedTestFixture;
@@ -130,7 +129,7 @@ describe('App-Owned Roles', () => {
             // Associate the role with the app
             const patchResp = await fixture.getHttpServer()
                 .patch(`/api/role/${role.id}`)
-                .send({ appId })
+                .send({appId})
                 .set('Authorization', `Bearer ${ownerAdminToken}`)
                 .set('Accept', 'application/json');
             expect2xx(patchResp);
@@ -251,7 +250,7 @@ describe('App-Owned Roles', () => {
             );
 
             const jwt = tokenResp.jwt;
-            const appOwnedRolesInToken = jwt.roles.filter((r: string) => 
+            const appOwnedRolesInToken = jwt.roles.filter((r: string) =>
                 appRoleNames.some(name => r === `${appName}:${name}`)
             );
             expect(appOwnedRolesInToken.length).toBe(appRoleNames.length);
@@ -321,7 +320,7 @@ describe('App-Owned Roles', () => {
                 const role = await roleClient.createRole(`${secondAppName}-${roleName}`, ownerTenantId);
                 const patchResp = await fixture.getHttpServer()
                     .patch(`/api/role/${role.id}`)
-                    .send({ appId: secondApp.id })
+                    .send({appId: secondApp.id})
                     .set('Authorization', `Bearer ${ownerAdminToken}`)
                     .set('Accept', 'application/json');
                 expect2xx(patchResp);
@@ -467,7 +466,7 @@ describe('App-Owned Roles', () => {
             // Use the subscriber's technical token to query the user's permissions
             const permResp = await fixture.getHttpServer()
                 .post('/api/v1/tenant-user/permissions')
-                .send({ email: subscriberUserEmail })
+                .send({email: subscriberUserEmail})
                 .set('Authorization', `Bearer ${subscriberTechnicalToken}`)
                 .set('Accept', 'application/json');
             expect2xx(permResp);
@@ -504,7 +503,7 @@ describe('App-Owned Roles', () => {
             const degradeRole = await roleClient.createRole(degradeRoleName, ownerTenantId);
             const patchResp = await fixture.getHttpServer()
                 .patch(`/api/role/${degradeRole.id}`)
-                .send({ appId: degradeApp.id })
+                .send({appId: degradeApp.id})
                 .set('Authorization', `Bearer ${ownerAdminToken}`)
                 .set('Accept', 'application/json');
             expect2xx(patchResp);
@@ -540,7 +539,7 @@ describe('App-Owned Roles', () => {
                 .set('Accept', 'application/json');
             expect2xx(onboardResp);
             await helper.enablePasswordGrant(onboardResp.body.tenantId, degradeSubDomain);
-            
+
             // Set a known password for the onboarded user
             await helper.setUserPassword(onboardResp.body.userId, degradeUserPassword);
 
@@ -559,7 +558,7 @@ describe('App-Owned Roles', () => {
             // Note: We can't delete the role because it's still assigned to users
             const removeAppResp = await fixture.getHttpServer()
                 .patch(`/api/role/${degradeRole.id}`)
-                .send({ appId: null })
+                .send({appId: null})
                 .set('Authorization', `Bearer ${ownerAdminToken}`)
                 .set('Accept', 'application/json');
             expect2xx(removeAppResp);
@@ -621,7 +620,7 @@ describe('App-Owned Roles', () => {
                 const role = await roleClient.createRole(roleName, ownerTenantId);
                 const patchResp = await fixture.getHttpServer()
                     .patch(`/api/role/${role.id}`)
-                    .send({ appId: unsubAppId })
+                    .send({appId: unsubAppId})
                     .set('Authorization', `Bearer ${ownerAdminToken}`)
                     .set('Accept', 'application/json');
                 expect2xx(patchResp);
@@ -669,7 +668,7 @@ describe('App-Owned Roles', () => {
                 unsubSubscriberDomain,
             );
             const rolesBefore = tokenBefore.jwt.roles;
-            const appRolesBefore = rolesBefore.filter((r: string) => 
+            const appRolesBefore = rolesBefore.filter((r: string) =>
                 unsubRoleNames.some(name => r === `${unsubAppName}:${name}`)
             );
             expect(appRolesBefore.length).toBe(unsubRoleNames.length);
@@ -685,7 +684,7 @@ describe('App-Owned Roles', () => {
                 unsubSubscriberDomain,
             );
             const rolesAfter = tokenAfter.jwt.roles;
-            const appRolesAfter = rolesAfter.filter((r: string) => 
+            const appRolesAfter = rolesAfter.filter((r: string) =>
                 unsubRoleNames.some(name => r === `${unsubAppName}:${name}`)
             );
             expect(appRolesAfter.length).toBe(0);

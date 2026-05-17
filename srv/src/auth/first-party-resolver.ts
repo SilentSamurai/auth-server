@@ -25,7 +25,8 @@ import {Environment} from '../config/environment.service';
 export class FirstPartyResolver {
     constructor(
         @InjectRepository(Tenant) private readonly tenants: Repository<Tenant>,
-    ) {}
+    ) {
+    }
 
     /**
      * Check if this is a first-party flow where consent can be skipped.

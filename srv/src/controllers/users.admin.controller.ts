@@ -11,8 +11,6 @@ import {
     UseGuards,
     UseInterceptors,
 } from "@nestjs/common";
-import * as yup from 'yup';
-
 import {User} from "../entity/user.entity";
 import {UsersService} from "../services/users.service";
 import {AuthService} from "../auth/auth.service";
@@ -20,25 +18,11 @@ import {MailService} from "../mail/mail.service";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
 import {SuperAdminGuard} from "../auth/super-admin.guard";
 import {ValidationPipe} from "../validation/validation.pipe";
-import {PASSWORD_MESSAGE, PASSWORD_REGEXP, ValidationSchema} from "../validation/validation.schema";
+import {ValidationSchema} from "../validation/validation.schema";
 import {TenantService} from "../services/tenant.service";
 import {Tenant} from "../entity/tenant.entity";
 import {CurrentPermission, Permission} from "../auth/auth.decorator";
-
-// Local VerifyUserSchema for this controller
-const VerifyUserSchema = yup.object().shape({
-    email: yup.string().required("Name is required").max(128),
-    verify: yup.boolean().required("boolean value is required"),
-});
-
-const UpdateUserPasswordSchema = yup.object().shape({
-    password: yup
-        .string()
-        .required("Password is required")
-        .matches(PASSWORD_REGEXP, PASSWORD_MESSAGE)
-        .max(128),
-    confirmPassword: yup.string().required("Confirm Password is required"),
-});
+import {UpdateUserPasswordSchema, VerifyUserSchema} from "../dto/user.dto";
 
 @Controller("api/users")
 @UseInterceptors(ClassSerializerInterceptor)

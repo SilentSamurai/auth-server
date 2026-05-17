@@ -62,7 +62,7 @@ import {MessageService} from 'primeng/api';
                 <button
                     class="btn btn-primary"
                     type="submit"
-                    (click)="editUserForm.onSubmit(krishna)"
+                    (click)="editUserForm.onSubmit($event)"
                 >
                     Update
                 </button>
@@ -75,7 +75,6 @@ export class EditUserModalComponent implements OnInit {
     @Input() user: any;
     @Output() passEntry: EventEmitter<any> = new EventEmitter();
     form: any;
-    krishna: any;
 
     constructor(
         private userService: UserService,
