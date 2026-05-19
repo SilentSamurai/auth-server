@@ -14,6 +14,7 @@ export interface DiscoveryDocument {
     jwks_uri: string;
     introspection_endpoint: string;
     revocation_endpoint: string;
+    end_session_endpoint: string;
     scopes_supported: string[];
     response_types_supported: string[];
     grant_types_supported: string[];
@@ -57,6 +58,7 @@ export class DiscoveryService {
             jwks_uri: `${effectiveBase}/${tenantDomain}/.well-known/jwks.json`,
             introspection_endpoint: `${effectiveBase}/api/oauth/introspect`,
             revocation_endpoint: `${effectiveBase}/api/oauth/revoke`,
+            end_session_endpoint: `${effectiveBase}/api/oauth/logout`,
             scopes_supported: DiscoveryService.SCOPES_SUPPORTED,
             response_types_supported: DiscoveryService.RESPONSE_TYPES_SUPPORTED,
             grant_types_supported: DiscoveryService.GRANT_TYPES_SUPPORTED,

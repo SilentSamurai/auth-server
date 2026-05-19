@@ -11,6 +11,7 @@ import {Permission} from '../auth/auth.decorator';
 import {App} from '../entity/app.entity';
 import {Tenant} from '../entity/tenant.entity';
 import {AmbiguousClientIdException} from '../exceptions/ambiguous-client-id.exception';
+import {OAuthException} from '../exceptions/oauth-exception';
 
 export interface CreateAppClientInput {
     tenant: Tenant;
@@ -215,6 +216,19 @@ export class ClientService {
             where: {tenant: {id: tenantId}},
             relations: ['tenant'],
         });
+    }
+
+    /**
+     * Validates that a post_logout_redirect_uri matches one of the client's registered redirect URIs.
+     * Per OIDC RP-Initiated Logout 1.0 §2.6, the OP MUST verify the URI against the client's registration.
+     */
+    validatePostLogoutRedirectUri(client: Client, uri: string): void {
+        const registeredUris = client.redirectUris || [];
+        if (registeredUris.length === 0 || !registeredUris.includes(uri)) {
+            throw OAuthException.invalidRequest(
+                'The post_logout_redirect_uri does not match any registered redirect URI',
+            );
+        }
     }
 
     validateClientSecret(client: Client, secret: string): boolean {
