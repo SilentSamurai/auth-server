@@ -166,5 +166,45 @@ export class AdminTenantClient extends HttpClient {
         expect2xx(response);
         return response.body;
     }
+
+    // ─── App-owned role admin endpoints ───
+
+    public async addMemberAppRoles(tenantId: string, userId: string, roleIds: string[]) {
+        const response = await this.app.getHttpServer()
+            .post(`/api/admin/tenant/${tenantId}/member/${userId}/app-roles/add`)
+            .send({roleIds})
+            .set('Authorization', `Bearer ${this.accessToken}`)
+            .set('Accept', 'application/json');
+        expect2xx(response);
+        return response.body;
+    }
+
+    public async removeMemberAppRoles(tenantId: string, userId: string, roleIds: string[]) {
+        const response = await this.app.getHttpServer()
+            .delete(`/api/admin/tenant/${tenantId}/member/${userId}/app-roles/remove`)
+            .send({roleIds})
+            .set('Authorization', `Bearer ${this.accessToken}`)
+            .set('Accept', 'application/json');
+        expect2xx(response);
+        return response.body;
+    }
+
+    public async getMemberAppRoles(tenantId: string, userId: string) {
+        const response = await this.app.getHttpServer()
+            .get(`/api/admin/tenant/${tenantId}/member/${userId}/app-roles`)
+            .set('Authorization', `Bearer ${this.accessToken}`)
+            .set('Accept', 'application/json');
+        expect2xx(response);
+        return response.body;
+    }
+
+    public async getTenantAvailableAppRoles(tenantId: string) {
+        const response = await this.app.getHttpServer()
+            .get(`/api/admin/tenant/${tenantId}/app-roles/available`)
+            .set('Authorization', `Bearer ${this.accessToken}`)
+            .set('Accept', 'application/json');
+        expect2xx(response);
+        return response.body;
+    }
 }
 

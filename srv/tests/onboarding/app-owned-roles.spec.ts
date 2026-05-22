@@ -702,4 +702,186 @@ describe('App-Owned Roles', () => {
             }
         });
     });
+
+    // ─── Granular App-Owned Role Assignment APIs ───
+
+    describe('granular app-owned role assignment APIs', () => {
+        let roleClient: RoleClient;
+        let subscriberToken: string;
+
+        beforeAll(async () => {
+            const tokenResp = await tokenFixture.fetchAccessTokenFlow(
+                subscriberUserEmail,
+                subscriberUserPassword,
+                subscriberDomain,
+            );
+            subscriberToken = tokenResp.accessToken;
+            roleClient = new RoleClient(fixture, subscriberToken);
+        });
+
+        it('should list assigned app-owned roles via GET /my/member/:userId/app-roles', async () => {
+            // Initially the user should have app-owned roles from onboarding
+            const appRoles = await roleClient.getAppOwnedRolesForMember(subscriberUserId);
+            expect(Array.isArray(appRoles)).toBe(true);
+            for (const roleName of appRoleNames) {
+                const found = appRoles.find((r: any) => r.name === roleName);
+                expect(found).toBeDefined();
+                expect(found.appId).toBe(appId);
+                expect(found.appName).toBe(appName);
+            }
+        });
+
+        it('should discover available app-owned roles via GET /my/app-roles/available', async () => {
+            const available = await roleClient.getAvailableAppOwnedRoles();
+            expect(Array.isArray(available)).toBe(true);
+            for (const roleName of appRoleNames) {
+                const found = available.find((r: any) => r.name === roleName);
+                expect(found).toBeDefined();
+                expect(found.appId).toBe(appId);
+            }
+        });
+
+        it('should add an app-owned role to a user', async () => {
+            // Create a new app-owned role via the owner tenant
+            const extraRoleName = `extra-role-${Date.now()}`;
+            const ownerRoleClient = new RoleClient(fixture, ownerAdminToken);
+            const newRole = await ownerRoleClient.createRole(extraRoleName, ownerTenantId);
+            await fixture.getHttpServer()
+                .patch(`/api/role/${newRole.id}`)
+                .send({appId})
+                .set('Authorization', `Bearer ${ownerAdminToken}`)
+                .set('Accept', 'application/json')
+                .expect(200);
+
+            // Add the role to the subscriber user
+            await roleClient.addAppOwnedRoles(subscriberUserId, [newRole.id]);
+
+            // Verify it appears in token claims
+            const tokenResp = await tokenFixture.fetchAccessTokenFlow(
+                subscriberUserEmail,
+                subscriberUserPassword,
+                subscriberDomain,
+            );
+            const jwt = tokenResp.jwt;
+            expect(jwt.roles).toContain(`${appName}:${extraRoleName}`);
+        });
+
+        it('should remove an app-owned role from a user', async () => {
+            // Remove one of the app-owned roles
+            const roleIdToRemove = appRoleIds[appRoleNames[0]];
+            await roleClient.removeAppOwnedRoles(subscriberUserId, [roleIdToRemove]);
+
+            // Verify it no longer appears in token
+            const tokenResp = await tokenFixture.fetchAccessTokenFlow(
+                subscriberUserEmail,
+                subscriberUserPassword,
+                subscriberDomain,
+            );
+            const jwt = tokenResp.jwt;
+            expect(jwt.roles).not.toContain(`${appName}:${appRoleNames[0]}`);
+
+            // Other app-owned roles should still be present
+            expect(jwt.roles).toContain(`${appName}:${appRoleNames[1]}`);
+        });
+
+        it('should reject adding role from unsubscribed app (subscription verification)', async () => {
+            // Create a second app with roles but do NOT subscribe to it
+            const appClient2 = new AppClient(fixture, ownerAdminToken);
+            const unsubAppName = `unsub-app-no-sub-${Date.now()}`;
+            const unsubApp = await appClient2.createApp(
+                ownerTenantId, unsubAppName, `http://localhost:${fixture.webhook.boundPort}`, 'No sub app',
+            );
+            const unsubRoleName = `unsub-role-${Date.now()}`;
+            const ownerRoleClient = new RoleClient(fixture, ownerAdminToken);
+            const unsubRole = await ownerRoleClient.createRole(unsubRoleName, ownerTenantId);
+            await fixture.getHttpServer()
+                .patch(`/api/role/${unsubRole.id}`)
+                .send({appId: unsubApp.id})
+                .set('Authorization', `Bearer ${ownerAdminToken}`)
+                .set('Accept', 'application/json')
+                .expect(200);
+
+            // Attempt to add — should NOT throw, but should silently skip since no subscription
+            // (the current implementation skips roles without active subscriptions)
+            await roleClient.addAppOwnedRoles(subscriberUserId, [unsubRole.id]);
+
+            // Verify the role was NOT added
+            const appRoles = await roleClient.getAppOwnedRolesForMember(subscriberUserId);
+            const found = appRoles.find((r: any) => r.id === unsubRole.id);
+            expect(found).toBeUndefined();
+        });
+
+        it('should reject adding role to non-existent user', async () => {
+            const response = await fixture.getHttpServer()
+                .post(`/api/tenant/my/member/00000000-0000-0000-0000-000000000000/app-roles/add`)
+                .send({roleIds: [appRoleIds[appRoleNames[0]]]})
+                .set('Authorization', `Bearer ${subscriberToken}`)
+                .set('Accept', 'application/json');
+            expect(response.status).toBe(404);
+        });
+    });
+
+    // ─── Super Admin Variant ───
+
+    describe('super admin app-owned role endpoints', () => {
+        it('should list member app roles via admin endpoint', async () => {
+            const memberRoles = await adminClient.getMemberAppRoles(subscriberTenantId, subscriberUserId);
+            expect(Array.isArray(memberRoles)).toBe(true);
+            // appRoleNames[0] was removed by the "should remove an app-owned role" test
+            const found = memberRoles.find((r: any) => r.name === appRoleNames[1]);
+            expect(found).toBeDefined();
+        });
+
+        it('should list available app roles via admin endpoint', async () => {
+            const available = await adminClient.getTenantAvailableAppRoles(subscriberTenantId);
+            expect(Array.isArray(available)).toBe(true);
+            for (const roleName of appRoleNames) {
+                const found = available.find((r: any) => r.name === roleName);
+                expect(found).toBeDefined();
+            }
+        });
+
+        it('should add app-owned role via admin endpoint', async () => {
+            const adminRoleName = `admin-extra-role-${Date.now()}`;
+            const ownerRoleClient = new RoleClient(fixture, ownerAdminToken);
+            const newRole = await ownerRoleClient.createRole(adminRoleName, ownerTenantId);
+            await fixture.getHttpServer()
+                .patch(`/api/role/${newRole.id}`)
+                .send({appId})
+                .set('Authorization', `Bearer ${ownerAdminToken}`)
+                .set('Accept', 'application/json')
+                .expect(200);
+
+            await adminClient.addMemberAppRoles(subscriberTenantId, subscriberUserId, [newRole.id]);
+
+            const tokenResp = await tokenFixture.fetchAccessTokenFlow(
+                subscriberUserEmail,
+                subscriberUserPassword,
+                subscriberDomain,
+            );
+            expect(tokenResp.jwt.roles).toContain(`${appName}:${adminRoleName}`);
+        });
+
+        it('should remove app-owned role via admin endpoint', async () => {
+            const removeRoleName = `admin-remove-role-${Date.now()}`;
+            const ownerRoleClient = new RoleClient(fixture, ownerAdminToken);
+            const newRole = await ownerRoleClient.createRole(removeRoleName, ownerTenantId);
+            await fixture.getHttpServer()
+                .patch(`/api/role/${newRole.id}`)
+                .send({appId})
+                .set('Authorization', `Bearer ${ownerAdminToken}`)
+                .set('Accept', 'application/json')
+                .expect(200);
+
+            await adminClient.addMemberAppRoles(subscriberTenantId, subscriberUserId, [newRole.id]);
+
+            let appRoles = await adminClient.getMemberAppRoles(subscriberTenantId, subscriberUserId);
+            expect(appRoles.find((r: any) => r.id === newRole.id)).toBeDefined();
+
+            await adminClient.removeMemberAppRoles(subscriberTenantId, subscriberUserId, [newRole.id]);
+
+            appRoles = await adminClient.getMemberAppRoles(subscriberTenantId, subscriberUserId);
+            expect(appRoles.find((r: any) => r.id === newRole.id)).toBeUndefined();
+        });
+    });
 });

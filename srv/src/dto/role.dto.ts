@@ -13,3 +13,7 @@ export const UpdateRoleSchema = yup.object().shape({
     description: yup.string().optional(),
     appId: yup.string().optional().nullable(),
 });
+
+export const AppRoleOperationSchema = yup.object().shape({
+    roleIds: yup.array().of(yup.string().uuid().required()).required().min(1).max(100),
+});

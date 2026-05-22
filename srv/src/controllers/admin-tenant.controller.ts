@@ -7,6 +7,7 @@ import {
     Get,
     Header,
     Inject,
+    NotFoundException,
     Param,
     ParseUUIDPipe,
     Patch,
@@ -339,5 +340,56 @@ export class AdminTenantController {
         const app = await this.appService.getAppById(appId);
         await this.subscriptionService.unsubscribe(tenant, app);
         return {status: "success"};
+    }
+
+    // ─── App-owned role endpoints ───
+
+    @Get("/:tenantId/member/:userId/app-roles")
+    async getMemberAppRoles(
+        @CurrentPermission() permission: Permission,
+        @Param("tenantId", ParseUUIDPipe) tenantId: string,
+        @Param("userId") userId: string,
+    ): Promise<any> {
+        return this.roleService.getAppOwnedRolesForMember(permission, tenantId, userId);
+    }
+
+    @Post("/:tenantId/member/:userId/app-roles/add")
+    async addMemberAppRoles(
+        @CurrentPermission() permission: Permission,
+        @Param("tenantId", ParseUUIDPipe) tenantId: string,
+        @Param("userId") userId: string,
+        @Body(new ValidationPipe(ValidationSchema.AppRoleOperationSchema))
+        body: { roleIds: string[] },
+    ): Promise<void> {
+        const adminPermission = this.securityService.createPermissionForMemberManagement(tenantId);
+        const user = await this.usersService.findById(adminPermission, userId);
+        if (!(await this.tenantService.isMember(permission, tenantId, user))) {
+            throw new NotFoundException("user is not a member of this tenant");
+        }
+        return this.roleService.addAppOwnedRoles(permission, userId, tenantId, body.roleIds);
+    }
+
+    @Delete("/:tenantId/member/:userId/app-roles/remove")
+    async removeMemberAppRoles(
+        @CurrentPermission() permission: Permission,
+        @Param("tenantId", ParseUUIDPipe) tenantId: string,
+        @Param("userId") userId: string,
+        @Body(new ValidationPipe(ValidationSchema.AppRoleOperationSchema))
+        body: { roleIds: string[] },
+    ): Promise<void> {
+        const adminPermission = this.securityService.createPermissionForMemberManagement(tenantId);
+        const user = await this.usersService.findById(adminPermission, userId);
+        if (!(await this.tenantService.isMember(permission, tenantId, user))) {
+            throw new NotFoundException("user is not a member of this tenant");
+        }
+        return this.roleService.removeAppOwnedRoles(permission, userId, tenantId, body.roleIds);
+    }
+
+    @Get("/:tenantId/app-roles/available")
+    async getTenantAvailableAppRoles(
+        @CurrentPermission() permission: Permission,
+        @Param("tenantId", ParseUUIDPipe) tenantId: string,
+    ): Promise<any> {
+        return this.roleService.getAvailableAppOwnedRoles(permission, tenantId);
     }
 }

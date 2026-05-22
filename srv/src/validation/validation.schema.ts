@@ -23,7 +23,7 @@ import {
 
 import {CreateTenantSchema, MemberOperationsSchema, OperatingRoleSchema, UpdateTenantSchema,} from "../dto/tenant.dto";
 
-import {CreateRoleSchema} from "../dto/role.dto";
+import {AppRoleOperationSchema, CreateRoleSchema} from "../dto/role.dto";
 
 import {
     AuthorizeSchema,
@@ -72,6 +72,7 @@ export const ValidationSchema = {
     DeleteUserSchema,
     CreateTenantSchema,
     UpdateTenantSchema,
+    AppRoleOperationSchema,
     CreateRoleSchema,
     OperatingRoleSchema,
     MemberOperationsSchema,

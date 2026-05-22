@@ -22,6 +22,7 @@ import {SubjectEnum} from "../entity/subjectEnum";
 import {SIGNING_KEY_PROVIDER, SigningKeyProvider} from "../core/token-abstraction";
 import {KeyManagementService} from "./key-management.service";
 import {Client} from "../entity/client.entity";
+import {UserRole} from "../entity/user.roles.entity";
 import {v4 as uuidv4} from "uuid";
 
 @Injectable()
@@ -38,6 +39,8 @@ export class TenantService implements OnModuleInit {
         private tenantMemberRepository: Repository<TenantMember>,
         @InjectRepository(User) private userRepository: Repository<User>,
         @InjectRepository(Client) private clientRepository: Repository<Client>,
+        @InjectRepository(UserRole)
+        private userRoleRepository: Repository<UserRole>,
     ) {
     }
 
@@ -294,6 +297,7 @@ export class TenantService implements OnModuleInit {
         let tenant: Tenant = await this.findById(permission, tenantId);
         let tenantMember = await this.findMembership(permission, tenant, user);
         await this.updateRolesOfMember(permission, [], tenantId, user);
+        await this.userRoleRepository.delete({tenantId: tenant.id, userId: user.id});
         await this.tenantMemberRepository.remove(tenantMember);
         return tenant;
     }

@@ -5,6 +5,7 @@ import {
     Delete,
     ForbiddenException,
     Get,
+    NotFoundException,
     Param,
     Post,
     Put,
@@ -132,6 +133,61 @@ export class MemberController {
         return this._getMemberRoles(permission, tenantId, userId);
     }
 
+    // ─── App-owned role endpoints ───
+
+    @Get("/my/member/:userId/app-roles")
+    @UseGuards(JwtAuthGuard)
+    async getMyMemberAppRoles(
+        @CurrentPermission() permission: Permission,
+        @CurrentTenantId() tenantId: string,
+        @Param("userId") userId: string,
+    ): Promise<any> {
+        return this.roleService.getAppOwnedRolesForMember(permission, tenantId, userId);
+    }
+
+    @Post("/my/member/:userId/app-roles/add")
+    @UseGuards(JwtAuthGuard)
+    async addAppRolesToMyMember(
+        @CurrentPermission() permission: Permission,
+        @CurrentTenantId() tenantId: string,
+        @Param("userId") userId: string,
+        @Body(new ValidationPipe(ValidationSchema.AppRoleOperationSchema))
+        body: { roleIds: string[] },
+    ): Promise<void> {
+        const adminPermission = this.securityService.createPermissionForMemberManagement(tenantId);
+        const user = await this.usersService.findById(adminPermission, userId);
+        if (!(await this.tenantService.isMember(permission, tenantId, user))) {
+            throw new NotFoundException("user is not a member of this tenant");
+        }
+        return this.roleService.addAppOwnedRoles(permission, userId, tenantId, body.roleIds);
+    }
+
+    @Delete("/my/member/:userId/app-roles/remove")
+    @UseGuards(JwtAuthGuard)
+    async removeAppRolesFromMyMember(
+        @CurrentPermission() permission: Permission,
+        @CurrentTenantId() tenantId: string,
+        @Param("userId") userId: string,
+        @Body(new ValidationPipe(ValidationSchema.AppRoleOperationSchema))
+        body: { roleIds: string[] },
+    ): Promise<void> {
+        const adminPermission = this.securityService.createPermissionForMemberManagement(tenantId);
+        const user = await this.usersService.findById(adminPermission, userId);
+        if (!(await this.tenantService.isMember(permission, tenantId, user))) {
+            throw new NotFoundException("user is not a member of this tenant");
+        }
+        return this.roleService.removeAppOwnedRoles(permission, userId, tenantId, body.roleIds);
+    }
+
+    @Get("/my/app-roles/available")
+    @UseGuards(JwtAuthGuard)
+    async getMyAvailableAppRoles(
+        @CurrentPermission() permission: Permission,
+        @CurrentTenantId() tenantId: string,
+    ): Promise<any> {
+        return this.roleService.getAvailableAppOwnedRoles(permission, tenantId);
+    }
+
     // ─── Shared implementation methods ───
 
     private async _getTenantMembers(permission: Permission, tenantId: string): Promise<User[]> {
@@ -198,8 +254,9 @@ export class MemberController {
             if (securityContext.email === email) {
                 throw new ForbiddenException("cannot remove self");
             }
-            return this.tenantService.removeMember(permission, tenantId, user);
+            await this.tenantService.removeMember(permission, tenantId, user);
         }
+        return this.tenantService.findById(permission, tenantId);
     }
 
     private async _getMember(permission: Permission, tenantId: string, userId: string): Promise<any> {
