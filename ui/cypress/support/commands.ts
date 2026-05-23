@@ -115,18 +115,19 @@ Cypress.Commands.add('subscribeAppFromOverview', (appName: string) => {
 });
 
 // Admin-context: add app to tenant via /admin/TN02
-Cypress.Commands.add('adminAddAppToTenant', (domain: string, appName: string, appUrl: string, description: string) => {
+Cypress.Commands.add('adminAddAppToTenant', (domain: string, appName: string, alias: string, appUrl: string, description: string) => {
     cy.adminGoToTenantObjectPage(domain);
-    cy.addAppFromOverview(appName, appUrl, description);
+    cy.addAppFromOverview(appName, alias, appUrl, description);
 });
 
-Cypress.Commands.add('addAppFromOverview', (appName: string, appUrl: string, description: string, options?: {
+Cypress.Commands.add('addAppFromOverview', (appName: string, alias: string, appUrl: string, description: string, options?: {
     onboardingEnabled?: boolean
 }) => {
     cy.contains('button', 'Apps').click();
     cy.contains('button', 'Create').click();
 
     cy.get('input[name="name"]').type(appName);
+    cy.get('input[name="alias"]').type(alias);
     cy.get('input[name="appUrl"]').type(appUrl);
     cy.get('textarea[name="description"]').type(description);
 

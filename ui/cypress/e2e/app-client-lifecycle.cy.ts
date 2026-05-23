@@ -5,6 +5,7 @@ describe('Per-App OAuth Client Identity — App_Client Lifecycle', () => {
     const TENANT_DOMAIN = Cypress.env('shireTenantAdminClientId');
     const uniqueSuffix = Date.now();
     const APP_NAME = `AppClient-E2E-${uniqueSuffix}`;
+    const APP_ALIAS = `appclient-e2e-${uniqueSuffix}`;
     const APP_URL = 'http://localhost:3000';
     const APP_DESC = 'Test app for App_Client lifecycle E2E';
     const UPDATED_NAME = `AppClient-E2E-Updated-${uniqueSuffix}`;
@@ -17,6 +18,7 @@ describe('Per-App OAuth Client Identity — App_Client Lifecycle', () => {
         cy.contains('button', 'Create').click();
 
         cy.get('input[name="name"]').type(APP_NAME);
+        cy.get('input[name="alias"]').type(APP_ALIAS);
         cy.get('input[name="appUrl"]').type(APP_URL);
         cy.get('textarea[name="description"]').type(APP_DESC);
 
@@ -109,7 +111,9 @@ describe('Per-App OAuth Client Identity — App_Client Lifecycle', () => {
         cy.get('app-create-app-admin select[id="tenantSelect"]').select('Shire Tenant (shire.local)');
 
         const adminAppName = `AppClient-Admin-${uniqueSuffix}`;
+        const adminAppAlias = `appclient-admin-${uniqueSuffix}`;
         cy.get('app-create-app-admin input[id="name"]').type(adminAppName);
+        cy.get('app-create-app-admin input[id="alias"]').type(adminAppAlias);
         cy.get('app-create-app-admin input[id="appUrl"]').type(APP_URL);
         cy.get('app-create-app-admin textarea[id="description"]').type(APP_DESC);
 

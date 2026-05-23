@@ -1,5 +1,6 @@
 import {SharedTestFixture} from '../shared-test.fixture';
 import {TokenFixture} from '../token.fixture';
+import {generateAlias} from '../api-client/client';
 import {ClientEntityClient} from '../api-client/client-entity-client';
 import {TenantClient} from '../api-client/tenant-client';
 
@@ -45,6 +46,7 @@ describe('GET /api/oauth/authorize', () => {
 
         // Client with a single redirect URI
         const singleUri = await clientApi.createClient(testTenantId, 'Single URI Client', {
+            alias: generateAlias('Single URI Client'),
             redirectUris: [REDIRECT_URI],
             allowedScopes: 'openid profile email',
             isPublic: true,
@@ -53,6 +55,7 @@ describe('GET /api/oauth/authorize', () => {
 
         // Client with multiple redirect URIs
         const multiUri = await clientApi.createClient(testTenantId, 'Multi URI Client', {
+            alias: generateAlias('Multi URI Client'),
             redirectUris: [REDIRECT_URI, REDIRECT_URI_2],
             allowedScopes: 'openid profile email',
             isPublic: true,
@@ -61,6 +64,7 @@ describe('GET /api/oauth/authorize', () => {
 
         // Client with requirePkce=true
         const pkceRequired = await clientApi.createClient(testTenantId, 'PKCE Required Client', {
+            alias: generateAlias('PKCE Required Client'),
             redirectUris: [REDIRECT_URI],
             allowedScopes: 'openid profile email',
             isPublic: true,
@@ -226,6 +230,7 @@ describe('GET /api/oauth/authorize', () => {
             // prevention via pkceMethodUsed is not active. This test verifies that a client
             // with requirePkce=false accepts both S256 and plain without error.
             const created = await clientApi.createClient(testTenantId, 'Downgrade Authorize Test', {
+                alias: generateAlias('Downgrade Authorize Test'),
                 redirectUris: [REDIRECT_URI],
                 allowedScopes: 'openid profile email',
                 isPublic: true,
@@ -291,6 +296,7 @@ describe('GET /api/oauth/authorize', () => {
         it('should default code_challenge_method to plain when omitted (Req 4.4)', async () => {
             // Use a non-requirePkce client with no S256 history
             const created = await clientApi.createClient(testTenantId, 'Default Method Client', {
+                alias: generateAlias('Default Method Client'),
                 redirectUris: [REDIRECT_URI],
                 allowedScopes: 'openid profile email',
                 isPublic: true,

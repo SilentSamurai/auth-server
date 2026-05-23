@@ -3,6 +3,7 @@ import {TokenFixture} from '../token.fixture';
 import {ClientEntityClient} from '../api-client/client-entity-client';
 import {TenantClient} from '../api-client/tenant-client';
 import {CryptUtil} from '../../src/util/crypt.util';
+import {generateAlias} from '../api-client/client';
 
 /**
  * Integration test: S256 enforcement and downgrade prevention
@@ -50,6 +51,7 @@ describe('S256 enforcement and downgrade prevention', () => {
 
     it('rejects plain method when client has require_pkce=true', async () => {
         const created = await clientApi.createClient(testTenantId, 'PKCE Required Client', {
+            alias: generateAlias('PKCE Required Client'),
             requirePkce: true,
             isPublic: true,
             allowedScopes: 'openid profile email',
@@ -97,6 +99,7 @@ describe('S256 enforcement and downgrade prevention', () => {
 
     it('accepts S256 method when client has require_pkce=true', async () => {
         const created = await clientApi.createClient(testTenantId, 'PKCE Required S256 Client', {
+            alias: generateAlias('PKCE Required S256 Client'),
             requirePkce: true,
             isPublic: true,
             allowedScopes: 'openid profile email',
@@ -124,6 +127,7 @@ describe('S256 enforcement and downgrade prevention', () => {
 
     it('accepts plain method when client has require_pkce=false', async () => {
         const created = await clientApi.createClient(testTenantId, 'PKCE Optional Client', {
+            alias: generateAlias('PKCE Optional Client'),
             requirePkce: false,
             isPublic: true,
             allowedScopes: 'openid profile email',
@@ -153,6 +157,7 @@ describe('S256 enforcement and downgrade prevention', () => {
         // Downgrade prevention via pkceMethodUsed is not active in the current implementation.
         // This test verifies that a requirePkce=false client accepts S256 without error.
         const created = await clientApi.createClient(testTenantId, 'Downgrade Test Client', {
+            alias: generateAlias('Downgrade Test Client'),
             requirePkce: false,
             isPublic: true,
             allowedScopes: 'openid profile email',
@@ -179,6 +184,7 @@ describe('S256 enforcement and downgrade prevention', () => {
 
     it('accepts S256 for fresh client with no history', async () => {
         const created = await clientApi.createClient(testTenantId, 'Fresh S256 Client', {
+            alias: generateAlias('Fresh S256 Client'),
             requirePkce: false,
             isPublic: true,
             allowedScopes: 'openid profile email',
@@ -204,6 +210,7 @@ describe('S256 enforcement and downgrade prevention', () => {
 
     it('accepts plain for fresh client with no history', async () => {
         const created = await clientApi.createClient(testTenantId, 'Fresh Plain Client', {
+            alias: generateAlias('Fresh Plain Client'),
             requirePkce: false,
             isPublic: true,
             allowedScopes: 'openid profile email',

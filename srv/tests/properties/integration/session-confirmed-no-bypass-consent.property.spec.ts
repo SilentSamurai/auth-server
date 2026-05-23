@@ -4,6 +4,7 @@ import {ClientEntityClient} from '../../api-client/client-entity-client';
 import {TenantClient} from '../../api-client/tenant-client';
 import {SharedTestFixture} from '../../shared-test.fixture';
 import {TokenFixture} from '../../token.fixture';
+import {generateAlias} from '../../api-client/client';
 
 const CODE_CHALLENGE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopq';
 const CODE_VERIFIER = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopq';
@@ -52,6 +53,7 @@ describe('Feature: session-confirmed-no-bypass-consent, Property 2b: session_con
         await fc.assert(
             fc.asyncProperty(scopeArb, async (scope) => {
                 const thirdParty = await clientApi.createClient(tenant.id, 'No Consent App', {
+                    alias: generateAlias('No Consent App'),
                     redirectUris: [REDIRECT_URI],
                     allowedScopes: scope,
                     isPublic: true,

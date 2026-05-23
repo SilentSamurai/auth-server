@@ -3,6 +3,7 @@ import {ClientEntityClient} from '../../api-client/client-entity-client';
 import {TenantClient} from '../../api-client/tenant-client';
 import {SharedTestFixture} from '../../shared-test.fixture';
 import {TokenFixture} from '../../token.fixture';
+import {generateAlias} from '../../api-client/client';
 
 /**
  * Feature: resource-indicator-support — Property-Based Tests for Auth Code Resource Precedence
@@ -107,6 +108,7 @@ describe('Feature: resource-indicator-support, Property 4: Auth code resource ta
 
                 // Create a client with both resources in allowedResources
                 const client = await clientApi.createClient(testTenantId, 'Precedence Test Client', {
+                    alias: generateAlias('Precedence Test Client'),
                     redirectUris: [REDIRECT_URI],
                     allowedScopes: 'openid profile email',
                     isPublic: true,
@@ -166,6 +168,7 @@ describe('Feature: resource-indicator-support, Property 4: Auth code resource ta
         const tokenRequestResource = 'https://ignored-resource.example.com/api';
 
         const client = await clientApi.createClient(testTenantId, 'Ignored Resource Client', {
+            alias: generateAlias('Ignored Resource Client'),
             redirectUris: [REDIRECT_URI],
             allowedScopes: 'openid profile email',
             isPublic: true,
@@ -216,6 +219,7 @@ describe('Feature: resource-indicator-support, Property 4: Auth code resource ta
 
         // Create a client with allowedResources
         const client = await clientApi.createClient(testTenantId, 'No Stored Resource Client', {
+            alias: generateAlias('No Stored Resource Client'),
             redirectUris: [REDIRECT_URI],
             allowedScopes: 'openid profile email',
             isPublic: true,

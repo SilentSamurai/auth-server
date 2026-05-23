@@ -24,7 +24,7 @@ import {TenantClient} from '../api-client/tenant-client';
 import {AdminTenantClient} from '../api-client/admin-tenant-client';
 import {HelperFixture} from '../helper.fixture';
 import {RoleClient} from '../api-client/role-client';
-import {expect2xx} from '../api-client/client';
+import {expect2xx, generateAlias} from '../api-client/client';
 
 describe('App-Owned Roles', () => {
     let fixture: SharedTestFixture;
@@ -54,6 +54,7 @@ describe('App-Owned Roles', () => {
     // App details
     let appId: string;
     let appName: string;
+    let appAlias: string;
 
     // App-owned role IDs and names
     const appRoleNames = ['app-editor', 'app-viewer'];
@@ -117,9 +118,10 @@ describe('App-Owned Roles', () => {
         const appClient = new AppClient(fixture, ownerAdminToken);
         appName = `app-roles-test-${Date.now()}`;
         const app = await appClient.createApp(
-            ownerTenantId, appName, `http://localhost:${fixture.webhook.boundPort}`, 'App for role tests',
+            ownerTenantId, appName, `http://localhost:${fixture.webhook.boundPort}`, generateAlias(appName), 'App for role tests',
         );
         appId = app.id;
+        appAlias = app.alias;
 
         // 7. Create app-owned roles and associate them with the app
         const roleClient = new RoleClient(fixture, ownerAdminToken);
@@ -222,7 +224,7 @@ describe('App-Owned Roles', () => {
 
             // The user should have the app-owned roles (namespaced as {appName}:{roleName})
             for (const appRoleName of appRoleNames) {
-                const namespacedRole = `${appName}:${appRoleName}`;
+                const namespacedRole = `${appAlias}:${appRoleName}`;
                 expect(jwt.roles).toContain(namespacedRole);
             }
         });
@@ -251,7 +253,7 @@ describe('App-Owned Roles', () => {
 
             const jwt = tokenResp.jwt;
             const appOwnedRolesInToken = jwt.roles.filter((r: string) =>
-                appRoleNames.some(name => r === `${appName}:${name}`)
+                appRoleNames.some(name => r === `${appAlias}:${name}`)
             );
             expect(appOwnedRolesInToken.length).toBe(appRoleNames.length);
         });
@@ -260,7 +262,7 @@ describe('App-Owned Roles', () => {
     // ─── Token Namespacing ───
 
     describe('token role namespacing', () => {
-        it('should include namespaced app-owned roles in token ({appName}:{roleName} format) (Req 7.2)', async () => {
+        it('should include namespaced app-owned roles in token ({clientAlias}:{roleName} format) (Req 7.2)', async () => {
             // Fetch an access token for the onboarded user using the subscriber domain
             const tokenResp = await tokenFixture.fetchAccessTokenFlow(
                 subscriberUserEmail,
@@ -272,9 +274,9 @@ describe('App-Owned Roles', () => {
             expect(jwt.roles).toBeDefined();
             expect(Array.isArray(jwt.roles)).toBe(true);
 
-            // Each app-owned role should be namespaced as {appName}:{roleName}
+            // Each app-owned role should be namespaced as {clientAlias}:{roleName}
             for (const roleName of appRoleNames) {
-                const namespacedRole = `${appName}:${roleName}`;
+                const namespacedRole = `${appAlias}:${roleName}`;
                 expect(jwt.roles).toContain(namespacedRole);
             }
         });
@@ -295,7 +297,7 @@ describe('App-Owned Roles', () => {
 
             // App-owned roles should be namespaced
             for (const roleName of appRoleNames) {
-                expect(jwt.roles).toContain(`${appName}:${roleName}`);
+                expect(jwt.roles).toContain(`${appAlias}:${roleName}`);
             }
 
             // Internal roles should NOT contain ':'
@@ -310,8 +312,9 @@ describe('App-Owned Roles', () => {
             const appClient2 = new AppClient(fixture, ownerAdminToken);
             const secondAppName = `app-roles-second-${Date.now()}`;
             const secondApp = await appClient2.createApp(
-                ownerTenantId, secondAppName, `http://localhost:${fixture.webhook.boundPort}`, 'Second app',
+                ownerTenantId, secondAppName, `http://localhost:${fixture.webhook.boundPort}`, generateAlias(secondAppName), 'Second app',
             );
+            const secondAppAlias = secondApp.alias;
 
             // Create roles for the second app
             const roleClient = new RoleClient(fixture, ownerAdminToken);
@@ -354,12 +357,12 @@ describe('App-Owned Roles', () => {
 
             // Roles from first app
             for (const roleName of appRoleNames) {
-                expect(jwt.roles).toContain(`${appName}:${roleName}`);
+                expect(jwt.roles).toContain(`${appAlias}:${roleName}`);
             }
 
             // Roles from second app
             for (const roleName of secondAppRoleNames) {
-                expect(jwt.roles).toContain(`${secondAppName}:${secondAppName}-${roleName}`);
+                expect(jwt.roles).toContain(`${secondAppAlias}:${secondAppName}-${roleName}`);
             }
         });
     });
@@ -494,8 +497,9 @@ describe('App-Owned Roles', () => {
             const appClient = new AppClient(fixture, ownerAdminToken);
             const degradeAppName = `degrade-app-${Date.now()}`;
             const degradeApp = await appClient.createApp(
-                ownerTenantId, degradeAppName, `http://localhost:${fixture.webhook.boundPort}`, 'Degrade test app',
+                ownerTenantId, degradeAppName, `http://localhost:${fixture.webhook.boundPort}`, generateAlias(degradeAppName), 'Degrade test app',
             );
+            const degradeAppAlias = degradeApp.alias;
 
             // Create a role and associate with the app
             const roleClient = new RoleClient(fixture, ownerAdminToken);
@@ -575,7 +579,7 @@ describe('App-Owned Roles', () => {
             expect(jwt.roles).toBeDefined();
 
             // The role should NOT appear as a namespaced app-owned role
-            const namespacedRole = `${degradeAppName}:${degradeRoleName}`;
+            const namespacedRole = `${degradeAppAlias}:${degradeRoleName}`;
             expect(jwt.roles).not.toContain(namespacedRole);
 
             // /my/permissions should not fail — graceful degradation
@@ -596,6 +600,7 @@ describe('App-Owned Roles', () => {
     describe('unsubscribe behavior', () => {
         let unsubAppId: string;
         let unsubAppName: string;
+        let unsubAppAlias: string;
         let unsubRoleNames: string[];
         let unsubSubscriberDomain: string;
         let unsubSubscriberTenantId: string;
@@ -609,9 +614,10 @@ describe('App-Owned Roles', () => {
             const appClient = new AppClient(fixture, ownerAdminToken);
             unsubAppName = `unsub-app-${Date.now()}`;
             const unsubApp = await appClient.createApp(
-                ownerTenantId, unsubAppName, `http://localhost:${fixture.webhook.boundPort}`, 'Unsub test app',
+                ownerTenantId, unsubAppName, `http://localhost:${fixture.webhook.boundPort}`, generateAlias(unsubAppName), 'Unsub test app',
             );
             unsubAppId = unsubApp.id;
+            unsubAppAlias = unsubApp.alias;
 
             // Create app-owned roles
             unsubRoleNames = ['unsub-editor', 'unsub-viewer'];
@@ -669,7 +675,7 @@ describe('App-Owned Roles', () => {
             );
             const rolesBefore = tokenBefore.jwt.roles;
             const appRolesBefore = rolesBefore.filter((r: string) =>
-                unsubRoleNames.some(name => r === `${unsubAppName}:${name}`)
+                unsubRoleNames.some(name => r === `${unsubAppAlias}:${name}`)
             );
             expect(appRolesBefore.length).toBe(unsubRoleNames.length);
 
@@ -685,7 +691,7 @@ describe('App-Owned Roles', () => {
             );
             const rolesAfter = tokenAfter.jwt.roles;
             const appRolesAfter = rolesAfter.filter((r: string) =>
-                unsubRoleNames.some(name => r === `${unsubAppName}:${name}`)
+                unsubRoleNames.some(name => r === `${unsubAppAlias}:${name}`)
             );
             expect(appRolesAfter.length).toBe(0);
 
@@ -753,8 +759,8 @@ describe('App-Owned Roles', () => {
                 .set('Accept', 'application/json')
                 .expect(200);
 
-            // Add the role to the subscriber user
-            await roleClient.addAppOwnedRoles(subscriberUserId, [newRole.id]);
+            // Add the role to the subscriber user using namespaced name
+            await roleClient.addAppOwnedRoles(subscriberUserId, [`${appAlias}:${extraRoleName}`]);
 
             // Verify it appears in token claims
             const tokenResp = await tokenFixture.fetchAccessTokenFlow(
@@ -763,13 +769,12 @@ describe('App-Owned Roles', () => {
                 subscriberDomain,
             );
             const jwt = tokenResp.jwt;
-            expect(jwt.roles).toContain(`${appName}:${extraRoleName}`);
+            expect(jwt.roles).toContain(`${appAlias}:${extraRoleName}`);
         });
 
         it('should remove an app-owned role from a user', async () => {
-            // Remove one of the app-owned roles
-            const roleIdToRemove = appRoleIds[appRoleNames[0]];
-            await roleClient.removeAppOwnedRoles(subscriberUserId, [roleIdToRemove]);
+            // Remove one of the app-owned roles using namespaced name
+            await roleClient.removeAppOwnedRoles(subscriberUserId, [`${appAlias}:${appRoleNames[0]}`]);
 
             // Verify it no longer appears in token
             const tokenResp = await tokenFixture.fetchAccessTokenFlow(
@@ -778,10 +783,10 @@ describe('App-Owned Roles', () => {
                 subscriberDomain,
             );
             const jwt = tokenResp.jwt;
-            expect(jwt.roles).not.toContain(`${appName}:${appRoleNames[0]}`);
+            expect(jwt.roles).not.toContain(`${appAlias}:${appRoleNames[0]}`);
 
             // Other app-owned roles should still be present
-            expect(jwt.roles).toContain(`${appName}:${appRoleNames[1]}`);
+            expect(jwt.roles).toContain(`${appAlias}:${appRoleNames[1]}`);
         });
 
         it('should reject adding role from unsubscribed app (subscription verification)', async () => {
@@ -789,8 +794,9 @@ describe('App-Owned Roles', () => {
             const appClient2 = new AppClient(fixture, ownerAdminToken);
             const unsubAppName = `unsub-app-no-sub-${Date.now()}`;
             const unsubApp = await appClient2.createApp(
-                ownerTenantId, unsubAppName, `http://localhost:${fixture.webhook.boundPort}`, 'No sub app',
+                ownerTenantId, unsubAppName, `http://localhost:${fixture.webhook.boundPort}`, generateAlias(unsubAppName), 'No sub app',
             );
+            const unsubAppAlias = unsubApp.alias;
             const unsubRoleName = `unsub-role-${Date.now()}`;
             const ownerRoleClient = new RoleClient(fixture, ownerAdminToken);
             const unsubRole = await ownerRoleClient.createRole(unsubRoleName, ownerTenantId);
@@ -803,18 +809,18 @@ describe('App-Owned Roles', () => {
 
             // Attempt to add — should NOT throw, but should silently skip since no subscription
             // (the current implementation skips roles without active subscriptions)
-            await roleClient.addAppOwnedRoles(subscriberUserId, [unsubRole.id]);
+            await roleClient.addAppOwnedRoles(subscriberUserId, [`${unsubAppAlias}:${unsubRoleName}`]);
 
             // Verify the role was NOT added
             const appRoles = await roleClient.getAppOwnedRolesForMember(subscriberUserId);
-            const found = appRoles.find((r: any) => r.id === unsubRole.id);
+            const found = appRoles.find((r: any) => r.name === unsubRoleName && r.appName === unsubAppName);
             expect(found).toBeUndefined();
         });
 
         it('should reject adding role to non-existent user', async () => {
             const response = await fixture.getHttpServer()
                 .post(`/api/tenant/my/member/00000000-0000-0000-0000-000000000000/app-roles/add`)
-                .send({roleIds: [appRoleIds[appRoleNames[0]]]})
+                .send({roleNames: [`${appAlias}:${appRoleNames[0]}`]})
                 .set('Authorization', `Bearer ${subscriberToken}`)
                 .set('Accept', 'application/json');
             expect(response.status).toBe(404);
@@ -852,14 +858,14 @@ describe('App-Owned Roles', () => {
                 .set('Accept', 'application/json')
                 .expect(200);
 
-            await adminClient.addMemberAppRoles(subscriberTenantId, subscriberUserId, [newRole.id]);
+            await adminClient.addMemberAppRoles(subscriberTenantId, subscriberUserId, [`${appAlias}:${adminRoleName}`]);
 
             const tokenResp = await tokenFixture.fetchAccessTokenFlow(
                 subscriberUserEmail,
                 subscriberUserPassword,
                 subscriberDomain,
             );
-            expect(tokenResp.jwt.roles).toContain(`${appName}:${adminRoleName}`);
+            expect(tokenResp.jwt.roles).toContain(`${appAlias}:${adminRoleName}`);
         });
 
         it('should remove app-owned role via admin endpoint', async () => {
@@ -873,15 +879,15 @@ describe('App-Owned Roles', () => {
                 .set('Accept', 'application/json')
                 .expect(200);
 
-            await adminClient.addMemberAppRoles(subscriberTenantId, subscriberUserId, [newRole.id]);
+            await adminClient.addMemberAppRoles(subscriberTenantId, subscriberUserId, [`${appAlias}:${removeRoleName}`]);
 
             let appRoles = await adminClient.getMemberAppRoles(subscriberTenantId, subscriberUserId);
-            expect(appRoles.find((r: any) => r.id === newRole.id)).toBeDefined();
+            expect(appRoles.find((r: any) => r.name === removeRoleName && r.appName === appName)).toBeDefined();
 
-            await adminClient.removeMemberAppRoles(subscriberTenantId, subscriberUserId, [newRole.id]);
+            await adminClient.removeMemberAppRoles(subscriberTenantId, subscriberUserId, [`${appAlias}:${removeRoleName}`]);
 
             appRoles = await adminClient.getMemberAppRoles(subscriberTenantId, subscriberUserId);
-            expect(appRoles.find((r: any) => r.id === newRole.id)).toBeUndefined();
+            expect(appRoles.find((r: any) => r.name === removeRoleName && r.appName === appName)).toBeUndefined();
         });
     });
 });

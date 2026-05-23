@@ -1,4 +1,4 @@
-param([int[]]$Ports = @(9001, 4200))
+param([int[]]$Ports = @(9001, 4200, 3000, 9765))
 foreach ($port in $Ports) {
     $pids = Get-NetTCPConnection -LocalPort $port -ErrorAction SilentlyContinue |
         Select-Object -ExpandProperty OwningProcess -Unique |

@@ -13,7 +13,7 @@ declare namespace Cypress {
 
         adminSubscribeToApp(tenantDomain: string, appName: string): Chainable<any>;
 
-        adminAddAppToTenant(domain: string, appName: string, appUrl: string, description: string): Chainable<any>;
+        adminAddAppToTenant(domain: string, appName: string, alias: string, appUrl: string, description: string): Chainable<any>;
 
         goToAdminPage(page: string): Chainable<any>;
 
@@ -35,7 +35,7 @@ declare namespace Cypress {
         userOpenClientList(): Chainable<any>;
 
         // Context-neutral commands (work on whatever page you're already on)
-        addAppFromOverview(appName: string, appUrl: string, description: string, options?: {
+        addAppFromOverview(appName: string, alias: string, appUrl: string, description: string, options?: {
             onboardingEnabled?: boolean
         }): Chainable<any>;
 

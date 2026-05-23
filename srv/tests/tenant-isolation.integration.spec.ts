@@ -2,7 +2,7 @@ import {createPublicKey} from "crypto";
 import * as jwt from "jsonwebtoken";
 import {SharedTestFixture} from "./shared-test.fixture";
 import {TokenFixture} from "./token.fixture";
-import {expect2xx} from "./api-client/client";
+import {expect2xx, generateAlias} from "./api-client/client";
 import {ClientEntityClient} from "./api-client/client-entity-client";
 
 /**
@@ -67,11 +67,13 @@ describe('Tenant isolation', () => {
         const clientEntityClient = new ClientEntityClient(app, adminAccessToken);
 
         const clientA = await clientEntityClient.createClient(resA.body.id, 'isolation-client-a', {
+            alias: generateAlias('isolation-client-a'),
             grantTypes: 'client_credentials',
             allowedScopes: 'openid profile email',
             isPublic: false,
         });
         const clientB = await clientEntityClient.createClient(resB.body.id, 'isolation-client-b', {
+            alias: generateAlias('isolation-client-b'),
             grantTypes: 'client_credentials',
             allowedScopes: 'openid profile email',
             isPublic: false,

@@ -25,6 +25,7 @@ import {TenantClient} from '../api-client/tenant-client';
 import {AdminTenantClient} from '../api-client/admin-tenant-client';
 import {HelperFixture} from '../helper.fixture';
 import {RoleClient} from '../api-client/role-client';
+import {generateAlias} from '../api-client/client';
 
 describe('Onboard Customer Endpoint', () => {
     let fixture: SharedTestFixture;
@@ -129,7 +130,7 @@ describe('Onboard Customer Endpoint', () => {
         // 7. Create an app owned by the owner tenant
         const appClient = new AppClient(fixture, ownerAdminToken);
         appName = `onboard-test-app-${Date.now()}`;
-        const app = await appClient.createApp(ownerTenantId, appName, 'http://localhost:9999', 'Test app for onboarding');
+        const app = await appClient.createApp(ownerTenantId, appName, 'http://localhost:9999', generateAlias(appName), 'Test app for onboarding');
 
         appId = app.id;
 
@@ -383,7 +384,7 @@ describe('Onboard Customer Endpoint', () => {
             const appClient = new AppClient(fixture, ownerAdminToken);
             const secondAppName = `second-app-${Date.now()}`;
             const secondApp = await appClient.createApp(
-                ownerTenantId, secondAppName, 'http://localhost:9998', 'Second test app',
+                ownerTenantId, secondAppName, 'http://localhost:9998', generateAlias(secondAppName), 'Second test app',
             );
             await appClient.publishApp(secondApp.id);
 
@@ -504,7 +505,7 @@ describe('Onboard Customer Endpoint', () => {
             const appClient = new AppClient(fixture, ownerAdminToken);
             const secondAppName = `email-app-${Date.now()}`;
             const secondApp = await appClient.createApp(
-                ownerTenantId, secondAppName, 'http://localhost:9997', 'Email test app 2',
+                ownerTenantId, secondAppName, 'http://localhost:9997', generateAlias(secondAppName), 'Email test app 2',
             );
 
             // Create app-owned roles for the second app

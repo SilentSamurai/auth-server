@@ -24,11 +24,12 @@ export class AppService {
         };
     }
 
-    async createApp(tenantId: string, name: string, appUrl: string, description: string, onboardingEnabled?: boolean, onboardingCallbackUrl?: string) {
+    async createApp(tenantId: string, name: string, alias: string, appUrl: string, description: string, onboardingEnabled?: boolean, onboardingCallbackUrl?: string) {
         return lastValueFrom(
             this.http.post(`${API_URL}/apps/create`, {
                 tenantId,
                 name,
+                alias,
                 appUrl,
                 description,
                 onboardingEnabled,

@@ -15,5 +15,10 @@ export const UpdateRoleSchema = yup.object().shape({
 });
 
 export const AppRoleOperationSchema = yup.object().shape({
-    roleIds: yup.array().of(yup.string().uuid().required()).required().min(1).max(100),
+    roleNames: yup.array().of(
+        yup.string().required().max(200).matches(
+            /:.+/,
+            'Must be in {clientAlias}:{roleName} format (e.g. my-app.my-tenant.test:editor)',
+        ),
+    ).required().min(1).max(100),
 });

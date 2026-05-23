@@ -13,6 +13,13 @@ import {AppService} from '../../../_services/app.service';
                         <input type="text" class="form-control" id="name" [(ngModel)]="app.name" name="name" required>
                     </div>
                     <div class="mb-3">
+                        <label for="alias" class="form-label">Alias</label>
+                        <input type="text" class="form-control" id="alias" [(ngModel)]="app.alias" name="alias" required
+                               placeholder="e.g. my-app">
+                        <small class="form-text text-muted">Lowercase alphanumeric with hyphens. Combined with tenant domain
+                            as the full alias.</small>
+                    </div>
+                    <div class="mb-3">
                         <label for="appUrl" class="form-label">App URL</label>
                         <input type="text" class="form-control" id="appUrl" [(ngModel)]="app.appUrl" name="appUrl"
                                required>
@@ -74,6 +81,7 @@ export class CreateAppComponent implements OnInit {
             await this.appService.createApp(
                 this.tenantId,
                 this.app.name,
+                this.app.alias,
                 this.app.appUrl,
                 this.app.description,
                 this.app.onboardingEnabled,

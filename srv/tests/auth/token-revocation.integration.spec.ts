@@ -2,6 +2,7 @@ import {SharedTestFixture} from '../shared-test.fixture';
 import {TokenFixture} from '../token.fixture';
 import {TenantClient} from '../api-client/tenant-client';
 import {ClientEntityClient} from '../api-client/client-entity-client';
+import {generateAlias} from '../api-client/client';
 
 /**
  * Integration tests for RFC 7009 Token Revocation and Logout endpoints.
@@ -68,6 +69,7 @@ describe('Token Revocation & Logout Endpoints (RFC 7009)', () => {
         // 4. Create a confidential client on the cross-tenant and obtain a Bearer token
         const clientEntityClient = new ClientEntityClient(app, adminAccessToken);
         const created = await clientEntityClient.createClient(crossTenant.id, 'cross-tenant-cc-client', {
+            alias: generateAlias('cross-tenant-cc-client'),
             isPublic: false,
             grantTypes: 'client_credentials',
             allowedScopes: 'openid profile email',

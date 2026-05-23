@@ -1,5 +1,6 @@
 import {SharedTestFixture} from '../shared-test.fixture';
 import {TokenFixture} from '../token.fixture';
+import {generateAlias} from '../api-client/client';
 import {ClientEntityClient} from '../api-client/client-entity-client';
 import {TenantClient} from '../api-client/tenant-client';
 
@@ -48,6 +49,7 @@ describe('Resource Indicator Audience Claim Construction', () => {
     describe('token without resource', () => {
         it('should have aud containing only SUPER_TENANT_DOMAIN (Req 4.3)', async () => {
             const client = await clientApi.createClient(testTenantId, 'No Resource Client', {
+                alias: generateAlias('No Resource Client'),
                 redirectUris: [REDIRECT_URI],
                 allowedScopes: 'openid profile email',
                 isPublic: true,
@@ -87,6 +89,7 @@ describe('Resource Indicator Audience Claim Construction', () => {
     describe('token with resource', () => {
         it('should have aud containing [resource, SUPER_TENANT_DOMAIN] (Req 4.1, 4.2)', async () => {
             const client = await clientApi.createClient(testTenantId, 'With Resource Client', {
+                alias: generateAlias('With Resource Client'),
                 redirectUris: [REDIRECT_URI],
                 allowedScopes: 'openid profile email',
                 isPublic: true,
@@ -129,6 +132,7 @@ describe('Resource Indicator Audience Claim Construction', () => {
         it('aud is always a JSON array (never a bare string) (Req 4.4)', async () => {
             // Test with resource
             const clientWithResource = await clientApi.createClient(testTenantId, 'Array Test Client', {
+                alias: generateAlias('Array Test Client'),
                 redirectUris: [REDIRECT_URI],
                 allowedScopes: 'openid profile email',
                 isPublic: true,
@@ -162,6 +166,7 @@ describe('Resource Indicator Audience Claim Construction', () => {
 
             // Test without resource
             const clientWithoutResource = await clientApi.createClient(testTenantId, 'Array Test Client 2', {
+                alias: generateAlias('Array Test Client 2'),
                 redirectUris: [REDIRECT_URI],
                 allowedScopes: 'openid profile email',
                 isPublic: true,
@@ -198,6 +203,7 @@ describe('Resource Indicator Audience Claim Construction', () => {
     describe('refresh token grant with resource', () => {
         it('should issue new token with correct aud (Req 4.4)', async () => {
             const client = await clientApi.createClient(testTenantId, 'Refresh Token Resource Client', {
+                alias: generateAlias('Refresh Token Resource Client'),
                 redirectUris: [REDIRECT_URI],
                 allowedScopes: 'openid profile email',
                 isPublic: true,
@@ -260,6 +266,7 @@ describe('Resource Indicator Audience Claim Construction', () => {
         it('should return invalid_target for client_credentials when client has no allowedResources (Req 4.1, 4.2)', async () => {
             // Create a confidential client without allowedResources
             const noResourceClient = await clientApi.createClient(testTenantId, 'No Resource CC Client', {
+                alias: generateAlias('No Resource CC Client'),
                 allowedScopes: 'openid profile email',
                 grantTypes: 'client_credentials',
                 isPublic: false,

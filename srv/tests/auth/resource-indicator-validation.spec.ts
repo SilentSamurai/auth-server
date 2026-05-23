@@ -2,6 +2,7 @@ import {SharedTestFixture} from '../shared-test.fixture';
 import {TokenFixture} from '../token.fixture';
 import {ClientEntityClient} from '../api-client/client-entity-client';
 import {TenantClient} from '../api-client/tenant-client';
+import {generateAlias} from '../api-client/client';
 
 /**
  * Integration tests for Resource Indicator Validation (RFC 8707).
@@ -61,6 +62,7 @@ describe('Resource Indicator Validation', () => {
     describe('authorize endpoint validation', () => {
         it('should redirect with resource forwarded when valid (Req 2.2)', async () => {
             const client = await clientApi.createClient(testTenantId, 'Valid Resource Client', {
+                alias: generateAlias('Valid Resource Client'),
                 redirectUris: [REDIRECT_URI],
                 allowedScopes: 'openid profile email',
                 isPublic: true,
@@ -94,6 +96,7 @@ describe('Resource Indicator Validation', () => {
             // Create a client with valid allowedResources (client creation validates URLs).
             // The non-absolute URI is only sent in the authorize request to test runtime validation.
             const client = await clientApi.createClient(testTenantId, 'Non-Absolute URI Client', {
+                alias: generateAlias('Non-Absolute URI Client'),
                 redirectUris: [REDIRECT_URI],
                 allowedScopes: 'openid profile email',
                 isPublic: true,
@@ -126,6 +129,7 @@ describe('Resource Indicator Validation', () => {
 
         it('should redirect with invalid_target for URI with fragment (Req 5.2)', async () => {
             const client = await clientApi.createClient(testTenantId, 'Fragment URI Client', {
+                alias: generateAlias('Fragment URI Client'),
                 redirectUris: [REDIRECT_URI],
                 allowedScopes: 'openid profile email',
                 isPublic: true,
@@ -158,6 +162,7 @@ describe('Resource Indicator Validation', () => {
 
         it('should redirect with invalid_target when resource not in allowedResources (Req 5.3)', async () => {
             const client = await clientApi.createClient(testTenantId, 'Not Allowed Resource Client', {
+                alias: generateAlias('Not Allowed Resource Client'),
                 redirectUris: [REDIRECT_URI],
                 allowedScopes: 'openid profile email',
                 isPublic: true,
@@ -190,6 +195,7 @@ describe('Resource Indicator Validation', () => {
 
         it('should redirect with invalid_target when client has no allowedResources (Req 5.4)', async () => {
             const client = await clientApi.createClient(testTenantId, 'No Allowed Resources Client', {
+                alias: generateAlias('No Allowed Resources Client'),
                 redirectUris: [REDIRECT_URI],
                 allowedScopes: 'openid profile email',
                 isPublic: true,
@@ -226,6 +232,7 @@ describe('Resource Indicator Validation', () => {
     describe('token endpoint validation', () => {
         it('should issue token with correct aud for valid resource (password grant) (Req 3.2)', async () => {
             const client = await clientApi.createClient(testTenantId, 'Password Grant Resource Client', {
+                alias: generateAlias('Password Grant Resource Client'),
                 redirectUris: [REDIRECT_URI],
                 allowedScopes: 'openid profile email',
                 isPublic: true,
@@ -262,6 +269,7 @@ describe('Resource Indicator Validation', () => {
 
         it('should return JSON 400 with invalid_target for invalid resource (Req 3.4)', async () => {
             const client = await clientApi.createClient(testTenantId, 'Invalid Resource Token Client', {
+                alias: generateAlias('Invalid Resource Token Client'),
                 redirectUris: [REDIRECT_URI],
                 allowedScopes: 'openid profile email',
                 isPublic: true,
@@ -294,6 +302,7 @@ describe('Resource Indicator Validation', () => {
             // For client_credentials, we need to use a Client entity that has allowedResources
             // and authenticate using the Client's own credentials (not tenant-level credentials).
             const client = await clientApi.createClient(testTenantId, 'Client Credentials Resource Client', {
+                alias: generateAlias('Client Credentials Resource Client'),
                 redirectUris: [REDIRECT_URI],
                 allowedScopes: 'openid profile email',
                 isPublic: false,
@@ -334,6 +343,7 @@ describe('Resource Indicator Validation', () => {
             // Create a client with valid allowedResources (client creation validates URLs).
             // The non-absolute URI is only sent in the token request to test runtime validation.
             const client = await clientApi.createClient(testTenantId, 'Non-Absolute Token Client', {
+                alias: generateAlias('Non-Absolute Token Client'),
                 redirectUris: [REDIRECT_URI],
                 allowedScopes: 'openid profile email',
                 isPublic: true,
@@ -364,6 +374,7 @@ describe('Resource Indicator Validation', () => {
 
         it('should return invalid_target for URI with fragment in token request (Req 5.2)', async () => {
             const client = await clientApi.createClient(testTenantId, 'Fragment Token Client', {
+                alias: generateAlias('Fragment Token Client'),
                 redirectUris: [REDIRECT_URI],
                 allowedScopes: 'openid profile email',
                 isPublic: true,
@@ -394,6 +405,7 @@ describe('Resource Indicator Validation', () => {
 
         it('should return invalid_target when client has no allowedResources in token request (Req 5.4)', async () => {
             const client = await clientApi.createClient(testTenantId, 'No Resources Token Client', {
+                alias: generateAlias('No Resources Token Client'),
                 redirectUris: [REDIRECT_URI],
                 allowedScopes: 'openid profile email',
                 isPublic: true,

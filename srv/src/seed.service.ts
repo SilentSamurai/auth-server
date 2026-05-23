@@ -11,6 +11,7 @@ import {readFile} from "fs/promises";
 import {Tenant} from "./entity/tenant.entity";
 import {SecurityService} from "./casl/security.service";
 
+
 function resolveAdminUiCallbackUris(configService: Environment, logger: Logger): string[] {
     const baseUrl: string = configService.get('BASE_URL', '');
     if (baseUrl) {
@@ -313,51 +314,59 @@ export class SeedService {
                         {
                             name: "Shire Portal",
                             appUrl: "https://portal.shire.local",
-                            description: "Main portal for Shire residents"
+                            description: "Main portal for Shire residents",
+                            alias: "shire-portal"
                         },
                         {
                             name: "Harvest Tracker",
                             appUrl: "https://harvest.shire.local",
-                            description: "Track crop yields"
+                            description: "Track crop yields",
+                            alias: "harvest-tracker"
                         },
                     ],
                     clients: [
                         {
                             name: "Shire Web App",
                             redirectUris: ["https://portal.shire.local/callback"],
-                            allowedScopes: "openid profile email tenant.read tenant.write"
+                            allowedScopes: "openid profile email tenant.read tenant.write",
+                            alias: "shire-web-app"
                         },
                         {
                             name: "Shire Mobile",
                             redirectUris: ["https://mobile.shire.local/callback"],
                             allowedScopes: "openid profile",
-                            isPublic: true
+                            isPublic: true,
+                            alias: "shire-mobile"
                         },
                         {
                             name: "Shire Authorize Test",
                             redirectUris: ["https://authorize-e2e.example.com/callback"],
                             allowedScopes: "openid profile email",
-                            isPublic: true
+                            isPublic: true,
+                            alias: "shire-authorize-test"
                         },
                         {
                             name: "Consent E2E Test",
                             redirectUris: ["https://consent-e2e.example.com/callback", "http://localhost:3000/consent-app.html"],
                             allowedScopes: "openid profile email",
-                            isPublic: true
+                            isPublic: true,
+                            alias: "consent-e2e-test"
                         },
                         {
                             name: "Shire PKCE Required",
                             redirectUris: ["https://pkce-required-e2e.example.com/callback"],
                             allowedScopes: "openid profile email",
                             isPublic: true,
-                            requirePkce: true
+                            requirePkce: true,
+                            alias: "shire-pkce-required"
                         },
                         {
                             name: "Shire No PKCE",
                             redirectUris: ["http://localhost:3000/no-pkce.html"],
                             allowedScopes: "openid profile email",
                             isPublic: true,
-                            requirePkce: false
+                            requirePkce: false,
+                            alias: "shire-no-pkce"
                         },
                     ],
                 },
@@ -369,20 +378,23 @@ export class SeedService {
                         {
                             name: "Gondor Defense",
                             appUrl: "https://defense.gondor.local",
-                            description: "Military coordination"
+                            description: "Military coordination",
+                            alias: "gondor-defense"
                         },
                         {
                             name: "Archive System",
                             appUrl: "https://archive.gondor.local",
-                            description: "Historical records"
+                            description: "Historical records",
+                            alias: "archive-system"
                         },
-                        {name: "Trade Ledger", appUrl: "https://trade.gondor.local", description: "Commerce tracking"},
+                        {name: "Trade Ledger", appUrl: "https://trade.gondor.local", description: "Commerce tracking", alias: "trade-ledger"},
                     ],
                     clients: [
                         {
                             name: "Gondor Defense Client",
                             redirectUris: ["https://defense.gondor.local/callback"],
-                            allowedScopes: "openid profile"
+                            allowedScopes: "openid profile",
+                            alias: "gondor-defense-client"
                         },
                     ],
                 },
@@ -394,7 +406,8 @@ export class SeedService {
                         {
                             name: "Rohan Dispatch",
                             appUrl: "https://dispatch.rohan.local",
-                            description: "Rider coordination"
+                            description: "Rider coordination",
+                            alias: "rohan-dispatch"
                         },
                     ],
                     clients: [],
@@ -407,14 +420,16 @@ export class SeedService {
                         {
                             name: "Library of Imladris",
                             appUrl: "https://library.rivendell.local",
-                            description: "Knowledge repository"
+                            description: "Knowledge repository",
+                            alias: "library-of-imladris"
                         },
                     ],
                     clients: [
                         {
                             name: "Rivendell Library Client",
                             redirectUris: ["https://library.rivendell.local/callback"],
-                            allowedScopes: "openid profile"
+                            allowedScopes: "openid profile",
+                            alias: "rivendell-library-client"
                         },
                     ],
                 },
@@ -466,7 +481,7 @@ export class SeedService {
 
                 for (const app of entry.apps) {
                     try {
-                        await this.appService.createApp(permission, tenant.id, app.name, app.appUrl, app.description);
+                        await this.appService.createApp(permission, tenant.id, app.name, app.appUrl, app.alias, app.description);
                         this.logger.log(`Created app: ${app.name} in ${entry.domain}`);
                     } catch (e) {
                         this.logger.warn(`App ${app.name} in ${entry.domain} may already exist`);
@@ -480,12 +495,16 @@ export class SeedService {
                             tenant.id,
                             client.name,
                             client.redirectUris,
+                            client.alias,
                             client.allowedScopes,
                             undefined,
                             undefined,
                             undefined,
                             client.isPublic,
                             client.requirePkce,
+                            undefined,
+                            undefined,
+                            undefined,
                         );
                         this.logger.log(`Created client: ${client.name} in ${entry.domain}`);
                     } catch (e) {

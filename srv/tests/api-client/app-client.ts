@@ -9,11 +9,14 @@ export class AppClient extends HttpClient {
         tenantId: string,
         name: string,
         appUrl: string,
+        alias: string,
         description?: string,
         onboardingEnabled?: boolean,
         onboardingCallbackUrl?: string,
     ) {
-        const body: Record<string, any> = {tenantId, name, appUrl};
+        const body: Record<string, any> = {
+            tenantId, name, appUrl, alias,
+        };
         if (description !== undefined) body.description = description;
         if (onboardingEnabled !== undefined) body.onboardingEnabled = onboardingEnabled;
         if (onboardingCallbackUrl !== undefined) body.onboardingCallbackUrl = onboardingCallbackUrl;

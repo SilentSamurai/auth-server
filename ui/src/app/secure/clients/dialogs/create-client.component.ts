@@ -16,6 +16,13 @@ import {ClientService, CreateClientRequest} from '../../../_services/client.serv
                         <input type="text" class="form-control" id="name" [(ngModel)]="name" name="name" required>
                     </div>
                     <div class="mb-3">
+                        <label for="alias" class="form-label">Alias</label>
+                        <input type="text" class="form-control" id="alias" [(ngModel)]="alias" name="alias" required
+                               placeholder="e.g. my-api">
+                        <small class="form-text text-muted">Lowercase alphanumeric with hyphens. Combined with your tenant
+                            domain as the full alias.</small>
+                    </div>
+                    <div class="mb-3">
                         <label for="redirectUris" class="form-label">Redirect URIs</label>
                         <textarea class="form-control" id="redirectUris" [(ngModel)]="redirectUris" name="redirectUris"
                                   rows="3" placeholder="Comma-separated URIs"></textarea>
@@ -69,6 +76,7 @@ export class CreateClientComponent implements OnInit {
     tenantId?: string = undefined;
 
     name: string = '';
+    alias: string = '';
     redirectUris: string = '';
     allowedScopes: string = '';
     grantTypes: string = 'authorization_code';
@@ -112,6 +120,7 @@ export class CreateClientComponent implements OnInit {
             const body: CreateClientRequest = {
                 tenantId: this.tenantId,
                 name: this.name.trim(),
+                alias: this.alias.trim(),
                 redirectUris: parsedUris,
                 allowedScopes: this.allowedScopes || undefined,
                 grantTypes: this.grantTypes || undefined,

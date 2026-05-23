@@ -1,5 +1,6 @@
 import {SharedTestFixture} from "../shared-test.fixture";
 import {TokenFixture} from "../token.fixture";
+import {generateAlias} from "../api-client/client";
 import {ClientEntityClient} from "../api-client/client-entity-client";
 
 /**
@@ -48,6 +49,7 @@ describe('Token Introspection Endpoint (RFC 7662)', () => {
         //    (introspection uses ClientService, not legacy Tenant credentials)
         const clientApi = new ClientEntityClient(app, userAccessToken);
         const created = await clientApi.createClient(tenantId, 'Introspection Test Client', {
+            alias: generateAlias('Introspection Test Client'),
             allowedScopes: 'openid profile email',
             grantTypes: 'client_credentials',
         });

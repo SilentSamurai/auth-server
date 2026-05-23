@@ -1,5 +1,6 @@
 import {SharedTestFixture} from '../shared-test.fixture';
 import {TokenFixture} from '../token.fixture';
+import {generateAlias} from '../api-client/client';
 import {ClientEntityClient} from '../api-client/client-entity-client';
 import {TenantClient} from '../api-client/tenant-client';
 
@@ -75,6 +76,7 @@ describe('Resource Indicator Auth Code Flow', () => {
     describe('login flow with resource', () => {
         it('should create auth code with resource stored (Req 2.5, 6.2)', async () => {
             const client = await clientApi.createClient(testTenantId, 'Login Resource Client', {
+                alias: generateAlias('Login Resource Client'),
                 redirectUris: [REDIRECT_URI],
                 allowedScopes: 'openid profile email',
                 isPublic: true,
@@ -117,6 +119,7 @@ describe('Resource Indicator Auth Code Flow', () => {
     describe('auth code exchange', () => {
         it('should issue token with aud containing resource and default audience (Req 4.1, 4.2)', async () => {
             const client = await clientApi.createClient(testTenantId, 'Exchange Resource Client', {
+                alias: generateAlias('Exchange Resource Client'),
                 redirectUris: [REDIRECT_URI],
                 allowedScopes: 'openid profile email',
                 isPublic: true,
@@ -157,6 +160,7 @@ describe('Resource Indicator Auth Code Flow', () => {
 
         it('should use auth code resource over token request resource (Req 3.5, 6.4)', async () => {
             const client = await clientApi.createClient(testTenantId, 'Precedence Resource Client', {
+                alias: generateAlias('Precedence Resource Client'),
                 redirectUris: [REDIRECT_URI],
                 allowedScopes: 'openid profile email',
                 isPublic: true,
@@ -202,6 +206,7 @@ describe('Resource Indicator Auth Code Flow', () => {
     describe('consent flow with resource', () => {
         it('should create auth code with resource stored via consent (Req 7.3)', async () => {
             const client = await clientApi.createClient(testTenantId, 'Consent Resource Client', {
+                alias: generateAlias('Consent Resource Client'),
                 redirectUris: [REDIRECT_URI],
                 allowedScopes: 'openid profile email',
                 isPublic: true,
@@ -243,6 +248,7 @@ describe('Resource Indicator Auth Code Flow', () => {
     describe('silent-auth with resource', () => {
         it('should create auth code with resource stored via authorize flow (Req 7.4)', async () => {
             const client = await clientApi.createClient(testTenantId, 'Silent Auth Resource Client', {
+                alias: generateAlias('Silent Auth Resource Client'),
                 redirectUris: [REDIRECT_URI],
                 allowedScopes: 'openid profile email',
                 isPublic: true,

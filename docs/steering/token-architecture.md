@@ -11,15 +11,15 @@ The JWT token model separates OAuth scopes from internal roles. These are indepe
 | Field                   | Contains                                                   | Used By                  | Purpose                            |
 |-------------------------|------------------------------------------------------------|--------------------------|------------------------------------|
 | `scopes` (JWT)          | OIDC values: `openid`, `profile`, `email`                  | OAuth client libraries   | Client access control per RFC 6749 |
-| `roles` (JWT)           | Role enums: `SUPER_ADMIN`, `TENANT_ADMIN`, `TENANT_VIEWER` | CASL ability factory, UI | User authorization                 |
+| `roles` (JWT)           | Role enums and namespaced app-owned roles (`{clientAlias}:{roleName}`) | CASL ability factory, UI | User authorization                 |
 | `scope` (HTTP response) | Space-delimited OIDC scopes                                | OAuth client libraries   | RFC 6749 §3.3 compliance           |
 
 ## Rules
 
 - `scopes` must only contain OIDC values. Never put role names in `scopes`.
-- `roles` must only contain role enum names. Never put OIDC values in `roles`.
+- `roles` must only contain role enum names (`SUPER_ADMIN`, `TENANT_ADMIN`, `TENANT_VIEWER`) and namespaced app-owned roles (`{clientAlias}:{roleName}`). Never put OIDC values in `roles`.
 - CASL abilities are derived from `token.roles`, never from `token.scopes`.
-- `isSuperAdmin` checks `roles.includes('SUPER_ADMIN')` combined with the super tenant domain. It does not check scopes.
+- `isSuperAdmin` checks `roles.includes('SUPER_ADMIN')` combined with the super tenant domain. It does not check scopes or app-owned roles.
 - OAuth scope resolution is a two-way intersection: `requested ∩ client.allowedScopes`. Roles are not involved in scope
   computation.
 - When `scope` is omitted from a token request, the client's full `allowedScopes` are used as the default.

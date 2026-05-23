@@ -3,6 +3,7 @@ import {ClientEntityClient} from '../../api-client/client-entity-client';
 import {TenantClient} from '../../api-client/tenant-client';
 import {SharedTestFixture} from '../../shared-test.fixture';
 import {TokenFixture} from '../../token.fixture';
+import {generateAlias} from '../../api-client/client';
 
 /**
  * Feature: resource-indicator-support — Property-Based Tests for Audience Construction
@@ -83,6 +84,7 @@ describe('Feature: resource-indicator-support, Property 5: Audience construction
             fc.asyncProperty(resourceUriArb, async (resource) => {
                 // Create a client with the resource in its allowedResources
                 const client = await clientApi.createClient(testTenantId, 'Audience Test Client', {
+                    alias: generateAlias('Audience Test Client'),
                     redirectUris: [REDIRECT_URI],
                     allowedScopes: 'openid profile email',
                     isPublic: true,
@@ -129,6 +131,7 @@ describe('Feature: resource-indicator-support, Property 5: Audience construction
     it('token without resource has aud containing only [SUPER_TENANT_DOMAIN]', async () => {
         // Create a client without allowedResources
         const client = await clientApi.createClient(testTenantId, 'No Resource Client', {
+            alias: generateAlias('No Resource Client'),
             redirectUris: [REDIRECT_URI],
             allowedScopes: 'openid profile email',
             isPublic: true,
@@ -167,6 +170,7 @@ describe('Feature: resource-indicator-support, Property 5: Audience construction
         await fc.assert(
             fc.asyncProperty(resourceUriArb, async (resource) => {
                 const client = await clientApi.createClient(testTenantId, 'Array Audience Client', {
+                    alias: generateAlias('Array Audience Client'),
                     redirectUris: [REDIRECT_URI],
                     allowedScopes: 'openid profile email',
                     isPublic: true,
@@ -207,6 +211,7 @@ describe('Feature: resource-indicator-support, Property 5: Audience construction
         const resource = 'https://refresh-audience-test.example.com/api';
 
         const client = await clientApi.createClient(testTenantId, 'Refresh Token Client', {
+            alias: generateAlias('Refresh Token Client'),
             redirectUris: [REDIRECT_URI],
             allowedScopes: 'openid profile email',
             isPublic: true,

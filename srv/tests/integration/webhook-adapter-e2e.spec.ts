@@ -4,6 +4,7 @@ import {AppClient} from '../api-client/app-client';
 import {SearchClient} from '../api-client/search-client';
 import {AdminTenantClient} from '../api-client/admin-tenant-client';
 import {v4 as uuid} from 'uuid';
+import {generateAlias} from "../api-client/client";
 
 describe('Webhook Adapter End-to-End', () => {
     let fixture: SharedTestFixture;
@@ -56,6 +57,7 @@ describe('Webhook Adapter End-to-End', () => {
             shireTenantId,
             appName,
             `http://localhost:${fixture.webhook.boundPort}`,
+            generateAlias(appName),
             'Webhook adapter e2e test app'
         );
 

@@ -1,6 +1,7 @@
 import supertest from "supertest";
 import TestAgent from "supertest/lib/agent";
 import {JwtService} from "@nestjs/jwt";
+import {randomBytes} from "crypto";
 
 export interface TestFixture {
     getHttpServer(): TestAgent<supertest.Test>;
@@ -10,6 +11,12 @@ export interface TestFixture {
 
 export function is2xx(response: { status: number }) {
     return response.status >= 200 && response.status < 300;
+}
+
+export function generateAlias(name: string): string {
+    const base = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    const suffix = randomBytes(4).toString('hex');
+    return `${base}-${suffix}`;
 }
 
 export function expect2xx(response: { body: any; status: number }) {

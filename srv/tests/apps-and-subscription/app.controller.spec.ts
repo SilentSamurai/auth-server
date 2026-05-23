@@ -19,6 +19,7 @@ import {TokenFixture} from '../token.fixture';
 import {TenantClient} from '../api-client/tenant-client';
 import {AdminTenantClient} from '../api-client/admin-tenant-client';
 import {HelperFixture} from '../helper.fixture';
+import {generateAlias} from "../api-client/client";
 
 describe('AppController', () => {
     let fixture: SharedTestFixture;
@@ -104,6 +105,7 @@ describe('AppController', () => {
                 creatorTenantId,
                 appData.name,
                 appData.appUrl,
+                generateAlias(appData.name),
                 appData.description
             );
 
@@ -138,6 +140,7 @@ describe('AppController', () => {
                 creatorTenantId,
                 `test-app-${uuid()}`,
                 `http://localhost:${fixture.webhook.boundPort}`,
+                generateAlias(`test-app-${uuid()}`),
                 'Test app for subscription'
             );
             testAppId = app.id;
@@ -219,6 +222,7 @@ describe('AppController', () => {
                 creatorTenantId,
                 `test-app-no-onboard-${uuid()}`,
                 `http://localhost:${fixture.webhook.boundPort}`,
+                generateAlias(`test-app-no-onboard-${uuid()}`),
                 'No onboard test',
                 false,
             );
@@ -237,6 +241,7 @@ describe('AppController', () => {
                 creatorTenantId,
                 `test-app-no-offboard-${uuid()}`,
                 `http://localhost:${fixture.webhook.boundPort}`,
+                generateAlias(`test-app-no-offboard-${uuid()}`),
                 'No offboard test',
                 false,
             );
@@ -255,6 +260,7 @@ describe('AppController', () => {
                 creatorTenantId,
                 `test-app-callback-url-${uuid()}`,
                 `http://localhost:1`,
+                generateAlias(`test-app-callback-url-${uuid()}`),
                 'Callback URL test',
                 true,
                 `http://localhost:${fixture.webhook.boundPort}`,
@@ -275,6 +281,7 @@ describe('AppController', () => {
             creatorTenantId,
             `test-app-scope-${uuid()}`,
             `http://localhost:${fixture.webhook.boundPort}`,
+            generateAlias(`test-app-scope-${uuid()}`),
             'Test app for scope validation'
         );
         // Publish the app so it can be subscribed to
@@ -307,6 +314,7 @@ describe('AppController', () => {
                 creatorTenantId,
                 testAppName,
                 `http://localhost:${fixture.webhook.boundPort}`,
+                generateAlias(testAppName),
                 'Test app for publish/visibility'
             );
             testAppId = app.id;

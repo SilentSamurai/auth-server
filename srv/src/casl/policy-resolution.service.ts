@@ -9,7 +9,7 @@ import {UserRole} from "../entity/user.roles.entity";
 /**
  * Service for resolving policies for app-owned roles.
  *
- * App-owned roles are identified by the `{appName}:{roleName}` format in tokens.
+ * App-owned roles are identified by the `{clientAlias}:{roleName}` format in tokens.
  * This service fetches the associated Policy records from the owner tenant
  * (where policy.tenant_id = owner_tenant.id).
  *
@@ -33,29 +33,29 @@ export class PolicyResolutionService {
     }
 
     /**
-     * Parses an app-owned role name in `{appName}:{roleName}` format.
+     * Parses an app-owned role name in `{clientAlias}:{roleName}` format.
      * Returns null if the format is invalid.
      */
-    parseAppOwnedRoleName(appRoleName: string): { appName: string; roleName: string } | null {
+    parseAppOwnedRoleName(appRoleName: string): { alias: string; roleName: string } | null {
         const separatorIndex = appRoleName.indexOf(':');
         if (separatorIndex === -1) {
             return null;
         }
 
-        const appName = appRoleName.substring(0, separatorIndex);
+        const alias = appRoleName.substring(0, separatorIndex);
         const roleName = appRoleName.substring(separatorIndex + 1);
 
-        if (!appName || !roleName) {
+        if (!alias || !roleName) {
             return null;
         }
 
-        return {appName, roleName};
+        return {alias, roleName};
     }
 
     /**
      * Resolves policies for app-owned roles.
      *
-     * For each role name in `{appName}:{roleName}` format:
+     * For each role name in `{clientAlias}:{roleName}` format:
      * 1. Parse the app name and role name
      * 2. Look up the App by name to get the owner tenant
      * 3. Query the Role entity where app_id IS NOT NULL and name matches
@@ -66,7 +66,7 @@ export class PolicyResolutionService {
      * - If an app is not found, the role is skipped
      * - If parsing fails, the role is skipped
      *
-     * @param appRoleNames Array of role names in `{appName}:{roleName}` format
+     * @param appRoleNames Array of role names in `{clientAlias}:{roleName}` format
      * @returns Array of Policy records from the owner tenant(s)
      */
     async resolveAppOwnedPolicies(appRoleNames: string[]): Promise<Policy[]> {
@@ -80,12 +80,12 @@ export class PolicyResolutionService {
                     continue;
                 }
 
-                const {appName, roleName} = parsed;
+                const {alias, roleName} = parsed;
 
-                // Find the app by name to get the owner tenant
+                // Find the app by client alias to get the owner tenant
                 const app = await this.appRepository.findOne({
-                    where: {name: appName},
-                    relations: ['owner'],
+                    where: {client: {alias}},
+                    relations: ['owner', 'client'],
                 });
 
                 if (!app) {
@@ -104,7 +104,7 @@ export class PolicyResolutionService {
                 });
 
                 if (!role) {
-                    this.logger.debug(`Role ${roleName} not found for app ${appName}, skipping`);
+                    this.logger.debug(`Role ${roleName} not found for app ${alias}, skipping`);
                     continue;
                 }
 
@@ -240,7 +240,7 @@ export class PolicyResolutionService {
                 // Fetch the role with app and tenant relations
                 const role = await this.roleRepository.findOne({
                     where: {id: userRole.roleId},
-                    relations: ['app', 'tenant'],
+                    relations: ['app', 'app.client', 'tenant'],
                 });
 
                 if (!role || !role.app) {

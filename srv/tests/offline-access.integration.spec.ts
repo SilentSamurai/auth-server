@@ -18,6 +18,7 @@ import {TokenFixture} from './token.fixture';
 import {ClientEntityClient} from './api-client/client-entity-client';
 import {AdminTenantClient} from './api-client/admin-tenant-client';
 import {HelperFixture} from './helper.fixture';
+import {generateAlias} from './api-client/client';
 
 const CLIENT_ID = 'offline-access-test.local';
 const EMAIL = 'admin@offline-access-test.local';
@@ -149,7 +150,7 @@ describe('Offline Access & Refresh Token Gating Integration Tests', () => {
 
         beforeAll(async () => {
             // Create a client with offline_access in allowedScopes and allowRefreshToken: false
-            testClient = await clientApi.createClient(testTenantId, 'Offline Access Scope Client', {
+            testClient = await clientApi.createClient(testTenantId, 'Offline Access Scope Client', { alias: generateAlias('Offline Access Scope Client'),
                 redirectUris: ['https://offline-test.example.com/callback'],
                 allowedScopes: 'openid profile email offline_access',
                 isPublic: true,
@@ -189,7 +190,7 @@ describe('Offline Access & Refresh Token Gating Integration Tests', () => {
 
         beforeAll(async () => {
             // Create a client without offline_access in allowedScopes and allowRefreshToken: false
-            testClient = await clientApi.createClient(testTenantId, 'No Refresh Token Client', {
+            testClient = await clientApi.createClient(testTenantId, 'No Refresh Token Client', { alias: generateAlias('No Refresh Token Client'),
                 redirectUris: ['https://no-refresh-test.example.com/callback'],
                 allowedScopes: 'openid profile email',
                 isPublic: true,
@@ -227,7 +228,7 @@ describe('Offline Access & Refresh Token Gating Integration Tests', () => {
 
         beforeAll(async () => {
             // Create a client without offline_access in allowedScopes but allowRefreshToken: true
-            testClient = await clientApi.createClient(testTenantId, 'Allow Refresh Token Override Client', {
+            testClient = await clientApi.createClient(testTenantId, 'Allow Refresh Token Override Client', { alias: generateAlias('Allow Refresh Token Override Client'),
                 redirectUris: ['https://override-test.example.com/callback'],
                 allowedScopes: 'openid profile email',
                 isPublic: true,
@@ -267,7 +268,7 @@ describe('Offline Access & Refresh Token Gating Integration Tests', () => {
 
         beforeAll(async () => {
             // Create a client with offline_access in allowedScopes
-            testClient = await clientApi.createClient(testTenantId, 'JWT Scope Filter Client', {
+            testClient = await clientApi.createClient(testTenantId, 'JWT Scope Filter Client', { alias: generateAlias('JWT Scope Filter Client'),
                 redirectUris: ['https://jwt-scope-test.example.com/callback'],
                 allowedScopes: 'openid profile email offline_access',
                 isPublic: true,
@@ -315,7 +316,7 @@ describe('Offline Access & Refresh Token Gating Integration Tests', () => {
 
         beforeAll(async () => {
             // Create a client with offline_access in allowedScopes
-            testClient = await clientApi.createClient(testTenantId, 'Refresh Token Scope Client', {
+            testClient = await clientApi.createClient(testTenantId, 'Refresh Token Scope Client', { alias: generateAlias('Refresh Token Scope Client'),
                 redirectUris: ['https://refresh-scope-test.example.com/callback'],
                 allowedScopes: 'openid profile email offline_access',
                 isPublic: true,
@@ -393,7 +394,7 @@ describe('Offline Access & Refresh Token Gating Integration Tests', () => {
 
         beforeAll(async () => {
             // Create a client WITHOUT offline_access in allowedScopes
-            testClient = await clientApi.createClient(testTenantId, 'Scope Resolution Client', {
+            testClient = await clientApi.createClient(testTenantId, 'Scope Resolution Client', { alias: generateAlias('Scope Resolution Client'),
                 redirectUris: ['https://scope-resolution-test.example.com/callback'],
                 allowedScopes: 'openid profile email',
                 isPublic: true,

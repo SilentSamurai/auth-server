@@ -43,12 +43,13 @@ export class AppController {
         @CurrentPermission() permission: Permission,
         @Body('tenantId', ParseUUIDPipe) tenantId: string,
         @Body('name', schemaPipe(yup.string().required('name is required').max(128))) name: string,
+        @Body('alias', schemaPipe(yup.string().required('alias is required').matches(/^[a-z0-9]+(-[a-z0-9]+)*$/, 'alias must be lowercase alphanumeric with hyphens (e.g. my-app)').max(253))) alias: string,
         @Body('appUrl', schemaPipe(yup.string().required('app url is required').max(2048))) appUrl: string,
         @Body('description', schemaPipe(yup.string().max(128))) description: string,
         @Body('onboardingEnabled', schemaPipe(yup.boolean().optional())) onboardingEnabled?: boolean,
         @Body('onboardingCallbackUrl', schemaPipe(yup.string().max(2048).nullable().optional())) onboardingCallbackUrl?: string,
     ) {
-        const app = await this.appService.createApp(permission, tenantId, name, appUrl, description, onboardingEnabled, onboardingCallbackUrl);
+        const app = await this.appService.createApp(permission, tenantId, name, appUrl, alias, description, onboardingEnabled, onboardingCallbackUrl);
         return this.mapAppResponse(app);
     }
 

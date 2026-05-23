@@ -16,9 +16,19 @@ import {schemaPipe} from '../validation/validation.pipe';
 import {CurrentPermission, CurrentTenantId, Permission} from '../auth/auth.decorator';
 import * as yup from 'yup';
 
+const aliasSchema = yup.string()
+    .required('alias is required')
+    .matches(/^[a-z0-9]+(-[a-z0-9]+)*$/, 'alias must be lowercase alphanumeric with hyphens (e.g. my-app)')
+    .max(253);
+
+const aliasUpdateSchema = yup.string()
+    .matches(/^[a-z0-9]+(-[a-z0-9]+)*$/, 'alias must be lowercase alphanumeric with hyphens (e.g. my-app)')
+    .max(253);
+
 const CreateClientSchema = yup.object().shape({
     tenantId: yup.string().uuid('tenantId must be a valid UUID').required('tenantId is required'),
     name: yup.string().required('name is required').max(128),
+    alias: aliasSchema,
     redirectUris: yup.array().of(yup.string().url('each redirectUri must be a valid URL')).default([]),
     allowedScopes: yup.string().max(1024),
     grantTypes: yup.string().max(256),
@@ -48,7 +58,7 @@ const CreateClientSchema = yup.object().shape({
 
 const UpdateClientSchema = yup.object().shape({
     name: yup.string().max(128),
-    alias: yup.string().max(253),
+    alias: aliasUpdateSchema,
     redirectUris: yup.array().of(yup.string().url('each redirectUri must be a valid URL')),
     requirePkce: yup.boolean(),
     allowPasswordGrant: yup.boolean(),
@@ -70,6 +80,7 @@ export class ClientController {
         @Body(schemaPipe(CreateClientSchema)) body: {
             tenantId: string;
             name: string;
+            alias: string;
             redirectUris?: string[];
             allowedScopes?: string;
             grantTypes?: string;
@@ -87,6 +98,7 @@ export class ClientController {
             body.tenantId,
             body.name,
             body.redirectUris || [],
+            body.alias,
             body.allowedScopes,
             body.grantTypes,
             body.responseTypes,

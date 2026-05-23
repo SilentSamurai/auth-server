@@ -436,16 +436,25 @@ export class RoleService {
         permission: Permission,
         userId: string,
         subscriberTenantId: string,
-        roleIds: string[],
+        roleNames: string[],
     ): Promise<void> {
         permission.isAuthorized(Action.Update, SubjectEnum.TENANT, {id: subscriberTenantId});
 
-        for (const roleId of roleIds) {
+        for (const namespacedName of roleNames) {
+            const separatorIndex = namespacedName.indexOf(':');
+            if (separatorIndex === -1) continue;
+            const alias = namespacedName.substring(0, separatorIndex);
+            const roleName = namespacedName.substring(separatorIndex + 1);
+            if (!alias || !roleName) continue;
+
+            const app = await this.appRepository.findOne({where: {client: {alias}}, relations: ['owner', 'client']});
+            if (!app) continue;
+
             const role = await this.roleRepository.findOne({
-                where: {id: roleId},
+                where: {name: roleName, app: {id: app.id}, tenant: {id: app.owner.id}},
                 relations: ['app'],
             });
-            if (!role?.app) continue;
+            if (!role) continue;
 
             const hasSubscription = await this.subscriptionRepository.exists({
                 where: {
@@ -457,13 +466,13 @@ export class RoleService {
             if (!hasSubscription) continue;
 
             const exists = await this.userRoleRepository.exists({
-                where: {tenantId: subscriberTenantId, userId, roleId},
+                where: {tenantId: subscriberTenantId, userId, roleId: role.id},
             });
             if (!exists) {
                 await this.userRoleRepository.save({
                     userId,
                     tenantId: subscriberTenantId,
-                    roleId,
+                    roleId: role.id,
                     from_group: false,
                 });
             }
@@ -474,21 +483,29 @@ export class RoleService {
         permission: Permission,
         userId: string,
         subscriberTenantId: string,
-        roleIds: string[],
+        roleNames: string[],
     ): Promise<void> {
         permission.isAuthorized(Action.Update, SubjectEnum.TENANT, {id: subscriberTenantId});
 
-        for (const roleId of roleIds) {
+        for (const namespacedName of roleNames) {
+            const separatorIndex = namespacedName.indexOf(':');
+            if (separatorIndex === -1) continue;
+            const alias = namespacedName.substring(0, separatorIndex);
+            const roleName = namespacedName.substring(separatorIndex + 1);
+            if (!alias || !roleName) continue;
+
+            const app = await this.appRepository.findOne({where: {client: {alias}}, relations: ['owner', 'client']});
+            if (!app) continue;
+
             const role = await this.roleRepository.findOne({
-                where: {id: roleId},
-                relations: ['app'],
+                where: {name: roleName, app: {id: app.id}, tenant: {id: app.owner.id}},
             });
-            if (!role?.app) continue;
+            if (!role) continue;
 
             await this.userRoleRepository.delete({
                 tenantId: subscriberTenantId,
                 userId,
-                roleId,
+                roleId: role.id,
             });
         }
     }

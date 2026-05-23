@@ -7,6 +7,7 @@ import {ClientEntityClient} from '../../api-client/client-entity-client';
 import {TenantClient} from '../../api-client/tenant-client';
 import {SharedTestFixture} from '../../shared-test.fixture';
 import {TokenFixture} from '../../token.fixture';
+import {generateAlias} from '../../api-client/client';
 
 /**
  * Feature: redirect-uri-validation, Property 1: Redirect URI validation accepts iff URI is in registered set
@@ -463,6 +464,7 @@ describe('Feature: redirect-uri-validation, Property 3: Auth code stores redirec
         tenantId = tenant.id;
 
         const created = await clientApi.createClient(tenant.id, 'Roundtrip Prop Client', {
+            alias: generateAlias('Roundtrip Prop Client'),
             redirectUris: [REGISTERED_URI],
             allowedScopes: 'openid profile email',
             isPublic: true,
@@ -630,6 +632,7 @@ describe('Feature: redirect-uri-validation, Property 4: Token exchange binding a
         const tenant = await tenantClient.createTenant('prop-binding', 'prop-binding.example.com');
 
         const created = await clientApi.createClient(tenant.id, 'Binding Prop Client', {
+            alias: generateAlias('Binding Prop Client'),
             redirectUris: [REGISTERED_URI],
             allowedScopes: 'openid profile email',
             isPublic: true,
@@ -759,6 +762,7 @@ describe('Feature: redirect-uri-validation, Property 5: Null stored redirect_uri
         tenantId = tenant.id;
 
         const created = await clientApi.createClient(tenant.id, 'Null Binding Prop Client', {
+            alias: generateAlias('Null Binding Prop Client'),
             redirectUris: [REGISTERED_URI],
             allowedScopes: 'openid profile email',
             isPublic: true,
@@ -877,6 +881,7 @@ describe('Feature: redirect-uri-validation, Property 6: Error responses never le
         await adminTenantClient.addMembers(tenant.id, [email]);
 
         const created = await clientApi.createClient(tenant.id, 'No Leak Prop Client', {
+            alias: generateAlias('No Leak Prop Client'),
             redirectUris: [REGISTERED_URI],
             allowedScopes: 'openid profile email',
             isPublic: true,

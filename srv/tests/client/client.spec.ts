@@ -7,6 +7,7 @@
  */
 import {SharedTestFixture} from "../shared-test.fixture";
 import {TokenFixture} from "../token.fixture";
+import {generateAlias} from "../api-client/client";
 import {ClientEntityClient} from "../api-client/client-entity-client";
 import {TenantClient} from "../api-client/tenant-client";
 import {AdminTenantClient} from "../api-client/admin-tenant-client";
@@ -44,6 +45,7 @@ describe("E2E Client Entity Management", () => {
     it("should perform full client lifecycle", async () => {
         // 1) Create a confidential client
         const created = await clientApi.createClient(testTenantId, "My Web App", {
+            alias: generateAlias("My Web App"),
             redirectUris: ["https://myapp.example.com/callback"],
             allowedScopes: "openid profile",
             grantTypes: "authorization_code",
@@ -100,6 +102,7 @@ describe("E2E Client Entity Management", () => {
     it("should update client fields", async () => {
         // Create a client to update
         const created = await clientApi.createClient(testTenantId, "Update Test Client", {
+            alias: generateAlias("Update Test Client"),
             redirectUris: ["https://original.example.com/callback"],
             requirePkce: false,
             allowPasswordGrant: false,
@@ -145,6 +148,7 @@ describe("E2E Client Entity Management", () => {
 
     it("should not allow updating isPublic or grantTypes via update endpoint", async () => {
         const created = await clientApi.createClient(testTenantId, "Immutable Fields Test", {
+            alias: generateAlias("Immutable Fields Test"),
             grantTypes: "authorization_code",
             isPublic: false,
         });
@@ -167,6 +171,7 @@ describe("E2E Client Entity Management", () => {
 
     it("should create a public client without a secret", async () => {
         const created = await clientApi.createClient(testTenantId, "Public SPA", {
+            alias: generateAlias("Public SPA"),
             redirectUris: ["https://spa.example.com/callback"],
             isPublic: true,
         });

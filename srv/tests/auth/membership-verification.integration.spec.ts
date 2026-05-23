@@ -23,6 +23,7 @@ import {AdminTenantClient} from '../api-client/admin-tenant-client';
 import {HelperFixture} from '../helper.fixture';
 import {AppClient} from '../api-client/app-client';
 import {ClientEntityClient} from '../api-client/client-entity-client';
+import {generateAlias} from "../api-client/client";
 
 describe('Membership Verification Integration Tests', () => {
     let fixture: SharedTestFixture;
@@ -121,6 +122,7 @@ describe('Membership Verification Integration Tests', () => {
         // Create a confidential client on the creator tenant for client_credentials grant tests
         const clientEntityClient = new ClientEntityClient(fixture, superAdminAccessToken);
         const ccClientResult = await clientEntityClient.createClient(creatorTenantId, 'cc-test-client', {
+            alias: generateAlias('cc-test-client'),
             grantTypes: 'client_credentials',
             allowedScopes: 'openid profile email',
             isPublic: false,
@@ -272,6 +274,7 @@ describe('Membership Verification Integration Tests', () => {
                 creatorTenantId,
                 `test-app-${Date.now()}`,
                 `http://localhost:${fixture.webhook.boundPort}`,
+                generateAlias(`test-app-${Date.now()}`),
                 'Test app for subscription'
             );
 

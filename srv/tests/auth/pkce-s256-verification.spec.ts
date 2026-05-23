@@ -2,6 +2,7 @@ import {SharedTestFixture} from '../shared-test.fixture';
 import {TokenFixture} from '../token.fixture';
 import {ClientEntityClient} from '../api-client/client-entity-client';
 import {TenantClient} from '../api-client/tenant-client';
+import {generateAlias} from '../api-client/client';
 import {CryptUtil} from '../../src/util/crypt.util';
 
 /**
@@ -57,6 +58,7 @@ describe('S256 end-to-end verification', () => {
 
         // Create a fresh public client with no PKCE history
         const created = await clientApi.createClient(testTenantId, 'PKCE Verification Test Client', {
+            alias: generateAlias('PKCE Verification Test Client'),
             isPublic: true,
             requirePkce: false,
             allowedScopes: 'openid profile email',
@@ -129,6 +131,7 @@ describe('S256 end-to-end verification', () => {
     it('succeeds when plain challenge is verified with the matching verifier', async () => {
         // Use a separate fresh client to avoid the downgrade block from S256 tests above
         const freshCreated = await clientApi.createClient(testTenantId, 'PKCE Plain Verification Client', {
+            alias: generateAlias('PKCE Plain Verification Client'),
             isPublic: true,
             requirePkce: false,
             allowedScopes: 'openid profile email',

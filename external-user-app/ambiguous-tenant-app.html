@@ -78,7 +78,7 @@
     // It uses the App_Client alias as client_id (per per-app-oauth-client-identity design).
     // OIDC discovery also uses the App_Client alias - the server resolves it to the owner tenant.
     const BASE_URL = 'http://localhost:9001';
-    const CLIENT_ID = 'ambiguous-tenant-test-app.mordor.local';
+    const CLIENT_ID = 'mordor.local.ambiguous-tenant-test-app';
     const REDIRECT_URI = window.location.origin + '/ambiguous-tenant-app.html';
 
     let config = null;

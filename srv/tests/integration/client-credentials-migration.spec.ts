@@ -2,6 +2,7 @@ import {SharedTestFixture} from '../shared-test.fixture';
 import {TokenFixture} from '../token.fixture';
 import {ClientEntityClient} from '../api-client/client-entity-client';
 import {AdminTenantClient} from '../api-client/admin-tenant-client';
+import {generateAlias} from '../api-client/client';
 
 /**
  * Integration tests for the Client Credentials Migration.
@@ -67,7 +68,7 @@ describe('Client Credentials Migration', () => {
         let confidentialClientSecret: string;
 
         beforeAll(async () => {
-            const result = await clientApi.createClient(tenantId, 'CC Migration Test Client', {
+            const result = await clientApi.createClient(tenantId, 'CC Migration Test Client', { alias: generateAlias('CC Migration Test Client'),
                 allowedScopes: 'openid profile email',
                 grantTypes: 'client_credentials',
                 isPublic: false,
@@ -111,7 +112,7 @@ describe('Client Credentials Migration', () => {
         let confidentialClientId: string;
 
         beforeAll(async () => {
-            const result = await clientApi.createClient(tenantId, 'CC Invalid Test Client', {
+            const result = await clientApi.createClient(tenantId, 'CC Invalid Test Client', { alias: generateAlias('CC Invalid Test Client'),
                 allowedScopes: 'openid profile email',
                 grantTypes: 'client_credentials',
                 isPublic: false,
@@ -213,7 +214,7 @@ describe('Client Credentials Migration', () => {
             );
 
             // Create a different client in the same tenant
-            const otherClient = await clientApi.createClient(tenantId, 'Other Client', {
+            const otherClient = await clientApi.createClient(tenantId, 'Other Client', { alias: generateAlias('Other Client'),
                 allowedScopes: 'openid profile email',
                 isPublic: true,
                 allowPasswordGrant: true,
@@ -284,7 +285,7 @@ describe('Client Credentials Migration', () => {
         let originalSecret: string;
 
         beforeAll(async () => {
-            const result = await clientApi.createClient(tenantId, 'Rotation Test Client', {
+            const result = await clientApi.createClient(tenantId, 'Rotation Test Client', { alias: generateAlias('Rotation Test Client'),
                 allowedScopes: 'openid profile email',
                 grantTypes: 'client_credentials',
                 isPublic: false,
@@ -350,7 +351,7 @@ describe('Client Credentials Migration', () => {
         });
 
         it('should have UUID-format client_id in technical access token', async () => {
-            const result = await clientApi.createClient(tenantId, 'UUID Claim Test Client', {
+            const result = await clientApi.createClient(tenantId, 'UUID Claim Test Client', { alias: generateAlias('UUID Claim Test Client'),
                 allowedScopes: 'openid profile email',
                 grantTypes: 'client_credentials',
                 isPublic: false,

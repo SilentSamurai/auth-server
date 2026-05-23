@@ -9,7 +9,6 @@ import {Permission} from "../auth/auth.decorator";
 import {Action} from "../casl/actions.enum";
 import {SubjectEnum} from '../entity/subjectEnum';
 import {ClientService} from './client.service';
-import {buildAlias, deriveSlug} from '../util/slug.util';
 import {isValidRedirectUri} from '../util/redirect-uri.validator';
 import {AppClientAuditLogger} from '../log/app-client-audit.logger';
 import {TechnicalTokenService} from '../core/technical-token.service';
@@ -50,7 +49,15 @@ export class AppService {
     ) {
     }
 
-    async createApp(permission: Permission, tenantId: string, name: string, appUrl: string, description?: string, onboardingEnabled?: boolean, onboardingCallbackUrl?: string): Promise<App> {
+    private buildAlias(alias: string, domain: string): string {
+        const fullAlias = `${domain}.${alias}`;
+        if (fullAlias.length > 253) {
+            throw new BadRequestException('Client alias exceeds 253-character limit');
+        }
+        return fullAlias;
+    }
+
+    async createApp(permission: Permission, tenantId: string, name: string, appUrl: string, alias: string, description?: string, onboardingEnabled?: boolean, onboardingCallbackUrl?: string): Promise<App> {
         const tenant = await this.tenantService.findById(permission, tenantId);
         permission.isAuthorized(Action.Update, SubjectEnum.TENANT, {id: tenant.id});
 
@@ -63,18 +70,10 @@ export class AppService {
             throw new BadRequestException('Onboarding callback URL is not a valid URI');
         }
 
-        const slug = deriveSlug(name);
-        if (!slug) {
-            throw new BadRequestException('App name produces no valid slug');
-        }
-
-        const alias = buildAlias(slug, tenant.domain);
-        if (alias.length > 253) {
-            throw new BadRequestException('Derived client alias exceeds 253-character limit');
-        }
+        const fullAlias = this.buildAlias(alias, tenant.domain);
 
         const clientRepo = this.dataSource.getRepository(Client);
-        const existingAlias = await clientRepo.findOne({where: {alias}});
+        const existingAlias = await clientRepo.findOne({where: {alias: fullAlias}});
         if (existingAlias) {
             throw new ConflictException('Client alias already in use');
         }
@@ -86,7 +85,7 @@ export class AppService {
         // If app creation fails after client is saved, delete the orphaned client.
         const appClient = await this.clientService.createAppClient(this.dataSource.manager, {
             tenant,
-            alias,
+            alias: fullAlias,
             name,
             appUrl,
         });
@@ -132,7 +131,7 @@ export class AppService {
             appName: saved.name,
             ownerTenantId: tenant.id,
             clientId: saved.client?.clientId || '',
-            alias: saved.client?.alias || alias,
+            alias: saved.client?.alias || fullAlias,
             actorId,
             correlationId: '',
         });

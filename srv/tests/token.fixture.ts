@@ -1,4 +1,4 @@
-import {expect2xx, TestFixture} from "./api-client/client";
+import {expect2xx, generateAlias, TestFixture} from "./api-client/client";
 import {ClientEntityClient} from "./api-client/client-entity-client";
 
 // ---------------------------------------------------------------------------
@@ -422,6 +422,7 @@ export class TokenFixture {
     ): Promise<{ clientId: string; clientSecret: string }> {
         const clientEntityClient = new ClientEntityClient(this.app, accessToken);
         const result = await clientEntityClient.createClient(tenantId, name, {
+            alias: generateAlias(name),
             grantTypes,
             allowedScopes,
             isPublic: false,

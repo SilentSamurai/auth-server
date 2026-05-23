@@ -25,6 +25,7 @@ export interface Client {
 export interface CreateClientRequest {
     tenantId: string;
     name: string;
+    alias: string;
     redirectUris: string[];
     allowedScopes?: string;
     grantTypes?: string;

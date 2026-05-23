@@ -1,14 +1,15 @@
-import {Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn} from 'typeorm';
+import {Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, Unique} from 'typeorm';
 import {Tenant} from './tenant.entity';
 import {Role} from './role.entity';
 import {Client} from './client.entity';
 
 @Entity({name: 'apps'})
+@Unique(['owner', 'name'])
 export class App {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @Column({unique: true})
+    @Column()
     name: string;
 
     @Column({name: 'app_url'})

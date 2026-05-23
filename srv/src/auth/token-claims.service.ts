@@ -96,7 +96,7 @@ export class TokenClaimsService {
     private formatRoleNamesForToken(roles: Role[]): string[] {
         return roles.map(role => {
             if (role.app) {
-                return `${role.app.name}:${role.name}`;
+                return `${role.app.client.alias}:${role.name}`;
             }
             return role.name;
         });

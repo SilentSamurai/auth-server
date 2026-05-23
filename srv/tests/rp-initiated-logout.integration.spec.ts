@@ -1,6 +1,6 @@
 import {SharedTestFixture} from "./shared-test.fixture";
 import {TokenFixture} from "./token.fixture";
-import {expect2xx} from "./api-client/client";
+import {expect2xx, generateAlias} from "./api-client/client";
 import {ClientEntityClient} from "./api-client/client-entity-client";
 import {TenantClient} from "./api-client/tenant-client";
 import {AdminTenantClient} from "./api-client/admin-tenant-client";
@@ -98,6 +98,7 @@ describe('RP-Initiated Logout', () => {
         // Create a client for RP-Initiated Logout tests with registered redirect URI
         const clientApi = new ClientEntityClient(app, adminAccessToken);
         const created = await clientApi.createClient(testTenant.id, 'RP Logout Test Client', {
+            alias: generateAlias('RP Logout Test Client'),
             redirectUris: [REDIRECT_URI],
             allowedScopes: 'openid profile email',
             isPublic: true,
@@ -170,6 +171,7 @@ describe('RP-Initiated Logout', () => {
         // Create a second client to get an ID token issued for a different client
         const clientApi = new ClientEntityClient(app, adminAccessToken);
         const otherClient = await clientApi.createClient(testTenant.id, 'Other RP Logout Client', {
+            alias: generateAlias('Other RP Logout Client'),
             redirectUris: ['https://other.example.com/callback'],
             allowedScopes: 'openid profile email',
             isPublic: true,

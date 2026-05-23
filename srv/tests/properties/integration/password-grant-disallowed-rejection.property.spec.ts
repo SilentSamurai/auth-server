@@ -3,6 +3,7 @@ import {ClientEntityClient} from '../../api-client/client-entity-client';
 import {TenantClient} from '../../api-client/tenant-client';
 import {SharedTestFixture} from '../../shared-test.fixture';
 import {TokenFixture} from '../../token.fixture';
+import {generateAlias} from '../../api-client/client';
 
 /**
  * Feature: password-grant-deprecation, Property 1: Disallowed clients always rejected
@@ -75,6 +76,7 @@ describe('Feature: password-grant-deprecation, Property 1: Disallowed clients al
                         testTenantId,
                         `PG Prop ${uniqueSuffix}`,
                         {
+                            alias: generateAlias(`PG Prop ${uniqueSuffix}`),
                             redirectUris: [REDIRECT_URI],
                             allowedScopes: 'openid profile email',
                             isPublic: true,
@@ -120,6 +122,7 @@ describe('Feature: password-grant-deprecation, Property 1: Disallowed clients al
             testTenantId,
             `PG Valid Creds ${uniqueSuffix}`,
             {
+                alias: generateAlias(`PG Valid Creds ${uniqueSuffix}`),
                 redirectUris: [REDIRECT_URI],
                 allowedScopes: 'openid profile email',
                 isPublic: true,
@@ -156,6 +159,7 @@ describe('Feature: password-grant-deprecation, Property 1: Disallowed clients al
             testTenantId,
             `PG NonExistent ${uniqueSuffix}`,
             {
+                alias: generateAlias(`PG NonExistent ${uniqueSuffix}`),
                 redirectUris: [REDIRECT_URI],
                 allowedScopes: 'openid profile email',
                 isPublic: true,
@@ -192,6 +196,7 @@ describe('Feature: password-grant-deprecation, Property 1: Disallowed clients al
             testTenantId,
             `PG Empty User ${uniqueSuffix}`,
             {
+                alias: generateAlias(`PG Empty User ${uniqueSuffix}`),
                 redirectUris: [REDIRECT_URI],
                 allowedScopes: 'openid profile email',
                 isPublic: true,

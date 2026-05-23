@@ -120,6 +120,7 @@ describe('Super Admin — Tenant CRUD Flow', () => {
         cy.contains('button', 'Create').click();
 
         cy.get('input[name="name"]').type(appName); // App name input
+        cy.get('input[name="alias"]').type(appName.toLowerCase().replace(/[^a-z0-9-]/g, '-'));
         cy.get('input[name="appUrl"]').type('http://localhost:3000'); // App name input
         cy.get('textarea[name="description"]').type('A test app for tenant E2E');
 

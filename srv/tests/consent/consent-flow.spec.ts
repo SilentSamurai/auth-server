@@ -26,6 +26,7 @@ import {SharedTestFixture} from '../shared-test.fixture';
 import {TokenFixture} from '../token.fixture';
 import {ClientEntityClient} from '../api-client/client-entity-client';
 import {TenantClient} from '../api-client/tenant-client';
+import {generateAlias} from '../api-client/client';
 
 const CODE_CHALLENGE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopq';
 const CODE_VERIFIER = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopq';
@@ -98,14 +99,14 @@ describe('Consent Flow Integration Tests', () => {
         );
         testTenantId = tenant.id;
 
-        const fullScopesClient = await clientApi.createClient(testTenantId, 'Full Scopes App', {
+        const fullScopesClient = await clientApi.createClient(testTenantId, 'Full Scopes App', { alias: generateAlias('Full Scopes App'),
             redirectUris: [REDIRECT_URI],
             allowedScopes: 'openid profile email',
             isPublic: true,
         });
         thirdPartyClientId = fullScopesClient.client.clientId;
 
-        const narrowClient = await clientApi.createClient(testTenantId, 'Narrow Scopes App', {
+        const narrowClient = await clientApi.createClient(testTenantId, 'Narrow Scopes App', { alias: generateAlias('Narrow Scopes App'),
             redirectUris: [REDIRECT_URI],
             allowedScopes: 'openid profile',
             isPublic: true,
@@ -297,7 +298,7 @@ describe('Consent Flow Integration Tests', () => {
     describe('authorize redirects to consent UI for a third-party client with no prior consent (Req 2.2, 6.1)', () => {
         it('redirects to /consent with client_id, redirect_uri, scope, state, and csrf_token', async () => {
             // Fresh client with no prior consent
-            const fresh = await clientApi.createClient(testTenantId, 'Consent UI App', {
+            const fresh = await clientApi.createClient(testTenantId, 'Consent UI App', { alias: generateAlias('Consent UI App'),
                 redirectUris: [REDIRECT_URI],
                 allowedScopes: 'openid profile email',
                 isPublic: true,
@@ -363,7 +364,7 @@ describe('Consent Flow Integration Tests', () => {
     describe('consent check uses resolved scopes, not the raw request (Req 3.1)', () => {
         it('skips consent on subsequent authorize with broader raw scope when stored consent covers the resolved intersection', async () => {
             // Fresh narrow-scope client: allowedScopes = 'openid profile'
-            const fresh = await clientApi.createClient(testTenantId, 'Resolved Scopes App', {
+            const fresh = await clientApi.createClient(testTenantId, 'Resolved Scopes App', { alias: generateAlias('Resolved Scopes App'),
                 redirectUris: [REDIRECT_URI],
                 allowedScopes: 'openid profile',
                 isPublic: true,
@@ -406,7 +407,7 @@ describe('Consent Flow Integration Tests', () => {
 
     describe('consent grant issues an exchangeable authorization code (Req 3.2)', () => {
         it('code from consent-grant flow can be exchanged for an access token', async () => {
-            const fresh = await clientApi.createClient(testTenantId, 'Token Exchange App', {
+            const fresh = await clientApi.createClient(testTenantId, 'Token Exchange App', { alias: generateAlias('Token Exchange App'),
                 redirectUris: [REDIRECT_URI],
                 allowedScopes: 'openid profile email',
                 isPublic: true,
@@ -442,7 +443,7 @@ describe('Consent Flow Integration Tests', () => {
 
     describe('consent deny action (Req 3.3)', () => {
         it('redirects to redirect_uri with error=access_denied and no code', async () => {
-            const fresh = await clientApi.createClient(testTenantId, 'Deny Test App', {
+            const fresh = await clientApi.createClient(testTenantId, 'Deny Test App', { alias: generateAlias('Deny Test App'),
                 redirectUris: [REDIRECT_URI],
                 allowedScopes: 'openid profile email',
                 isPublic: true,
@@ -480,7 +481,7 @@ describe('Consent Flow Integration Tests', () => {
         });
 
         it('deny does not create a consent record — subsequent authorize still redirects to consent UI', async () => {
-            const fresh = await clientApi.createClient(testTenantId, 'Deny No Record App', {
+            const fresh = await clientApi.createClient(testTenantId, 'Deny No Record App', { alias: generateAlias('Deny No Record App'),
                 redirectUris: [REDIRECT_URI],
                 allowedScopes: 'openid profile email',
                 isPublic: true,
@@ -634,7 +635,7 @@ describe('Consent Flow Integration Tests', () => {
 
     describe('prompt=consent forces re-consent (OIDC prompt)', () => {
         it('redirects to consent UI even when existing consent already covers requested scopes', async () => {
-            const fresh = await clientApi.createClient(testTenantId, 'Prompt Consent App', {
+            const fresh = await clientApi.createClient(testTenantId, 'Prompt Consent App', { alias: generateAlias('Prompt Consent App'),
                 redirectUris: [REDIRECT_URI],
                 allowedScopes: 'openid profile email',
                 isPublic: true,
