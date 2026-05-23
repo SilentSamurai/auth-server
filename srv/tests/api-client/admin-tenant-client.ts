@@ -169,20 +169,20 @@ export class AdminTenantClient extends HttpClient {
 
     // ─── App-owned role admin endpoints ───
 
-    public async addMemberAppRoles(tenantId: string, userId: string, roleIds: string[]) {
+    public async addMemberAppRoles(tenantId: string, userId: string, roleNames: string[]) {
         const response = await this.app.getHttpServer()
             .post(`/api/admin/tenant/${tenantId}/member/${userId}/app-roles/add`)
-            .send({roleIds})
+            .send({roleNames})
             .set('Authorization', `Bearer ${this.accessToken}`)
             .set('Accept', 'application/json');
         expect2xx(response);
         return response.body;
     }
 
-    public async removeMemberAppRoles(tenantId: string, userId: string, roleIds: string[]) {
+    public async removeMemberAppRoles(tenantId: string, userId: string, roleNames: string[]) {
         const response = await this.app.getHttpServer()
             .delete(`/api/admin/tenant/${tenantId}/member/${userId}/app-roles/remove`)
-            .send({roleIds})
+            .send({roleNames})
             .set('Authorization', `Bearer ${this.accessToken}`)
             .set('Accept', 'application/json');
         expect2xx(response);

@@ -509,18 +509,207 @@ Returns the full updated array of role objects assigned to the user after the re
 
 ---
 
+## Get Member App-Owned Roles
+
+```http
+GET /api/tenant/my/member/{userId}/app-roles
+```
+
+`protected`  `application/json`
+
+Returns the app-owned roles assigned to a specific member within the tenant. App-owned roles are namespaced as `{clientAlias}:{roleName}`.
+
+**Path Parameters**
+
+| Parameter | Description      |
+|-----------|------------------|
+| `userId`  | UUID of the user |
+
+**Response**
+
+Returns an array of role objects:
+
+```json
+[
+    {
+        "id": "r1b2c3d4-e5f6-7890-abcd-ef1234567890",
+        "name": "todo-app:editor",
+        "description": "Can edit todo items",
+        "removable": true,
+        "createdAt": "2024-01-15T10:00:00.000Z"
+    }
+]
+```
+
+| Field                 | Type    | Description                                           |
+|-----------------------|---------|-------------------------------------------------------|
+| `id`                  | string  | UUID of the role (in the owner tenant)                |
+| `name`                | string  | Namespaced role name (`{clientAlias}:{roleName}`)     |
+| `description`         | string  | Human-readable description of the role                |
+| `removable`           | boolean | Whether the role can be removed from the user         |
+| `createdAt`           | string  | ISO 8601 timestamp of role creation                   |
+
+**Error Responses**
+
+| Status | Description                                                        |
+|--------|--------------------------------------------------------------------|
+| `401`  | Missing or invalid access token                                    |
+| `403`  | Insufficient permissions (requires `TENANT_VIEWER` role or higher) |
+| `404`  | Tenant or user not found                                           |
+
+---
+
+## Add App-Owned Roles to Member
+
+```http
+POST /api/tenant/my/member/{userId}/app-roles/add
+```
+
+`protected`  `application/json`
+
+Adds one or more app-owned roles to a member. Requires the `TENANT_ADMIN` role. The subscribing tenant must have an active subscription to the app.
+
+**Path Parameters**
+
+| Parameter | Description      |
+|-----------|------------------|
+| `userId`  | UUID of the user |
+
+**Request Body**
+
+```json
+{
+    "roleNames": [
+        "todo-app:editor",
+        "todo-app:viewer"
+    ]
+}
+```
+
+| Parameter   | Required | Description                                                           |
+|-------------|----------|-----------------------------------------------------------------------|
+| `roleNames` | Yes      | Array of namespaced app-owned role names (`{clientAlias}:{roleName}`) |
+
+**Response**
+
+Returns `204 No Content` on success.
+
+**Error Responses**
+
+| Status | Description                                                                         |
+|--------|-------------------------------------------------------------------------------------|
+| `400`  | Invalid request body (e.g., malformed role name format)                             |
+| `401`  | Missing or invalid access token                                                     |
+| `403`  | Insufficient permissions (requires `TENANT_ADMIN` role)                             |
+| `404`  | Tenant, user, or role not found; or user is not a member of this tenant             |
+| `402`  | No active subscription to the app that owns the role                                |
+
+---
+
+## Remove App-Owned Roles from Member
+
+```http
+DELETE /api/tenant/my/member/{userId}/app-roles/remove
+```
+
+`protected`  `application/json`
+
+Removes one or more app-owned roles from a member without affecting their other roles. Requires the `TENANT_ADMIN` role. Does **not** require an active subscription — removal is always allowed.
+
+**Path Parameters**
+
+| Parameter | Description      |
+|-----------|------------------|
+| `userId`  | UUID of the user |
+
+**Request Body**
+
+```json
+{
+    "roleNames": [
+        "todo-app:editor"
+    ]
+}
+```
+
+| Parameter   | Required | Description                                                           |
+|-------------|----------|-----------------------------------------------------------------------|
+| `roleNames` | Yes      | Array of namespaced app-owned role names to remove from the user      |
+
+**Response**
+
+Returns `204 No Content` on success.
+
+**Error Responses**
+
+| Status | Description                                                                         |
+|--------|-------------------------------------------------------------------------------------|
+| `400`  | Invalid request body                                                                |
+| `401`  | Missing or invalid access token                                                     |
+| `403`  | Insufficient permissions (requires `TENANT_ADMIN` role)                             |
+| `404`  | Tenant, user, or role not found; or user is not a member of this tenant             |
+
+---
+
+## Get Available App-Owned Roles
+
+```http
+GET /api/tenant/my/app-roles/available
+```
+
+`protected`  `application/json`
+
+Returns all app-owned roles available to the tenant — i.e., roles belonging to apps the tenant has an active subscription to. Requires at least the `TENANT_VIEWER` role.
+
+**Response**
+
+Returns an array of role objects:
+
+```json
+[
+    {
+        "id": "r1b2c3d4-e5f6-7890-abcd-ef1234567890",
+        "name": "todo-app:editor",
+        "description": "Can edit todo items",
+        "appName": "My Todo App",
+        "appId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+    },
+    {
+        "id": "r2c3d4e5-f6a7-8901-bcde-f12345678901",
+        "name": "todo-app:viewer",
+        "description": "Can view todo items",
+        "appName": "My Todo App",
+        "appId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+    }
+]
+```
+
+**Error Responses**
+
+| Status | Description                                                        |
+|--------|--------------------------------------------------------------------|
+| `401`  | Missing or invalid access token                                    |
+| `403`  | Insufficient permissions (requires `TENANT_VIEWER` role or higher) |
+| `404`  | Tenant not found                                                   |
+
+---
+
 ## Endpoint Summary
 
-| Method   | Path                                          | Description                         | Required Role   |
-|----------|-----------------------------------------------|-------------------------------------|-----------------|
-| `GET`    | `/api/tenant/my/members`                      | List all members                    | `TENANT_VIEWER` |
-| `POST`   | `/api/tenant/my/members/add`                  | Add members by email                | `TENANT_ADMIN`  |
-| `DELETE` | `/api/tenant/my/members/delete`               | Remove members by email             | `TENANT_ADMIN`  |
-| `GET`    | `/api/tenant/my/member/{userId}`              | Get a specific member's details     | `TENANT_VIEWER` |
-| `GET`    | `/api/tenant/my/member/{userId}/roles`        | Get a member's roles                | `TENANT_VIEWER` |
-| `PUT`    | `/api/tenant/my/member/{userId}/roles`        | Replace a member's roles (full set) | `TENANT_ADMIN`  |
-| `POST`   | `/api/tenant/my/member/{userId}/roles/add`    | Add roles to a member               | `TENANT_ADMIN`  |
-| `DELETE` | `/api/tenant/my/member/{userId}/roles/remove` | Remove roles from a member          | `TENANT_ADMIN`  |
+| Method   | Path                                                   | Description                               | Required Role   |
+|----------|--------------------------------------------------------|-------------------------------------------|-----------------|
+| `GET`    | `/api/tenant/my/members`                               | List all members                          | `TENANT_VIEWER` |
+| `POST`   | `/api/tenant/my/members/add`                           | Add members by email                      | `TENANT_ADMIN`  |
+| `DELETE` | `/api/tenant/my/members/delete`                        | Remove members by email                   | `TENANT_ADMIN`  |
+| `GET`    | `/api/tenant/my/member/{userId}`                       | Get a specific member's details           | `TENANT_VIEWER` |
+| `GET`    | `/api/tenant/my/member/{userId}/roles`                 | Get a member's roles                      | `TENANT_VIEWER` |
+| `PUT`    | `/api/tenant/my/member/{userId}/roles`                 | Replace a member's roles (full set)       | `TENANT_ADMIN`  |
+| `POST`   | `/api/tenant/my/member/{userId}/roles/add`             | Add roles to a member                     | `TENANT_ADMIN`  |
+| `DELETE` | `/api/tenant/my/member/{userId}/roles/remove`          | Remove roles from a member                | `TENANT_ADMIN`  |
+| `GET`    | `/api/tenant/my/member/{userId}/app-roles`             | Get a member's app-owned roles            | `TENANT_VIEWER` |
+| `POST`   | `/api/tenant/my/member/{userId}/app-roles/add`         | Add app-owned roles to a member           | `TENANT_ADMIN`  |
+| `DELETE` | `/api/tenant/my/member/{userId}/app-roles/remove`      | Remove app-owned roles from a member      | `TENANT_ADMIN`  |
+| `GET`    | `/api/tenant/my/app-roles/available`                   | Get available app-owned roles             | `TENANT_VIEWER` |
 
 ---
 

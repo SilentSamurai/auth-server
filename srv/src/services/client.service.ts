@@ -126,8 +126,14 @@ export class ClientService {
             }];
         }
 
+        const alias = `client-${clientId}`;
+        if (alias.length > 253) {
+            throw new BadRequestException('Derived client alias exceeds 253-character limit');
+        }
+
         const client = this.clientRepository.create({
             clientId,
+            alias,
             clientSecrets,
             redirectUris: redirectUris || [],
             allowedScopes: allowedScopes || '',

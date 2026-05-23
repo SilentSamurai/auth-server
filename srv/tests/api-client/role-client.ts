@@ -17,19 +17,19 @@ export class RoleClient extends HttpClient {
         return response.body;
     }
 
-    public async addAppOwnedRoles(userId: string, roleIds: string[]): Promise<void> {
+    public async addAppOwnedRoles(userId: string, roleNames: string[]): Promise<void> {
         await this.app.getHttpServer()
             .post(`/api/tenant/my/member/${userId}/app-roles/add`)
-            .send({roleIds})
+            .send({roleNames})
             .set('Authorization', `Bearer ${this.accessToken}`)
             .set('Accept', 'application/json')
             .expect(201);
     }
 
-    public async removeAppOwnedRoles(userId: string, roleIds: string[]): Promise<void> {
+    public async removeAppOwnedRoles(userId: string, roleNames: string[]): Promise<void> {
         await this.app.getHttpServer()
             .delete(`/api/tenant/my/member/${userId}/app-roles/remove`)
-            .send({roleIds})
+            .send({roleNames})
             .set('Authorization', `Bearer ${this.accessToken}`)
             .set('Accept', 'application/json')
             .expect(200);

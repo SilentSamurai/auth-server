@@ -283,7 +283,7 @@ export class AppSubscriptionService {
         if (data.appNames && Array.isArray(data.appNames)) {
             // Recursively subscribe to each app name returned
             for (const name of data.appNames) {
-                const nextApp = await this.appRepo.findOne({where: {name}});
+                const nextApp = await this.appRepo.findOne({where: {name, owner: {id: app.owner.id}}});
                 if (nextApp) {
                     await this.subscribeApp(tenant, nextApp, visited);
                 } else {
@@ -353,7 +353,7 @@ export class AppSubscriptionService {
 
         if (data.appNames && Array.isArray(data.appNames)) {
             for (const name of data.appNames) {
-                const nextApp = await this.appRepo.findOne({where: {name}});
+                const nextApp = await this.appRepo.findOne({where: {name, owner: {id: app.owner.id}}});
                 if (nextApp) {
                     await this.unsubscribe(tenant, nextApp, visited);
                 } else {

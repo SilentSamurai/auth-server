@@ -45,8 +45,8 @@ export class Client {
     @Column({nullable: true})
     name: string;
 
-    @Column({nullable: true, unique: true, name: "alias"})
-    alias: string | null;
+    @Column({nullable: false, unique: true, name: "alias"})
+    alias: string;
 
     @Column({type: "simple-json", nullable: true, name: "allowed_resources"})
     allowedResources: string[] | null;

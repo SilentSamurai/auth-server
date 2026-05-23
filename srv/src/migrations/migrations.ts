@@ -5,6 +5,7 @@ import {Milestone4RefreshSessionsConsents1800000000003} from "./1800000000003-mi
 import {
     Milestone5ResourceIndicatorsOnboarding1800000000004
 } from "./1800000000004-milestone-5-resource-indicators-onboarding";
+import {Milestone6AliasNotNullAndAppNamePerTenant1800000000005} from "./1800000000005-milestone-6-alias-not-null-app-name-per-tenant";
 
 export const migrations = [
     Milestone1InitialSchema1800000000000,
@@ -12,4 +13,5 @@ export const migrations = [
     Milestone3ClientsPkce1800000000002,
     Milestone4RefreshSessionsConsents1800000000003,
     Milestone5ResourceIndicatorsOnboarding1800000000004,
+    Milestone6AliasNotNullAndAppNamePerTenant1800000000005,
 ];

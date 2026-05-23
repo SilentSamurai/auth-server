@@ -152,14 +152,14 @@ export class MemberController {
         @CurrentTenantId() tenantId: string,
         @Param("userId") userId: string,
         @Body(new ValidationPipe(ValidationSchema.AppRoleOperationSchema))
-        body: { roleIds: string[] },
+        body: { roleNames: string[] },
     ): Promise<void> {
         const adminPermission = this.securityService.createPermissionForMemberManagement(tenantId);
         const user = await this.usersService.findById(adminPermission, userId);
         if (!(await this.tenantService.isMember(permission, tenantId, user))) {
             throw new NotFoundException("user is not a member of this tenant");
         }
-        return this.roleService.addAppOwnedRoles(permission, userId, tenantId, body.roleIds);
+        return this.roleService.addAppOwnedRoles(permission, userId, tenantId, body.roleNames);
     }
 
     @Delete("/my/member/:userId/app-roles/remove")
@@ -169,14 +169,14 @@ export class MemberController {
         @CurrentTenantId() tenantId: string,
         @Param("userId") userId: string,
         @Body(new ValidationPipe(ValidationSchema.AppRoleOperationSchema))
-        body: { roleIds: string[] },
+        body: { roleNames: string[] },
     ): Promise<void> {
         const adminPermission = this.securityService.createPermissionForMemberManagement(tenantId);
         const user = await this.usersService.findById(adminPermission, userId);
         if (!(await this.tenantService.isMember(permission, tenantId, user))) {
             throw new NotFoundException("user is not a member of this tenant");
         }
-        return this.roleService.removeAppOwnedRoles(permission, userId, tenantId, body.roleIds);
+        return this.roleService.removeAppOwnedRoles(permission, userId, tenantId, body.roleNames);
     }
 
     @Get("/my/app-roles/available")
@@ -248,8 +248,9 @@ export class MemberController {
             SubjectEnum.TENANT,
             {id: tenant.id},
         );
+        const adminPermission = this.securityService.createPermissionForMemberManagement(tenantId);
         for (const email of body.emails) {
-            const user = await this.usersService.findByEmail(permission, email);
+            const user = await this.usersService.findByEmail(adminPermission, email);
             let securityContext = permission.authContext.SECURITY_CONTEXT as TenantToken;
             if (securityContext.email === email) {
                 throw new ForbiddenException("cannot remove self");

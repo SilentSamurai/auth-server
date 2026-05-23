@@ -16,11 +16,11 @@ or its policies, the change takes effect immediately for all subscribers — no 
 
 The system has three categories of roles:
 
-| Type         | `app_id` Column    | Residency         | Token Format                                   | Policy Source        |
-|--------------|--------------------|-------------------|------------------------------------------------|----------------------|
-| Internal     | N/A (hardcoded)    | Auth server code  | `SUPER_ADMIN`, `TENANT_ADMIN`, `TENANT_VIEWER` | Hardcoded CASL rules |
-| Tenant-local | `null`             | Single tenant     | `roleName`                                     | User's tenant        |
-| App-owned    | Set (FK to `apps`) | Owner tenant only | `appName:roleName`                             | Owner tenant         |
+| Type         | `app_id` Column    | Residency         | Token Format                                         | Policy Source        |
+|--------------|--------------------|-------------------|------------------------------------------------------|----------------------|
+| Internal     | N/A (hardcoded)    | Auth server code  | `SUPER_ADMIN`, `TENANT_ADMIN`, `TENANT_VIEWER`       | Hardcoded CASL rules |
+| Tenant-local | `null`             | Single tenant     | `roleName`                                           | User's tenant        |
+| App-owned    | Set (FK to `apps`) | Owner tenant only | `{clientAlias}:{roleName}`                           | Owner tenant         |
 
 **Internal roles** (`SUPER_ADMIN`, `TENANT_ADMIN`, `TENANT_VIEWER`) are hardcoded in the auth server's CASL ability
 factory. They control access to the auth server's own endpoints and are unaffected by this feature.
@@ -82,8 +82,9 @@ If an app-owned role is deleted from the owner tenant, the system handles it gra
 
 ## Role Namespacing in JWT
 
-App-owned roles are namespaced in the JWT `roles` array using the format `{appName}:{roleName}`. This prevents
-collisions when a user has roles from multiple apps.
+App-owned roles are namespaced in the JWT `roles` array using the format `{clientAlias}:{roleName}`. This prevents
+collisions when a user has roles from multiple apps. The client alias is globally unique and is used for lookups instead
+of the app name (which is only unique within a tenant).
 
 ### Token Example
 
@@ -95,20 +96,20 @@ different apps would receive a token with:
   "roles": [
     "TENANT_ADMIN",
     "reviewer",
-    "todo-app:editor",
-    "todo-app:viewer",
-    "crm-app:sales-manager"
+    "client-todo-abc:editor",
+    "client-todo-abc:viewer",
+    "client-crm-xyz:sales-manager"
   ]
 }
 ```
 
 ### Namespacing Rules
 
-| Role Type    | Format                     | Example           |
-|--------------|----------------------------|-------------------|
-| Internal     | `ROLE_NAME` (no separator) | `SUPER_ADMIN`     |
-| Tenant-local | `roleName` (no separator)  | `reviewer`        |
-| App-owned    | `appName:roleName`         | `todo-app:editor` |
+| Role Type    | Format                       | Example                    |
+|--------------|------------------------------|----------------------------|
+| Internal     | `ROLE_NAME` (no separator)   | `SUPER_ADMIN`              |
+| Tenant-local | `roleName` (no separator)    | `reviewer`                 |
+| App-owned    | `{clientAlias}:{roleName}`   | `client-todo-abc:editor`   |
 
 The `:` character is the separator. Internal and tenant-local role names never contain `:`, so the presence of a colon
 reliably identifies an app-owned role.
@@ -157,15 +158,15 @@ by resource servers that need to fetch policies for a user without that user's t
 ### Resolution Flow
 
 ```
-Token roles: ["TENANT_ADMIN", "reviewer", "todo-app:editor"]
+Token roles: ["TENANT_ADMIN", "reviewer", "client-todo-abc:editor"]
 
-1. "TENANT_ADMIN"      → internal role, skip (handled by auth server CASL)
-2. "reviewer"           → tenant-local, fetch policies from user's tenant
-3. "todo-app:editor"    → app-owned:
-                           a. Parse → app="todo-app", role="editor"
-                           b. Look up app "todo-app" → owner_tenant_id
-                           c. Find role "editor" in owner tenant where app_id = app.id
-                           d. Fetch policies where role_id = role.id AND tenant_id = owner_tenant_id
+1. "TENANT_ADMIN"          → internal role, skip (handled by auth server CASL)
+2. "reviewer"               → tenant-local, fetch policies from user's tenant
+3. "client-todo-abc:editor" → app-owned:
+                               a. Parse → alias="client-todo-abc", role="editor"
+                               b. Look up client by alias → find app → owner_tenant_id
+                               c. Find role "editor" in owner tenant where app_id = app.id
+                               d. Fetch policies where role_id = role.id AND tenant_id = owner_tenant_id
 
 Result: policies from step 2 + policies from step 3
 ```
@@ -257,8 +258,8 @@ After:  user_roles entries for app-owned roles are deleted
 For the full token claims reference, see [Resource Server Verification](resource-server-verification.md). The `roles`
 array is the relevant claim for app-owned roles:
 
-| Claim   | Description                                                                | Example                               |
-|---------|----------------------------------------------------------------------------|---------------------------------------|
-| `roles` | Array of role names. App-owned roles are namespaced as `appName:roleName`. | `["TENANT_ADMIN", "todo-app:editor"]` |
+| Claim   | Description                                                                       | Example                                      |
+|---------|-----------------------------------------------------------------------------------|----------------------------------------------|
+| `roles` | Array of role names. App-owned roles are namespaced as `{clientAlias}:{roleName}`. | `["TENANT_ADMIN", "client-todo-abc:editor"]` |
 
 Technical tokens (`client_credentials` grant) do not have a `roles` field — there is no user context.
