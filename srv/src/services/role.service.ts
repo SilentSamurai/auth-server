@@ -10,6 +10,7 @@ import {Permission} from "../auth/auth.decorator";
 import {Action} from "../casl/actions.enum";
 import {SubjectEnum} from "../entity/subjectEnum";
 import {App} from "../entity/app.entity";
+import {Subscription, SubscriptionStatus} from "../entity/subscription.entity";
 
 @Injectable()
 export class RoleService {
@@ -21,6 +22,8 @@ export class RoleService {
         private userRoleRepository: Repository<UserRole>,
         @InjectRepository(App)
         private appRepository: Repository<App>,
+        @InjectRepository(Subscription)
+        private subscriptionRepository: Repository<Subscription>,
     ) {
     }
 
@@ -402,5 +405,117 @@ export class RoleService {
                 }
             }),
         );
+    }
+
+    async getAppOwnedRolesForMember(
+        permission: Permission,
+        tenantId: string,
+        userId: string,
+    ): Promise<{ id: string; name: string; appId: string; appName: string }[]> {
+        permission.isAuthorized(Action.Read, SubjectEnum.TENANT, {id: tenantId});
+
+        const userRoles = await this.userRoleRepository.find({
+            where: {tenantId, userId},
+        });
+        if (userRoles.length === 0) return [];
+
+        const results: { id: string; name: string; appId: string; appName: string }[] = [];
+        for (const ur of userRoles) {
+            const role = await this.roleRepository.findOne({
+                where: {id: ur.roleId},
+                relations: ['app'],
+            });
+            if (role?.app) {
+                results.push({id: role.id, name: role.name, appId: role.app.id, appName: role.app.name});
+            }
+        }
+        return results;
+    }
+
+    async addAppOwnedRoles(
+        permission: Permission,
+        userId: string,
+        subscriberTenantId: string,
+        roleIds: string[],
+    ): Promise<void> {
+        permission.isAuthorized(Action.Update, SubjectEnum.TENANT, {id: subscriberTenantId});
+
+        for (const roleId of roleIds) {
+            const role = await this.roleRepository.findOne({
+                where: {id: roleId},
+                relations: ['app'],
+            });
+            if (!role?.app) continue;
+
+            const hasSubscription = await this.subscriptionRepository.exists({
+                where: {
+                    subscriber: {id: subscriberTenantId},
+                    app: {id: role.app.id},
+                    status: SubscriptionStatus.SUCCESS,
+                },
+            });
+            if (!hasSubscription) continue;
+
+            const exists = await this.userRoleRepository.exists({
+                where: {tenantId: subscriberTenantId, userId, roleId},
+            });
+            if (!exists) {
+                await this.userRoleRepository.save({
+                    userId,
+                    tenantId: subscriberTenantId,
+                    roleId,
+                    from_group: false,
+                });
+            }
+        }
+    }
+
+    async removeAppOwnedRoles(
+        permission: Permission,
+        userId: string,
+        subscriberTenantId: string,
+        roleIds: string[],
+    ): Promise<void> {
+        permission.isAuthorized(Action.Update, SubjectEnum.TENANT, {id: subscriberTenantId});
+
+        for (const roleId of roleIds) {
+            const role = await this.roleRepository.findOne({
+                where: {id: roleId},
+                relations: ['app'],
+            });
+            if (!role?.app) continue;
+
+            await this.userRoleRepository.delete({
+                tenantId: subscriberTenantId,
+                userId,
+                roleId,
+            });
+        }
+    }
+
+    async getAvailableAppOwnedRoles(
+        permission: Permission,
+        tenantId: string,
+    ): Promise<{ id: string; name: string; appId: string; appName: string }[]> {
+        permission.isAuthorized(Action.Read, SubjectEnum.TENANT, {id: tenantId});
+
+        const subscriptions = await this.subscriptionRepository.find({
+            where: {
+                subscriber: {id: tenantId},
+                status: SubscriptionStatus.SUCCESS,
+            },
+            relations: ['app'],
+        });
+
+        const results: { id: string; name: string; appId: string; appName: string }[] = [];
+        for (const sub of subscriptions) {
+            const roles = await this.roleRepository.find({
+                where: {app: {id: sub.app.id}},
+            });
+            for (const role of roles) {
+                results.push({id: role.id, name: role.name, appId: sub.app.id, appName: sub.app.name});
+            }
+        }
+        return results;
     }
 }

@@ -44,8 +44,9 @@ The discovery document contains the following fields:
 | `token_endpoint`                        | `string`   | URL of the OAuth 2.0 token endpoint. Clients exchange authorization codes and refresh tokens here.                                                                        |
 | `userinfo_endpoint`                     | `string`   | URL of the OIDC UserInfo endpoint. Returns claims about the authenticated user when called with a valid access token.                                                     |
 | `jwks_uri`                              | `string`   | URL of the JSON Web Key Set (JWKS) endpoint. Resource servers use this to fetch the public keys needed to verify token signatures. See [JWKS Endpoint](jwks-endpoint.md). |
-| `registration_endpoint`                 | `string`   | URL of the client registration endpoint (if dynamic client registration is supported).                                                                                    |
-| `scopes_supported`                      | `string[]` | List of OAuth 2.0 scope values supported by this server.                                                                                                                  |
+| `registration_endpoint`                 | `string`   | URL of the client registration endpoint (if dynamic client registration is supported).                    |
+| `end_session_endpoint`                  | `string`   | URL of the RP-Initiated Logout endpoint. Clients redirect users here to end their session.                |
+| `scopes_supported`                      | `string[]` | List of OAuth 2.0 scope values supported by this server.                                                  |
 | `response_types_supported`              | `string[]` | List of `response_type` values supported at the authorization endpoint.                                                                                                   |
 | `grant_types_supported`                 | `string[]` | List of OAuth 2.0 grant type values supported at the token endpoint.                                                                                                      |
 | `subject_types_supported`               | `string[]` | List of Subject Identifier types supported. `public` means the `sub` claim is the same for all clients.                                                                   |
@@ -66,6 +67,7 @@ The discovery document contains the following fields:
     "userinfo_endpoint": "https://auth.server.com/api/oauth/userinfo",
     "jwks_uri": "https://auth.server.com/acme.example.com/.well-known/jwks.json",
     "registration_endpoint": "https://auth.server.com/api/register-domain",
+    "end_session_endpoint": "https://auth.server.com/api/oauth/logout",
     "scopes_supported": [
         "openid",
         "profile",

@@ -118,9 +118,9 @@ describe('OIDC Discovery endpoint', () => {
         expect(res.status).not.toEqual(200);
     });
 
-    // ─── Requirement 2.1–2.13: All required metadata fields present ───
+    // ─── Requirement 2.1–2.14: All required metadata fields present ───
 
-    it('should contain all 13 required OIDC metadata fields with correct types', async () => {
+    it('should contain all 14 required OIDC metadata fields with correct types', async () => {
         const res = await app.getHttpServer()
             .get(`/${tenantA.domain}/.well-known/openid-configuration`);
         expect(res.status).toEqual(200);
@@ -135,6 +135,7 @@ describe('OIDC Discovery endpoint', () => {
         expect(typeof doc.jwks_uri).toBe('string');
         expect(typeof doc.introspection_endpoint).toBe('string');
         expect(typeof doc.revocation_endpoint).toBe('string');
+        expect(typeof doc.end_session_endpoint).toBe('string');
 
         // Array fields (capabilities)
         expect(Array.isArray(doc.scopes_supported)).toBe(true);
@@ -178,6 +179,7 @@ describe('OIDC Discovery endpoint', () => {
             'jwks_uri',
             'introspection_endpoint',
             'revocation_endpoint',
+            'end_session_endpoint',
         ];
 
         for (const field of endpointFields) {
@@ -185,7 +187,18 @@ describe('OIDC Discovery endpoint', () => {
         }
     });
 
-    // ─── Requirement 2.5: jwks_uri contains tenant domain ───
+    // ─── Requirement 2.5: end_session_endpoint points to RP-Initiated Logout URL ───
+
+    it('should have end_session_endpoint ending with /api/oauth/logout', async () => {
+        const res = await app.getHttpServer()
+            .get(`/${tenantA.domain}/.well-known/openid-configuration`);
+        expect(res.status).toEqual(200);
+
+        const doc = res.body;
+        expect(doc.end_session_endpoint).toMatch(/\/api\/oauth\/logout$/);
+    });
+
+    // ─── Requirement 2.6: jwks_uri contains tenant domain ───
 
     it('should have jwks_uri containing tenant domain and ending with /.well-known/jwks.json', async () => {
         const res = await app.getHttpServer()
@@ -223,6 +236,7 @@ describe('OIDC Discovery endpoint', () => {
         expect(docA.userinfo_endpoint).toEqual(docB.userinfo_endpoint);
         expect(docA.introspection_endpoint).toEqual(docB.introspection_endpoint);
         expect(docA.revocation_endpoint).toEqual(docB.revocation_endpoint);
+        expect(docA.end_session_endpoint).toEqual(docB.end_session_endpoint);
         expect(docA.scopes_supported).toEqual(docB.scopes_supported);
         expect(docA.response_types_supported).toEqual(docB.response_types_supported);
         expect(docA.grant_types_supported).toEqual(docB.grant_types_supported);
@@ -323,6 +337,7 @@ describe('OIDC Discovery endpoint', () => {
             'jwks_uri',
             'introspection_endpoint',
             'revocation_endpoint',
+            'end_session_endpoint',
         ];
 
         for (const field of endpointFields) {

@@ -24,5 +24,5 @@ export const MemberOperationsSchema = yup.object().shape({
 });
 
 export const OperatingRoleSchema = yup.object().shape({
-    scopes: yup.array().of(yup.string().max(20)),
+    roles: yup.array().of(yup.string().required().max(100)).required(),
 });
