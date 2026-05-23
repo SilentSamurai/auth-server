@@ -3,6 +3,7 @@ import {ClientEntityClient} from '../../api-client/client-entity-client';
 import {TenantClient} from '../../api-client/tenant-client';
 import {SharedTestFixture} from '../../shared-test.fixture';
 import {TokenFixture} from '../../token.fixture';
+import {generateAlias} from '../../api-client/client';
 
 const CODE_CHALLENGE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopq';
 const ADMIN_EMAIL = 'admin@auth.server.com';
@@ -123,7 +124,7 @@ describe('Feature: prompt-none-no-session, Property 7: prompt=none with no sessi
         const freshClient = await clientApi.createClient(
             tenantId,
             'No Consent PNN',
-            {redirectUris: [REDIRECT_URI], allowedScopes: 'openid profile email', isPublic: true},
+            {alias: generateAlias('No Consent PNN'), redirectUris: [REDIRECT_URI], allowedScopes: 'openid profile email', isPublic: true},
         );
         const freshClientId = freshClient.client.clientId;
 

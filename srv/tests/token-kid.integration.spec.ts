@@ -5,7 +5,7 @@ import {TokenFixture} from "./token.fixture";
 import {AdminTenantClient} from "./api-client/admin-tenant-client";
 import {TenantClient} from "./api-client/tenant-client";
 import {ClientEntityClient} from "./api-client/client-entity-client";
-import {expect2xx} from "./api-client/client";
+import {expect2xx, generateAlias} from "./api-client/client";
 
 /**
  * Integration tests for token kid (Key ID) in JWT headers.
@@ -56,6 +56,7 @@ describe('Token kid integration', () => {
 
         const tenant = await tenantClient.createTenant(name, domain);
         const result = await clientEntityClient.createClient(tenant.id, 'cc-test-client', {
+            alias: generateAlias('cc-test-client'),
             grantTypes: 'client_credentials',
             allowedScopes: 'openid profile email',
             isPublic: false,

@@ -4,6 +4,7 @@ import {getTestPorts} from '../test-ports';
 import {TokenFixture} from '../token.fixture';
 import {SearchClient} from '../api-client/search-client';
 import {ClientEntityClient} from '../api-client/client-entity-client';
+import {generateAlias} from '../api-client/client';
 import {confirmSession, extractFlowIdCookieAndCsrf, grantConsent, login} from '../api-client/fetch-utils';
 
 /**
@@ -142,7 +143,7 @@ describe('OIDC Compatibility (openid-client v5)', () => {
         });
 
         // 5. Create a confidential client with redirect URI
-        const createClientRes = await clientEntityClient.createClient(tenantId, 'oidc-compat-confidential', {
+        const createClientRes = await clientEntityClient.createClient(tenantId, 'oidc-compat-confidential', { alias: generateAlias('oidc-compat-confidential'),
             grantTypes: 'client_credentials authorization_code refresh_token',
             allowedScopes: 'openid profile email offline_access',
             isPublic: false,

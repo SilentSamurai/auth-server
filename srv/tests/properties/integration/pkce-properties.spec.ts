@@ -5,6 +5,7 @@ import {ClientEntityClient} from '../../api-client/client-entity-client';
 import {SharedTestFixture} from '../../shared-test.fixture';
 import {TokenFixture} from '../../token.fixture';
 import {createHash, randomBytes} from 'crypto';
+import {generateAlias} from '../../api-client/client';
 
 /**
  * Feature: pkce-compliance, Property 1: Code verifier format validation
@@ -516,6 +517,7 @@ describe('PKCE Enforcement: required PKCE, voluntary PKCE, downgrade prevention,
 
         // Create client with requirePkce=true
         const pkceRequired = await clientApi.createClient(tenantId, 'PKCE Preservation Required Client', {
+            alias: generateAlias('PKCE Preservation Required Client'),
             redirectUris: [REDIRECT_URI],
             allowedScopes: 'openid profile email',
             isPublic: true,
@@ -525,6 +527,7 @@ describe('PKCE Enforcement: required PKCE, voluntary PKCE, downgrade prevention,
 
         // Create client with requirePkce=false (for voluntary PKCE)
         const pkceOptional = await clientApi.createClient(tenantId, 'PKCE Preservation Optional Client', {
+            alias: generateAlias('PKCE Preservation Optional Client'),
             redirectUris: [REDIRECT_URI],
             allowedScopes: 'openid profile email',
             isPublic: true,
@@ -787,6 +790,7 @@ describe('PKCE Optional Flow: authorize → token exchange without code_challeng
 
         // Create a client with requirePkce=false and isPublic=true
         const created = await clientApi.createClient(tenantId, 'PKCE Bug Condition Client', {
+            alias: generateAlias('PKCE Bug Condition Client'),
             redirectUris: [REDIRECT_URI],
             allowedScopes: 'openid profile email',
             isPublic: true,

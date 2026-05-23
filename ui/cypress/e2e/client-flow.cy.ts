@@ -35,6 +35,7 @@ describe('Client Flow', () => {
         cy.get('#CREATE_CLIENT_BTN').click();
 
         cy.get('#name').type(CLIENT_NAME);
+        cy.get('#alias').type(CLIENT_NAME.toLowerCase().replace(/[^a-z0-9-]/g, '-'));
         cy.get('#redirectUris').type('https://example.com/callback');
         cy.get('#allowedScopes').clear().type('openid profile');
 
@@ -162,6 +163,7 @@ describe('Client Flow', () => {
         cy.get('#CREATE_CLIENT_BTN').click();
 
         cy.get('#name').type(CLIENT_NAME_DELETE);
+        cy.get('#alias').type(CLIENT_NAME_DELETE.toLowerCase().replace(/[^a-z0-9-]/g, '-'));
         cy.get('#redirectUris').type('https://example.com/callback');
 
         cy.intercept('POST', '**/api/clients/create').as('CreateClientForDelete');

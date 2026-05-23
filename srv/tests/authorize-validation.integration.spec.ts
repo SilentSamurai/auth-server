@@ -2,6 +2,7 @@ import {SharedTestFixture} from './shared-test.fixture';
 import {TokenFixture} from './token.fixture';
 import {ClientEntityClient} from './api-client/client-entity-client';
 import {TenantClient} from './api-client/tenant-client';
+import {generateAlias} from './api-client/client';
 
 /**
  * Integration tests for AuthorizeSchema validation in GET /api/oauth/authorize.
@@ -46,6 +47,7 @@ describe('AuthorizeSchema validation — GET /api/oauth/authorize', () => {
 
         // Client without allowedResources - for tests that don't use resource parameter
         const created = await clientApi.createClient(tenant.id, 'Authorize Validation Test Client', {
+            alias: generateAlias('Authorize Validation Test Client'),
             redirectUris: [REDIRECT_URI],
             allowedScopes: 'openid profile email',
             isPublic: true,
@@ -54,6 +56,7 @@ describe('AuthorizeSchema validation — GET /api/oauth/authorize', () => {
 
         // Client with allowedResources - for tests that use resource parameter
         const createdWithResources = await clientApi.createClient(tenant.id, 'Authorize Validation Test Client With Resources', {
+            alias: generateAlias('Authorize Validation Test Client With Resources'),
             redirectUris: [REDIRECT_URI],
             allowedScopes: 'openid profile email',
             isPublic: true,

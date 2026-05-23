@@ -1,7 +1,7 @@
 import {SharedTestFixture} from "../shared-test.fixture";
 import {TokenFixture} from "../token.fixture";
 import {ClientEntityClient} from "../api-client/client-entity-client";
-import {expect2xx} from "../api-client/client";
+import {expect2xx, generateAlias} from "../api-client/client";
 
 describe('e2e tenant technical credential', () => {
     let app: SharedTestFixture;
@@ -52,6 +52,7 @@ describe('e2e tenant technical credential', () => {
     it(`Create confidential Client entity for client_credentials grant`, async () => {
         const clientApi = new ClientEntityClient(app, adminAccessToken);
         const result = await clientApi.createClient(tenant.id, 'Credential Test Client', {
+            alias: generateAlias('Credential Test Client'),
             allowedScopes: 'openid profile email',
             grantTypes: 'client_credentials',
         });

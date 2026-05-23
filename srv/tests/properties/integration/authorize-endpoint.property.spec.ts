@@ -3,6 +3,7 @@ import {ClientEntityClient} from '../../api-client/client-entity-client';
 import {TenantClient} from '../../api-client/tenant-client';
 import {SharedTestFixture} from '../../shared-test.fixture';
 import {TokenFixture} from '../../token.fixture';
+import {generateAlias} from '../../api-client/client';
 
 /**
  * Feature: authorize-endpoint, Property 1: Invalid response_type rejection
@@ -34,6 +35,7 @@ describe('Feature: authorize-endpoint, Property 1: Invalid response_type rejecti
         const tenant = await tenantClient.createTenant('prop-rt-test', 'prop-rt-test.com');
 
         const created = await clientApi.createClient(tenant.id, 'Property RT Client', {
+            alias: generateAlias('Property RT Client'),
             redirectUris: [REDIRECT_URI],
             allowedScopes: 'openid profile email',
             isPublic: true,
@@ -110,6 +112,7 @@ describe('Feature: authorize-endpoint, Property 2: Redirect URI exact match', ()
         const tenant = await tenantClient.createTenant('prop-ruri-test', 'prop-ruri-test.com');
 
         const created = await clientApi.createClient(tenant.id, 'Property RURI Client', {
+            alias: generateAlias('Property RURI Client'),
             redirectUris: [REDIRECT_URI],
             allowedScopes: 'openid profile email',
             isPublic: true,
@@ -186,6 +189,7 @@ describe('Feature: authorize-endpoint, Property 3: State parameter round-trip', 
         const tenant = await tenantClient.createTenant('prop-state-test', 'prop-state-test.com');
 
         const created = await clientApi.createClient(tenant.id, 'Property State Client', {
+            alias: generateAlias('Property State Client'),
             redirectUris: [REDIRECT_URI],
             allowedScopes: 'openid profile email',
             isPublic: true,
@@ -264,6 +268,7 @@ describe('Feature: authorize-endpoint, Property 5: Scope excludes role names', (
         const tenant = await tenantClient.createTenant('prop-scope-role-test', 'prop-scope-role-test.com');
 
         const created = await clientApi.createClient(tenant.id, 'Property Scope Role Client', {
+            alias: generateAlias('Property Scope Role Client'),
             redirectUris: [REDIRECT_URI],
             allowedScopes: 'openid profile email',
             isPublic: true,
@@ -352,6 +357,7 @@ describe('Feature: authorize-endpoint, Property 6: Post-redirect errors include 
 
         // Client with requirePkce=true for PKCE violation scenarios
         const pkceClient = await clientApi.createClient(tenant.id, 'Property PostErr PKCE Client', {
+            alias: generateAlias('Property PostErr PKCE Client'),
             redirectUris: [REDIRECT_URI],
             allowedScopes: 'openid profile email',
             isPublic: true,
@@ -475,6 +481,7 @@ describe('Feature: authorize-endpoint, Property 7: Pre-redirect errors never red
         const tenant = await tenantClient.createTenant('prop-preerr-test', 'prop-preerr-test.com');
 
         const created = await clientApi.createClient(tenant.id, 'Property PreErr Client', {
+            alias: generateAlias('Property PreErr Client'),
             redirectUris: [REDIRECT_URI],
             allowedScopes: 'openid profile email',
             isPublic: true,
@@ -589,6 +596,7 @@ describe('Feature: authorize-endpoint, Property 8: Error codes are standard OAut
         const tenant = await tenantClient.createTenant('prop-errcodes-test', 'prop-errcodes-test.com');
 
         const created = await clientApi.createClient(tenant.id, 'Property ErrCodes Client', {
+            alias: generateAlias('Property ErrCodes Client'),
             redirectUris: [REDIRECT_URI],
             allowedScopes: 'openid profile email',
             isPublic: true,

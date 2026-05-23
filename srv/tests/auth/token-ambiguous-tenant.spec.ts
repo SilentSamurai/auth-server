@@ -32,6 +32,7 @@ import {TokenFixture} from '../token.fixture';
 import {UsersClient} from '../api-client/user-client';
 import {AdminTenantClient} from '../api-client/admin-tenant-client';
 import {HelperFixture} from '../helper.fixture';
+import {generateAlias} from "../api-client/client";
 
 describe('Ambiguous Subscription Tenant Flow', () => {
     let app: SharedTestFixture;
@@ -75,7 +76,7 @@ describe('Ambiguous Subscription Tenant Flow', () => {
             expect(subscriber2).toBeDefined();
             expect(appOwnerTenant).toBeDefined();
 
-            const createdApp = await appClient.createApp(appOwnerTenant.id, `ambiguous-app-${uuid()}`, `http://localhost:${app.webhook.boundPort}`, 'Ambiguous app for test');
+            const createdApp = await appClient.createApp(appOwnerTenant.id, `ambiguous-app-${uuid()}`, `http://localhost:${app.webhook.boundPort}`, generateAlias(`ambiguous-app-${uuid()}`), 'Ambiguous app for test');
             await appClient.publishApp(createdApp.id);
 
             const testUserEmail = `ambiguous-user-${uuid()}@test.com`;
@@ -104,7 +105,7 @@ describe('Ambiguous Subscription Tenant Flow', () => {
             expect(subscriber1).toBeDefined();
             expect(subscriber2).toBeDefined();
 
-            const createdApp = await appClient.createApp(appOwnerTenant.id, `ambiguous-app-${uuid()}`, `http://localhost:${app.webhook.boundPort}`, 'Ambiguous app for test');
+            const createdApp = await appClient.createApp(appOwnerTenant.id, `ambiguous-app-${uuid()}`, `http://localhost:${app.webhook.boundPort}`, generateAlias(`ambiguous-app-${uuid()}`), 'Ambiguous app for test');
             await appClient.publishApp(createdApp.id);
 
             const testUserEmail = `ambiguous-user-${uuid()}@test.com`;
@@ -139,7 +140,7 @@ describe('Ambiguous Subscription Tenant Flow', () => {
             expect(appOwnerTenant).toBeDefined();
             expect(subscriber).toBeDefined();
 
-            const createdApp = await appClient.createApp(appOwnerTenant.id, `single-sub-app-${uuid()}`, `http://localhost:${app.webhook.boundPort}`, 'Single subscription app for test');
+            const createdApp = await appClient.createApp(appOwnerTenant.id, `single-sub-app-${uuid()}`, `http://localhost:${app.webhook.boundPort}`, generateAlias(`single-sub-app-${uuid()}`), 'Single subscription app for test');
             await appClient.publishApp(createdApp.id);
 
             const testUserEmail = `single-sub-user-${uuid()}@test.com`;
@@ -167,7 +168,7 @@ describe('Ambiguous Subscription Tenant Flow', () => {
             const appOwnerTenant = await searchClient.findTenantBy({domain: 'shire.local'});
             expect(appOwnerTenant).toBeDefined();
 
-            const createdApp = await appClient.createApp(appOwnerTenant.id, `own-tenant-app-${uuid()}`, `http://localhost:${app.webhook.boundPort}`, 'App for own tenant test');
+            const createdApp = await appClient.createApp(appOwnerTenant.id, `own-tenant-app-${uuid()}`, `http://localhost:${app.webhook.boundPort}`, generateAlias(`own-tenant-app-${uuid()}`), 'App for own tenant test');
             await appClient.publishApp(createdApp.id);
 
             const testUserEmail = `own-tenant-user-${uuid()}@test.com`;
@@ -219,7 +220,7 @@ describe('Ambiguous Subscription Tenant Flow', () => {
             expect(subscriber2).toBeDefined();
             expect(appOwnerTenant).toBeDefined();
 
-            const createdApp = await appClient.createApp(appOwnerTenant.id, `hint-test-app-${uuid()}`, `http://localhost:${app.webhook.boundPort}`, 'App for testing tenant hint');
+            const createdApp = await appClient.createApp(appOwnerTenant.id, `hint-test-app-${uuid()}`, `http://localhost:${app.webhook.boundPort}`, generateAlias(`hint-test-app-${uuid()}`), 'App for testing tenant hint');
             await appClient.publishApp(createdApp.id);
 
             const testUserEmail = `hint-test-user-${uuid()}@test.com`;
@@ -279,6 +280,7 @@ describe('Ambiguous Subscription Tenant Flow', () => {
                 appOwnerTenant.id,
                 `authcode-ambiguous-app-${uuid()}`,
                 `http://localhost:${app.webhook.boundPort}`,
+                generateAlias(`authcode-ambiguous-app-${uuid()}`),
                 'App for auth code ambiguity test'
             );
             await appClient.publishApp(createdApp.id);
@@ -326,6 +328,7 @@ describe('Ambiguous Subscription Tenant Flow', () => {
                 appOwnerTenant.id,
                 `authcode-hint-app-${uuid()}`,
                 `http://localhost:${app.webhook.boundPort}`,
+                generateAlias(`authcode-hint-app-${uuid()}`),
                 'App for hint validation test'
             );
             await appClient.publishApp(createdApp.id);
@@ -424,6 +427,7 @@ describe('Ambiguous Subscription Tenant Flow', () => {
                 appOwnerTenant.id,
                 `authcode-full-flow-app-${uuid()}`,
                 appUrl,
+                generateAlias(`authcode-full-flow-app-${uuid()}`),
                 'App for full auth code flow test'
             );
             await appClient.publishApp(createdApp.id);

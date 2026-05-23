@@ -24,7 +24,7 @@ import {TenantClient} from '../api-client/tenant-client';
 import {AdminTenantClient} from '../api-client/admin-tenant-client';
 import {HelperFixture} from '../helper.fixture';
 import {RoleClient} from '../api-client/role-client';
-import {expect2xx} from '../api-client/client';
+import {expect2xx, generateAlias} from '../api-client/client';
 
 describe('App-Owned Roles', () => {
     let fixture: SharedTestFixture;
@@ -118,7 +118,7 @@ describe('App-Owned Roles', () => {
         const appClient = new AppClient(fixture, ownerAdminToken);
         appName = `app-roles-test-${Date.now()}`;
         const app = await appClient.createApp(
-            ownerTenantId, appName, `http://localhost:${fixture.webhook.boundPort}`, 'App for role tests',
+            ownerTenantId, appName, `http://localhost:${fixture.webhook.boundPort}`, generateAlias(appName), 'App for role tests',
         );
         appId = app.id;
         appAlias = app.alias;
@@ -312,7 +312,7 @@ describe('App-Owned Roles', () => {
             const appClient2 = new AppClient(fixture, ownerAdminToken);
             const secondAppName = `app-roles-second-${Date.now()}`;
             const secondApp = await appClient2.createApp(
-                ownerTenantId, secondAppName, `http://localhost:${fixture.webhook.boundPort}`, 'Second app',
+                ownerTenantId, secondAppName, `http://localhost:${fixture.webhook.boundPort}`, generateAlias(secondAppName), 'Second app',
             );
             const secondAppAlias = secondApp.alias;
 
@@ -497,7 +497,7 @@ describe('App-Owned Roles', () => {
             const appClient = new AppClient(fixture, ownerAdminToken);
             const degradeAppName = `degrade-app-${Date.now()}`;
             const degradeApp = await appClient.createApp(
-                ownerTenantId, degradeAppName, `http://localhost:${fixture.webhook.boundPort}`, 'Degrade test app',
+                ownerTenantId, degradeAppName, `http://localhost:${fixture.webhook.boundPort}`, generateAlias(degradeAppName), 'Degrade test app',
             );
             const degradeAppAlias = degradeApp.alias;
 
@@ -614,7 +614,7 @@ describe('App-Owned Roles', () => {
             const appClient = new AppClient(fixture, ownerAdminToken);
             unsubAppName = `unsub-app-${Date.now()}`;
             const unsubApp = await appClient.createApp(
-                ownerTenantId, unsubAppName, `http://localhost:${fixture.webhook.boundPort}`, 'Unsub test app',
+                ownerTenantId, unsubAppName, `http://localhost:${fixture.webhook.boundPort}`, generateAlias(unsubAppName), 'Unsub test app',
             );
             unsubAppId = unsubApp.id;
             unsubAppAlias = unsubApp.alias;
@@ -794,7 +794,7 @@ describe('App-Owned Roles', () => {
             const appClient2 = new AppClient(fixture, ownerAdminToken);
             const unsubAppName = `unsub-app-no-sub-${Date.now()}`;
             const unsubApp = await appClient2.createApp(
-                ownerTenantId, unsubAppName, `http://localhost:${fixture.webhook.boundPort}`, 'No sub app',
+                ownerTenantId, unsubAppName, `http://localhost:${fixture.webhook.boundPort}`, generateAlias(unsubAppName), 'No sub app',
             );
             const unsubAppAlias = unsubApp.alias;
             const unsubRoleName = `unsub-role-${Date.now()}`;

@@ -7,6 +7,7 @@ export class ClientEntityClient extends HttpClient {
     }
 
     public async createClient(tenantId: string, name: string, opts: {
+        alias: string;
         redirectUris?: string[];
         allowedScopes?: string;
         grantTypes?: string;
@@ -17,9 +18,10 @@ export class ClientEntityClient extends HttpClient {
         allowPasswordGrant?: boolean;
         allowRefreshToken?: boolean;
         allowedResources?: string[];
-    } = {}) {
+    }) {
+        const {alias, ...rest} = opts;
         const response = await this.post('/api/clients/create')
-            .send({tenantId, name, ...opts});
+            .send({tenantId, name, alias, ...rest});
 
         expect2xx(response);
         return response.body;

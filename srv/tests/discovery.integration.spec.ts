@@ -1,7 +1,7 @@
 import {createHash} from "crypto";
 import {SharedTestFixture} from "./shared-test.fixture";
 import {TokenFixture} from "./token.fixture";
-import {expect2xx} from "./api-client/client";
+import {expect2xx, generateAlias} from "./api-client/client";
 import {HelperFixture} from "./helper.fixture";
 import {AdminTenantClient} from "./api-client/admin-tenant-client";
 import {AppClient} from "./api-client/app-client";
@@ -76,6 +76,7 @@ describe('OIDC Discovery endpoint', () => {
             tenantA.id,
             `disco-app-${Date.now()}`,
             `http://localhost:${app.webhook.boundPort}`,
+            generateAlias(`disco-app-${Date.now()}`),
             'App for discovery alias test'
         );
         appAlias = createdApp.alias;

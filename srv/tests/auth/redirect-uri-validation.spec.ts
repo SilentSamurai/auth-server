@@ -1,9 +1,9 @@
 import {SharedTestFixture} from '../shared-test.fixture';
 import {TokenFixture} from '../token.fixture';
+import {expect2xx, generateAlias} from '../api-client/client';
 import {ClientEntityClient} from '../api-client/client-entity-client';
 import {TenantClient} from '../api-client/tenant-client';
 import {AdminTenantClient} from '../api-client/admin-tenant-client';
-import {expect2xx} from '../api-client/client';
 
 /**
  * Integration tests for redirect URI validation at the authorization endpoint.
@@ -39,6 +39,7 @@ describe('Authorization endpoint redirect URI validation', () => {
         testTenantId = tenant.id;
 
         const singleUri = await clientApi.createClient(testTenantId, 'Single URI Validation Client', {
+            alias: generateAlias('Single URI Validation Client'),
             redirectUris: [REDIRECT_URI],
             allowedScopes: 'openid profile email',
             isPublic: true,
@@ -46,6 +47,7 @@ describe('Authorization endpoint redirect URI validation', () => {
         singleUriClientId = singleUri.client.clientId;
 
         const multiUri = await clientApi.createClient(testTenantId, 'Multi URI Validation Client', {
+            alias: generateAlias('Multi URI Validation Client'),
             redirectUris: [REDIRECT_URI, REDIRECT_URI_2],
             allowedScopes: 'openid profile email',
             isPublic: true,
@@ -53,6 +55,7 @@ describe('Authorization endpoint redirect URI validation', () => {
         multiUriClientId = multiUri.client.clientId;
 
         const noUri = await clientApi.createClient(testTenantId, 'No URI Validation Client', {
+            alias: generateAlias('No URI Validation Client'),
             redirectUris: [],
             allowedScopes: 'openid profile email',
             isPublic: true,
@@ -227,6 +230,7 @@ describe('Authorize endpoint redirect URI validation', () => {
         await adminTenantClient.addMembers(testTenantId, [email]);
 
         const singleUri = await clientApi.createClient(testTenantId, 'Login Redir Validation Client', {
+            alias: generateAlias('Login Redir Validation Client'),
             redirectUris: [REDIRECT_URI],
             allowedScopes: 'openid profile email',
             isPublic: true,
@@ -382,6 +386,7 @@ describe('Token exchange redirect URI binding', () => {
         await adminTenantClient.addMembers(testTenantId, [email]);
 
         const singleUri = await clientApi.createClient(testTenantId, 'Token Xchg Redir Client', {
+            alias: generateAlias('Token Xchg Redir Client'),
             redirectUris: [REDIRECT_URI],
             allowedScopes: 'openid profile email',
             isPublic: true,
@@ -506,6 +511,7 @@ describe('Error response format compliance', () => {
         await adminTenantClient.addMembers(testTenantId, [email]);
 
         const singleUri = await clientApi.createClient(testTenantId, 'ErrFmt Redir Client', {
+            alias: generateAlias('ErrFmt Redir Client'),
             redirectUris: [REGISTERED_URI],
             allowedScopes: 'openid profile email',
             isPublic: true,

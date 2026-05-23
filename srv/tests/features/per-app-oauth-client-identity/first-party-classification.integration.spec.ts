@@ -7,6 +7,7 @@ import {AdminTenantClient} from '../../api-client/admin-tenant-client';
 import {HelperFixture} from '../../helper.fixture';
 import {ClientEntityClient} from '../../api-client/client-entity-client';
 import {SearchClient} from '../../api-client/search-client';
+import {generateAlias} from '../../api-client/client';
 
 /**
  * Tests for Requirement 5: First-Party Classification
@@ -99,7 +100,7 @@ describe('Per-App OAuth Client Identity — First-Party Classification', () => {
         // Create an App on the super tenant
         const appName = `super-app-${uuid().slice(0, 8)}`;
         const appUrl = 'https://super-tenant-app.example.com/callback';
-        const app = await appClient.createApp(superTenantId, appName, appUrl);
+        const app = await appClient.createApp(superTenantId, appName, appUrl, generateAlias(appName));
 
         expect(app.clientId).toBeDefined();
         expect(app.alias).toBeDefined();

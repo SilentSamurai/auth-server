@@ -8,6 +8,7 @@ import {HelperFixture} from '../../helper.fixture';
 import {ClientEntityClient} from '../../api-client/client-entity-client';
 import {SearchClient} from '../../api-client/search-client';
 import {UsersClient} from '../../api-client/user-client';
+import {generateAlias} from '../../api-client/client';
 
 describe('Per-App OAuth Client Identity', () => {
     let fixture: SharedTestFixture;
@@ -74,7 +75,7 @@ describe('Per-App OAuth Client Identity', () => {
     it('should create an App with App_Client and expose clientId + alias', async () => {
         const appName = `happy-path-${uuid()}`;
         const appUrl = 'https://myapp.example.com/callback';
-        const app = await appClient.createApp(tenantId, appName, appUrl, 'Test description');
+        const app = await appClient.createApp(tenantId, appName, appUrl, generateAlias(appName), 'Test description');
 
         expect(app.clientId).toBeDefined();
         expect(app.alias).toBeDefined();
@@ -94,7 +95,7 @@ describe('Per-App OAuth Client Identity', () => {
         const appName = `del-reject-${uuid()}`;
         // Use the test webhook server so subscription onboard call succeeds
         const appUrl = `http://localhost:${fixture.webhook.boundPort}`;
-        const app = await appClient.createApp(tenantId, appName, appUrl);
+        const app = await appClient.createApp(tenantId, appName, appUrl, generateAlias(appName));
 
         await appClient.publishApp(app.id);
 
@@ -117,7 +118,7 @@ describe('Per-App OAuth Client Identity', () => {
     it('should cascade name change to App_Client but keep alias unchanged', async () => {
         const appName = `rename-test-${uuid()}`;
         const appUrl = 'https://rename.example.com/callback';
-        const app = await appClient.createApp(tenantId, appName, appUrl);
+        const app = await appClient.createApp(tenantId, appName, appUrl, generateAlias(appName));
         const originalAlias = app.alias;
 
         const newName = `renamed-${uuid()}`;
@@ -131,7 +132,7 @@ describe('Per-App OAuth Client Identity', () => {
     it('should cascade appUrl change to App_Client redirectUris', async () => {
         const appName = `url-cascade-${uuid()}`;
         const appUrl = 'https://original.example.com/callback';
-        const app = await appClient.createApp(tenantId, appName, appUrl);
+        const app = await appClient.createApp(tenantId, appName, appUrl, generateAlias(appName));
 
         const newUrl = 'https://updated.example.com/callback';
         const updated = await appClient.updateApp(app.id, appName, newUrl);
@@ -142,7 +143,7 @@ describe('Per-App OAuth Client Identity', () => {
     it('should reject appUrl with fragment', async () => {
         const appName = `fragment-reject-${uuid()}`;
         try {
-            await appClient.createApp(tenantId, appName, 'https://example.com#fragment');
+            await appClient.createApp(tenantId, appName, 'https://example.com#fragment', generateAlias(appName));
             fail('Expected createApp to throw');
         } catch (e: any) {
             expect(e.status).toBe(400);
@@ -153,7 +154,7 @@ describe('Per-App OAuth Client Identity', () => {
     it('should reject appUrl with HTTP non-localhost', async () => {
         const appName = `http-reject-${uuid()}`;
         try {
-            await appClient.createApp(tenantId, appName, 'http://example.com/callback');
+            await appClient.createApp(tenantId, appName, 'http://example.com/callback', generateAlias(appName));
             fail('Expected createApp to throw');
         } catch (e: any) {
             expect(e.status).toBe(400);
@@ -163,20 +164,20 @@ describe('Per-App OAuth Client Identity', () => {
 
     it('should allow appUrl with HTTP localhost', async () => {
         const appName = `http-allow-${uuid()}`;
-        const app = await appClient.createApp(tenantId, appName, 'http://localhost:3000/callback');
+        const app = await appClient.createApp(tenantId, appName, 'http://localhost:3000/callback', generateAlias(appName));
         expect(app.id).toBeDefined();
     });
 
     it('should allow appUrl with custom scheme', async () => {
         const appName = `custom-scheme-${uuid()}`;
-        const app = await appClient.createApp(tenantId, appName, 'myapp://oauth/callback');
+        const app = await appClient.createApp(tenantId, appName, 'myapp://oauth/callback', generateAlias(appName));
         expect(app.id).toBeDefined();
     });
 
     // 17.10 Client update on App_Client
     it('should reject PATCH name on App_Client with HTTP 400', async () => {
         const appName = `immutable-alias-${uuid()}`;
-        const app = await appClient.createApp(tenantId, appName, 'https://immutable.example.com/callback');
+        const app = await appClient.createApp(tenantId, appName, 'https://immutable.example.com/callback', generateAlias(appName));
 
         const detail = await appClient.getAppDetails(app.id);
         const clientId = detail.client.clientId;
@@ -192,7 +193,7 @@ describe('Per-App OAuth Client Identity', () => {
 
     it('should allow PATCH allowPasswordGrant on App_Client', async () => {
         const appName = `scopes-update-${uuid()}`;
-        const app = await appClient.createApp(tenantId, appName, 'https://scopes.example.com/callback');
+        const app = await appClient.createApp(tenantId, appName, 'https://scopes.example.com/callback', generateAlias(appName));
 
         const detail = await appClient.getAppDetails(app.id);
         const clientId = detail.client.clientId;
@@ -204,7 +205,7 @@ describe('Per-App OAuth Client Identity', () => {
     // 17.11 App detail and search
     it('should return full client config from detail endpoint (no secrets)', async () => {
         const appName = `detail-check-${uuid()}`;
-        const app = await appClient.createApp(tenantId, appName, 'https://detail.example.com/callback');
+        const app = await appClient.createApp(tenantId, appName, 'https://detail.example.com/callback', generateAlias(appName));
         const detail = await appClient.getAppDetails(app.id);
 
         expect(detail.client).toBeDefined();
@@ -217,7 +218,7 @@ describe('Per-App OAuth Client Identity', () => {
     // 17.12 Logging test - basic check
     it('should create app with audit logging', async () => {
         const appName = `audit-log-${uuid()}`;
-        const app = await appClient.createApp(tenantId, appName, 'https://audit.example.com/callback');
+        const app = await appClient.createApp(tenantId, appName, 'https://audit.example.com/callback', generateAlias(appName));
         expect(app.clientId).toBeDefined();
         expect(app.alias).toBeDefined();
     });
@@ -225,13 +226,13 @@ describe('Per-App OAuth Client Identity', () => {
     // 17.10 - Additional: Reject PATCH alias on App_Client (Req 7.6)
     it('should reject PATCH alias on App_Client with HTTP 400', async () => {
         const appName = `immutable-alias-test-${uuid()}`;
-        const app = await appClient.createApp(tenantId, appName, 'https://alias-test.example.com/callback');
+        const app = await appClient.createApp(tenantId, appName, 'https://alias-test.example.com/callback', generateAlias(appName));
 
         const detail = await appClient.getAppDetails(app.id);
         const clientId = detail.client.clientId;
 
         try {
-            await clientEntityClient.updateClient(clientId, {alias: 'new-alias.test.local'});
+            await clientEntityClient.updateClient(clientId, {alias: 'new-alias-test-local'});
             fail('Expected updateClient to throw');
         } catch (e: any) {
             expect(e.status).toBe(400);
@@ -244,7 +245,7 @@ describe('Per-App OAuth Client Identity', () => {
     it('should resolve authorize request by App_Client alias', async () => {
         const appName = `authorize-alias-${uuid()}`;
         const appUrl = 'https://authorize-alias.example.com/callback';
-        const app = await appClient.createApp(tenantId, appName, appUrl);
+        const app = await appClient.createApp(tenantId, appName, appUrl, generateAlias(appName));
 
         // Attempt authorize with App_Client alias
         const response = await fixture.getHttpServer()
@@ -268,7 +269,7 @@ describe('Per-App OAuth Client Identity', () => {
     it('should resolve authorize request by App_Client UUID', async () => {
         const appName = `authorize-uuid-${uuid()}`;
         const appUrl = 'https://authorize-uuid.example.com/callback';
-        const app = await appClient.createApp(tenantId, appName, appUrl);
+        const app = await appClient.createApp(tenantId, appName, appUrl, generateAlias(appName));
 
         // Attempt authorize with App_Client clientId (UUID)
         const response = await fixture.getHttpServer()

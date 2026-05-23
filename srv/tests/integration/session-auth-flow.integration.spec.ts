@@ -3,6 +3,7 @@ import {TokenFixture} from '../token.fixture';
 import {ClientEntityClient} from '../api-client/client-entity-client';
 import {TenantClient} from '../api-client/tenant-client';
 import {AdminTenantClient} from '../api-client/admin-tenant-client';
+import {generateAlias} from '../api-client/client';
 
 const CODE_CHALLENGE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopq';
 const CODE_VERIFIER = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopq';
@@ -42,7 +43,7 @@ describe('Session Auth Flow', () => {
         );
         testTenantId = tenant.id;
 
-        const thirdParty = await clientApi.createClient(testTenantId, 'Third Party', {
+        const thirdParty = await clientApi.createClient(testTenantId, 'Third Party', { alias: generateAlias('Third Party'),
             redirectUris: [REDIRECT_URI],
             allowedScopes: 'openid profile email',
             isPublic: true,
@@ -416,7 +417,7 @@ describe('Session Auth Flow', () => {
 
     describe('17.6 — session_confirmed security', () => {
         it('session_confirmed=true does not bypass consent for third-party with no prior consent', async () => {
-            const freshClient = await clientApi.createClient(testTenantId, 'No Consent App', {
+            const freshClient = await clientApi.createClient(testTenantId, 'No Consent App', { alias: generateAlias('No Consent App'),
                 redirectUris: [REDIRECT_URI],
                 allowedScopes: 'openid profile email',
                 isPublic: true,

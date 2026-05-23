@@ -1,4 +1,4 @@
-import {BadRequestException, Injectable, NotFoundException} from '@nestjs/common';
+import {BadRequestException, ConflictException, Injectable, NotFoundException} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {EntityManager, Repository} from 'typeorm';
 import {Client} from '../entity/client.entity';
@@ -97,6 +97,7 @@ export class ClientService {
         tenantId: string,
         name: string,
         redirectUris: string[],
+        alias: string,
         allowedScopes?: string,
         grantTypes?: string,
         responseTypes?: string,
@@ -126,14 +127,19 @@ export class ClientService {
             }];
         }
 
-        const alias = `client-${clientId}`;
-        if (alias.length > 253) {
-            throw new BadRequestException('Derived client alias exceeds 253-character limit');
+        const fullAlias = `${tenant.domain}.${alias}`;
+        if (fullAlias.length > 253) {
+            throw new BadRequestException('Client alias exceeds 253-character limit');
+        }
+
+        const existingAlias = await this.clientRepository.findOne({where: {alias: fullAlias}});
+        if (existingAlias) {
+            throw new ConflictException('Client alias already in use');
         }
 
         const client = this.clientRepository.create({
             clientId,
-            alias,
+            alias: fullAlias,
             clientSecrets,
             redirectUris: redirectUris || [],
             allowedScopes: allowedScopes || '',
@@ -328,6 +334,7 @@ export class ClientService {
         if (updates.requirePkce !== undefined) client.requirePkce = updates.requirePkce;
         if (updates.allowPasswordGrant !== undefined) client.allowPasswordGrant = updates.allowPasswordGrant;
         if (updates.allowRefreshToken !== undefined) client.allowRefreshToken = updates.allowRefreshToken;
+        if (updates.alias !== undefined) client.alias = updates.alias;
         return this.clientRepository.save(client);
     }
 

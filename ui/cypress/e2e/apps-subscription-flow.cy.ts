@@ -14,6 +14,7 @@ describe('Apps & Subscription Flow', () => {
     const TENANT_B_ADMIN = 'admin@bree.local';
     const TENANT_B_DOMAIN = 'bree.local';
     const APP_NAME = 'Subscription Test App';
+    const APP_ALIAS = 'subscription-test-app';
     const APP_URL = 'http://localhost:3000';
     const APP_DESC = 'A test app for subscription E2E';
 
@@ -22,7 +23,7 @@ describe('Apps & Subscription Flow', () => {
     it('Tenant A should add an app', () => {
         cy.login(TENANT_A_ADMIN, Cypress.env('shireTenantAdminPassword'), TENANT_A_DOMAIN);
         cy.userOpenTenantOverview();
-        cy.addAppFromOverview(APP_NAME, APP_URL, APP_DESC);
+        cy.addAppFromOverview(APP_NAME, APP_ALIAS, APP_URL, APP_DESC);
     });
 
     // Tenant B opens the subscription dialog and verifies the unpublished app is not listed

@@ -20,6 +20,7 @@ import {ClientEntityClient} from '../api-client/client-entity-client';
 import {TenantClient} from '../api-client/tenant-client';
 import {AdminTenantClient} from '../api-client/admin-tenant-client';
 import {HelperFixture} from '../helper.fixture';
+import {generateAlias} from '../api-client/client';
 
 const CODE_CHALLENGE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopq';
 const CODE_VERIFIER = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopq';
@@ -203,7 +204,7 @@ describe('Password Grant Deprecation Integration Tests', () => {
     describe('Req 4.2: Allowed client succeeds via clientId (UUID)', () => {
         it('should return tokens when password grant is used with a valid clientId (UUID)', async () => {
             // Create a client with allowPasswordGrant: true
-            const client = await clientApi.createClient(testTenantId, 'Password Grant Client', {
+            const client = await clientApi.createClient(testTenantId, 'Password Grant Client', { alias: generateAlias('Password Grant Client'),
                 redirectUris: [REDIRECT_URI],
                 allowedScopes: 'openid profile email',
                 isPublic: true,
@@ -283,7 +284,7 @@ describe('Password Grant Deprecation Integration Tests', () => {
     describe('Req 4.3, 5.1, 5.2: Disallowed client rejected', () => {
         it('should reject password grant when allowPasswordGrant is false', async () => {
             // Create a client with allowPasswordGrant: false (default)
-            const client = await clientApi.createClient(testTenantId, 'No Password Grant Client', {
+            const client = await clientApi.createClient(testTenantId, 'No Password Grant Client', { alias: generateAlias('No Password Grant Client'),
                 redirectUris: [REDIRECT_URI],
                 allowedScopes: 'openid profile email',
                 isPublic: true,
@@ -352,7 +353,7 @@ describe('Password Grant Deprecation Integration Tests', () => {
     describe('Req 5.3: Flag check before credential validation', () => {
         it('should reject with unauthorized_client even when credentials are invalid', async () => {
             // Create a client with allowPasswordGrant: false
-            const client = await clientApi.createClient(testTenantId, 'Flag Check Client', {
+            const client = await clientApi.createClient(testTenantId, 'Flag Check Client', { alias: generateAlias('Flag Check Client'),
                 redirectUris: [REDIRECT_URI],
                 allowedScopes: 'openid profile email',
                 isPublic: true,
@@ -381,7 +382,7 @@ describe('Password Grant Deprecation Integration Tests', () => {
 
         it('should reject with unauthorized_client even when username does not exist', async () => {
             // Create a client with allowPasswordGrant: false
-            const client = await clientApi.createClient(testTenantId, 'Flag Check NonExistent User', {
+            const client = await clientApi.createClient(testTenantId, 'Flag Check NonExistent User', { alias: generateAlias('Flag Check NonExistent User'),
                 redirectUris: [REDIRECT_URI],
                 allowedScopes: 'openid profile email',
                 isPublic: true,
@@ -553,7 +554,7 @@ describe('Password Grant Deprecation Integration Tests', () => {
 
         it('should require consent for third-party (non-alias) client', async () => {
             // Create a third-party client (no alias match)
-            const client = await clientApi.createClient(testTenantId, 'Third Party App', {
+            const client = await clientApi.createClient(testTenantId, 'Third Party App', { alias: generateAlias('Third Party App'),
                 redirectUris: [REDIRECT_URI],
                 allowedScopes: 'openid profile email',
                 isPublic: true,
@@ -655,7 +656,7 @@ describe('Password Grant Deprecation Integration Tests', () => {
     describe('Req 10.1, 10.2: Consent granted via alias is recognized via UUID', () => {
         it('should recognize consent granted via alias when logging in via UUID', async () => {
             // Create a third-party client for consent testing
-            const client = await clientApi.createClient(testTenantId, 'Consent Norm App', {
+            const client = await clientApi.createClient(testTenantId, 'Consent Norm App', { alias: generateAlias('Consent Norm App'),
                 redirectUris: [REDIRECT_URI],
                 allowedScopes: 'openid profile email',
                 isPublic: true,

@@ -1,6 +1,6 @@
 import {SharedTestFixture} from "../shared-test.fixture";
 import {TokenFixture} from "../token.fixture";
-import {expect2xx} from "../api-client/client";
+import {expect2xx, generateAlias} from "../api-client/client";
 import {ClientEntityClient} from "../api-client/client-entity-client";
 import {TenantClient} from "../api-client/tenant-client";
 import {AdminTenantClient} from "../api-client/admin-tenant-client";
@@ -139,6 +139,7 @@ describe('ID Token Audience Validation Integration', () => {
 
         // Create client with allowedResources for resource parameter tests
         const created = await clientApi.createClient(testTenant.id, 'ID Token Audience Test Client', {
+            alias: generateAlias('ID Token Audience Test Client'),
             redirectUris: [REDIRECT_URI],
             allowedScopes: 'openid profile email',
             isPublic: true,

@@ -37,6 +37,7 @@ describe('Super Admin — Client Cross-Tenant CRUD Flow', () => {
         });
 
         cy.get('#name').type(SHIRE_CLIENT);
+        cy.get('#alias').type(SHIRE_CLIENT.toLowerCase().replace(/[^a-z0-9-]/g, '-'));
         cy.get('#redirectUris').type('https://shire.example.com/callback');
         cy.get('#allowedScopes').clear().type('openid profile');
 
@@ -69,6 +70,7 @@ describe('Super Admin — Client Cross-Tenant CRUD Flow', () => {
         });
 
         cy.get('#name').type(BREE_CLIENT);
+        cy.get('#alias').type(BREE_CLIENT.toLowerCase().replace(/[^a-z0-9-]/g, '-'));
         cy.get('#redirectUris').type('https://bree.example.com/callback');
         cy.get('#allowedScopes').clear().type('openid profile');
 

@@ -3,6 +3,7 @@ import {ClientEntityClient} from '../../api-client/client-entity-client';
 import {TenantClient} from '../../api-client/tenant-client';
 import {SharedTestFixture} from '../../shared-test.fixture';
 import {TokenFixture} from '../../token.fixture';
+import {generateAlias} from '../../api-client/client';
 
 /**
  * Feature: resource-indicator-support — Property-Based Tests for Auth Code Resource Round-Trip
@@ -83,6 +84,7 @@ describe('Feature: resource-indicator-support, Property 3: Auth code resource ro
             fc.asyncProperty(resourceUriArb, async (resource) => {
                 // Create a client with the resource in its allowedResources
                 const client = await clientApi.createClient(testTenantId, 'Resource Roundtrip Client', {
+                    alias: generateAlias('Resource Roundtrip Client'),
                     redirectUris: [REDIRECT_URI],
                     allowedScopes: 'openid profile email',
                     isPublic: true,
@@ -157,6 +159,7 @@ describe('Feature: resource-indicator-support, Property 3: Auth code resource ro
 
         for (const resource of edgeCaseUris) {
             const client = await clientApi.createClient(testTenantId, 'Edge Case Client', {
+                alias: generateAlias('Edge Case Client'),
                 redirectUris: [REDIRECT_URI],
                 allowedScopes: 'openid profile email',
                 isPublic: true,

@@ -4,6 +4,7 @@ import {ClientEntityClient} from '../../api-client/client-entity-client';
 import {TenantClient} from '../../api-client/tenant-client';
 import {SharedTestFixture} from '../../shared-test.fixture';
 import {TokenFixture} from '../../token.fixture';
+import {generateAlias} from '../../api-client/client';
 
 /**
  * Feature: user-consent-tracking, Property 1: Consent version tracks mutation count
@@ -99,6 +100,7 @@ describe('Feature: user-consent-tracking, Property 1: Consent version tracks mut
                         testTenantId,
                         `CV Prop ${uniqueSuffix}`,
                         {
+                            alias: generateAlias(`CV Prop ${uniqueSuffix}`),
                             redirectUris: [REDIRECT_URI],
                             allowedScopes: 'openid profile email',
                             isPublic: true,
@@ -136,6 +138,7 @@ describe('Feature: user-consent-tracking, Property 1: Consent version tracks mut
                         testTenantId,
                         `CV First ${uniqueSuffix}`,
                         {
+                            alias: generateAlias(`CV First ${uniqueSuffix}`),
                             redirectUris: [REDIRECT_URI],
                             allowedScopes: 'openid profile email',
                             isPublic: true,
@@ -175,6 +178,7 @@ describe('Feature: user-consent-tracking, Property 1: Consent version tracks mut
                         testTenantId,
                         `CV Mono ${uniqueSuffix}`,
                         {
+                            alias: generateAlias(`CV Mono ${uniqueSuffix}`),
                             redirectUris: [REDIRECT_URI],
                             allowedScopes: 'openid profile email',
                             isPublic: true,
@@ -316,6 +320,7 @@ describe('Feature: user-consent-tracking, Property 4: Granting consent produces 
                         testTenantId,
                         `CU Prop ${uniqueSuffix}`,
                         {
+                            alias: generateAlias(`CU Prop ${uniqueSuffix}`),
                             redirectUris: [REDIRECT_URI],
                             allowedScopes: 'openid profile email',
                             isPublic: true,
@@ -357,6 +362,7 @@ describe('Feature: user-consent-tracking, Property 4: Granting consent produces 
                         testTenantId,
                         `CU CommA ${uniqueSuffix}`,
                         {
+                            alias: generateAlias(`CU CommA ${uniqueSuffix}`),
                             redirectUris: [REDIRECT_URI],
                             allowedScopes: 'openid profile email',
                             isPublic: true,
@@ -367,6 +373,7 @@ describe('Feature: user-consent-tracking, Property 4: Granting consent produces 
                         testTenantId,
                         `CU CommB ${uniqueSuffix}`,
                         {
+                            alias: generateAlias(`CU CommB ${uniqueSuffix}`),
                             redirectUris: [REDIRECT_URI],
                             allowedScopes: 'openid profile email',
                             isPublic: true,
@@ -408,6 +415,7 @@ describe('Feature: user-consent-tracking, Property 4: Granting consent produces 
                         testTenantId,
                         `CU Idem ${uniqueSuffix}`,
                         {
+                            alias: generateAlias(`CU Idem ${uniqueSuffix}`),
                             redirectUris: [REDIRECT_URI],
                             allowedScopes: 'openid profile email',
                             isPublic: true,
@@ -518,6 +526,7 @@ describe('Feature: user-consent-tracking, Property 3: Missing consent record alw
                         testTenantId,
                         `CM Prop ${uniqueSuffix}`,
                         {
+                            alias: generateAlias(`CM Prop ${uniqueSuffix}`),
                             redirectUris: [REDIRECT_URI],
                             allowedScopes: 'openid profile email',
                             isPublic: true,
@@ -554,9 +563,10 @@ describe('Feature: user-consent-tracking, Property 3: Missing consent record alw
             const uniqueSuffix = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
             const client = await clientApi.createClient(
                 testTenantId,
-                `CM All ${uniqueSuffix}`,
-                {
-                    redirectUris: [REDIRECT_URI],
+                        `CM All ${uniqueSuffix}`,
+                        {
+                            alias: generateAlias(`CM All ${uniqueSuffix}`),
+                            redirectUris: [REDIRECT_URI],
                     allowedScopes: 'openid profile email',
                     isPublic: true,
                 },
@@ -584,6 +594,7 @@ describe('Feature: user-consent-tracking, Property 3: Missing consent record alw
                         testTenantId,
                         `CM ClientA ${uniqueSuffix}`,
                         {
+                            alias: generateAlias(`CM ClientA ${uniqueSuffix}`),
                             redirectUris: [REDIRECT_URI],
                             allowedScopes: 'openid profile email',
                             isPublic: true,
@@ -593,6 +604,7 @@ describe('Feature: user-consent-tracking, Property 3: Missing consent record alw
                         testTenantId,
                         `CM ClientB ${uniqueSuffix}`,
                         {
+                            alias: generateAlias(`CM ClientB ${uniqueSuffix}`),
                             redirectUris: [REDIRECT_URI],
                             allowedScopes: 'openid profile email',
                             isPublic: true,
@@ -733,6 +745,7 @@ describe('Feature: user-consent-tracking, Property 5: Narrower requests do not m
                         testTenantId,
                         `CN Prop ${uniqueSuffix}`,
                         {
+                            alias: generateAlias(`CN Prop ${uniqueSuffix}`),
                             redirectUris: [REDIRECT_URI],
                             allowedScopes: 'openid profile email',
                             isPublic: true,
@@ -777,6 +790,7 @@ describe('Feature: user-consent-tracking, Property 5: Narrower requests do not m
                         testTenantId,
                         `CN Multi ${uniqueSuffix}`,
                         {
+                            alias: generateAlias(`CN Multi ${uniqueSuffix}`),
                             redirectUris: [REDIRECT_URI],
                             allowedScopes: 'openid profile email',
                             isPublic: true,
@@ -822,6 +836,7 @@ describe('Feature: user-consent-tracking, Property 5: Narrower requests do not m
                         testTenantId,
                         `CN Equal ${uniqueSuffix}`,
                         {
+                            alias: generateAlias(`CN Equal ${uniqueSuffix}`),
                             redirectUris: [REDIRECT_URI],
                             allowedScopes: 'openid profile email',
                             isPublic: true,
@@ -857,9 +872,10 @@ describe('Feature: user-consent-tracking, Property 5: Narrower requests do not m
         const uniqueSuffix = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
         const client = await clientApi.createClient(
             testTenantId,
-            `CN NoExpand ${uniqueSuffix}`,
-            {
-                redirectUris: [REDIRECT_URI],
+                            `CN NoExpand ${uniqueSuffix}`,
+                            {
+                                alias: generateAlias(`CN NoExpand ${uniqueSuffix}`),
+                                redirectUris: [REDIRECT_URI],
                 allowedScopes: 'openid profile email',
                 isPublic: true,
             },
@@ -968,6 +984,7 @@ describe('Feature: user-consent-tracking, Property 2: Consent required iff reque
                         testTenantId,
                         `CI Prop ${uniqueSuffix}`,
                         {
+                            alias: generateAlias(`CI Prop ${uniqueSuffix}`),
                             redirectUris: [REDIRECT_URI],
                             allowedScopes: 'openid profile email',
                             isPublic: true,
@@ -1013,6 +1030,7 @@ describe('Feature: user-consent-tracking, Property 2: Consent required iff reque
                         testTenantId,
                         `CI Equal ${uniqueSuffix}`,
                         {
+                            alias: generateAlias(`CI Equal ${uniqueSuffix}`),
                             redirectUris: [REDIRECT_URI],
                             allowedScopes: 'openid profile email',
                             isPublic: true,
@@ -1056,6 +1074,7 @@ describe('Feature: user-consent-tracking, Property 2: Consent required iff reque
                         testTenantId,
                         `CI Subset ${uniqueSuffix}`,
                         {
+                            alias: generateAlias(`CI Subset ${uniqueSuffix}`),
                             redirectUris: [REDIRECT_URI],
                             allowedScopes: 'openid profile email',
                             isPublic: true,
@@ -1100,6 +1119,7 @@ describe('Feature: user-consent-tracking, Property 2: Consent required iff reque
                         testTenantId,
                         `CI Exceed ${uniqueSuffix}`,
                         {
+                            alias: generateAlias(`CI Exceed ${uniqueSuffix}`),
                             redirectUris: [REDIRECT_URI],
                             allowedScopes: 'openid profile email',
                             isPublic: true,
