@@ -1,16 +1,29 @@
+# OAuth API
+
+## Overview
+
+The OAuth API implements the OAuth 2.0 authorization framework per [RFC 6749](https://datatracker.ietf.org/doc/html/rfc6749)
+with mandatory PKCE support per [RFC 7636](https://datatracker.ietf.org/doc/html/rfc7636). It provides the authorization
+endpoint and the token endpoint, supporting four grant types.
+
+**Base path:** `/api/oauth`
+
+---
+
+## Authorization Endpoint
+
 ### Authorize (Authorization Code Flow Entry Point)
 
 ```http
-[GET] /api/oauth/authorize
+GET /api/oauth/authorize
 ```
 
 `public`  `query parameters`
 
-Initiates the OAuth 2.0 Authorization Code flow
-per [RFC 6749 §4.1](https://datatracker.ietf.org/doc/html/rfc6749#section-4.1). Validates the client's authorization
-request parameters and redirects the user-agent to the login UI. This endpoint does not authenticate users or issue
-authorization codes directly — after the user logs in, the login flow creates the authorization code and redirects back
-to the client.
+Initiates the OAuth 2.0 Authorization Code flow per [RFC 6749 §4.1](https://datatracker.ietf.org/doc/html/rfc6749#section-4.1).
+Validates the client's authorization request parameters and redirects the user-agent to the login UI. This endpoint does
+not authenticate users or issue authorization codes directly — after the user logs in, the login flow creates the
+authorization code and redirects back to the client.
 
 **Request (query parameters)**
 
@@ -24,6 +37,8 @@ to the client.
 | `code_challenge`        | Conditional | Required if the client has PKCE enforcement enabled. Base64url-encoded challenge value.                                                    |
 | `code_challenge_method` | No          | `plain` or `S256`. Defaults to `plain` if `code_challenge` is present but method is omitted. Must be `S256` when the client requires PKCE. |
 | `nonce`                 | No          | Opaque value for ID token replay protection. Max 512 characters.                                                                           |
+| `prompt`                | No          | Controls authentication behavior: `none`, `login`, `consent`, `select_account`. See [Login Sessions](login-sessions.md).                   |
+| `max_age`               | No          | Maximum authentication age in seconds. If exceeded, re-authentication is forced.                                                           |
 
 **Example**
 
@@ -75,15 +90,88 @@ HTTP/1.1 302 Found
 Location: https://app.example.com/callback?error=invalid_request&error_description=The+state+parameter+is+required+for+CSRF+protection&state=abc123
 ```
 
-<hr>
+---
 
-### OAuth Token (Password Grant Type)
+## Token Endpoint
+
+All grant types use the same endpoint path with different `grant_type` values and parameters.
+
+### Authorization Code Grant
 
 ```http
-[POST] /api/oauth/token
+POST /api/oauth/token
 ```
 
 `public`  `application/json`
+
+Exchanges an authorization code for tokens per [RFC 6749 §4.1.3](https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.3).
+This is the recommended grant type for all user-facing applications. PKCE is mandatory.
+
+**Request**
+
+```json
+{
+    "grant_type": "authorization_code",
+    "code": "string",
+    "redirect_uri": "string",
+    "client_id": "string",
+    "client_secret": "string",
+    "code_verifier": "string"
+}
+```
+
+| Parameter       | Required | Type   | Description                                                         |
+|-----------------|----------|--------|---------------------------------------------------------------------|
+| `grant_type`    | Yes      | string | Must be `authorization_code`                                        |
+| `code`          | Yes      | string | The authorization code received from the redirect                   |
+| `redirect_uri`  | Yes      | string | Must match the `redirect_uri` from the authorization request        |
+| `client_id`     | Yes      | string | The OAuth client identifier                                         |
+| `client_secret` | Yes      | string | The client secret for authentication                                |
+| `code_verifier` | Yes      | string | The PKCE code verifier used to generate the `code_challenge`        |
+
+**Response**
+
+```json
+{
+    "access_token": "eyJhbGciOiJSUzI1NiIs...",
+    "token_type": "Bearer",
+    "expires_in": 3600,
+    "refresh_token": "opaque-refresh-token-string",
+    "id_token": "eyJhbGciOiJSUzI1NiIs...",
+    "scope": "openid profile email"
+}
+```
+
+| Field          | Type   | Description                                                      |
+|----------------|--------|------------------------------------------------------------------|
+| `access_token` | string | Signed JWT access token                                          |
+| `token_type`   | string | Always `Bearer`                                                  |
+| `expires_in`   | number | Token lifetime in seconds                                        |
+| `refresh_token`| string | Opaque refresh token (see [Refresh Token Rotation](refresh-token-rotation.md)) |
+| `id_token`     | string | Signed JWT ID token (only when `openid` scope is requested)     |
+| `scope`        | string | Space-delimited granted scopes                                   |
+
+**Error Responses**
+
+| Status | Error Code          | Description                          |
+|--------|---------------------|--------------------------------------|
+| `400`  | `invalid_grant`     | Expired or already consumed code     |
+| `400`  | `invalid_request`   | Missing required parameters          |
+| `401`  | `invalid_client`    | Invalid client credentials           |
+| `400`  | `invalid_grant`     | PKCE code_verifier does not match    |
+
+---
+
+### Password Grant (Legacy)
+
+```http
+POST /api/oauth/token
+```
+
+`public`  `application/json`
+
+Direct username/password exchange per [RFC 6749 §4.3](https://datatracker.ietf.org/doc/html/rfc6749#section-4.3).
+Supported for backward compatibility only. New applications should use the authorization code flow with PKCE.
 
 **Request**
 
@@ -96,59 +184,78 @@ Location: https://app.example.com/callback?error=invalid_request&error_descripti
 }
 ```
 
+| Parameter    | Required | Type   | Description                            |
+|--------------|----------|--------|----------------------------------------|
+| `grant_type` | Yes      | string | Must be `password`                     |
+| `email`      | Yes      | string | User's email address                   |
+| `password`   | Yes      | string | User's password                        |
+| `domain`     | Yes      | string | Tenant domain (e.g., `acme.example.com`) |
+
 **Response**
 
 ```json
 {
-    "access_token": "string",
-    "token_type": "string",
-    "expires_in": "string",
-    "refresh_token": "string"
+    "access_token": "eyJhbGciOiJSUzI1NiIs...",
+    "token_type": "Bearer",
+    "expires_in": 3600,
+    "refresh_token": "opaque-refresh-token-string"
 }
 ```
 
-<hr>
+---
 
-### OAuth Token (Client Grant Type)
+### Client Credentials Grant
 
 ```http
-[POST] /api/oauth/token
+POST /api/oauth/token
 ```
 
 `public`  `application/json`
+
+Machine-to-machine authentication per [RFC 6749 §4.4](https://datatracker.ietf.org/doc/html/rfc6749#section-4.4).
+Issues a technical token with no user context.
 
 **Request**
 
 ```json
 {
-    "grant_type": "client_credential",
+    "grant_type": "client_credentials",
     "client_id": "string",
     "client_secret": "string"
 }
 ```
 
+| Parameter      | Required | Type   | Description                      |
+|----------------|----------|--------|----------------------------------|
+| `grant_type`   | Yes      | string | Must be `client_credentials`     |
+| `client_id`    | Yes      | string | The OAuth client identifier      |
+| `client_secret`| Yes      | string | The client secret                |
+
 **Response**
 
 ```json
 {
-    "access_token": "string",
-    "token_type": "string",
-    "expires_in": "string"
+    "access_token": "eyJhbGciOiJSUzI1NiIs...",
+    "token_type": "Bearer",
+    "expires_in": 3600
 }
 ```
 
-<HR> 
+> **Note:** Client credentials tokens have no `refresh_token` and no `roles` claim. They carry only `scopes`.
 
-### OAuth Token (Refresh Grant Type)
+---
+
+### Refresh Token Grant
 
 ```http
-[POST] /api/oauth/token
+POST /api/oauth/token
 ```
 
 `public`  `application/json`
 
-Refresh tokens are opaque, single-use strings that rotate on every request. Each successful refresh invalidates the old
-token and returns a new one. See [Refresh Token Rotation](refresh-token-rotation.md) for details.
+Exchange a refresh token for a new access token. Refresh tokens are opaque, single-use strings that rotate on every
+request. Each successful refresh invalidates the old token and returns a new one. See
+[Refresh Token Rotation](refresh-token-rotation.md) for details.
 
 **Request**
 
@@ -174,13 +281,107 @@ token and returns a new one. See [Refresh Token Rotation](refresh-token-rotation
 
 ```json
 {
-    "access_token": "string",
+    "access_token": "eyJhbGciOiJSUzI1NiIs...",
     "token_type": "Bearer",
-    "expires_in": "number",
-    "refresh_token": "string (new rotated token — must replace the old one)",
-    "scope": "string"
+    "expires_in": 3600,
+    "refresh_token": "new-rotated-refresh-token",
+    "scope": "openid profile email"
 }
 ```
 
 > **Important:** The response contains a new `refresh_token`. Clients must store this new token and discard the old one.
 > Reusing a previously consumed token will revoke the entire token family.
+
+---
+
+## RP-Initiated Logout
+
+```http
+GET /api/oauth/logout
+```
+
+`public`  `query parameters`
+
+Implements [OpenID Connect RP-Initiated Logout 1.0](https://openid.net/specs/openid-connect-rpinitiated-logout-1_0.html).
+Ends the user's session and optionally redirects back to the client.
+
+**Query Parameters**
+
+| Parameter               | Required | Description                                                                 |
+|-------------------------|----------|-----------------------------------------------------------------------------|
+| `id_token_hint`         | No       | ID token previously issued to the client. Used to identify the session.     |
+| `client_id`             | No*      | Client identifier (required if `id_token_hint` is not provided).            |
+| `post_logout_redirect_uri` | No    | URI to redirect to after logout. Must be a registered redirect URI.         |
+| `state`                 | No       | Opaque value returned in the redirect for client-side state management.     |
+
+\* Either `id_token_hint` or `client_id` must be provided.
+
+**Success Response**
+
+```
+HTTP/1.1 302 Found
+Location: https://app.example.com/logged-out?state=abc123
+```
+
+If no `post_logout_redirect_uri` is specified, the user is redirected to a default logout confirmation page.
+
+**Error Responses**
+
+| Status | Description                                      |
+|--------|--------------------------------------------------|
+| `400`  | Neither `id_token_hint` nor `client_id` provided |
+| `400`  | `post_logout_redirect_uri` not registered for client |
+
+> See also `POST /api/oauth/logout` in [Token Revocation](token-revocation.md) for programmatic logout.
+
+---
+
+## User Consent
+
+```http
+POST /api/oauth/consent
+```
+
+`public`  `application/json`
+
+Submits the user's consent decision during the authorization flow. Reads signed cookies `flow_id` and `sid` to identify
+the ongoing authorization session.
+
+**Request Body**
+
+```json
+{
+    "client_id": "my-client",
+    "scope": "openid profile email",
+    "csrf_token": "csrf-token-from-form",
+    "decision": "grant"
+}
+```
+
+| Parameter    | Required | Type   | Description                                           |
+|--------------|----------|--------|-------------------------------------------------------|
+| `client_id`  | Yes      | string | The client requesting authorization                   |
+| `scope`      | No       | string | Space-delimited scopes being consented to             |
+| `csrf_token` | Yes      | string | CSRF token from the consent form                      |
+| `decision`   | Yes      | string | `grant` to approve the request, `deny` to reject it   |
+
+**Response**
+
+```json
+{
+    "success": true
+}
+```
+
+See [User Consent Flow](user-consent.md) for the full consent lifecycle.
+
+---
+
+## Grant Type Reference
+
+| Grant Type             | RFC          | User Context | Refresh Token | PKCE  | Use Case                                    |
+|------------------------|--------------|--------------|---------------|-------|---------------------------------------------|
+| `authorization_code`   | RFC 6749 §4.1| Yes          | Yes           | Yes   | User-facing apps (SPAs, mobile, web)        |
+| `password`             | RFC 6749 §4.3| Yes          | Yes           | No    | Legacy/trusted apps (avoid for new apps)    |
+| `client_credentials`   | RFC 6749 §4.4| No           | No            | No    | Machine-to-machine, service accounts        |
+| `refresh_token`        | RFC 6749 §6  | Yes          | Yes (rotation)| No    | Token renewal without re-authentication     |
