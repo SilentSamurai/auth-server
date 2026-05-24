@@ -130,6 +130,13 @@ tasks:
             - echo "🚀 Pushing sd25/auth-server:latest"
             - docker push sd25/auth-server:latest
 
+    # ─── k6 Load Tests ───
+    k6:test:
+        desc: Run all k6 load tests (starts backend, seeds, runs all scenarios)
+        dir: ./k6-load-test
+        cmds:
+            - npm test
+
     lxc:upgrade:
         desc: Upgrade LXC container
         cmds:
