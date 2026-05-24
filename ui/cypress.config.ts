@@ -18,6 +18,9 @@ export default defineConfig({
         shireTenantAdminClientId: 'shire.local',
         adminTenantUserEmail: 'legolas@mail.com',
         adminTenantUserPassword: 'legolas9000',
+        appOwnedRolesTestEmail: 'admin@app-roles-test.local',
+        appOwnedRolesTestPassword: 'admin9000',
+        appOwnedRolesTestClientId: 'app-roles-test.local',
     },
 
 })

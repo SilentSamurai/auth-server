@@ -232,6 +232,12 @@ export class SeedService {
                     redirectUris: ['http://localhost:3000/callback']
                 },
                 {name: "Group E2E Test Tenant", domain: "group-e2e-test.local", signUp: false},
+                {
+                    name: "App Owned Roles Test Tenant",
+                    domain: "app-roles-test.local",
+                    signUp: false,
+                    redirectUris: ['http://localhost:3000/app-owned-roles.html']
+                },
             ];
 
             for (const {name, domain, signUp, redirectUris} of dummyTenants) {

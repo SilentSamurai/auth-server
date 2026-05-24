@@ -6,7 +6,6 @@ import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 import {Action, Effect} from "./actions.enum";
 import {SubjectEnum} from "../entity/subjectEnum";
-import {CacheService} from "./cache.service";
 import {Tenant} from "../entity/tenant.entity";
 import {Permission} from "../auth/auth.decorator";
 
@@ -16,7 +15,6 @@ export class PolicyService {
 
     constructor(
         private readonly configService: Environment,
-        private readonly cacheService: CacheService,
         @InjectRepository(Policy)
         private authorizationRepository: Repository<Policy>,
     ) {
@@ -58,21 +56,14 @@ export class PolicyService {
             {tenantId: tenant.id},
         );
 
-        let cache_key = `POLICY:${role.id}`;
-        if (this.cacheService.has(cache_key)) {
-            return this.cacheService.get<Policy[]>(cache_key);
-        } else {
-            const policies = await this.authorizationRepository.find({
-                where: {
-                    role: {
-                        id: role.id,
-                    },
+        return await this.authorizationRepository.find({
+            where: {
+                role: {
+                    id: role.id,
                 },
-                relations: ["role"],
-            });
-            this.cacheService.set(cache_key, policies);
-            return policies;
-        }
+            },
+            relations: ["role"],
+        });
     }
 
     public async findById(

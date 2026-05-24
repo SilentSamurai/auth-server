@@ -15,7 +15,6 @@ import {GroupRole} from "../entity/group.roles.entity";
 import {GroupUser} from "../entity/group.users.entity";
 import {Policy} from "../entity/authorization.entity";
 import {PolicyService} from "./policy.service";
-import {CacheService} from "./cache.service";
 import {ScopeResolverService} from "./scope-resolver.service";
 import {ResolvePermissionPipe} from "../auth/auth.decorator";
 import {CoreModule} from "../core/core.module";
@@ -46,7 +45,6 @@ import {App} from "../entity/app.entity";
         CaslAbilityFactory,
         AuthUserService,
         PolicyService,
-        CacheService,
         ScopeResolverService,
         ResolvePermissionPipe,
         PolicyResolutionService,
@@ -56,7 +54,6 @@ import {App} from "../entity/app.entity";
         CaslAbilityFactory,
         AuthUserService,
         PolicyService,
-        CacheService,
         ScopeResolverService,
         ResolvePermissionPipe,
         PolicyResolutionService,
