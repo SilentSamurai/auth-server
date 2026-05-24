@@ -1,11 +1,14 @@
 import {Injectable} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
+import {Mutex} from 'async-mutex';
 import {Repository} from 'typeorm';
 import {UserConsent} from '../entity/user-consent.entity';
 import {ScopeNormalizer} from '../casl/scope-normalizer';
 
 @Injectable()
 export class ConsentService {
+    private readonly perKeyMutex = new Map<string, Mutex>();
+
     constructor(
         @InjectRepository(UserConsent)
         private readonly userConsentRepository: Repository<UserConsent>,
@@ -55,30 +58,35 @@ export class ConsentService {
         clientId: string,
         approvedScopes: string[],
     ): Promise<UserConsent> {
-        let consent = await this.userConsentRepository.findOne({
-            where: {userId, clientId},
-        });
-
-        if (!consent) {
-            // Create new consent record
-            consent = this.userConsentRepository.create({
-                userId,
-                clientId,
-                grantedScopes: ScopeNormalizer.format(approvedScopes),
-                consentVersion: 1,
-            });
-        } else {
-            // Update existing consent record
-            const existingScopes = ScopeNormalizer.parse(consent.grantedScopes);
-            const mergedScopes = ScopeNormalizer.union(
-                existingScopes,
-                approvedScopes,
-            );
-            consent.grantedScopes = ScopeNormalizer.format(mergedScopes);
-            consent.consentVersion += 1;
+        const key = `${userId}:${clientId}`;
+        if (!this.perKeyMutex.has(key)) {
+            this.perKeyMutex.set(key, new Mutex());
         }
 
-        return this.userConsentRepository.save(consent);
+        return this.perKeyMutex.get(key)!.runExclusive(async () => {
+            let consent = await this.userConsentRepository.findOne({
+                where: {userId, clientId},
+            });
+
+            if (!consent) {
+                consent = this.userConsentRepository.create({
+                    userId,
+                    clientId,
+                    grantedScopes: ScopeNormalizer.format(approvedScopes),
+                    consentVersion: 1,
+                });
+            } else {
+                const existingScopes = ScopeNormalizer.parse(consent.grantedScopes);
+                const mergedScopes = ScopeNormalizer.union(
+                    existingScopes,
+                    approvedScopes,
+                );
+                consent.grantedScopes = ScopeNormalizer.format(mergedScopes);
+                consent.consentVersion += 1;
+            }
+
+            return this.userConsentRepository.save(consent);
+        });
     }
 
     /**

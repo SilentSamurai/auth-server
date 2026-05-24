@@ -3,22 +3,13 @@ import { check } from 'k6';
 import { b64encode } from 'k6/encoding';
 import { BASE_URL, COMMON_THRESHOLDS, loadJson } from '../lib/config.js';
 
-const client = loadJson('./data/client.json', { clientId: '', clientSecret: '' });
+const client = loadJson('../data/client.json', { clientId: '', clientSecret: '' });
 
 const headers = { 'Content-Type': 'application/json' };
 
 export const options = {
-    scenarios: {
-        introspection: {
-            executor: 'ramping-vus',
-            startVUs: 0,
-            stages: [
-                { duration: '10s', target: __ENV.STAGE1_VUS ? parseInt(__ENV.STAGE1_VUS) : 10 },
-                { duration: '30s', target: __ENV.STAGE2_VUS ? parseInt(__ENV.STAGE2_VUS) : 10 },
-                { duration: '10s', target: 0 },
-            ],
-        },
-    },
+    vus: 50,
+    iterations: 50,
     thresholds: Object.assign({}, COMMON_THRESHOLDS, {
         http_req_duration: ['p(95)<2000', 'p(99)<5000'],
     }),

@@ -3,8 +3,8 @@ import { check } from 'k6';
 import { BASE_URL, SUPER_TENANT_DOMAIN, COMMON_THRESHOLDS, checkStatus200 } from '../lib/config.js';
 
 export const options = {
-    vus: __ENV.VUS ? parseInt(__ENV.VUS) : 10,
-    duration: __ENV.DURATION || '30s',
+    vus: 50,
+    iterations: 50,
     thresholds: Object.assign({}, COMMON_THRESHOLDS, {
         http_req_duration: ['p(95)<1000'],
     }),
