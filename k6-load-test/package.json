@@ -1,11 +1,21 @@
 {
-    "name": "auth-server",
+    "name": "auth-server-k6-load-test",
     "version": "1.0.0",
+    "private": true,
+    "description": "k6 load tests for the auth-server",
     "scripts": {
-        "create-user-data": "",
-        "start": "cd ./srv && npm run start:prod"
+        "seed": "node seed/setup.js",
+        "start:backend": "cd ../srv && cross-env ENV=testing npm run start > ..\\k6-load-test\\backend-k6.log 2>&1",
+        "test:well-known": "start-server-and-test start:backend http://localhost:9001 \"k6 run --iterations 1 tests/well-known.js\"",
+        "test:authorize": "start-server-and-test start:backend http://localhost:9001 \"npm run seed && k6 run --iterations 1 --vus 1 tests/authorize.js\"",
+        "test:introspection": "start-server-and-test start:backend http://localhost:9001 \"npm run seed && k6 run --iterations 1 tests/introspection.js\"",
+        "test": "start-server-and-test start:backend http://localhost:9001 \"npm run seed && k6 run tests/well-known.js && k6 run tests/authorize.js && k6 run  tests/introspection.js\""
     },
     "dependencies": {
         "@faker-js/faker": "^8.4.1"
+    },
+    "devDependencies": {
+        "cross-env": "^7.0.3",
+        "start-server-and-test": "^2.0.11"
     }
 }

@@ -1,52 +1,39 @@
-backend:
-    replicaCount: 1
-    image:
-        name: docker.io/library/auth-server-srv:latest
-        pullPolicy: Never
-    service:
-        type: ClusterIP
-        port: 8080
-    readinessProbe:
-        path: /api/v1/health-check
-    env:
-        ENV: "development"
-        PORT: "8080"
-        DATABASE_TYPE: "postgres"
-        DATABASE_HOST: "postgres-db-postgresql.postgres.svc.cluster.local"
-        DATABASE_PORT: "5432"
-        DATABASE_NAME: "auth_server_db"
-        DATABASE_USERNAME: "auth_server_db_user"
-        DATABASE_PASSWORD: "secret"
-        DATABASE_SSL: "false"
-    resources:
-        requests:
-            cpu: "50m"
-            memory: "512Mi"
-        limits:
-            cpu: "50m"
-            memory: "512Mi"
+replicaCount: 1
 
+image:
+  name: sd25/auth-server:latest
+  pullPolicy: IfNotPresent
 
-web:
-    replicaCount: 1
-    image:
-        name: docker.io/library/auth-server-ui:latest
-        pullPolicy: Never
-    service:
-        type: ClusterIP
-        port: 8080
-    env:
-        PORT: "8080"
-        AUTH_SERVER: "http://auth-server-api.auth-server.svc.cluster.local:8080/api"
-    resources:
-        requests:
-            cpu: "50m"
-            memory: "512Mi"
-        limits:
-            cpu: "50m"
-            memory: "512Mi"
+service:
+  type: ClusterIP
+  port: 80
+
+readinessProbe:
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  path: /api/v1/health-check
+  port: 9001
+
+env:
+  ENV: "production"
+  DATABASE_TYPE: "postgres"
+  DATABASE_HOST: "postgres-db-postgresql.postgres.svc.cluster.local"
+  DATABASE_PORT: "5432"
+  DATABASE_NAME: "auth_server_db"
+  DATABASE_USERNAME: "auth_server_db_user"
+  DATABASE_PASSWORD: "secret"
+  DATABASE_SSL: "false"
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: "512Mi"
+  limits:
+    cpu: "200m"
+    memory: "1Gi"
 
 ingress:
-    enabled: true
-    host: auth.oauth2.local
-
+  enabled: false
+  className: ""
+  host: auth.oauth2.local
+  annotations: {}

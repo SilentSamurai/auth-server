@@ -1,0 +1,8 @@
+node_modules/
+data/
+*.csv
+*.json
+!package.json
+!package-lock.json
+k6-output/
+logs/
