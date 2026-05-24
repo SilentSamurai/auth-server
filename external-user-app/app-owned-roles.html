@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>App-Owned Roles Demo RP</title>
+    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" rel="stylesheet">
+    <script type="importmap">
+        {
+            "imports": {
+                "oauth4webapi": "https://unpkg.com/oauth4webapi@3.5.0/build/index.js",
+                "jose": "https://unpkg.com/jose@5.9.6/dist/browser/index.js",
+                "jose/errors": "https://unpkg.com/jose@5.9.6/dist/browser/util/errors.js",
+                "jose/jwk/thumbprint": "https://unpkg.com/jose@5.9.6/dist/browser/jwk/thumbprint.js",
+                "jose/jwe/compact/decrypt": "https://unpkg.com/jose@5.9.6/dist/browser/jwe/compact/decrypt.js",
+                "jose/jwe/flattened/decrypt": "https://unpkg.com/jose@5.9.6/dist/browser/jwe/flattened/decrypt.js",
+                "jose/jwks/local": "https://unpkg.com/jose@5.9.6/dist/browser/jwks/local.js",
+                "jose/jws/compact/verify": "https://unpkg.com/jose@5.9.6/dist/browser/jws/compact/verify.js",
+                "jose/jws/flattened/verify": "https://unpkg.com/jose@5.9.6/dist/browser/jws/flattened/verify.js",
+                "jose/jwt/decrypt": "https://unpkg.com/jose@5.9.6/dist/browser/jwt/decrypt.js",
+                "jose/jwt/verify": "https://unpkg.com/jose@5.9.6/dist/browser/jwt/verify.js",
+                "jose/key/import": "https://unpkg.com/jose@5.9.6/dist/browser/key/import.js"
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #41464b;
+        }
+
+        .login-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .login-button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <div id="onboardSection" class="card mb-3" style="display:none">
+        <h5>Onboard Customer</h5>
+        <form id="onboardForm">
+            <div class="mb-2">
+                <label class="form-label">App ID</label>
+                <input type="text" class="form-control" id="onboardAppId" required>
+            </div>
+            <div class="mb-2">
+                <label class="form-label">Client ID</label>
+                <input type="text" class="form-control" id="onboardClientId" required>
+            </div>
+            <div class="mb-2">
+                <label class="form-label">Client Secret</label>
+                <input type="password" class="form-control" id="onboardClientSecret" required>
+            </div>
+            <div class="mb-2">
+                <label class="form-label">Tenant Name</label>
+                <input type="text" class="form-control" id="onboardTenantName" required>
+            </div>
+            <div class="mb-2">
+                <label class="form-label">Tenant Domain</label>
+                <input type="text" class="form-control" id="onboardTenantDomain" required>
+            </div>
+            <div class="mb-2">
+                <label class="form-label">User Email</label>
+                <input type="email" class="form-control" id="onboardUserEmail" required>
+            </div>
+            <div class="mb-2">
+                <label class="form-label">User Name</label>
+                <input type="text" class="form-control" id="onboardUserName" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Onboard Customer</button>
+        </form>
+        <div class="mt-3">
+            <pre><code id="onboardResult"></code></pre>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="card">
+            <pre><code id="decodedToken"></code></pre>
+        </div>
+    </div>
+
+    <div class="card mt-3">
+        <h5>User Info</h5>
+        <pre><code id="userInfo"></code></pre>
+    </div>
+
+    <div class="card mt-3">
+        <h5>Resolved Permissions</h5>
+        <pre><code id="permissions"></code></pre>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-4 ">
+            <button class="login-button w-100" id="login-btn">
+                Login
+            </button>
+        </div>
+    </div>
+</div>
+</body>
+<script crossorigin="anonymous" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+<script type="module">
+    import * as client from 'https://unpkg.com/openid-client@6.8.4/build/index.js';
+
+    const BASE_URL = 'http://localhost:9001';
+    const urlParams = new URLSearchParams(window.location.search);
+    const CLIENT_ID = urlParams.get('client_id') || sessionStorage.getItem('oauth-client-id') || 'shire.local';
+    const REDIRECT_URI = window.location.origin + window.location.pathname;
+
+    if (urlParams.get('client_id')) {
+        sessionStorage.setItem('oauth-client-id', urlParams.get('client_id'));
+    }
+
+    let config = null;
+    let accessToken = null;
+
+    if (urlParams.get('showOnboard') === 'true') {
+        document.getElementById('onboardSection').style.display = 'block';
+    }
+
+    async function initOIDC() {
+        const discoveryUrl = new URL(`${BASE_URL}/${CLIENT_ID}/.well-known/openid-configuration`);
+        config = await client.discovery(
+            discoveryUrl,
+            CLIENT_ID,
+            undefined,
+            undefined,
+            { execute: [client.allowInsecureRequests] }
+        );
+    }
+
+    async function startLogin() {
+        try {
+            if (!config) await initOIDC();
+
+            const code_verifier = client.randomPKCECodeVerifier();
+            const code_challenge = await client.calculatePKCECodeChallenge(code_verifier);
+            sessionStorage.setItem('pkce-code-verifier', code_verifier);
+
+            const state = client.randomState();
+            sessionStorage.setItem('oauth-state', state);
+
+            const redirectTo = client.buildAuthorizationUrl(config, {
+                redirect_uri: REDIRECT_URI,
+                code_challenge,
+                code_challenge_method: 'S256',
+                state,
+                scope: 'openid profile email'
+            });
+
+            window.location.href = redirectTo.href;
+        } catch (error) {
+            document.getElementById('decodedToken').innerText = 'Login failed: ' + error.message;
+        }
+    }
+
+    async function handleCallback() {
+        const urlParams = new URLSearchParams(window.location.search);
+
+        if (!urlParams.has('code')) return;
+
+        const storedState = sessionStorage.getItem('oauth-state');
+        const callbackState = urlParams.get('state');
+
+        if (!storedState) {
+            document.getElementById('decodedToken').innerText =
+                'Error: No stored state found \u2014 possible CSRF attack. Cannot validate state parameter.';
+            return;
+        }
+
+        if (!callbackState) {
+            document.getElementById('decodedToken').innerText =
+                'Error: Missing state parameter in callback URL \u2014 possible CSRF attack.';
+            return;
+        }
+
+        if (storedState !== callbackState) {
+            document.getElementById('decodedToken').innerText =
+                'Error: state mismatch \u2014 expected state does not match callback state. Possible CSRF attack.';
+            sessionStorage.removeItem('pkce-code-verifier');
+            sessionStorage.removeItem('oauth-state');
+            return;
+        }
+
+        if (!config) await initOIDC();
+
+        const code_verifier = sessionStorage.getItem('pkce-code-verifier');
+
+        try {
+            const currentUrl = new URL(window.location.href);
+            const tokens = await client.authorizationCodeGrant(config, currentUrl, {
+                pkceCodeVerifier: code_verifier,
+                expectedState: storedState,
+                idTokenExpected: true
+            });
+
+            sessionStorage.removeItem('pkce-code-verifier');
+            sessionStorage.removeItem('oauth-state');
+
+            accessToken = tokens.access_token;
+            const username = decodeToken(accessToken);
+
+            const loginBtn = document.getElementById('login-btn');
+            loginBtn.innerText = 'Logout ' + username;
+
+            if (tokens.id_token) {
+                const claims = tokens.claims();
+                console.log('ID Token Claims:', claims);
+            }
+
+            fetchAndDisplayUserInfo(accessToken);
+            fetchAndDisplayPermissions(accessToken);
+        } catch (error) {
+            document.getElementById('decodedToken').innerText = 'Error: Token exchange failed \u2014 ' + error.message;
+        }
+    }
+
+    function decodeToken(token) {
+        if (!token) return '';
+
+        try {
+            const tokenParts = token.split('.');
+            const decodedToken = {
+                header: JSON.parse(atob(tokenParts[0])),
+                payload: JSON.parse(atob(tokenParts[1])),
+                signature: tokenParts[2]
+            };
+            document.getElementById('decodedToken').innerText = JSON.stringify(decodedToken, null, 4);
+            return decodedToken.payload.sub || decodedToken.payload.email || 'User';
+        } catch (error) {
+            document.getElementById('decodedToken').innerText = 'Error decoding token: ' + error.message;
+            return '';
+        }
+    }
+
+    async function fetchAndDisplayUserInfo(token) {
+        try {
+            const res = await fetch(`${BASE_URL}/api/oauth/userinfo`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            if (!res.ok) {
+                document.getElementById('userInfo').innerText =
+                    `UserInfo fetch failed: ${res.status} ${res.statusText}`;
+                return;
+            }
+            const info = await res.json();
+            document.getElementById('userInfo').innerText = JSON.stringify(info, null, 4);
+        } catch (error) {
+            document.getElementById('userInfo').innerText = 'Error fetching user info: ' + error.message;
+        }
+    }
+
+    async function fetchAndDisplayPermissions(token) {
+        try {
+            const res = await fetch(`${BASE_URL}/api/v1/my/permissions`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            if (!res.ok) {
+                document.getElementById('permissions').innerText =
+                    `Permissions fetch failed: ${res.status} ${res.statusText}`;
+                return;
+            }
+            const policies = await res.json();
+            const simplified = policies.map(p => ({
+                effect: p.effect,
+                action: p.action,
+                subject: p.subject,
+                role: p.role?.name,
+            }));
+            document.getElementById('permissions').innerText = JSON.stringify(simplified, null, 4);
+        } catch (error) {
+            document.getElementById('permissions').innerText = 'Error fetching permissions: ' + error.message;
+        }
+    }
+
+    async function handleOnboard(event) {
+        event.preventDefault();
+        const appId = document.getElementById('onboardAppId').value;
+        const clientId = document.getElementById('onboardClientId').value;
+        const clientSecret = document.getElementById('onboardClientSecret').value;
+
+        try {
+            const tokenRes = await fetch(`${BASE_URL}/api/oauth/token`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({
+                    grant_type: 'client_credentials',
+                    client_id: clientId,
+                    client_secret: clientSecret,
+                }),
+            });
+            if (!tokenRes.ok) {
+                document.getElementById('onboardResult').innerText =
+                    `Token exchange failed: ${tokenRes.status}`;
+                return;
+            }
+            const tokenData = await tokenRes.json();
+
+            const onboardRes = await fetch(
+                `${BASE_URL}/api/apps/${appId}/onboard-customer`,
+                {
+                    method: 'POST',
+                    headers: {
+                        Authorization: `Bearer ${tokenData.access_token}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        tenantName: document.getElementById('onboardTenantName').value,
+                        tenantDomain: document.getElementById('onboardTenantDomain').value,
+                        userEmail: document.getElementById('onboardUserEmail').value,
+                        userName: document.getElementById('onboardUserName').value,
+                    }),
+                }
+            );
+            const result = await onboardRes.json();
+            document.getElementById('onboardResult').innerText =
+                `Status: ${onboardRes.status}\n` +
+                JSON.stringify(result, null, 2);
+        } catch (error) {
+            document.getElementById('onboardResult').innerText = 'Error: ' + error.message;
+        }
+    }
+
+    document.getElementById('login-btn').addEventListener('click', startLogin);
+    document.getElementById('onboardForm').addEventListener('submit', handleOnboard);
+
+    handleCallback()
+        .then(() => initOIDC())
+        .catch(error => {
+            console.error('Initialization failed:', error);
+            if (!document.getElementById('decodedToken').innerText) {
+                document.getElementById('decodedToken').innerText = 'OIDC discovery failed: ' + error.message;
+            }
+        });
+</script>
+</html>

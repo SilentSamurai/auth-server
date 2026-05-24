@@ -37,6 +37,7 @@ Testing uses `srv/envs/.env.testing` with in-memory SQLite.
 
 ## Testing quirks
 
+### Backend
 - Backend tests are **integration tests** using a shared NestJS app (globalSetup/globalTeardown) across all suites for
   performance. Runs on port 9001 by default.
 - Test infrastructure: FakeSmtpServer (ports 3101/3102), TenantAppServer (port 3103).
@@ -51,6 +52,16 @@ Testing uses `srv/envs/.env.testing` with in-memory SQLite.
 - `auth.server.com` is the super tenant — only use it for setup/onboarding operations, never for test assertions.
 - `npm test` uses `--silent=true --maxWorkers=25%`. Override with `--verbose --silent=false` for debugging.
 - E2E requires the full stack: backend + UI + external-user-app (handled by `start-server-and-test`).
+
+### UI
+- There are two types of UI tests:
+  - Karma unit tests (run in ChromeHeadless)
+  - Cypress E2E tests (run in ChromeHeadless)
+- Karma UI tests are **unit tests** using Karma/ChromeHeadless.
+- Cypress UI tests are **end-to-end tests** using Cypress; This is where the backend and the ui and the external-user-app
+  are all running. and simulates real-world user interactions.
+- Cypress tests are used to simulate real-world user interactions, they should never call apis directly. Always load UI via
+  `cy.visit()`. Load the Ui then simulate user actions and complete the test.
 
 ## Architecture notes
 
@@ -71,7 +82,7 @@ Testing uses `srv/envs/.env.testing` with in-memory SQLite.
 - List pages use `DataSource` / `RestApiModel` backed by `POST /api/search/{Entity}` with
   `{ pageNo, pageSize, where, orderBy, expand }`.
 - DB Calls over caches.
-- MOST IMPORTANT : ALWAYS BE COMPLIANT WITH RFC
+- MOST IMPORTANT: ALWAYS BE COMPLIANT WITH RFC
 
 ## Steering Docs
 

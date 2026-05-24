@@ -216,6 +216,7 @@ export class OnboardingService {
 
         if (user) {
             response.userId = user.id;
+            response.userEmail = request.userEmail;
             response.roleNames = assignedRoleNames;
         }
 
@@ -247,6 +248,7 @@ export class OnboardingService {
             await this.assignAppRoles(tenant, user, appRoles);
 
             response.userId = user.id;
+            response.userEmail = request.userEmail;
             response.roleNames = appRoles.map(r => r.name);
 
             // Send email only for newly created users (after return)
@@ -286,6 +288,7 @@ export class OnboardingService {
             await this.assignAppRoles(tenant, user, appRoles);
 
             response.userId = user.id;
+            response.userEmail = request.userEmail;
             response.roleNames = appRoles.map(r => r.name);
 
             if (isNew) {

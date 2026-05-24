@@ -526,6 +526,9 @@ export class TenantService implements OnModuleInit {
     }
 
     private async createDefaultClient(tenantId: string, domain: string): Promise<Client> {
+        const baseUrl: string = this.configService.get('BASE_URL', '');
+        const adminUiCallbackUri = baseUrl ? `${baseUrl.replace(/\/+$/, '')}/oauth/callback` : null;
+
         const client = this.clientRepository.create({
             clientId: uuidv4(),
             alias: domain,
@@ -533,7 +536,7 @@ export class TenantService implements OnModuleInit {
             allowPasswordGrant: false,
             allowedScopes: 'openid profile email',
             name: 'Default Client',
-            redirectUris: [],
+            redirectUris: adminUiCallbackUri ? [adminUiCallbackUri] : [],
             grantTypes: 'authorization_code',
             responseTypes: 'code',
             tokenEndpointAuthMethod: 'none',

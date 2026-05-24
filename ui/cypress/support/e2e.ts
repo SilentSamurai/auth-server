@@ -21,3 +21,12 @@ import './commands';
 // Unified OAuth Authorization UI — exports visitAuthorize, interceptAll,
 // assertNoCredentialLeak helpers consumed by ui/cypress/e2e/unified-authorize/*.
 import './unified-authorize';
+
+// Hide PrimeNG toast notifications in tests — they overlap modals and block element clicks.
+const HIDE_TOAST_CSS = 'p-toast { display: none !important; }';
+Cypress.on('window:before:load', (win) => {
+    const style = win.document.createElement('style');
+    style.id = 'cypress-toast-hide';
+    style.textContent = HIDE_TOAST_CSS;
+    win.document.head.appendChild(style);
+});

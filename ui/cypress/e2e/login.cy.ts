@@ -22,17 +22,20 @@ describe('Login', () => {
 
     it('should show email verification success banner', () => {
         cy.visit('/login?verified=true');
+        cy.get('#cypress-toast-hide').invoke('remove');
         cy.contains('Email Verified').should('be.visible');
         cy.get('#client_id').should('be.visible');
     });
 
     it('should show email verification failure banner', () => {
         cy.visit('/login?verified=false');
+        cy.get('#cypress-toast-hide').invoke('remove');
         cy.contains('Verification Failed').should('be.visible');
     });
 
     it('should show OAuth error banner when error param is present', () => {
         cy.visit('/login?error=invalid_request&error_description=missing+state');
+        cy.get('#cypress-toast-hide').invoke('remove');
         cy.contains('Sign-in interrupted').should('be.visible');
     });
 

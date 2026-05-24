@@ -28,7 +28,7 @@ import {PolicyService} from '../../_services/policy.service';
                 <form [formGroup]="policyForm" novalidate>
                     <div class="mb-3">
                         <label class="form-label">Effect</label>
-                        <select class="form-select" formControlName="effect">
+                        <select class="form-select" formControlName="effect" id="create.policy.effect">
                             <option value="ALLOW">ALLOW</option>
                             <option value="DENY">DENY</option>
                         </select>
@@ -36,7 +36,7 @@ import {PolicyService} from '../../_services/policy.service';
 
                     <div class="mb-3">
                         <label class="form-label">Action</label>
-                        <select class="form-select" formControlName="action">
+                        <select class="form-select" formControlName="action" id="create.policy.action">
                             <option *ngFor="let act of possibleActions" [value]="act">
                                 {{ act.toUpperCase() }}
                             </option>
@@ -77,6 +77,7 @@ import {PolicyService} from '../../_services/policy.service';
                             type="text"
                             class="form-control"
                             formControlName="subject"
+                            id="create.policy.subject"
                             placeholder="e.g., 'orders'..."
                         />
                         <div
@@ -113,6 +114,7 @@ import {PolicyService} from '../../_services/policy.service';
                 <button
                     *ngIf="!viewOnly"
                     class="btn btn-primary"
+                    id="CREATE_POLICY_SUBMIT_BTN"
                     [disabled]="policyForm.invalid"
                     (click)="onSave()"
                     form="createPolicyForm"

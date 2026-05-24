@@ -12,6 +12,7 @@
     * [Refresh Token Rotation](refresh-token-rotation.md)
     * [Login Sessions](login-sessions.md)
     * [User Consent Flow](user-consent.md)
+    * [Password Reset](password-reset-api.md)
     * [OIDC Compliance Requirements](oauth-oidc-compliance-requirements.md)
 
 * **APIs**
@@ -20,6 +21,15 @@
     * [Tenant Management API](tenant-management-api.md)
     * [Member Management API](member-management-api.md)
     * [Registration API](registration-api.md)
+    * [Role Management API](role-management-api.md)
+    * [Group Management API](group-management-api.md)
+    * [Policy Management API](policy-management-api.md)
+    * [App Management API](app-management-api.md)
+    * [Tenant Bits API](tenant-bits-api.md)
+
+* **Admin APIs**
+    * [Admin Tenant API](admin-tenant-api.md)
+    * [Admin User API](admin-user-api.md)
 
 * **Architecture**
     * [Resource Server Verification](resource-server-verification.md)

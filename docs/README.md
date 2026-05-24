@@ -82,6 +82,17 @@ See the [Architecture Overview](architecture.md) for a full description of the s
 - [Tenant Management API](tenant-management-api.md) — Creating and configuring tenants
 - [Member Management API](member-management-api.md) — Managing tenant members and roles
 - [Registration API](registration-api.md) — User sign-up, sign-down, and email verification
+- [Role Management API](role-management-api.md) — Creating and managing role definitions within a tenant
+- [Group Management API](group-management-api.md) — Managing user groups and group-based role assignment
+- [Policy Management API](policy-management-api.md) — Defining CASL-based authorization policies for roles
+- [App Management API](app-management-api.md) — Creating apps, managing subscriptions, and onboarding customers
+- [Tenant Bits API](tenant-bits-api.md) — Per-tenant key-value configuration storage
+- [Password Reset](password-reset-api.md) — Forgot-password and reset-password flow
+
+### Admin APIs
+
+- [Admin Tenant API](admin-tenant-api.md) — Super admin endpoints for managing all tenants
+- [Admin User API](admin-user-api.md) — Super admin endpoints for managing all users
 
 ### Architecture & Advanced Topics
 

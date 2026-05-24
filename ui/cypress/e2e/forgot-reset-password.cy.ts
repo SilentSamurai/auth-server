@@ -1,30 +1,8 @@
 /// <reference types="cypress" />
 
+import { extractFirstLinkFromEmail, normalizeDevLink } from '../support/helpers';
+
 // Configuration assumptions:
-// - UI runs at http://localhost:4200
-// - API server runs at http://localhost:9001
-// - Fake SMTP control server runs at http://127.0.0.1:8899 (from FakeSmtpServer.ts defaults)
-// - Service name is "Auth Server" (used in mail subjects)
-
-function extractFirstLinkFromEmail(email: any): string | null {
-    const links: string[] = email.links || [];
-    if (!links.length) return null;
-    // Clean trailing punctuation that may be added by email rendering
-    return links[0].replace(/[\]\)>]+$/g, "");
-}
-
-function normalizeDevLink(link: string): string {
-    try {
-        const u = new URL(link);
-        if ((u.hostname === 'localhost' || u.hostname === '127.0.0.1') && u.protocol === 'https:') {
-            u.protocol = 'http:';
-            u.port = '4200';
-        }
-        return u.toString();
-    } catch {
-        return link;
-    }
-}
 
 /**
  * Forgot/Reset Password Flow Test

@@ -189,8 +189,9 @@ describe('Nonce Replay Protection', () => {
 
         cy.wait('@tokenCall');
 
-        // The UI should show an authentication error (via PrimeNG toast)
-        cy.contains('Authentication failed').should('be.visible');
+        // The UI should show an authentication error (via Bootstrap alert)
+        cy.get('.alert-danger').should('be.visible')
+            .and('contain.text', 'nonce mismatch');
 
         // Session should be cleared (auth token not set due to rejection)
         cy.window().then((win) => {

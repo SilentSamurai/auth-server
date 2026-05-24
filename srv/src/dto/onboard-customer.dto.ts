@@ -39,5 +39,6 @@ export interface OnboardCustomerResponse {
     tenantId: string;
     subscriptionId: string;
     userId?: string;
+    userEmail?: string;
     roleNames?: string[];
 }

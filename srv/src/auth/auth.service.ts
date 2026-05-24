@@ -454,8 +454,11 @@ export class AuthService {
         );
         const permission = this.securityService.createPermission(authContext);
 
+        // Password reset via an email link proves email ownership.
+        // Auto-verify the email for users who haven't completed verification yet
+        // (e.g., newly onboarded customers). For already-verified users this is a no-op.
         if (!user.verified) {
-            throw new UnauthorizedException('Email not verified');
+            await this.userService.updateVerified(permission, user.id, true);
         }
 
         await this.userService.updatePassword(permission, user.id, password);
