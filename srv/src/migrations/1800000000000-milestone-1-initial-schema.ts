@@ -4,8 +4,13 @@ export class Milestone1InitialSchema1800000000000 implements MigrationInterface 
     name = 'Milestone1InitialSchema1800000000000'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
+        const isPostgres = queryRunner.connection.options.type === "postgres";
+        if (isPostgres) {
+            await queryRunner.query('CREATE EXTENSION IF NOT EXISTS "uuid-ossp"');
+        }
+
         const DB_STRING_TYPE = "VARCHAR";
-        const DB_UUID_GENERATOR = "uuid_generate_v4()";
+        const DB_UUID_GENERATOR = isPostgres ? "uuid_generate_v4()" : undefined;
 
         // ── Users table ──
         await queryRunner.createTable(
@@ -24,7 +29,7 @@ export class Milestone1InitialSchema1800000000000 implements MigrationInterface 
                     {name: "password", type: DB_STRING_TYPE, length: "128", isNullable: false},
                     {name: "email", type: DB_STRING_TYPE, isUnique: true, length: "128", isNullable: false},
                     {name: "verified", type: "boolean", default: false},
-                    {name: "created_at", type: "timestamp", default: "now()"},
+                    {name: "created_at", type: "timestamp", default: "CURRENT_TIMESTAMP"},
                 ],
             }),
             true,
@@ -50,7 +55,7 @@ export class Milestone1InitialSchema1800000000000 implements MigrationInterface 
                     {name: "secret_salt", type: DB_STRING_TYPE, isNullable: false},
                     {name: "private_key", type: DB_STRING_TYPE, isNullable: false},
                     {name: "public_key", type: DB_STRING_TYPE, isNullable: false},
-                    {name: "created_at", type: "timestamp", default: "now()"},
+                    {name: "created_at", type: "timestamp", default: "CURRENT_TIMESTAMP"},
                 ],
             }),
             true,
@@ -72,7 +77,7 @@ export class Milestone1InitialSchema1800000000000 implements MigrationInterface 
                     {name: "name", type: DB_STRING_TYPE, isNullable: false},
                     {name: "tenant_id", type: DB_STRING_TYPE, length: "36", isNullable: false},
                     {name: "is_removable", type: "boolean", default: true},
-                    {name: "created_at", type: "timestamp", default: "now()"},
+                    {name: "created_at", type: "timestamp", default: "CURRENT_TIMESTAMP"},
                 ],
                 uniques: [
                     {name: "tenant_role_constrain", columnNames: ["tenant_id", "name"]},
@@ -148,7 +153,7 @@ export class Milestone1InitialSchema1800000000000 implements MigrationInterface 
                     {name: "method", type: DB_STRING_TYPE, isNullable: false},
                     {name: "user_id", type: DB_STRING_TYPE, isNullable: false},
                     {name: "tenant_id", type: DB_STRING_TYPE, isNullable: false},
-                    {name: "created_at", type: "timestamp", default: "now()"},
+                    {name: "created_at", type: "timestamp", default: "CURRENT_TIMESTAMP"},
                 ],
             }),
             true,
@@ -243,7 +248,7 @@ export class Milestone1InitialSchema1800000000000 implements MigrationInterface 
                     },
                     {name: "name", type: DB_STRING_TYPE, isNullable: false},
                     {name: "tenant_id", type: DB_STRING_TYPE, isNullable: false},
-                    {name: "created_at", type: "timestamp", default: "now()"},
+                    {name: "created_at", type: "timestamp", default: "CURRENT_TIMESTAMP"},
                 ],
                 uniques: [{name: "tenant_group_name_unq_constrain", columnNames: ["tenant_id", "name"]}],
             }),
@@ -257,7 +262,7 @@ export class Milestone1InitialSchema1800000000000 implements MigrationInterface 
                     {name: "group_id", type: DB_STRING_TYPE, isNullable: false, isPrimary: true},
                     {name: "tenant_id", type: DB_STRING_TYPE, isPrimary: true, isNullable: false},
                     {name: "user_id", type: DB_STRING_TYPE, isPrimary: true, isNullable: false},
-                    {name: "created_at", type: "timestamp", default: "now()"},
+                    {name: "created_at", type: "timestamp", default: "CURRENT_TIMESTAMP"},
                 ],
                 foreignKeys: [
                     {
@@ -285,7 +290,7 @@ export class Milestone1InitialSchema1800000000000 implements MigrationInterface 
                     {name: "group_id", type: DB_STRING_TYPE, isNullable: false, isPrimary: true},
                     {name: "tenant_id", type: DB_STRING_TYPE, isPrimary: true, isNullable: false},
                     {name: "role_id", type: DB_STRING_TYPE, isPrimary: true, isNullable: false},
-                    {name: "created_at", type: "timestamp", default: "now()"},
+                    {name: "created_at", type: "timestamp", default: "CURRENT_TIMESTAMP"},
                 ],
                 foreignKeys: [
                     {

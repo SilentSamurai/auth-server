@@ -5,7 +5,9 @@ export class Milestone3ClientsPkce1800000000002 implements MigrationInterface {
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         const DB_STRING_TYPE = "VARCHAR";
-        const DB_UUID_GENERATOR = "uuid_generate_v4()";
+        const DB_UUID_GENERATOR = queryRunner.connection.options.type === "postgres"
+            ? "uuid_generate_v4()"
+            : undefined;
 
         // ── Clients table ──
         await queryRunner.createTable(
@@ -32,7 +34,7 @@ export class Milestone3ClientsPkce1800000000002 implements MigrationInterface {
                     {name: "allow_password_grant", type: "boolean", default: false},
                     {name: "allow_refresh_token", type: "boolean", default: true},
                     {name: "name", type: DB_STRING_TYPE, isNullable: true},
-                    {name: "created_at", type: "timestamp", default: "now()"},
+                    {name: "created_at", type: "timestamp", default: "CURRENT_TIMESTAMP"},
                     {name: "tenant_id", type: DB_STRING_TYPE, length: "36", isNullable: false},
                 ],
                 uniques: [new TableUnique({name: "UQ_clients_client_id", columnNames: ["client_id"]})],

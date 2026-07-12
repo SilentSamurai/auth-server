@@ -5,7 +5,9 @@ export class Milestone4RefreshSessionsConsents1800000000003 implements Migration
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         const DB_STRING_TYPE = "VARCHAR";
-        const DB_UUID_GENERATOR = "uuid_generate_v4()";
+        const DB_UUID_GENERATOR = queryRunner.connection.options.type === "postgres"
+            ? "uuid_generate_v4()"
+            : undefined;
 
         // ── Refresh tokens table ──
         await queryRunner.createTable(
@@ -27,11 +29,11 @@ export class Milestone4RefreshSessionsConsents1800000000003 implements Migration
                     {name: "client_id", type: DB_STRING_TYPE, isNullable: false},
                     {name: "tenant_id", type: DB_STRING_TYPE, length: "36", isNullable: false},
                     {name: "scope", type: DB_STRING_TYPE, isNullable: false},
-                    {name: "absolute_expires_at", type: "datetime", isNullable: false},
-                    {name: "expires_at", type: "datetime", isNullable: false},
+                    {name: "absolute_expires_at", type: "timestamp", isNullable: false},
+                    {name: "expires_at", type: "timestamp", isNullable: false},
                     {name: "revoked", type: "boolean", default: false},
-                    {name: "used_at", type: "datetime", isNullable: true},
-                    {name: "created_at", type: "timestamp", default: "now()"},
+                    {name: "used_at", type: "timestamp", isNullable: true},
+                    {name: "created_at", type: "timestamp", default: "CURRENT_TIMESTAMP"},
                 ],
                 uniques: [new TableUnique({name: "UQ_refresh_tokens_parent_id", columnNames: ["parent_id"]})],
                 indices: [
@@ -68,7 +70,7 @@ export class Milestone4RefreshSessionsConsents1800000000003 implements Migration
                     {name: "public_key", type: "text", isNullable: false},
                     {name: "private_key", type: "text", isNullable: false},
                     {name: "is_current", type: "boolean", isNullable: false, default: false},
-                    {name: "created_at", type: "timestamp", isNullable: false, default: "now()"},
+                    {name: "created_at", type: "timestamp", isNullable: false, default: "CURRENT_TIMESTAMP"},
                     {name: "superseded_at", type: "timestamp", isNullable: true},
                     {name: "deactivated_at", type: "timestamp", isNullable: true},
                 ],
@@ -128,9 +130,9 @@ export class Milestone4RefreshSessionsConsents1800000000003 implements Migration
                     {name: "user_id", type: DB_STRING_TYPE, length: "36", isNullable: false},
                     {name: "tenant_id", type: DB_STRING_TYPE, length: "36", isNullable: false},
                     {name: "auth_time", type: "integer", isNullable: false},
-                    {name: "expires_at", type: "datetime", isNullable: false},
-                    {name: "invalidated_at", type: "datetime", isNullable: true},
-                    {name: "created_at", type: "timestamp", default: "now()"},
+                    {name: "expires_at", type: "timestamp", isNullable: false},
+                    {name: "invalidated_at", type: "timestamp", isNullable: true},
+                    {name: "created_at", type: "timestamp", default: "CURRENT_TIMESTAMP"},
                 ],
                 indices: [
                     new TableIndex({name: "IDX_login_sessions_user_id", columnNames: ["user_id"]}),
@@ -168,14 +170,14 @@ export class Milestone4RefreshSessionsConsents1800000000003 implements Migration
                         length: "36",
                         isPrimary: true,
                         generationStrategy: "uuid",
-                        default: "uuid_generate_v4()"
+                        default: DB_UUID_GENERATOR
                     },
                     {name: "user_id", type: DB_STRING_TYPE, length: "36", isNullable: false},
                     {name: "client_id", type: DB_STRING_TYPE, isNullable: false},
                     {name: "granted_scopes", type: DB_STRING_TYPE, isNullable: false},
                     {name: "consent_version", type: "integer", isNullable: false, default: 1},
-                    {name: "created_at", type: "timestamp", default: "now()"},
-                    {name: "updated_at", type: "timestamp", default: "now()"},
+                    {name: "created_at", type: "timestamp", default: "CURRENT_TIMESTAMP"},
+                    {name: "updated_at", type: "timestamp", default: "CURRENT_TIMESTAMP"},
                 ],
                 uniques: [new TableUnique({
                     name: "UQ_user_consents_user_client",

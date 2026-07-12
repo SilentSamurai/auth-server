@@ -7,7 +7,7 @@ export class TenantKey {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @Column({name: "tenant_id", type: "varchar", length: 36})
+    @Column({name: "tenant_id", type: "varchar"})
     tenantId: string;
 
     @ManyToOne(() => Tenant, {onDelete: "CASCADE"})
@@ -33,9 +33,9 @@ export class TenantKey {
     @CreateDateColumn({name: "created_at"})
     createdAt: Date;
 
-    @Column({name: "superseded_at", type: "datetime", nullable: true})
+    @Column({name: "superseded_at", type: Date, nullable: true})
     supersededAt: Date | null;
 
-    @Column({name: "deactivated_at", type: "datetime", nullable: true})
+    @Column({name: "deactivated_at", type: Date, nullable: true})
     deactivatedAt: Date | null;
 }

@@ -17,7 +17,7 @@ export class UserConsent {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @Column({name: "user_id", type: "varchar", length: 36, nullable: false})
+    @Column({name: "user_id", type: "varchar", nullable: false})
     @Index()
     userId: string;
 

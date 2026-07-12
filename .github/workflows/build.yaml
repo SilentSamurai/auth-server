@@ -46,3 +46,40 @@ jobs:
                     push: false
                     cache-from: type=gha
                     cache-to: type=gha,mode=max
+
+    postgres-startup:
+        name: PostgreSQL Startup Smoke Test
+        runs-on: ubuntu-latest
+
+        services:
+            postgres:
+                image: postgres:16-alpine
+                env:
+                    POSTGRES_USER: root
+                    POSTGRES_PASSWORD: root
+                    POSTGRES_DB: auth_server_test
+                ports:
+                    - 5432:5432
+                options: >-
+                    --health-cmd "pg_isready -U root -d auth_server_test"
+                    --health-interval 10s
+                    --health-timeout 5s
+                    --health-retries 5
+
+        steps:
+            -   name: Check out the repo
+                uses: actions/checkout@v4
+
+            -   name: Run PostgreSQL startup smoke test
+                working-directory: srv
+                env:
+                    DATABASE_TYPE: postgres
+                    DATABASE_HOST: 127.0.0.1
+                    DATABASE_PORT: 5432
+                    DATABASE_NAME: auth_server_test
+                    DATABASE_USERNAME: root
+                    DATABASE_PASSWORD: root
+                    DATABASE_SSL: "false"
+                run: |
+                    npm ci
+                    npm test -- --runInBand --testPathPattern=postgres-startup.integration.spec.ts
