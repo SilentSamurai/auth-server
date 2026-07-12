@@ -47,8 +47,8 @@ jobs:
                     cache-from: type=gha
                     cache-to: type=gha,mode=max
 
-    postgres-startup:
-        name: PostgreSQL Startup Smoke Test
+    postgres-tests:
+        name: PostgreSQL Backend Test Suite
         runs-on: ubuntu-latest
 
         services:
@@ -70,7 +70,7 @@ jobs:
             -   name: Check out the repo
                 uses: actions/checkout@v4
 
-            -   name: Run PostgreSQL startup smoke test
+            -   name: Run backend test suite against PostgreSQL
                 working-directory: srv
                 env:
                     DATABASE_TYPE: postgres
@@ -82,4 +82,4 @@ jobs:
                     DATABASE_SSL: "false"
                 run: |
                     npm ci
-                    npm test -- --runInBand --testPathPattern=postgres-startup.integration.spec.ts
+                    npm test
