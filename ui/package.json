@@ -1,6 +1,9 @@
 {
     "name": "auth-server-ui",
     "version": "0.0.0",
+    "engines": {
+        "node": "24.x"
+    },
     "scripts": {
         "ng": "ng",
         "ui:serve": "ng serve --proxy-config proxy.conf.js",

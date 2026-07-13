@@ -5,6 +5,9 @@
     "author": "",
     "private": true,
     "license": "MIT",
+    "engines": {
+        "node": "24.x"
+    },
     "scripts": {
         "typeorm": "typeorm",
         "generate-migration": "typeorm migration:create ./src/migrations/new-migration ",
