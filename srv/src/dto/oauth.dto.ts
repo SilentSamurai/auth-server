@@ -13,6 +13,10 @@ export const PasswordGrantSchema = yup.object().shape({
         .matches(PASSWORD_REGEXP, PASSWORD_MESSAGE)
         .max(128),
     client_id: yup.string().required("client_id is required"),
+    // Required at runtime for confidential clients; public clients do not
+    // possess a secret. The controller resolves the client type before
+    // applying that conditional requirement.
+    client_secret: yup.string().optional().max(512),
     subscriber_tenant_hint: yup.string().nullable(),
     scope: yup.string().optional(),
     resource: yup.string().optional(),
