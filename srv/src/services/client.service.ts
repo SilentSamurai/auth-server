@@ -5,8 +5,7 @@ import {Client} from '../entity/client.entity';
 import {TenantService} from './tenant.service';
 import {Action} from '../casl/actions.enum';
 import {SubjectEnum} from '../entity/subjectEnum';
-import {randomBytes, scryptSync, timingSafeEqual} from 'crypto';
-import {v4 as uuidv4} from 'uuid';
+import {randomBytes, randomUUID, scryptSync, timingSafeEqual} from 'crypto';
 import {Permission} from '../auth/auth.decorator';
 import {App} from '../entity/app.entity';
 import {Tenant} from '../entity/tenant.entity';
@@ -33,7 +32,7 @@ export class ClientService {
 
     async createAppClient(manager: EntityManager, input: CreateAppClientInput): Promise<Client> {
         const client = manager.create(Client, {
-            clientId: uuidv4(),
+            clientId: randomUUID(),
             alias: input.alias,
             name: input.name,
             tenantId: input.tenant.id,
@@ -111,7 +110,7 @@ export class ClientService {
         permission.isAuthorized(Action.Create, SubjectEnum.CLIENT, {tenantId});
 
         const tenant = await this.tenantService.findById(permission, tenantId);
-        const clientId = uuidv4();
+        const clientId = randomUUID();
 
         let clientSecrets: { secret: string; salt: string; created_at: string; expires_at: string | null }[] = [];
         let plainSecret: string | null = null;
@@ -205,7 +204,7 @@ export class ClientService {
 
     async createDefaultClient(tenantId: string, domain: string): Promise<Client> {
         const client = this.clientRepository.create({
-            clientId: uuidv4(),
+            clientId: randomUUID(),
             alias: domain,
             isPublic: true,
             allowPasswordGrant: false,
