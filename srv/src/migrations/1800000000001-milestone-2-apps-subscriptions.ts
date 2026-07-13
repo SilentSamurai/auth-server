@@ -5,7 +5,9 @@ export class Milestone2AppsSubscriptions1800000000001 implements MigrationInterf
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         const DB_STRING_TYPE = 'VARCHAR';
-        const DB_UUID_GENERATOR = 'uuid_generate_v4()';
+        const DB_UUID_GENERATOR = queryRunner.connection.options.type === 'postgres'
+            ? 'uuid_generate_v4()'
+            : undefined;
 
         // ── Apps table ──
         await queryRunner.createTable(
@@ -93,7 +95,7 @@ export class Milestone2AppsSubscriptions1800000000001 implements MigrationInterf
                         isPrimary: true,
                         isNullable: false,
                         generationStrategy: "uuid",
-                        default: "uuid_generate_v4()"
+                        default: DB_UUID_GENERATOR
                     },
                     {name: "tenant_id", type: DB_STRING_TYPE, isNullable: false},
                     {name: "owner_tenant_id", type: DB_STRING_TYPE, isNullable: false},

@@ -33,16 +33,16 @@ export class RefreshToken {
     @Column({nullable: false})
     scope: string;
 
-    @Column({name: "absolute_expires_at", type: "datetime", nullable: false})
+    @Column({name: "absolute_expires_at", type: Date, nullable: false})
     absoluteExpiresAt: Date;
 
-    @Column({name: "expires_at", type: "datetime", nullable: false})
+    @Column({name: "expires_at", type: Date, nullable: false})
     expiresAt: Date;
 
     @Column({default: false})
     revoked: boolean;
 
-    @Column({name: "used_at", type: "datetime", nullable: true})
+    @Column({name: "used_at", type: Date, nullable: true})
     usedAt: Date | null;
 
     @Column({name: "sid", type: "varchar", length: 36, nullable: true})

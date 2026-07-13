@@ -164,17 +164,17 @@ export class AuthCodeService {
     }
 
     private async redeemAuthCodePostgres(code: string): Promise<AuthCode> {
-        const result: any[] = await this.authCodeRepository.query(
+        const [rows]: [any[], number] = await this.authCodeRepository.query(
             `UPDATE auth_code SET used = true, used_at = NOW() WHERE code = $1 AND used = false AND expires_at > NOW() RETURNING *`,
             [code],
         );
 
-        if (!result || result.length === 0) {
+        if (!rows || rows.length === 0) {
             this.LOGGER.warn(`Auth code redemption failed for code: ${code.substring(0, 4)}****`);
             throw OAuthException.invalidGrant('The authorization code is invalid, expired, or has already been used');
         }
 
-        const row = result[0];
+        const row = rows[0];
         return this.mapRowToAuthCode(row);
     }
 

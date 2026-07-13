@@ -16,10 +16,10 @@ export class LoginSession {
     @Column({name: "auth_time", type: "integer", nullable: false})
     authTime: number;
 
-    @Column({name: "expires_at", type: "datetime", nullable: false})
+    @Column({name: "expires_at", type: Date, nullable: false})
     expiresAt: Date;
 
-    @Column({name: "invalidated_at", type: "datetime", nullable: true})
+    @Column({name: "invalidated_at", type: Date, nullable: true})
     invalidatedAt: Date | null;
 
     @CreateDateColumn({name: "created_at"})
