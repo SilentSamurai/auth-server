@@ -170,26 +170,34 @@ POST /api/oauth/token
 
 `public`  `application/json`
 
-Direct username/password exchange per [RFC 6749 §4.3](https://datatracker.ietf.org/doc/html/rfc6749#section-4.3).
-Supported for backward compatibility only. New applications should use the authorization code flow with PKCE.
+> **Deprecated:** This legacy grant is retained only for backward compatibility. New applications must use the
+> authorization code flow with PKCE. It is intentionally omitted from OIDC discovery metadata.
+>
+> Per [RFC 9700 §2.4](https://www.rfc-editor.org/rfc/rfc9700.html#section-2.4), new OAuth deployments must not use
+> the resource owner password credentials grant. If a confidential client is permitted to use this legacy endpoint,
+> it must authenticate with its `client_secret`.
 
 **Request**
 
 ```json
 {
     "grant_type": "password",
-    "email": "string",
+    "client_id": "string",
+    "client_secret": "string (confidential clients only)",
+    "username": "user@example.com",
     "password": "string",
-    "domain": "string"
+    "scope": "openid profile email"
 }
 ```
 
-| Parameter    | Required | Type   | Description                            |
-|--------------|----------|--------|----------------------------------------|
-| `grant_type` | Yes      | string | Must be `password`                     |
-| `email`      | Yes      | string | User's email address                   |
-| `password`   | Yes      | string | User's password                        |
-| `domain`     | Yes      | string | Tenant domain (e.g., `acme.example.com`) |
+| Parameter       | Required | Type   | Description |
+|-----------------|----------|--------|-------------|
+| `grant_type`    | Yes      | string | Must be `password` |
+| `client_id`     | Yes      | string | Registered client ID or alias |
+| `client_secret` | Conditional | string | Required for confidential clients; omit for public clients |
+| `username`      | Yes      | string | Resource owner's email address |
+| `password`      | Yes      | string | Resource owner's password |
+| `scope`         | No       | string | Requested OAuth scopes |
 
 **Response**
 

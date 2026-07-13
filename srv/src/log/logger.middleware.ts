@@ -72,7 +72,7 @@ export class LoggerMiddleware implements NestMiddleware {
 
             this.logger.log(message);
 
-            if (Object.keys(request.body).length !== 0) {
+            if (request.body && Object.keys(request.body).length !== 0) {
                 this.logger.log(`${BASE_COLOR}${JSON.stringify(redactBody(request.body))}`);
             }
         });

@@ -1,7 +1,10 @@
-FROM node:20.19.0-alpine AS build
+FROM node:24-alpine AS build
 
 # Set work directory
 WORKDIR /home/app
+
+# Required to compile the better-sqlite3 native module on Alpine.
+RUN apk add --no-cache python3 make g++
 
 # SRV
 COPY ./srv/package.json             /home/app/srv/
@@ -31,15 +34,17 @@ RUN npm ci && npm run build
 
 
 # Production image
-FROM node:20.19.0-alpine
+FROM node:24-alpine
 
-RUN apk add --no-cache nginx gettext
+RUN apk add --no-cache nginx gettext libstdc++
 
 WORKDIR /home/app/srv
 
 # Copy backend package files and install production dependencies only
 COPY ./srv/package.json ./srv/package-lock.json ./
-RUN npm ci --omit=dev
+RUN apk add --no-cache --virtual .native-build-deps python3 make g++ \
+    && npm ci --omit=dev \
+    && apk del .native-build-deps
 
 # Copy backend build artifacts
 COPY --from=build /home/app/srv/dist ./dist

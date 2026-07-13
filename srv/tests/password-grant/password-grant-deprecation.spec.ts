@@ -88,6 +88,7 @@ describe('Password Grant Deprecation Integration Tests', () => {
      */
     function passwordGrantRequest(body: {
         client_id: string;
+        client_secret?: string;
         username?: string;
         password?: string;
         scope?: string;
@@ -227,6 +228,43 @@ describe('Password Grant Deprecation Integration Tests', () => {
                 const decoded = app.jwtService().decode(response.body.access_token, {json: true}) as any;
                 expect(decoded.sub).toBeDefined();
                 expect(decoded.grant_type).toEqual('password');
+            } finally {
+                await clientApi.deleteClient(clientId).catch(() => {
+                });
+            }
+        });
+    });
+
+    describe('RFC 6749 §4.3.2: Confidential-client authentication', () => {
+        it('requires a valid client secret for a confidential client', async () => {
+            const client = await clientApi.createClient(testTenantId, 'Confidential Password Grant Client', {
+                alias: generateAlias('Confidential Password Grant Client'),
+                redirectUris: [REDIRECT_URI],
+                allowedScopes: 'openid profile email',
+                isPublic: false,
+                allowPasswordGrant: true,
+            });
+            const clientId = client.client.clientId;
+            const rotated = await clientApi.rotateSecret(clientId);
+
+            try {
+                const missingSecret = await passwordGrantRequest({client_id: clientId});
+                expect(missingSecret.status).toEqual(401);
+                expect(missingSecret.body.error).toEqual('invalid_client');
+
+                const invalidSecret = await passwordGrantRequest({
+                    client_id: clientId,
+                    client_secret: 'not-the-client-secret',
+                });
+                expect(invalidSecret.status).toEqual(401);
+                expect(invalidSecret.body.error).toEqual('invalid_client');
+
+                const validSecret = await passwordGrantRequest({
+                    client_id: clientId,
+                    client_secret: rotated.clientSecret,
+                });
+                expect(validSecret.status).toEqual(200);
+                expect(validSecret.body.access_token).toBeDefined();
             } finally {
                 await clientApi.deleteClient(clientId).catch(() => {
                 });

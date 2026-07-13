@@ -1,4 +1,4 @@
-FROM docker.io/node:20.19.0-alpine AS build
+FROM docker.io/node:24-alpine AS build
 LABEL author="Sourav Das"
 
 COPY  ./package-lock.json /home/app/

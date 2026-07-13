@@ -227,12 +227,20 @@ export class RefreshTokenService {
 
     private getSlidingExpiryMs(): number {
         const raw = this.configService.get("REFRESH_TOKEN_SLIDING_EXPIRY", "7d");
-        return ms(raw);
+        return this.parseDuration(raw, "REFRESH_TOKEN_SLIDING_EXPIRY");
     }
 
     private getAbsoluteExpiryMs(): number {
         const raw = this.configService.get("REFRESH_TOKEN_ABSOLUTE_EXPIRY", "30d");
-        return ms(raw);
+        return this.parseDuration(raw, "REFRESH_TOKEN_ABSOLUTE_EXPIRY");
+    }
+
+    private parseDuration(raw: unknown, key: string): number {
+        const duration = ms(String(raw) as ms.StringValue);
+        if (typeof duration !== "number" || duration <= 0) {
+            throw new Error(`${key} must be a positive duration`);
+        }
+        return duration;
     }
 
     private getGraceWindowSeconds(): number {

@@ -23,7 +23,7 @@ import {SIGNING_KEY_PROVIDER, SigningKeyProvider} from "../core/token-abstractio
 import {KeyManagementService} from "./key-management.service";
 import {Client} from "../entity/client.entity";
 import {UserRole} from "../entity/user.roles.entity";
-import {v4 as uuidv4} from "uuid";
+import {randomUUID} from "crypto";
 
 @Injectable()
 export class TenantService implements OnModuleInit {
@@ -530,7 +530,7 @@ export class TenantService implements OnModuleInit {
         const adminUiCallbackUri = baseUrl ? `${baseUrl.replace(/\/+$/, '')}/oauth/callback` : null;
 
         const client = this.clientRepository.create({
-            clientId: uuidv4(),
+            clientId: randomUUID(),
             alias: domain,
             isPublic: true,
             allowPasswordGrant: false,

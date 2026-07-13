@@ -188,6 +188,15 @@ export class TokenController {
             throw OAuthException.unauthorizedClient('The password grant is not permitted for this client');
         }
 
+        // RFC 6749 §4.3.2 requires confidential clients (and clients issued
+        // credentials) to authenticate at the token endpoint. Public clients
+        // cannot safely hold a secret, so client_id is sufficient for them.
+        if (!client.isPublic) {
+            if (!body.client_secret || !this.clientService.validateClientSecret(client, body.client_secret)) {
+                throw OAuthException.invalidClient('Client authentication failed');
+            }
+        }
+
         const user: User = await this.authService.validate(
             body.username,
             body.password
