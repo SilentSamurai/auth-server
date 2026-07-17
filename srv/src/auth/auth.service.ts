@@ -459,10 +459,17 @@ export class AuthService {
      * Reset the user's password.
      */
     async resetPassword(token: string, password: string): Promise<boolean> {
-        // Get the user.
-        let payload: ResetPasswordToken = this.hs256TokenGenerator.decode(
-            token,
-        ) as ResetPasswordToken;
+        // Get the user. A malformed token decodes to null; guard it so the
+        // caller gets a clean 401 rather than a 500 from dereferencing null.
+        let payload: ResetPasswordToken;
+        try {
+            payload = this.hs256TokenGenerator.decode(token) as ResetPasswordToken;
+        } catch {
+            payload = null;
+        }
+        if (!payload?.sub) {
+            throw new UnauthorizedException('Invalid token');
+        }
 
         const user: User = await this.authUserService.findUserByEmail(
             payload.sub,
@@ -528,10 +535,17 @@ export class AuthService {
      * Confirm the user's email change.
      */
     async confirmEmailChange(token: string): Promise<boolean> {
-        // Get the user.
-        let payload: ChangeEmailToken = this.hs256TokenGenerator.decode(
-            token,
-        ) as ChangeEmailToken;
+        // Get the user. A malformed token decodes to null; guard it so the
+        // caller gets a clean 401 rather than a 500 from dereferencing null.
+        let payload: ChangeEmailToken;
+        try {
+            payload = this.hs256TokenGenerator.decode(token) as ChangeEmailToken;
+        } catch {
+            payload = null;
+        }
+        if (!payload?.sub) {
+            throw new UnauthorizedException('Invalid token');
+        }
 
         const user: User = await this.authUserService.findUserByEmail(
             payload.sub,

@@ -81,14 +81,20 @@ describe('MailService Rate Limiting', () => {
         expect(result3.status).toBe(201);
         expect(result3.body.status).toBe(true);
 
-        // Fourth request should fail due to rate limit
+        // Fourth request is still rate-limited internally, but the response is
+        // deliberately identical to a successful one (201 {status:true}).
+        // Surfacing the limit as a distinct 503 would leak account existence:
+        // only a registered address can reach the cap — an unknown address never
+        // does — so a 503-vs-201 difference is an enumeration oracle.
         const result4 = await getHttpServer()
             .post('/api/oauth/forgot-password')
             .set('Accept', 'application/json')
             .send({email: 'test@example.com'});
-        expect(result4.status).toBe(503); // Too Many Requests
+        expect(result4.status).toBe(201);
+        expect(result4.body.status).toBe(true);
 
-        // Verify email count in database
+        // The rate limit is still enforced where it matters: the 4th email is
+        // NOT sent, so the per-user counter stays capped at 3.
         const updatedUser = await app.get('UserRepository').findOne({where: {email: 'test@example.com'}});
         expect(updatedUser.emailCount).toBe(3);
     });
