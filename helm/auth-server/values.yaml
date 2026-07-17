@@ -23,6 +23,11 @@ env:
   DATABASE_USERNAME: "auth_server_db_user"
   DATABASE_PASSWORD: "secret"
   DATABASE_SSL: "false"
+  # SUPER_ADMIN_PASSWORD must be supplied for production — the server refuses to
+  # boot without it. Do NOT hardcode it here; source it from a Secret, e.g.:
+  #   SUPER_ADMIN_PASSWORD: "{{ .Values.superAdminPassword }}"  # via --set / sealed secret
+  # DATABASE_PASSWORD above should be moved to a Secret for the same reason.
+  # SUPER_ADMIN_PASSWORD: ""
 
 resources:
   requests:

@@ -21,10 +21,31 @@ limit_req_zone $binary_remote_addr zone=oauth_login:10m rate=10r/m;
 limit_req_zone $binary_remote_addr zone=oauth_authorize:10m rate=20r/m;
 
 # ============================================================================
+# Real Client IP
+# ============================================================================
+# The rate limit zones key on $binary_remote_addr. Without this block that is
+# the address of whatever proxy fronts us (k8s ingress controller, cloud LB),
+# so every client shares a single bucket — the per-IP limits below would neither
+# isolate an attacker nor leave legitimate traffic alone.
+#
+# Only private ranges are trusted, so a client connecting from a public address
+# cannot spoof X-Forwarded-For to evade the limits. Narrow these to your
+# ingress CIDR if untrusted clients can reach this server from private space.
+set_real_ip_from 10.0.0.0/8;
+set_real_ip_from 172.16.0.0/12;
+set_real_ip_from 192.168.0.0/16;
+set_real_ip_from 127.0.0.0/8;
+real_ip_header X-Forwarded-For;
+real_ip_recursive on;
+
+# ============================================================================
 # Custom 429 Error Response (RFC 6585 §4 compliant)
 # ============================================================================
 # Returns a JSON error response when rate limits are exceeded
 # Headers ensure the response is not cached per OAuth security best practices
+# limit_req_status must be set explicitly — nginx rejects with 503 by default,
+# which would never match the 429 error_page below.
+limit_req_status 429;
 error_page 429 = @rate_limit_exceeded;
 
 server {

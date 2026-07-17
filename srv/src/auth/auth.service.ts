@@ -81,17 +81,50 @@ export class AuthService {
 
     /**
      * Validate the email and password.
+     *
+     * A missing user and a wrong password are reported identically
+     * (invalid_grant, never 404) and both perform an argon2 verification so the
+     * response time does not reveal whether the account exists — closing the
+     * account-enumeration channel and matching RFC 6749 §5.2.
      */
     async validate(email: string, password: string): Promise<User> {
-        const user: User = await this.authUserService.findUserByEmail(email);
-        const valid: boolean = await argon2.verify(user.password, password);
-        if (!valid) {
+        let user: User | null;
+        try {
+            user = await this.authUserService.findUserByEmail(email);
+        } catch {
+            user = null;
+        }
+
+        const hashToVerify = user ? user.password : await AuthService.enumerationGuardHash();
+
+        let valid = false;
+        try {
+            valid = await argon2.verify(hashToVerify, password);
+        } catch {
+            valid = false;
+        }
+
+        if (!user || !valid) {
             throw OAuthException.invalidGrant('Invalid email or password');
         }
         if (user.locked) {
             throw OAuthException.invalidGrant('Account is locked');
         }
         return user;
+    }
+
+    /**
+     * A stable dummy argon2 hash used to equalize verification time when no user
+     * exists. Computed once against a random secret; the password will never
+     * match it, so verify() returns false after doing the real hashing work.
+     */
+    private static enumerationGuardHashPromise: Promise<string> | null = null;
+
+    private static enumerationGuardHash(): Promise<string> {
+        if (!AuthService.enumerationGuardHashPromise) {
+            AuthService.enumerationGuardHashPromise = argon2.hash(randomUUID() + randomUUID());
+        }
+        return AuthService.enumerationGuardHashPromise;
     }
 
     async validateAccessToken(token: string): Promise<Token> {
@@ -474,12 +507,21 @@ export class AuthService {
             sub: user.email,
             updatedEmail: email,
         };
-        // Use the user's current email for signing the token.
-        // All tokens generated before a successful email change would get invalidated.
         return this.hs256TokenGenerator.sign(payload, {
-            secret: user.email,
+            secret: this.changeEmailTokenSecret(user),
             expiresIn: this.configService.get("TOKEN_CHANGE_EMAIL_EXPIRATION_TIME")
         });
+    }
+
+    /**
+     * Signing key for change-email tokens.
+     *
+     * Binds the password hash (secret, unlike the email address itself) so the
+     * token is unforgeable, and the current email so that a successful change —
+     * or a password change — invalidates any token issued beforehand.
+     */
+    private changeEmailTokenSecret(user: User): string {
+        return `${user.password}:${user.email}`;
     }
 
     /**
@@ -498,12 +540,10 @@ export class AuthService {
             throw new NotFoundException("User not found");
         }
 
-        // The token is signed with the user's current email.
-        // A successful email change will invalidate the token.
         payload = null;
         try {
             payload = await this.hs256TokenGenerator.verify(token, {
-                secret: user.email,
+                secret: this.changeEmailTokenSecret(user),
             }) as ChangeEmailToken;
         } catch (exception: any) {
             throw new UnauthorizedException('Invalid token');

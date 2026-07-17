@@ -2,7 +2,7 @@ import {Column, CreateDateColumn, Entity, PrimaryColumn} from "typeorm";
 
 @Entity({name: "auth_code"})
 export class AuthCode {
-    @PrimaryColumn({name: "code", length: 16})
+    @PrimaryColumn({name: "code", length: 64})
     code: string;
 
     @Column({name: "code_challenge", nullable: true})

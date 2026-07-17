@@ -34,22 +34,31 @@ export class PasswordResetController {
         @Body(new ValidationPipe(ValidationSchema.ForgotPasswordSchema))
         body: any,
     ): Promise<object> {
-        const user: User = await this.authUserService.findUserByEmail(
-            body.email,
-        );
-        const token: string = await this.authService.createResetPasswordToken(user);
-        const baseUrl = this.configService.get("BASE_URL");
-        const link = `${baseUrl}/reset-password/${token}`;
-
-        const sent: boolean = await this.mailService.sendResetPasswordMail(
-            user,
-            link,
-        );
-        if (!sent) {
-            throw new ServiceUnavailableException('Mail service error');
+        // Always respond identically whether or not the address is registered,
+        // so this endpoint cannot be used to enumerate accounts. The reset mail
+        // is only sent when a matching user exists.
+        let user: User | null;
+        try {
+            user = await this.authUserService.findUserByEmail(body.email);
+        } catch {
+            user = null;
         }
 
-        return {status: sent};
+        if (user) {
+            const token: string = await this.authService.createResetPasswordToken(user);
+            const baseUrl = this.configService.get("BASE_URL");
+            const link = `${baseUrl}/reset-password/${token}`;
+
+            const sent: boolean = await this.mailService.sendResetPasswordMail(
+                user,
+                link,
+            );
+            if (!sent) {
+                throw new ServiceUnavailableException('Mail service error');
+            }
+        }
+
+        return {status: true};
     }
 
     @Post("/reset-password/:token")

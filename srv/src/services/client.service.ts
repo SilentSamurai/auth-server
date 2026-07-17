@@ -242,9 +242,17 @@ export class ClientService {
         }
     }
 
+    /**
+     * Validate a client secret against the client's stored secrets.
+     *
+     * Public clients hold no secret and cannot authenticate this way, so they
+     * are rejected. Callers that intentionally allow public clients must check
+     * isPublic themselves — this must never report success for a caller that
+     * did not prove possession of a secret.
+     */
     validateClientSecret(client: Client, secret: string): boolean {
-        if (client.isPublic) {
-            return true;
+        if (client.isPublic || !secret) {
+            return false;
         }
         if (!client.clientSecrets || client.clientSecrets.length === 0) {
             return false;

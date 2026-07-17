@@ -1,4 +1,4 @@
-import {createHash, generateKeyPairSync, randomBytes} from "crypto";
+import {createHash, generateKeyPairSync, randomBytes, randomInt} from "crypto";
 import {generate} from "otp-generator";
 
 function base64UrlEncode(input: Buffer | string): string {
@@ -56,13 +56,20 @@ export class CryptUtil {
         return verifier;
     }
 
+    /**
+     * Generate an authorization code with 256 bits of entropy, per the
+     * RFC 6749 §10.10 requirement that codes not be guessable.
+     */
+    public static generateAuthorizationCode(): string {
+        return base64UrlEncode(randomBytes(32));
+    }
+
     public static generateRandomString(length: number): string {
         const characters =
             "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         let randomString = "";
         for (let i = 0; i < length; i++) {
-            const randomIndex = Math.floor(Math.random() * characters.length);
-            randomString += characters.charAt(randomIndex);
+            randomString += characters.charAt(randomInt(characters.length));
         }
         return randomString;
     }
