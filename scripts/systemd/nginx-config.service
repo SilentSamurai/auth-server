@@ -1,0 +1,16 @@
+[Unit]
+Description=Render nginx server config from template
+Requires=container-env.service
+After=container-env.service
+Before=nginx.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+EnvironmentFile=/run/container.env
+ExecStart=/usr/local/bin/render-nginx-config.sh
+# Surface boot-time failures on the container console, not just the journal.
+StandardError=journal+console
+
+[Install]
+WantedBy=multi-user.target

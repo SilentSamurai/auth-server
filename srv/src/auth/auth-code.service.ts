@@ -77,11 +77,7 @@ export class AuthCodeService {
         requireAuthTime?: boolean,
         resource?: string,
     ): Promise<string> {
-        let code = CryptUtil.generateOTP(6);
-
-        if (await this.existByCode(code)) {
-            code = CryptUtil.generateRandomString(16);
-        }
+        const code = CryptUtil.generateAuthorizationCode();
 
         const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
 

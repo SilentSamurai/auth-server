@@ -82,7 +82,10 @@ describe('e2e negative token flow', () => {
             })
             .set('Accept', 'application/json');
 
-        expect(response.status).toEqual(404);
+        // An unknown user must be indistinguishable from a wrong password:
+        // invalid_grant (400), never 404 (which would enumerate accounts).
+        expect(response.status).toEqual(400);
+        expect(response.body.error).toEqual('invalid_grant');
     });
 
     it(`/POST Wrong Domain `, async () => {

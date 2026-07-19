@@ -1,0 +1,24 @@
+[Unit]
+Description=nginx (auth-server reverse proxy + SPA)
+Requires=nginx-config.service
+After=nginx-config.service
+# Intentionally NOT coupled to auth-backend: nginx must serve the SPA and stay up
+# even if the backend is down/restarting (it just returns 502 for /api until the
+# backend is ready). Coupling here would let a backend crash-loop also take nginx
+# down, since a perpetually auto-restarting unit never "finishes activating".
+
+[Service]
+Type=simple
+ExecStartPre=/usr/sbin/nginx -t
+ExecStart=/usr/sbin/nginx -g 'daemon off;'
+ExecReload=/usr/sbin/nginx -s reload
+Restart=on-failure
+RestartSec=2
+# nginx errors (error_log stderr, incl. config-test failures) -> journal AND
+# the container console for easy debugging. Access logs go via syslog, not here.
+StandardError=journal+console
+# access_log -> /dev/stdout, error_log -> /dev/stderr (see ui/nginx/nginx.conf),
+# both captured by the journal.
+
+[Install]
+WantedBy=multi-user.target

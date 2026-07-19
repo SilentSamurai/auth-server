@@ -10,6 +10,7 @@ import {RoleEnum} from "./entity/roleEnum";
 import {DataSource} from "typeorm/data-source/DataSource";
 import {SecurityService} from "./casl/security.service";
 import {SeedService} from "./seed.service";
+import {Permission} from "./auth/auth.decorator";
 
 @Injectable()
 export class StartUpService implements OnModuleInit {
@@ -27,7 +28,13 @@ export class StartUpService implements OnModuleInit {
     ) {
     }
 
+    // Password shipped in the committed env files for local/dev/test use only.
+    // A production deployment must inject a real SUPER_ADMIN_PASSWORD.
+    private static readonly INSECURE_DEFAULT_ADMIN_PASSWORD = "admin9000";
+
     async onModuleInit(): Promise<any> {
+        this.assertProductionAdminSecretIsSafe();
+
         await this.dataSource.runMigrations({
             transaction: "all",
         });
@@ -38,6 +45,27 @@ export class StartUpService implements OnModuleInit {
         }
         await this.createAdminUser();
         await this.populateGlobalTenant();
+    }
+
+    /**
+     * Refuse to boot a production instance whose super-admin password is missing
+     * or is the well-known default baked into the committed env files. Otherwise
+     * the very first account — a full super admin — would have a password that is
+     * public in the repository. This must run outside createAdminUser(), whose
+     * try/catch would otherwise swallow the failure and let startup continue.
+     */
+    private assertProductionAdminSecretIsSafe(): void {
+        if (!this.configService.isProduction()) {
+            return;
+        }
+        const password = this.configService.get("SUPER_ADMIN_PASSWORD");
+        if (!password || password === StartUpService.INSECURE_DEFAULT_ADMIN_PASSWORD) {
+            throw new Error(
+                "SUPER_ADMIN_PASSWORD must be set to a strong, non-default value in production. " +
+                "Inject it via the environment (e.g. a Kubernetes secret); do not rely on the " +
+                "committed env file default.",
+            );
+        }
     }
 
     async createAdminUser() {
@@ -62,31 +90,45 @@ export class StartUpService implements OnModuleInit {
                     true,
                 );
 
-                const isPresent = await this.usersService.existByEmail(
-                    permission,
-                    "admin@mail.com",
-                );
-
-                if (!isPresent) {
-
-                    let normalUser: User = await this.usersService.create(
-                        permission,
-                        "admin9000",
-                        "admin@mail.com",
-                        "admin",
-                    );
-
-                    await this.usersService.updateVerified(
-                        permission,
-                        user.id,
-                        true,
-                    );
-                }
+                await this.createDefaultAdminUser(permission);
             }
         } catch (exception: any) {
             // Catch user already created.
             console.error(exception);
         }
+    }
+
+    /**
+     * Create the optional default admin account from DEFAULT_ADMIN_EMAIL /
+     * DEFAULT_ADMIN_PASSWORD. Both must be set, so an account with a known
+     * password is never created implicitly on a deployment that didn't ask for one.
+     */
+    private async createDefaultAdminUser(permission: Permission) {
+        const email = this.configService.get("DEFAULT_ADMIN_EMAIL");
+        const password = this.configService.get("DEFAULT_ADMIN_PASSWORD");
+
+        if (!email || !password) {
+            return;
+        }
+
+        if (await this.usersService.existByEmail(permission, email)) {
+            return;
+        }
+
+        const defaultAdmin: User = await this.usersService.create(
+            permission,
+            password,
+            email,
+            this.configService.get("DEFAULT_ADMIN_NAME", "admin"),
+        );
+
+        await this.usersService.updateVerified(
+            permission,
+            defaultAdmin.id,
+            true,
+        );
+
+        this.logger.log(`Created default admin user: ${email}`);
     }
 
     async populateGlobalTenant() {

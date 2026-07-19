@@ -60,6 +60,14 @@ export class OAuthVerificationController {
             throw OAuthException.invalidClient("Unknown client_id");
         }
 
+        // The code must have been issued to *this* client, not merely to some
+        // client in the same tenant. Mirror the token endpoint's exact client_id
+        // binding (handleCodeGrant) so a different same-tenant client cannot use
+        // this endpoint to read the code's associated user email.
+        if (authCodeObj.clientId !== body.client_id) {
+            throw OAuthException.invalidGrant("auth_code does not belong to the provided client_id");
+        }
+
         const tenant = client.tenant;
         if (authCodeObj.tenantId !== tenant.id) {
             throw OAuthException.invalidGrant("auth_code does not belong to the provided client_id");

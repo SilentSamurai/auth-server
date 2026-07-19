@@ -9,6 +9,7 @@ import * as express from "express";
 import * as process from "node:process";
 import {CorsInterceptor} from "./interceptors/cors.interceptor";
 import * as cookieParser from "cookie-parser";
+import {JsonConsoleLogger} from "./log/JsonConsoleLogger";
 
 // Hold reference to SMTP server (if started) so we can close it on shutdown
 let smtpServerRef: { close(): Promise<void> } | null = null;
@@ -45,7 +46,10 @@ export async function prepareApp() {
         smtpServerRef = await launchFakeSmtpServer();
     }
 
-    console.log("Application options: ", options);
+    if (Environment.isProduction()) {
+        (options as any).logger = new JsonConsoleLogger();
+    }
+
     const app: NestExpressApplication =
         await NestFactory.create<NestExpressApplication>(AppModule, options);
     app.useGlobalFilters(new HttpExceptionFilter());

@@ -24,6 +24,10 @@ containers:
             ENV: "production"
             COOKIE_SECRET: "changeme"
             BASE_URL: "http://auth-server.myc"
+            # Grafana Alloy ships journald logs (backend + nginx) here.
+            LOKI_URL: "http://192.168.0.167:3100"
+            # LOKI_BASIC_AUTH_USER: ""
+            # LOKI_BASIC_AUTH_PASSWORD: ""
             # PORT: "8080"
             # DATABASE_TYPE: "postgres"
             # DATABASE_HOST: "db"
