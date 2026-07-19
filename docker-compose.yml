@@ -65,11 +65,32 @@ services:
     standalone:
         build:
             dockerfile: standalone.dockerfile
+        # The image boots systemd as PID 1, which needs a writable cgroup mount
+        # and privileged mode under Docker. (In prod this runs as a Proxmox LXC
+        # where systemd is native and none of this is required.)
+        privileged: true
+        cgroup: host
+        stop_signal: SIGRTMIN+3
+        # Allocate a console so systemd's boot output and service stderr
+        # (StandardError=journal+console) are captured by `docker logs`. The
+        # Proxmox LXC already provides this via `pct console`, so it's local-only.
+        tty: true
         environment:
-            TEST: tes
-            PORT: 4200
+            ENV: production
+            PORT: 4200            # nginx listen port
+            BACKEND_PORT: 9001    # backend listen port
+            # Local-only test secrets; the backend refuses to boot in production
+            # without these (.env.production defaults to a self-contained sqlite DB).
+            COOKIE_SECRET: "local-dev-not-a-real-secret"
+            SUPER_ADMIN_PASSWORD: "local-dev-not-a-real-password"
+            # Point at your Loki to test log shipping end-to-end:
+            LOKI_URL: "http://192.168.0.167:3100"
         volumes:
             - ./ui/nginx/templates:/etc/nginx/templates
+            - /sys/fs/cgroup:/sys/fs/cgroup:rw
+        tmpfs:
+            - /run
+            - /run/lock
         ports:
             - 4200:4200
 

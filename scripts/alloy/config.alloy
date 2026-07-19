@@ -1,0 +1,70 @@
+// Grafana Alloy config: tail the systemd journal and push to Loki.
+//
+// The whole standalone image runs under systemd, so both the NestJS backend
+// (JsonConsoleLogger JSON) and nginx (JSON access log + error log) land in the
+// journal. We forward them to Loki with a small set of low-cardinality labels;
+// the full JSON payload stays in the line for query-time `| json` parsing.
+//
+// The Loki endpoint is env-configurable (LOKI_URL), injected via
+// EnvironmentFile=/run/loki.env by the alloy.service drop-in.
+
+loki.source.journal "journald" {
+	max_age       = "12h"
+	forward_to    = [loki.process.parse.receiver]
+	relabel_rules = loki.relabel.journal.rules
+	labels        = { job = "auth-server" }
+}
+
+// Promote a couple of journal fields to labels (low cardinality).
+loki.relabel "journal" {
+	forward_to = []
+
+	// systemd unit that produced the line -> `unit`
+	// (e.g. auth-backend.service, nginx.service).
+	rule {
+		source_labels = ["__journal__systemd_unit"]
+		target_label  = "unit"
+	}
+
+	// journal priority keyword (err, warning, info, ...) -> `level`.
+	// Overridden below for the backend, whose JSON carries its own level.
+	rule {
+		source_labels = ["__journal_priority_keyword"]
+		target_label  = "level"
+	}
+}
+
+// For the backend the log line is JSON; lift its `level` over the journal one.
+loki.process "parse" {
+	forward_to = [loki.write.default.receiver]
+
+	stage.match {
+		selector = "{unit=\"auth-backend.service\"}"
+
+		stage.json {
+			expressions = { level = "level" }
+		}
+
+		stage.labels {
+			values = { level = "level" }
+		}
+	}
+}
+
+loki.write "default" {
+	endpoint {
+		url = sys.env("LOKI_URL") + "/loki/api/v1/push"
+
+		// If your Loki requires auth, uncomment and set
+		// LOKI_BASIC_AUTH_USER / LOKI_BASIC_AUTH_PASSWORD:
+		// basic_auth {
+		//     username = sys.env("LOKI_BASIC_AUTH_USER")
+		//     password = sys.env("LOKI_BASIC_AUTH_PASSWORD")
+		// }
+	}
+
+	external_labels = {
+		app  = "auth-server",
+		host = constants.hostname,
+	}
+}

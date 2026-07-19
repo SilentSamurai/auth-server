@@ -1,0 +1,20 @@
+[Unit]
+Description=Auth server backend (NestJS)
+Requires=container-env.service
+After=container-env.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/app/srv
+EnvironmentFile=/run/container.env
+ExecStart=/usr/local/bin/start-backend.sh
+Restart=on-failure
+RestartSec=2
+# stdout (the JsonConsoleLogger JSON) -> journal only (shipped to Loki).
+# stderr (errors / fatals) -> journal AND the container console, so failures are
+# visible in `docker logs` / `pct console` without having to run journalctl.
+StandardError=journal+console
+
+[Install]
+WantedBy=multi-user.target

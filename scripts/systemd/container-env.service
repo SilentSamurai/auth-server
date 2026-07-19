@@ -1,0 +1,15 @@
+[Unit]
+Description=Export container environment to EnvironmentFiles
+DefaultDependencies=no
+After=local-fs.target
+Before=nginx-config.service auth-backend.service nginx.service alloy.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/bin/export-container-env.sh
+# Surface boot-time failures on the container console, not just the journal.
+StandardError=journal+console
+
+[Install]
+WantedBy=multi-user.target
